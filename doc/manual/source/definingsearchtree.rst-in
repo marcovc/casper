@@ -1,0 +1,18 @@
+
+Defining the search tree
+------------------------
+
+The essential building block for controling search is the Goal. There are currently three ways to define the search tree for a given problem: 
+
+a) choose from a set of predefined goals (a.k.a labeling primitives), 
+b) compose complex goals from simpler, predefined, goals,
+c) write a new goal
+
+The methods above are ordered by ease of use, and in reverse order of expressive power. Let us illustrate each of these methods.
+
+.. toctree::
+   :maxdepth: 2
+
+   labeling
+   composition
+   goals

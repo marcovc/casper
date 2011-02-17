@@ -1,0 +1,26 @@
+
+
+Goal Composition
+----------------
+
+A search tree is defined by a Goal. A Goal is a predicate or logical combination of predicates: 
+
+.. highlight:: cpp
+
+.. parsed-literal::
+
+   Solver solver;
+   DomVarArray\<Int\> v(solver,3,1,2);
+   // ... post some constraints ...
+   Goal st = (v[0]==1 or v[0]==2) and (v[1]==1 or v[1]==2) and (v[2]==1 or v[2]==2);
+   solver.solve(st);
+
+In the above example, the goal "st" defines the following search tree:
+
+.. image:: searchtree1.png
+   :align: center
+   
+   
+As illustrated, disjunctions control the width of the search tree, while conjunctions define its height.
+
+Writing the search tree 

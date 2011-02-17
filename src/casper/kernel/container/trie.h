@@ -1,0 +1,194 @@
+ /*************************************************************************\
+ *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
+ *                                                                         *
+ *   Copyright:                                                            *
+ *   2008-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *                                                                         *
+ *   Licensed under the Apache License, Version 2.0 (the "License");       *
+ *   you may not use this file except in compliance with the License.      *
+ *   You may obtain a copy of the License at                               *
+ *            http://www.apache.org/licenses/LICENSE-2.0                   *
+ *   Unless required by applicable law or agreed to in writing, software   *
+ *   distributed under the License is distributed on an                    *
+ *   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,          *
+ *   either express or implied.                                            *
+ *   See the License for the specific language governing permissions and   *
+ *   limitations under the License.                                        *
+ \*************************************************************************/
+
+#ifndef CASPER_KERNEL_CONTAINER_TRIE_H_
+#define CASPER_KERNEL_CONTAINER_TRIE_H_
+
+namespace casper {
+
+namespace detail {
+
+template<class T>
+struct Trie
+{
+	struct NodeI
+	{
+		NodeI(NodeI* pParent) :
+			pParent(pParent),
+			pLChild(NULL), pRSibling(NULL) {}
+		NodeI*	pParent;
+		NodeI*	pLChild;
+		NodeI*	pRSibling;
+	};
+
+	struct Node : NodeI
+	{
+		Node(const T& value, NodeI* pParent) :
+			NodeI(pParent),value(value) {}
+		const T value;
+	};
+
+	typedef NodeI*			PNode;
+	typedef Array<PNode>	Levels;
+
+	Trie(UInt levels) :
+		levels(stdHeap,levels,static_cast<NodeI*>(NULL)),
+		pDelim(new (stdHeap) NodeI(static_cast<NodeI*>(NULL))) {}
+	Trie(Heap h,UInt levels) :
+		levels(h,levels,static_cast<NodeI*>(NULL)),
+		pDelim(new (h) NodeI(static_cast<NodeI*>(NULL))) {}
+
+
+	Bool isDelim(PNode p) const
+	{	return !p or p->pParent == pDelim;	}
+
+	const T& value(PNode p) const
+	{	return static_cast<Node*>(p)->value;	}
+
+	UInt maxDepth() const
+	{	return levels.size();	}
+
+	template<class InputIterator>
+	Void insert(InputIterator b, InputIterator e)
+	{
+		//std::cout << "inserting ";
+		//std::copy(b,e,std::ostream_iterator<Int>(std::cout," "));
+		//std::cout << std::endl;
+		UInt curLev = 0;
+		PNode pLastNode = NULL;
+		PNode pCurNode = levels[0];
+
+		// skip common prefix
+		while (b != e)
+		{
+			for ( ; !isDelim(pCurNode) ; pCurNode = pCurNode->pRSibling)
+				if (value(pCurNode) == *b)
+					break;
+			if (isDelim(pCurNode))
+				break;
+			pLastNode = pCurNode;
+			pCurNode = pCurNode->pLChild;
+			++curLev;
+			++b;
+		}
+
+		// store the rest in a new branch
+		while (b != e)
+		{
+			pCurNode = new (levels.heap()) Node(*b,pLastNode);
+			if (!pLastNode)
+			{
+				assert(curLev == 0);
+				PNode p = levels[curLev];
+				if (!isDelim(p) and value(p) < *b)
+				{
+					while (  !isDelim(p->pRSibling) and
+							 value(p->pRSibling) < *b )
+						p = p->pRSibling;
+					pCurNode->pRSibling = p->pRSibling;
+					p->pRSibling = pCurNode;
+				}
+				else
+				{
+					pCurNode->pRSibling = p;
+					levels[curLev] = pCurNode;
+				}
+			}
+			else
+			if (!pLastNode->pLChild)
+			{
+				if (levels[curLev])
+				{
+					PNode pDelimNode = new (levels.heap()) NodeI(pDelim);
+					pDelimNode->pRSibling = levels[curLev];
+					pCurNode->pRSibling = pDelimNode;
+				}
+				levels[curLev] = pCurNode;
+				pLastNode->pLChild = pCurNode;
+			}
+			else
+			{
+				PNode p = levels[curLev];
+
+				if (levels[curLev] == pLastNode->pLChild and
+					 value(levels[curLev]) >= *b)
+				{
+					pCurNode->pRSibling = levels[curLev];
+					levels[curLev] = pCurNode;
+				}
+				else
+				{
+					if (p != pLastNode->pLChild)
+						while ( p->pRSibling != pLastNode->pLChild )
+							p = p->pRSibling;
+
+					while (  !isDelim(p->pRSibling) and
+							 value(p->pRSibling) < *b )
+						p = p->pRSibling;
+					pCurNode->pRSibling = p->pRSibling;
+					p->pRSibling = pCurNode;
+				}
+				if (pCurNode->pRSibling == pLastNode->pLChild)
+					pLastNode->pLChild = pCurNode;
+			}
+			pLastNode = pCurNode;
+			++b;
+			++curLev;
+		}
+	}
+	
+	Void insert(const detail::List<T>& list)
+	{	insert(list.begin(),list.end());	}
+
+	Levels		levels;
+	const PNode	pDelim;
+};
+
+
+/**
+	Writes the contents of the Trie to an ostream (in graphviz format)
+*/
+template<typename T>
+std::ostream& operator<<(std::ostream& o, const casper::detail::Trie<T>& s)
+{
+	typedef casper::detail::Trie<T> Tr;
+	o << "strict digraph { " << std::endl;
+	o << "root" << std::endl;
+	for (typename Tr::PNode p = s.levels[0]; p != NULL; p = p->pRSibling)
+		if (!s.isDelim(p))
+		{
+			o << (UInt)p << " [label="
+			  << static_cast<typename Tr::Node*>(p)->value << "]\n";
+			o << "root -> " << (UInt)p << std::endl;
+		}
+	for (UInt i = 1; i < s.levels.size(); i++)
+		for (typename Tr::PNode p = s.levels[i]; p != NULL; p = p->pRSibling)
+			if (!s.isDelim(p))
+			{
+				o << (UInt)p->pParent << " -> " << (UInt)p << std::endl;
+				o << (UInt)p << " [label="
+				  << static_cast<typename Tr::Node*>(p)->value << "]\n";
+			}
+	o << "}" << std::endl;
+	return o;
+}
+
+}
+}
+
+#endif /*CASPER_KERNEL_CONTAINER_TRIE_H_*/

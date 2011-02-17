@@ -1,0 +1,6 @@
+var bool: v;
+var int: i;
+
+constraint bool2int(v,i);
+
+solve satisfy;

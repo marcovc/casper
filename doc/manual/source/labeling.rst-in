@@ -1,0 +1,30 @@
+
+
+Labeling Primitives
+-------------------
+
+Search trees may be defined using the `label <refmanurl/group__Search.html#LabelingPrimitives>`_ function. The following example finds a consistent assignment for all the variables in the array vars.
+
+.. highlight:: cpp
+
+.. parsed-literal::
+
+   Solver solver;
+   DomVarArray\<Int\> vars(solver,3,1,2);
+   // ... post some constraints ...
+   solver.solve(`label <refmanurl/group__Search.html#LabelingPrimitives>`_\(vars\));
+
+Calling `label <refmanurl/group__Search.html#LabelingPrimitives>`_ enumerates (i.e. labels) each variable in the set. The function accepts one or two optional arguments for controlling the order in which variables and values are tested. A number of popular search heuristics may be easily applied to a given CSP by passing to this function a combination of a variable and value selector:
+
+.. highlight:: cpp
+
+.. parsed-literal::
+
+   Solver solver;
+   DomVarArray\<Int\> vars(solver,3,1,2);
+   // ... post some constraints ...
+   solver.solve(`label <refmanurl/group__Search.html#LabelingPrimitives>`_\(vars,selectVarMinDom\(vars\),selectValMin\(vars\)\));
+
+Search in the above example is performed by iteratively selecting the variable with smaller domain and assigning it the minimum value in its domain. Many more variable and value selection policies are possible - see `variable selectors <refmanurl/group__Search.html#VariableSelectors>`_ and `value selectors <refmanurl/group__Search.html#ValueSelectors>`_.
+
+It is also possible to define new variable and value selectors by subclassing from IVarSelector and IValSelector.

@@ -1,0 +1,4 @@
+var int: a;
+var int: b;
+constraint int_lin_gt([1,2],[a,b], 1);
+solve satisfy;

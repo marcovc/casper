@@ -1,0 +1,184 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN">
+
+<refentry id="saucy">
+
+<refmeta>
+<refentrytitle>saucy</refentrytitle>
+<manvolnum>1</manvolnum>
+<refmiscinfo>University of Michigan</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>saucy</refname>
+<refpurpose>graph automorphism generator generator</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+<command>saucy</command>
+<arg><option>-sqzg</option></arg>
+<arg><option>-p</option> <replaceable>count</replaceable></arg>
+<arg><option>-t</option> <replaceable>secs</replaceable></arg>
+<arg choice="plain"><replaceable>file</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+<command>saucy</command> reads a graph from
+<replaceable>file</replaceable> in its native format, or if
+<option>-g</option> is specified, in the GAP format used by Shatter.
+Generators implicitly representing the automorphism group of the
+graph are computed and sent to standard output.
+</para>
+</refsect1>
+
+<refsect1><title>Options</title>
+<variablelist>
+
+<varlistentry>
+<term><option>-s</option></term>
+<listitem><para>
+Output computation statistics to standard error.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>-q</option></term>
+<listitem><para>
+Quiet mode: do not output the generators discovered during the search.
+This is primarily useful in conjunction with <option>-s</option>.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>-z</option></term>
+<listitem><para>
+Stop the search once the first discrete partition is found.  Again,
+primarily useful in debugging refinement in conjunction with
+<option>-s</option>.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>-g</option></term>
+<listitem><para>
+Use GAP as the input and output format, for use with Shatter.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>-t</option> <replaceable>secs</replaceable></term>
+<listitem><para>
+Force <command>saucy</command> to end computation after at least
+<replaceable>secs</replaceable> seconds.  <command>saucy</command>
+may not terminate immediately, depending on the current state of the
+computation.  In particular, it will not terminate in the middle of
+outputting an automorphism.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>-p</option> <replaceable>count</replaceable></term>
+<listitem><para>
+Cache <replaceable>count</replaceable> automorphisms for efficient
+backtracking.  The default <replaceable>count</replaceable> is
+60 automorphisms.  This cache is used only during backtracking, and
+thus increasing its size will not improve performance on many graphs.
+If the cache is needed, a larger cache can improve the effectiveness
+of the backtracking, but at the expense of time and memory overhead.
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+</refsect1>
+
+<refsect1><title>Input</title>
+<para>
+<command>saucy</command> uses a very simplistic input format for graphs.
+Note that the brackets below are not part of the syntax, and that the
+vertices of a graph are numbered from 0.
+</para>
+<para>
+{<replaceable>vertices</replaceable>}
+{<replaceable>edges</replaceable>}
+{<replaceable>cells</replaceable>}
+{<replaceable>starts...</replaceable>}
+{<replaceable>v1 v2</replaceable>}
+{<replaceable>...</replaceable>}
+</para>
+
+<variablelist>
+
+<varlistentry>
+<term><replaceable>vertices</replaceable></term>
+<listitem><para>Total number of vertices in the graph.</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><replaceable>edges</replaceable></term>
+<listitem><para>Total number of edges in the graph.</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><replaceable>cells</replaceable></term>
+<listitem><para>
+Number of cells in the initial coloring.  <command>saucy</command>
+operates on ordered partitions, or colorings, of the set of vertices of
+the graph.  The <replaceable>cells</replaceable> attribute specifies the
+number of colors present in the initial coloring of the graph.  If the
+graph is initially uncolored, then all vertices are indistinguished and
+<replaceable>cells</replaceable> should be 1.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><replaceable>starts</replaceable></term>
+<listitem><para>
+Locations of the starts of cells in the initial coloring.
+<command>saucy</command> reads <replaceable>cells</replaceable>-1
+starts, each identifying the beginning of the new cell in the
+partition.  The first cell starts from zero, and is omitted.
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><replaceable>v1 v2</replaceable></term>
+<listitem><para>
+Add an edge between these two vertices.  The remainder of the file
+consists of <replaceable>edges</replaceable> pairs of vertices.
+<replaceable>v1</replaceable> and <replaceable>v2</replaceable> are not
+allowed to be equal.
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+</refsect1>
+
+<refsect1><title>Notes</title>
+<para>
+<command>saucy</command> assumes that its input file is well-formed,
+and will not behave gracefully if it is not.
+</para>
+</refsect1>
+
+<refsect1><title>Author</title>
+<para>
+This program is written and maintained by Paul T. Darga
+<email>pdarga@umich.edu</email> with help from Mark Liffiton
+<email>liffiton@umich.edu</email>.  The underlying mathematics,
+search tree, and basic refinement algorithms are all due to Brendan
+D. McKay and his <command>nauty</command> package.  The algorithms are
+published in McKay, B. D., "Practical Graph Isomorphism", Congressus
+Numerantium 30 (1981), pp.45-87.
+</para>
+<para>
+<command>saucy</command> was originally inspired by the work of DoRon B.
+Motter on his <command>AutoGraph</command> project.
+</para>
+<para>
+This work was funded in part by NSF ITR grant 0205288.
+</para>
+</refsect1>
+
+</refentry>

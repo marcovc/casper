@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?>
+
+<cproject>
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="org.eclipse.cdt.core.default.config.898685268">
+			<storageModule buildSystemId="org.eclipse.cdt.core.defaultConfigDataProvider" id="org.eclipse.cdt.core.default.config.898685268" moduleId="org.eclipse.cdt.core.settings" name="Configuration">
+				<externalSettings/>
+				<extensions/>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+			<storageModule moduleId="scannerConfiguration"/>
+			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.pathentry">
+				<pathentry include="/usr/include" kind="inc" path="" system="true"/>
+				<pathentry kind="src" path=""/>
+				<pathentry kind="out" path=""/>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+				<buildTargets>
+					<target name="int-debug-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 debug_level=3</buildArguments>
+						<buildTarget>build/debug/examples/int/debug</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="casper-cspxml" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 optimize_level=3</buildArguments>
+						<buildTarget>minicasper-cspxml</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="library-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 optimize_level=3</buildArguments>
+						<buildTarget>library</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="examples-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 optimize_level=3</buildArguments>
+						<buildTarget>examples</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="clean-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 debug_level=3</buildArguments>
+						<buildTarget>build/debug/examples/int/magic</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="example-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 optimize_level=3</buildArguments>
+						<buildTarget>build/release/examples/set/hamming</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="example-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 debug_level=3</buildArguments>
+						<buildTarget>build/debug/examples/int/nqueens</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="examples-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 debug_level=3</buildArguments>
+						<buildTarget>examples</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="benchmark-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 optimize_level=3</buildArguments>
+						<buildTarget>build/release/other/testsuite/benchmark</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="bindings_cpp-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 optimize_level=3</buildArguments>
+						<buildTarget>casperbind_cpp</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="bindings_cpp_tests-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 optimize_level=3</buildArguments>
+						<buildTarget>casperbind_cpp_tests</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="bindings_cpp_tests-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 debug_level=3</buildArguments>
+						<buildTarget>casperbind_cpp_tests</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="bindings-xcsp-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 3 debug_level=3</buildArguments>
+						<buildTarget>casperbind_xcsp</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="bindings-fzn-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>debug_level=3</buildArguments>
+						<buildTarget>casperbind_fzn</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="bindings-fzn-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>optimize_level=3</buildArguments>
+						<buildTarget>casperbind_fzn</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="library-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>debug_level=3</buildArguments>
+						<buildTarget>library</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+				</buildTargets>
+			</storageModule>
+		</cconfiguration>
+	</storageModule>
+</cproject>
