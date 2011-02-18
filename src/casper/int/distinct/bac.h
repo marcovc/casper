@@ -46,6 +46,15 @@
 
 namespace casper {
 
+struct BacktrackSentinel
+{
+	BacktrackSentinel(ICPSolver& solver) : rCounter(solver,0),iCounter(0) {}
+	Bool hasBacktracked() const	{ return rCounter < iCounter;	}
+	Void update() {	rCounter = rCounter+1; iCounter = rCounter; }
+	Reversible<Counter>	rCounter;
+	Counter	iCounter;
+};
+
 /**
  *  Filter that enforces bounds consistency
  *  on the distinct constraint over a sequence of
@@ -85,8 +94,10 @@ struct BndFilterView1<Distinct,IntSeq,View> : IFilter
 		{ rOwner.vars[varIdx].attach(this); }
 		bool notify()
 		{
-			if (rOwner.solver().stats().fails() > rOwner.fails)
+			//if (rOwner.solver().stats().fails() > rOwner.fails)
+			if (rOwner.btSentinel.hasBacktracked())
 				return rOwner.pParent->notify();
+			rOwner.btSentinel.update();
 
 			 // incremental
 			Int l,u;
@@ -116,7 +127,7 @@ struct BndFilterView1<Distinct,IntSeq,View> : IFilter
 	Int pathmax(Int *t, Int i);
 
     BndArrayView<Int,View> vars;
-	Counter 	fails;
+	BacktrackSentinel 	btSentinel;
     Int n;
     Int *t;		// tree links
     Int *d;		// diffs between critical capacities
@@ -135,7 +146,7 @@ struct BndFilterView1<Distinct,IntSeq,View> : IFilter
 
 template<class View>
 BndFilterView1<Distinct,IntSeq,View>::BndFilterView1(ICPSolver& s,const View& v)
-  							: IFilter(s), vars(s,v), fails(0), pParent(NULL)
+  							: IFilter(s), vars(s,v), btSentinel(s)/*fails(0)*/, pParent(NULL)
 {
 	Int i;
 
@@ -379,7 +390,8 @@ Bool	BndFilterView1<Distinct,IntSeq,View>::execute()
 */
 	Int  status_lower, status_upper;
 
-	if( vars.solver().fails() > fails )
+//	if( vars.solver().fails() > fails )
+	if( btSentinel.hasBacktracked())
   	{
     	// solver has backtracked: reset
     	for (UInt i = 0; i < vars.size(); i++)
@@ -389,7 +401,8 @@ Bool	BndFilterView1<Distinct,IntSeq,View>::execute()
       		iv[i].max = vars[i].max();
     	}
   	}
-  	fails = vars.solver().fails();
+  	//fails = vars.solver().fails();
+	btSentinel.update();
 
 	status_lower = status_upper = CHANGES;
   	sortit();
