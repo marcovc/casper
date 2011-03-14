@@ -21,7 +21,7 @@
 
 #include "symbol.h"
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 /**
@@ -41,7 +41,7 @@ struct Container : Symbol
 	virtual ElemType getElemType() const = 0;
 };
 
-namespace detail {
+namespace Detail {
 template<class>
 struct ElemTypeTraits;
 
@@ -72,10 +72,10 @@ Container::ElemType getElemType()
 };
 
 template<class T>
-Symbol::operator const detail::Array<T>&() const
+Symbol::operator const Array<T>&() const
 {
-	const detail::Array<T>& r = skipPtrs<detail::Array<T> >(*this,sArray,"Array");
-	assert(r.getElemType() == detail::getElemType<T>());
+	const Array<T>& r = skipPtrs<Array<T> >(*this,sArray,"Array");
+	assert(r.getElemType() == Detail::getElemType<T>());
 	return r;
 }
 
@@ -85,7 +85,7 @@ Symbol::operator const detail::Array<T>&() const
 
 #include "detail.h"
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 
@@ -94,66 +94,66 @@ namespace cpp {
  * \ingroup CasperBindingsCPP
  */
 
-typedef detail::Array<SharedSymbol>	SymbolArray;
+typedef Array<SharedSymbol>	SymbolArray;
 
 /**
  * Heterogeneous set of (shared) objects
  * \ingroup CasperBindingsCPP
  */
 
-typedef detail::Set<SharedSymbol,detail::LtSharedSymbol>	SymbolSet;
+typedef Detail::Set<SharedSymbol,Detail::LtSharedSymbol>	SymbolSet;
 
 /**
  * Closed interval of something.Set<SharedSymbol>
  * \ingroup CasperBindingsCPP
  */
-typedef detail::Range<SharedSymbol> SymbolRange;
+typedef StdRange<SharedSymbol> SymbolRange;
 
 /**
  * Multidimensional array of booleans
  * \ingroup CasperBindingsCPP
  */
-typedef detail::Array<bool> BoolArray;
+typedef Array<bool> BoolArray;
 
 /**
  * Multidimensional array of integers
  * \ingroup CasperBindingsCPP
  */
-typedef detail::Array<int> IntArray;
+typedef Array<int> IntArray;
 
 /**
  * Multidimensional array of reals
  * \ingroup CasperBindingsCPP
  */
-typedef detail::Array<double> RealArray;
+typedef Array<double> RealArray;
 
 /**
  * Set of booleans
  * \ingroup CasperBindingsCPP
  */
-typedef detail::Set<bool> BoolSet;
+typedef Detail::Set<bool> BoolSet;
 
 /**
  * Set of integers
  * \ingroup CasperBindingsCPP
  */
-typedef detail::Set<int> IntSet;
+typedef Detail::Set<int> IntSet;
 
 /**
  * Set of realse
  * \ingroup CasperBindingsCPP
  */
-typedef detail::Set<double> RealSet;
+typedef Detail::Set<double> RealSet;
 
 //TODO
-typedef detail::Range<SymbolSet> SetRange;
+typedef StdRange<SymbolSet> SetRange;
 
 
 /**
  * Closed integer interval.
  * \ingroup CasperBindingsCPP
  */
-typedef detail::Range<int> IntRange;
+typedef StdRange<int> IntRange;
 
 
 
@@ -161,23 +161,23 @@ typedef detail::Range<int> IntRange;
  * Closed real interval.
  * \ingroup CasperBindingsCPP
  */
-typedef detail::Range<double> RealRange;
+typedef StdRange<double> RealRange;
 
 
 template<class T>
-Symbol::operator detail::Array<T>() const
+Symbol::operator Array<T>() const
 {
-	//const detail::Array<T>& r = skipPtrs<detail::Array<T> >(*this,sArray,"Array");
-	//assert(r.getElemType() == detail::getElemType<T>());
+	//const Array<T>& r = skipPtrs<Array<T> >(*this,sArray,"Array");
+	//assert(r.getElemType() == Detail::getElemType<T>());
 	//return r;
 
-	const detail::Array<T>& r = skipPtrs<detail::Array<T> >(*this,sArray,"Array");
-	if (r.getElemType() == detail::getElemType<T>())
+	const Array<T>& r = skipPtrs<Array<T> >(*this,sArray,"Array");
+	if (r.getElemType() == Detail::getElemType<T>())
 		return r;
 	if (r.getElemType()==Container::sSymbol)
 	{
 		const SymbolArray& r1 = skipPtrs<SymbolArray>(*this,sArray,"Array");
-		detail::Array<T> r(r1.getSize());
+		Array<T> r(r1.getSize());
 		for (int i = 0; i < r1.getSize(); ++i)
 			r[i] = r1[i];
 		return r;
@@ -186,13 +186,13 @@ Symbol::operator detail::Array<T>() const
 }
 
 inline SymbolArray makeSymbolArray(SharedSymbol arg1)
-{ 	return detail::makeArray<SharedSymbol>(arg1); }
+{ 	return Detail::makeArray<SharedSymbol>(arg1); }
 
 inline SymbolArray makeSymbolArray(SharedSymbol arg1,SharedSymbol arg2)
-{ 	return detail::makeArray<SharedSymbol>(arg1,arg2); }
+{ 	return Detail::makeArray<SharedSymbol>(arg1,arg2); }
 
 inline SymbolArray makeSymbolArray(SharedSymbol arg1,SharedSymbol arg2,SharedSymbol arg3)
-{ 	return detail::makeArray<SharedSymbol>(arg1,arg2,arg3); }
+{ 	return Detail::makeArray<SharedSymbol>(arg1,arg2,arg3); }
 
 }
 }

@@ -1,7 +1,7 @@
 template<> struct SymbolToCasper<eBoolExpr,cBounds>
 {
-	typedef casper::BndExpr<casper::Bool> Type;
-	Type operator()(ICPSolver& solver,const Symbol& s)
+	typedef Casper::BndExpr<Casper::bool> Type;
+	Type operator()(CPSolver& solver,const Symbol& s)
 	{
 		const Predicate& p = s;
 		Eval e1,e2,e3;
@@ -325,8 +325,8 @@ template<> struct SymbolToCasper<eBoolExpr,cBounds>
 };
 template<> struct SymbolToCasper<eIntExpr,cBounds>
 {
-	typedef casper::BndExpr<casper::Int> Type;
-	Type operator()(ICPSolver& solver,const Symbol& s)
+	typedef Casper::BndExpr<Casper::int> Type;
+	Type operator()(CPSolver& solver,const Symbol& s)
 	{
 		const Expression& p = s;
 		Eval e1,e2,e3;
@@ -496,8 +496,8 @@ template<> struct SymbolToCasper<eIntExpr,cBounds>
 };
 template<> struct SymbolToCasper<eRealExpr,cBounds>
 {
-	typedef casper::BndExpr<casper::Double> Type;
-	Type operator()(ICPSolver& solver,const Symbol& s)
+	typedef Casper::BndExpr<Casper::double> Type;
+	Type operator()(CPSolver& solver,const Symbol& s)
 	{
 		const Expression& p = s;
 		Eval e1,e2,e3;
@@ -509,8 +509,8 @@ template<> struct SymbolToCasper<eRealExpr,cBounds>
 };
 template<> struct SymbolToCasper<eIntSetExpr,cBounds>
 {
-	typedef casper::DomExpr<casper::IntSet> Type;
-	Type operator()(ICPSolver& solver,const Symbol& s)
+	typedef Casper::DomExpr<Casper::IntSet> Type;
+	Type operator()(CPSolver& solver,const Symbol& s)
 	{
 		const Expression& p = s;
 		Eval e1,e2,e3;
@@ -522,8 +522,8 @@ template<> struct SymbolToCasper<eIntSetExpr,cBounds>
 };
 template<> struct SymbolToCasper<eBoolSetExpr,cBounds>
 {
-	typedef casper::DomExpr<casper::BoolSet> Type;
-	Type operator()(ICPSolver& solver,const Symbol& s)
+	typedef Casper::DomExpr<Casper::BoolSet> Type;
+	Type operator()(CPSolver& solver,const Symbol& s)
 	{
 		const Expression& p = s;
 		Eval e1,e2,e3;

@@ -177,7 +177,7 @@ casperbind::cpp::IntSet XCSPParser::parseIntSet(const Glib::ustring& text)
 	boost::split(tokens, text.raw(), boost::is_space());
 	casperbind::cpp::IntSet r;
 	std::transform(tokens.begin(),tokens.end(),
-			casperbind::cpp::detail::inserter(r),StrToInt());
+			casperbind::cpp::Detail::inserter(r),StrToInt());
 	return r;
 }
 
@@ -254,7 +254,7 @@ casperbind::cpp::SymbolArray XCSPParser::parseParameters(const std::string& s) c
 		if (index.hasKey(*it)) // parameter is a variable
 			l.push_back(index.getSymbol(*it));
 		else // parameter is an integral constant
-			l.push_back(casperbind::cpp::Int(atoi(it->c_str())));
+			l.push_back(casperbind::cpp::int(atoi(it->c_str())));
 	casperbind::cpp::SymbolArray r(l.size());
 	std::copy(l.begin(),l.end(),r.getData());
 	return r;

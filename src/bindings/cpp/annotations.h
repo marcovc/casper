@@ -26,7 +26,7 @@
 #include "print.h" // tmp
 #include <iostream>
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 struct Annotations
@@ -41,10 +41,10 @@ struct Annotations
 	void add(SharedSymbol s, const Annotation& a)
 	{	keysFrom[&s.get()].push_back(a); }
 
-	Bool hasAnnotations(SharedSymbol s) const
+	bool hasAnnotations(SharedSymbol s) const
 	{	return keysFrom.find(&s.get())!=keysFrom.end(); }
 
-	Bool hasAnnotation(SharedSymbol s, const String& ann) const
+	bool hasAnnotation(SharedSymbol s, const String& ann) const
 	{
 		if (keysFrom.find(&s.get())==keysFrom.end())
 			return false;

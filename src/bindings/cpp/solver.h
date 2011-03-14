@@ -23,16 +23,16 @@
 #include <casper/version.h>
 #include "instance.h"
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
-struct ICPSolver&Impl;
+struct CPSolver&Impl;
 
-struct ICPSolver&
+struct CPSolver&
 {
-	ICPSolver&Impl* pImpl;
+	CPSolver&Impl* pImpl;
 
-	ICPSolver&(const Instance& instance);
+	CPSolver&(const Instance& instance);
 
 	bool solve();
 	bool next();
@@ -43,31 +43,31 @@ struct ICPSolver&
 };
 
 inline unsigned int getCaSPERVersionMajor()
-{	return casper::getVersionMajor(); }
+{	return Casper::getVersionMajor(); }
 
 inline unsigned int getCaSPERVersionMinor()
-{	return casper::getVersionMinor(); }
+{	return Casper::getVersionMinor(); }
 
 inline unsigned int getCaSPERVersionRelease()
-{	return casper::getVersionRelease(); }
+{	return Casper::getVersionRelease(); }
 
 inline unsigned int getCaSPERRevision()
-{	return casper::getRevision(); }
+{	return Casper::getRevision(); }
 
 inline std::string getCaSPERVersion()
-{	return casper::getVersion(); }
+{	return Casper::getVersion(); }
 
 inline std::string getCaSPERBuildCompiler()
-{	return casper::getBuildCompiler(); }
+{	return Casper::getBuildCompiler(); }
 
 inline std::string getCaSPERBuildStdlib()
-{	return casper::getBuildStdlib(); }
+{	return Casper::getBuildStdlib(); }
 
 inline std::string getCaSPERBuildFlags()
-{	return casper::getBuildFlags(); }
+{	return Casper::getBuildFlags(); }
 
 inline std::string getCaSPERBuildDate()
-{	return casper::getBuildDate(); }
+{	return Casper::getBuildDate(); }
 
 
 

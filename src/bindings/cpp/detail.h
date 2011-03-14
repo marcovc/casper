@@ -26,28 +26,28 @@
 #include <set>
 
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
-namespace detail {
+namespace Detail {
 
 /// Generic ranges.
 template<class T>
-struct Range : Container
+struct StdRange : Container
 {
 	T lower;
 	T upper;
 
-	Range(const T l,const T u) : lower(l),upper(u) {}
-	~Range() { }
+	StdRange(const T l,const T u) : lower(l),upper(u) {}
+	~StdRange() { }
 	Type getType(bool t = false) const { return Symbol::sRange; }
-	ElemType getElemType() const { return detail::getElemType<T>();	}
+	ElemType getElemType() const { return Detail::getElemType<T>();	}
 	const T& getLower() const { return lower; }
 	const T& getUpper() const { return upper; }
 	void setLower(const T& n) { lower = n; }
 	void setUpper(const T& n) { upper = n; }
-	const Symbol* clone() const {	return new Range(lower,upper);	}
-	bool operator==(const Range& s) const { return lower==s.lower and upper==s.upper; }
-	bool operator!=(const Range& s) const { return lower!=s.lower or upper!=s.upper; }
+	const Symbol* clone() const {	return new StdRange(lower,upper);	}
+	bool operator==(const StdRange& s) const { return lower==s.lower and upper==s.upper; }
+	bool operator!=(const StdRange& s) const { return lower!=s.lower or upper!=s.upper; }
 };
 
 /// Generic sets.
@@ -77,7 +77,7 @@ struct Set : Container
 	ConstRIterator rend() const { return data.rend(); }
 
 	Type getType(bool t = false) const { return Symbol::sSet; }
-	ElemType getElemType() const { return detail::getElemType<T>();	}
+	ElemType getElemType() const { return Detail::getElemType<T>();	}
 	int getSize() const { return data.size(); }
 	bool empty() const { return data.empty(); }
 	void add(const T& t) { data.insert(t); }
@@ -103,7 +103,7 @@ struct Array : Container
 	~Array();
 	Type getType(bool t = false) const
 	{	return Symbol::sArray;	}
-	ElemType getElemType() const { return detail::getElemType<T>();	}
+	ElemType getElemType() const { return Detail::getElemType<T>();	}
 	int getSize() const;
 	const Symbol* clone() const
 	{	return new Array(dims, sizes, data); }
@@ -131,7 +131,7 @@ Array<T> makeArray(const T& arg1,const T& arg2,const T& arg3)
 /**
  *  Creates a one-dimensional array
  *	\param dims Number of elements in the array.
- *	\param sizes Vector with size \p dims specifying the size of each dimension.
+ *	\param sizes StdVector with size \p dims specifying the size of each dimension.
  *	\note \p T must have a default constructor
  */
 template<class T>
@@ -145,7 +145,7 @@ Array<T>::Array(const int size)
 
 /**
  *	\param dims Number of dimensions of the array.
- *	\param sizes Vector with size \p dims specifying the size of each dimension.
+ *	\param sizes StdVector with size \p dims specifying the size of each dimension.
  *	\note \p T must have a default constructor
  */
 template<class T>
@@ -182,7 +182,7 @@ void Array<T>::initialize(const int dims, const int *sizes, const T* data)
 
 /**
  *	\param dims Number of dimensions of the array.
- *	\param sizes Vector with size \p dims specifying the size of each dimension.
+ *	\param sizes StdVector with size \p dims specifying the size of each dimension.
  *	\param data Pointer to a contiguous block of elements to store in the array.
  *	\note All vector arguments are copied to internal data structures (no
  *	pointers to user data are kept)

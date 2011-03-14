@@ -24,7 +24,7 @@
 #include <exception>
 #include <sstream>
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 struct Symbol;

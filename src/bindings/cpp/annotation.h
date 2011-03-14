@@ -26,7 +26,7 @@
 
 #include <iostream>
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 /**

@@ -38,12 +38,12 @@
  */
 
 /**
- *	\namespace casperbind
+ *	\namespace Casperbind
  *  \ingroup CasperBindings
  */
 
 /**
- *	\namespace casperbind::cpp
+ *	\namespace Casperbind::cpp
  *  \ingroup CasperBindingsCPP
  */
 

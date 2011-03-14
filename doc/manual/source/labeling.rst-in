@@ -10,7 +10,7 @@ Search trees may be defined using the `label <refmanurl/group__Search.html#Label
 .. parsed-literal::
 
    Solver solver;
-   DomVarArray\<Int\> vars(solver,3,1,2);
+   VarArray\<int\> vars(solver,3,1,2);
    // ... post some constraints ...
    solver.solve(`label <refmanurl/group__Search.html#LabelingPrimitives>`_\(vars\));
 
@@ -21,7 +21,7 @@ Calling `label <refmanurl/group__Search.html#LabelingPrimitives>`_ enumerates (i
 .. parsed-literal::
 
    Solver solver;
-   DomVarArray\<Int\> vars(solver,3,1,2);
+   VarArray\<int\> vars(solver,3,1,2);
    // ... post some constraints ...
    solver.solve(`label <refmanurl/group__Search.html#LabelingPrimitives>`_\(vars,selectVarMinDom\(vars\),selectValMin\(vars\)\));
 

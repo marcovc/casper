@@ -12,7 +12,7 @@
 #include <parser.hpp>
 #include <list>
 
-using namespace casperbind::cpp;
+using namespace Casperbind::cpp;
 
 class FlatzincDriver;
 // Announce to Flex the prototype we want for lexing function, ...

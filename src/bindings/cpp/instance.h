@@ -23,7 +23,7 @@
 #include "container.h"
 #include "annotations.h"
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 /**

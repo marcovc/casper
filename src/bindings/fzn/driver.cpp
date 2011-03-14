@@ -85,7 +85,7 @@ const SharedSymbol& FlatzincDriver::getSymbol(const std::string& k){
 	}catch(ENoSymbolForKey e){
 		std::cout << "Nothing for " + k + "." << std::endl;
 	}
-	return *new SharedSymbol(new Int(0));
+	return *new SharedSymbol(new int(0));
 }
 
 IntRange* FlatzincDriver::getDefaultIntRange(){
@@ -103,7 +103,7 @@ void FlatzincDriver::beginArgList(){
 template<class T>
 struct ArgListAsTypedArray
 {
-	typedef casperbind::cpp::detail::Array<T> Ret;
+	typedef casperbind::cpp::Array<T> Ret;
 	const Symbol* operator()(const FlatzincDriver& d) const
 	{
 		int sizes[1] = {d.argList.size()};

@@ -86,12 +86,12 @@ casperbind::cpp::SharedSymbol	createSharedSymbol(PyObject* pObj)
 	static swig_type_info * swig_Symbol_ptr = SWIG_TypeQuery("casperbind::cpp::Symbol*");
 	static swig_type_info * swig_PSymbol_ptr = SWIG_TypeQuery("casperbind::cpp::Symbol**");
 
-	static swig_type_info * swig_Bool_ptr = SWIG_TypeQuery("casperbind::cpp::Bool*");
-	static swig_type_info * swig_Int_ptr = SWIG_TypeQuery("casperbind::cpp::Int*");
-	static swig_type_info * swig_BoolSet_ptr = SWIG_TypeQuery("casperbind::cpp::detail::Set<bool>*");
-	static swig_type_info * swig_IntSet_ptr = SWIG_TypeQuery("casperbind::cpp::detail::Set<int>*");
-	static swig_type_info * swig_IntRange_ptr = SWIG_TypeQuery("casperbind::cpp::detail::Range<int>*");
-	static swig_type_info * swig_SymbolSet_ptr = SWIG_TypeQuery("casperbind::cpp::detail::Set<casperbind::cpp::SharedSymbol,casperbind::cpp::detail::LtSharedSymbol>*");
+	static swig_type_info * swig_Bool_ptr = SWIG_TypeQuery("casperbind::cpp::bool*");
+	static swig_type_info * swig_Int_ptr = SWIG_TypeQuery("casperbind::cpp::int*");
+	static swig_type_info * swig_BoolSet_ptr = SWIG_TypeQuery("casperbind::cpp::Detail::Set<bool>*");
+	static swig_type_info * swig_IntSet_ptr = SWIG_TypeQuery("casperbind::cpp::Detail::Set<int>*");
+	static swig_type_info * swig_IntRange_ptr = SWIG_TypeQuery("casperbind::cpp::StdRange<int>*");
+	static swig_type_info * swig_SymbolSet_ptr = SWIG_TypeQuery("casperbind::cpp::Detail::Set<casperbind::cpp::SharedSymbol,casperbind::cpp::Detail::LtSharedSymbol>*");
 	
 	void * argp = NULL;
 	
@@ -107,7 +107,7 @@ casperbind::cpp::SharedSymbol	createSharedSymbol(PyObject* pObj)
 	else
 	if (PyBool_Check(pObj))
 	{
-		casperbind::cpp::Bool* r = new casperbind::cpp::Bool(static_cast<bool>(PyInt_AsLong(pObj)));
+		casperbind::cpp::bool* r = new casperbind::cpp::bool(static_cast<bool>(PyInt_AsLong(pObj)));
 		PyObject* pPyObj = SWIG_NewPointerObj(r, swig_Bool_ptr, 1);
 		insertRef(r,pPyObj);
 		return casperbind::cpp::SharedSymbol(r,SharedSymbolDeleter());							
@@ -115,7 +115,7 @@ casperbind::cpp::SharedSymbol	createSharedSymbol(PyObject* pObj)
 	else
 	if (PyInt_Check(pObj))
 	{
-		casperbind::cpp::Int* r = new casperbind::cpp::Int(static_cast<int>(PyInt_AsLong(pObj)));
+		casperbind::cpp::int* r = new casperbind::cpp::int(static_cast<int>(PyInt_AsLong(pObj)));
 		PyObject* pPyObj = SWIG_NewPointerObj(r, swig_Int_ptr, 1);
 		insertRef(r,pPyObj);
 		return casperbind::cpp::SharedSymbol(r,SharedSymbolDeleter());							
@@ -132,7 +132,7 @@ casperbind::cpp::SharedSymbol	createSharedSymbol(PyObject* pObj)
 				break;
 		if (i==size)
 		{
-			casperbind::cpp::detail::Set<bool>* r = new casperbind::cpp::detail::Set<bool>();
+			casperbind::cpp::Detail::Set<bool>* r = new casperbind::cpp::Detail::Set<bool>();
 			for (int i = 0; i < size; i++)
 				r->add(static_cast<bool>(PyInt_AsLong(PySequence_GetItem(pObj, i))));
 			PyObject* pPyObj = SWIG_NewPointerObj(r, swig_BoolSet_ptr, 1);
@@ -153,10 +153,10 @@ casperbind::cpp::SharedSymbol	createSharedSymbol(PyObject* pObj)
 					break;
 				else
 					last = static_cast<int>(PyInt_AsLong(PySequence_GetItem(pObj, i)));
-			if (i==size)	// store it as Range
+			if (i==size)	// store it as StdRange
 			{
-				casperbind::cpp::detail::Range<int>* r = 
-						new casperbind::cpp::detail::Range<int>(
+				casperbind::cpp::StdRange<int>* r = 
+						new casperbind::cpp::StdRange<int>(
 								static_cast<int>(PyInt_AsLong(PySequence_GetItem(pObj, 0))),
 								static_cast<int>(PyInt_AsLong(PySequence_GetItem(pObj, size-1))));
 				PyObject* pPyObj = SWIG_NewPointerObj(r, swig_IntRange_ptr, 1);
@@ -165,7 +165,7 @@ casperbind::cpp::SharedSymbol	createSharedSymbol(PyObject* pObj)
 			}
 			else			// store it as Set
 			{		
-				casperbind::cpp::detail::Set<int>* r = new casperbind::cpp::detail::Set<int>();
+				casperbind::cpp::Detail::Set<int>* r = new casperbind::cpp::Detail::Set<int>();
 				for (int i = 0; i < size; i++)
 					r->add(static_cast<int>(PyInt_AsLong(PySequence_GetItem(pObj, i))));
 				PyObject* pPyObj = SWIG_NewPointerObj(r, swig_IntSet_ptr, 1);
@@ -176,8 +176,8 @@ casperbind::cpp::SharedSymbol	createSharedSymbol(PyObject* pObj)
 
 		// build heterogeneous set
 		{
-			casperbind::cpp::detail::Set<casperbind::cpp::SharedSymbol,casperbind::cpp::detail::LtSharedSymbol>* r =
-				new casperbind::cpp::detail::Set<casperbind::cpp::SharedSymbol,casperbind::cpp::detail::LtSharedSymbol>();
+			casperbind::cpp::Detail::Set<casperbind::cpp::SharedSymbol,casperbind::cpp::Detail::LtSharedSymbol>* r =
+				new casperbind::cpp::Detail::Set<casperbind::cpp::SharedSymbol,casperbind::cpp::Detail::LtSharedSymbol>();
 			for (int i = 0; i < size; i++)
 				r->add(createSharedSymbol(PySequence_GetItem(pObj, i)));
 			PyObject* pPyObj = SWIG_NewPointerObj(r, swig_SymbolSet_ptr, 1);
@@ -241,29 +241,29 @@ COUTWRAPPER(casperbind::cpp::SharedSymbol)
 %include "bindings/cpp/container.h"
 
 %include "bindings/cpp/detail.h"
-COUTWRAPPER(casperbind::cpp::detail::Range)
-COUTWRAPPER(casperbind::cpp::detail::Array)
-COUTWRAPPER(casperbind::cpp::detail::Set)
-%template(IntRange) 	casperbind::cpp::detail::Range<int>;
-%template(SymbolRange) 	casperbind::cpp::detail::Range<casperbind::cpp::SharedSymbol>;
-%template(IntArray) 	casperbind::cpp::detail::Array<int>;
-%template(SymbolArray) 	casperbind::cpp::detail::Array<casperbind::cpp::SharedSymbol>;
-%template(BoolArray) 	casperbind::cpp::detail::Array<bool>;
-%template(IntSet) 		casperbind::cpp::detail::Set<int>;
-%template(BoolSet) 		casperbind::cpp::detail::Set<bool>;
-%template(SymbolSet) 	casperbind::cpp::detail::Set<casperbind::cpp::SharedSymbol,casperbind::cpp::detail::LtSharedSymbol>;
+COUTWRAPPER(casperbind::cpp::StdRange)
+COUTWRAPPER(casperbind::cpp::Array)
+COUTWRAPPER(casperbind::cpp::Detail::Set)
+%template(IntRange) 	casperbind::cpp::StdRange<int>;
+%template(SymbolRange) 	casperbind::cpp::StdRange<casperbind::cpp::SharedSymbol>;
+%template(IntArray) 	casperbind::cpp::Array<int>;
+%template(SymbolArray) 	casperbind::cpp::Array<casperbind::cpp::SharedSymbol>;
+%template(BoolArray) 	casperbind::cpp::Array<bool>;
+%template(IntSet) 		casperbind::cpp::Detail::Set<int>;
+%template(BoolSet) 		casperbind::cpp::Detail::Set<bool>;
+%template(SymbolSet) 	casperbind::cpp::Detail::Set<casperbind::cpp::SharedSymbol,casperbind::cpp::Detail::LtSharedSymbol>;
 
 %include "bindings/cpp/variable.h"
 COUTWRAPPER(casperbind::cpp::Variable)
 
 %include "bindings/cpp/expression.h"
 COUTWRAPPER(casperbind::cpp::Expression)
-%template(Int) 			casperbind::cpp::detail::Constant<int,casperbind::cpp::Symbol::sInt>;
-%template(Bool) 		casperbind::cpp::detail::Constant<bool,casperbind::cpp::Symbol::sBool>;
-%template(Double) 		casperbind::cpp::detail::Constant<double,casperbind::cpp::Symbol::sDouble>;
-%template(String) 		casperbind::cpp::detail::Constant<const char*,casperbind::cpp::Symbol::sString>;
+%template(int) 			casperbind::cpp::Detail::Constant<int,casperbind::cpp::Symbol::sInt>;
+%template(bool) 		casperbind::cpp::Detail::Constant<bool,casperbind::cpp::Symbol::sBool>;
+%template(double) 		casperbind::cpp::Detail::Constant<double,casperbind::cpp::Symbol::sDouble>;
+%template(String) 		casperbind::cpp::Detail::Constant<const char*,casperbind::cpp::Symbol::sString>;
 
-%extend casperbind::cpp::detail::Constant<bool,casperbind::cpp::Symbol::sBool> 
+%extend casperbind::cpp::Detail::Constant<bool,casperbind::cpp::Symbol::sBool> 
 {
 	int __int__() { return $self->data; }
 	%pythoncode
@@ -318,7 +318,7 @@ COUTWRAPPER(casperbind::cpp::Expression)
 	}
 };
 
-%extend casperbind::cpp::detail::Constant<int,casperbind::cpp::Symbol::sInt> 
+%extend casperbind::cpp::Detail::Constant<int,casperbind::cpp::Symbol::sInt> 
 {
 	int __int__() { return $self->data; }
 	
@@ -375,7 +375,7 @@ COUTWRAPPER(casperbind::cpp::Expression)
 	}
 };
 
-%extend casperbind::cpp::detail::Constant<double,casperbind::cpp::Symbol::sDouble> 
+%extend casperbind::cpp::Detail::Constant<double,casperbind::cpp::Symbol::sDouble> 
 {
 	double __float__() { return $self->data; }
 	int __int__() { return static_cast<int>($self->data); }
@@ -432,7 +432,7 @@ COUTWRAPPER(casperbind::cpp::Expression)
 	}
 };
 
-%extend casperbind::cpp::detail::Range<int> 
+%extend casperbind::cpp::StdRange<int> 
 {
 	bool __contains__(int i) const { return i >= $self->getLower() and i <= $self->getUpper(); }
 	%pythoncode

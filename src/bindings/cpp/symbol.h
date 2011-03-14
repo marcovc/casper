@@ -26,7 +26,7 @@
  * 	Bindings (API's for different programming languages) for the
  * 	CaSPER library.
  */
-namespace casperbind {
+namespace Casperbind {
 
 /**
  * 	C++ bindings. Provides a structured set of c++ classes describing CSP
@@ -45,9 +45,9 @@ struct Predicate;
 struct Instance;
 struct Annotation;
 
-namespace detail {
+namespace Detail {
 template<class> struct Array;
-template<class> struct Range;
+template<class> struct StdRange;
 template<class,class> struct Set;
 
 }
@@ -97,15 +97,15 @@ struct Symbol
 	operator const Annotation&() const;
 
 	template<class T>
-	operator const detail::Array<T>&() const;
+	operator const Array<T>&() const;
 	template<class T,class C>
-	operator const detail::Set<T,C>&() const;
+	operator const Detail::Set<T,C>&() const;
 	template<class T>
-	operator const detail::Range<T>&() const;
+	operator const StdRange<T>&() const;
 
 	// creates a copy (temp)
 	template<class T>
-	operator detail::Array<T>() const;
+	operator Array<T>() const;
 
 	// \}
 
@@ -134,22 +134,22 @@ template<class T>
 const T& skipPtrs(const Symbol& s, const Symbol::Type type, const std::string& stype);
 /*
 template<class T>
-Symbol::operator const detail::Array<T>&() const
+Symbol::operator const Array<T>&() const
 {
-	const detail::Array<T>& r = skipPtrs<detail::Array<T> >(*this,sArray,"Array");
-	ass r.getElemType() == detail::getElemType<T>();
+	const Array<T>& r = skipPtrs<Array<T> >(*this,sArray,"Array");
+	ass r.getElemType() == Detail::getElemType<T>();
 }*/
 
 template<class T,class C>
-Symbol::operator const detail::Set<T,C>&() const
+Symbol::operator const Detail::Set<T,C>&() const
 {
-	return skipPtrs<detail::Set<T,C> >(*this,sSet,"Set");
+	return skipPtrs<Detail::Set<T,C> >(*this,sSet,"Set");
 }
 
 template<class T>
-Symbol::operator const detail::Range<T>&() const
+Symbol::operator const StdRange<T>&() const
 {
-	return skipPtrs<detail::Range<T> >(*this,sRange,"Range");
+	return skipPtrs<StdRange<T> >(*this,sRange,"StdRange");
 }
 
 /**
@@ -213,7 +213,7 @@ struct SharedSymbol : Symbol
 };
 
 // comparing shared symbols
-namespace detail {
+namespace Detail {
 struct LtSharedSymbol
 {
 	bool operator()(const SharedSymbol& s1,const SharedSymbol& s2) const

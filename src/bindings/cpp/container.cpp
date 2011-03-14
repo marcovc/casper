@@ -22,10 +22,10 @@
 
 using namespace std;
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
-namespace detail {
+namespace Detail {
 
 const Container::ElemType ElemTypeTraits<bool>::type = Container::sBool;
 

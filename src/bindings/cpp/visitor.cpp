@@ -19,7 +19,7 @@
 #include "visitor.h"
 #include "print.h"
 
-using namespace casperbind::cpp;
+using namespace Casperbind::cpp;
 
 void visitTopDown(const Symbol& s, IVisitor& v)
 {
@@ -30,7 +30,7 @@ void visitTopDown(const Symbol& s, IVisitor& v)
 
 	v(s);
 
-	using namespace casperbind::cpp;
+	using namespace Casperbind::cpp;
 	switch (s.getType())
 	{
 		case Symbol::sSet:

@@ -15,16 +15,16 @@
 	//#include <driver.h>
 
 	//using namespace std;
-	using namespace casperbind::cpp;
-	using namespace casperbind::cpp::detail;
+	using namespace Casperbind::cpp;
+	using namespace Casperbind::cpp::detail;
 
 	%}
 
 %code requires {
 	class FlatzincDriver;
 	//using namespace std;
-	using namespace casperbind::cpp;
-	using namespace casperbind::cpp::detail;
+	using namespace Casperbind::cpp;
+	using namespace Casperbind::cpp::detail;
 }
 
 
@@ -50,7 +50,7 @@
 	const Symbol *symbol;
 	SymbolSet *set;	
 	SymbolArray *array;
-	Bool *bval;
+	bool *bval;
 	int int_val;
 	double float_val;
 	const SharedSymbol* ssymbol;
@@ -199,7 +199,7 @@ IDENT LPAR exprs RPAR
 
 		SymbolArray feqArray(2);
 		feqArray[0] = b;
-		feqArray[1] = new Int(1);
+		feqArray[1] = new int(1);
 
 		SymbolArray fIffArray(2);
 
@@ -208,7 +208,7 @@ IDENT LPAR exprs RPAR
 
 		SymbolArray seqArray(2);
 		seqArray[0] = b;
-		seqArray[1] = new Int(0);
+		seqArray[1] = new int(0);
 
 		SymbolArray sIffArray(2);
 
@@ -868,7 +868,7 @@ bool_ti_expr_tail {$$ = $1;}
 
 bool_ti_expr_tail:
 BOOL {
-	BoolSet *b = new BoolSet(); b->add(Bool(false)); b->add(Bool(true));
+	BoolSet *b = new BoolSet(); b->add(bool(false)); b->add(bool(true));
 	$$ = b;}
 
 int_ti_expr_tail:
@@ -900,8 +900,8 @@ expr COMMA exprs {driver.addArg(($1)->clone());}
 
 expr:
 bool_literal {$$ = $1;}
-| INT_LITERAL {$$ = new Int($1);}
-| FLOAT_LITERAL {$$ = new Double($1);}
+| INT_LITERAL {$$ = new int($1);}
+| FLOAT_LITERAL {$$ = new double($1);}
 | STRING_LITERAL {$$ = new String($1->c_str());}
 | array_literal {$$ = $1;}
 | array_access_expr {$$ = $1;}
@@ -917,8 +917,8 @@ bool_literal {$$ = $1;}
 | set_literal {$$ = $1;}
 
 bool_literal: 
-FALSE {$$ = new Bool(false);}
-| 	TRUE {$$ = new Bool(true);}
+FALSE {$$ = new bool(false);}
+| 	TRUE {$$ = new bool(true);}
 
 set_literal:
 LCUR exprs RCUR { $$ = driver.argListAsSet();}

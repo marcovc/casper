@@ -10,7 +10,7 @@ A search tree is defined by a Goal. A Goal is a predicate or logical combination
 .. parsed-literal::
 
    Solver solver;
-   DomVarArray\<Int\> v(solver,3,1,2);
+   VarArray\<int\> v(solver,3,1,2);
    // ... post some constraints ...
    Goal st = (v[0]==1 or v[0]==2) and (v[1]==1 or v[1]==2) and (v[2]==1 or v[2]==2);
    solver.solve(st);

@@ -27,7 +27,7 @@
 
 using namespace boost::xpressive;
 using namespace regex_constants;
-using namespace casperbind::cpp;
+using namespace Casperbind::cpp;
 
 ExprParser::ExprParser()
 {
@@ -99,10 +99,10 @@ SharedSymbol ExprParser::parseBoolExpression(const smatch& what,
 	if (begin->regex_id() == boolean.regex_id())
 	{
 		if (begin->str() == "true")
-			return Int(1);
+			return int(1);
 		else
 		if (begin->str() == "false")
-			return Int(0);
+			return int(0);
 		assert(0);
 	}
 	else
@@ -177,7 +177,7 @@ SharedSymbol ExprParser::parseIntExpression(const smatch& what,
 	assert(what.nested_results().size()==1);
 
 	if (begin->regex_id() == integer.regex_id())
-		return Int(atoi(begin->str().c_str()));
+		return int(atoi(begin->str().c_str()));
 	else
 	if (begin->regex_id() == id.regex_id())
 	{
