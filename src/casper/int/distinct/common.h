@@ -23,6 +23,16 @@
 
 namespace casper {
 
+
+struct BacktrackSentinel
+{
+	BacktrackSentinel(ICPSolver& solver) : rCounter(solver,0),iCounter(0) {}
+	Bool hasBacktracked() const	{ return rCounter < iCounter;	}
+	Void update() {	rCounter = rCounter+1; iCounter = rCounter; }
+	Reversible<Counter>	rCounter;
+	Counter	iCounter;
+};
+
 NEW_REL_1(distinct,Distinct)
 
 template<class View>

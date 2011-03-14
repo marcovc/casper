@@ -76,18 +76,18 @@ struct DomFilterView1<Distinct,IntSeq,View> : IFilter
 	bool	init();
 	//DomVarArray<Int> vars;
 	typedef DomArrayView<Int,View>	Doms;
+	BacktrackSentinel 	btSentinel;
 	Doms						doms;
 	detail::VarValGraph<Doms>* 	vvg;
-	Counter						nfails;
 	INotifiable*				pParent;
 };
 
 template<class View>
 DomFilterView1<Distinct,IntSeq,View>::DomFilterView1(ICPSolver& solver, const View& v) :
 		IFilter(solver),
+		btSentinel(solver),
 		doms(solver,v),
-		vvg(NULL),
-		nfails(0)
+		vvg(NULL)
 {}
 
 template<class View>
@@ -122,9 +122,9 @@ Bool DomFilterView1<Distinct,IntSeq,View>::init()
 template<class View>
 Bool DomFilterView1<Distinct,IntSeq,View>::execute()
 {
-	if (solver().fails() > nfails)
+	if (btSentinel.hasBacktracked())
 		vvg = NULL;
-	nfails = solver().fails();
+	btSentinel.update();
 
 	if (vvg == NULL)
 	{
