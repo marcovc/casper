@@ -127,7 +127,7 @@ def print_pred_cpp_code(ret_eval,ret_type):
 	print "template<> struct SymbolToCasper<"+ret_eval+",cBounds>"
 	print "{"
 	print "\ttypedef "+ret_type+" Type;"
-	print "\tType operator()(ICPSolver& solver,const Symbol& s)"
+	print "\tType operator()(CPSolver& solver,const Symbol& s)"
 	print "\t{"
 	print "\t\tconst Predicate& p = s;"
 	print "\t\tEval e1,e2,e3;"
@@ -151,7 +151,7 @@ def print_expr_cpp_code(ret_eval,ret_type,valid_exprs):
 	print "template<> struct SymbolToCasper<"+ret_eval+",cBounds>"
 	print "{"
 	print "\ttypedef "+ret_type+" Type;"
-	print "\tType operator()(ICPSolver& solver,const Symbol& s)"
+	print "\tType operator()(CPSolver& solver,const Symbol& s)"
 	print "\t{"
 	print "\t\tconst Expression& p = s;"
 	print "\t\tEval e1,e2,e3;"
@@ -171,9 +171,9 @@ def print_expr_cpp_code(ret_eval,ret_type,valid_exprs):
 	print "\t}"
 	print "};"
 
-print_pred_cpp_code("eBoolExpr","casper::BndExpr<casper::Bool>")
-print_expr_cpp_code("eIntExpr","casper::BndExpr<casper::Int>",valid_int_exprs)
-print_expr_cpp_code("eRealExpr","casper::BndExpr<casper::Double>",valid_real_exprs)
-print_expr_cpp_code("eIntSetExpr","casper::DomExpr<casper::IntSet>",valid_int_set_exprs)
-print_expr_cpp_code("eBoolSetExpr","casper::DomExpr<casper::BoolSet>",valid_bool_set_exprs)
+print_pred_cpp_code("eBoolExpr","Casper::BndExpr<Casper::bool>")
+print_expr_cpp_code("eIntExpr","Casper::BndExpr<Casper::int>",valid_int_exprs)
+print_expr_cpp_code("eRealExpr","Casper::BndExpr<Casper::double>",valid_real_exprs)
+print_expr_cpp_code("eIntSetExpr","Casper::DomExpr<Casper::IntSet>",valid_int_set_exprs)
+print_expr_cpp_code("eBoolSetExpr","Casper::DomExpr<Casper::BoolSet>",valid_bool_set_exprs)
 

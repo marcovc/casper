@@ -23,7 +23,7 @@
 #include <map>
 #include <list>
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 struct Index

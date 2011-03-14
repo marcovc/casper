@@ -86,7 +86,7 @@ po::variables_map processOptions(int argc, char **argv)
 	return vm;
 }
 
-void printVariable(const ICPSolver&& solver, const Symbol& s)
+void printVariable(const CPSolver&& solver, const Symbol& s)
 {
 	if (s.getType(true) == Symbol::sVariable)
 	{
@@ -121,7 +121,7 @@ void printArrayOfIntRanges(const Symbol& s)
 				  << static_cast<const IntRange&>(a[i]).getUpper();
 }
 
-void printSolution(const casperbind::cpp::ICPSolver&& solver,const Instance& instance)
+void printSolution(const casperbind::cpp::CPSolver&& solver,const Instance& instance)
 {
 	for (SymbolSet::Iterator it = instance.getVariables().begin();
 			it != instance.getVariables().end(); ++it)
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
 	int solCount = 0;
 	try
 	{
-		casperbind::cpp::ICPSolver& solver(instance);
+		casperbind::cpp::CPSolver& solver(instance);
 		while (solver.solve())
 		{
 			++solCount;

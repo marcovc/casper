@@ -19,7 +19,7 @@
 #include "cpp.h"
 #include "eval.h"
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 Eval getFirstElemEval(const Symbol& s)

@@ -21,7 +21,7 @@
 #include <bindings/cpp/validate.h>
 #include <iostream>
 
-using namespace casperbind::cpp;
+using namespace Casperbind::cpp;
 using namespace std;
 
 void testIntArray()
@@ -48,24 +48,24 @@ void testIntSet()
 
 void testVariable()
 {
-	Variable v(Int(1));
+	Variable v(int(1));
 //	cout << validate(v) << endl;
 	cout << v << endl;
 }
 /*
 void testExpression()
 {
-	Expression e(Expression::eAdd,Variable(IntRange(1,10)),Int(10));
+	Expression e(Expression::eAdd,Variable(IntRange(1,10)),int(10));
 //	cout << validate(e) << endl;
 	cout << e << endl;
 }
 
 void testPredicate()
 {
-	Expression e(Expression::eAdd,Variable(IntRange(1,10)),Int(10));
+	Expression e(Expression::eAdd,Variable(IntRange(1,10)),int(10));
 	SymbolArray s(2);
 	s[0] = e;
-	s[1] = Int(2);
+	s[1] = int(2);
 	Predicate p(Predicate::pEqual,s);
 	//cout << validate(p) << endl;
 	cout << p << endl;
@@ -74,7 +74,7 @@ void testPredicate()
 
 int main()
 {
-	std::cout << SharedSymbol(Int(4)) << std::endl;
+	std::cout << SharedSymbol(int(4)) << std::endl;
 	//testIntArray();
 /*	testIntSet();
 	testVariable();

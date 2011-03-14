@@ -21,7 +21,7 @@
 
 #include "symbol.h"
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 enum Eval { eBool,eInt, eReal,

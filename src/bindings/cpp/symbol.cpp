@@ -24,7 +24,7 @@
 #include "predicate.h"
 #include "instance.h"
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 const unsigned int Symbol::versionMajor = 0;
@@ -33,22 +33,22 @@ const unsigned int Symbol::versionRelease = 0;
 
 Symbol::operator bool() const
 {
-	return static_cast<bool>(skipPtrs<detail::Constant<bool,sBool> >(*this,sBool,"Bool"));
+	return static_cast<bool>(skipPtrs<Detail::Constant<bool,sBool> >(*this,sBool,"bool"));
 }
 
 Symbol::operator int() const
 {
-	return static_cast<int>(skipPtrs<detail::Constant<int,sInt> >(*this,sInt,"Int"));
+	return static_cast<int>(skipPtrs<Detail::Constant<int,sInt> >(*this,sInt,"int"));
 }
 
 Symbol::operator double() const
 {
-	return static_cast<double>(skipPtrs<detail::Constant<double,sDouble> >(*this,sDouble,"Double"));
+	return static_cast<double>(skipPtrs<Detail::Constant<double,sDouble> >(*this,sDouble,"double"));
 }
 
 Symbol::operator const char*() const
 {
-	return static_cast<const char*>(skipPtrs<detail::Constant<const char*,sString> >(*this,sString,"String"));
+	return static_cast<const char*>(skipPtrs<Detail::Constant<const char*,sString> >(*this,sString,"String"));
 }
 
 Symbol::operator const Container&() const
@@ -127,10 +127,10 @@ void Symbol::assertVersionIn(unsigned int lbMajor,
 	}
 }
 
-SharedSymbol::SharedSymbol(bool i) : pData(new Bool(i)) {}
-SharedSymbol::SharedSymbol(int i) : pData(new Int(i)) {}
-SharedSymbol::SharedSymbol(unsigned int i) : pData(new Int(i)) {}
-SharedSymbol::SharedSymbol(double i)  : pData(new Double(i)) {}
+SharedSymbol::SharedSymbol(bool i) : pData(new bool(i)) {}
+SharedSymbol::SharedSymbol(int i) : pData(new int(i)) {}
+SharedSymbol::SharedSymbol(unsigned int i) : pData(new int(i)) {}
+SharedSymbol::SharedSymbol(double i)  : pData(new double(i)) {}
 
 }
 }

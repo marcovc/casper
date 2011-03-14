@@ -23,10 +23,10 @@
 #include "symbol.h"
 #include "container.h"
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
-namespace detail {
+namespace Detail {
 template<class T,Symbol::Type type>
 struct Constant : Symbol
 {
@@ -44,25 +44,25 @@ struct Constant : Symbol
  * Symbol for a boolean (bool) constant
  * \ingroup CasperBindingsCPP
  */
-typedef detail::Constant<bool,Symbol::sBool>			Bool;
+typedef Detail::Constant<bool,Symbol::sBool>			bool;
 
 /**
  * Symbol for an integral (int) constant
  * \ingroup CasperBindingsCPP
  */
-typedef detail::Constant<int,Symbol::sInt>			Int;
+typedef Detail::Constant<int,Symbol::sInt>			int;
 
 /**
  *  Symbol for a real (double) constant.
  *  \ingroup CasperBindingsCPP
  */
-typedef detail::Constant<double,Symbol::sDouble>	Double;
+typedef Detail::Constant<double,Symbol::sDouble>	double;
 
 /**
  *  Symbol for a string constant.
  *  \ingroup CasperBindingsCPP
  */
-typedef detail::Constant<const char*,Symbol::sString>	String;
+typedef Detail::Constant<const char*,Symbol::sString>	String;
 
 /**
  * 	Symbol for arithmetic expressions. Currently only integer or real-valued

@@ -18,7 +18,7 @@
 
 #include "expression.h"
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 Expression::Expression(Operator  op, SharedSymbol  op1) :

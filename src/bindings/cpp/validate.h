@@ -23,7 +23,7 @@
 #include "cpp.h"
 #include <iostream>
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 /**

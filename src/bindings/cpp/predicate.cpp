@@ -18,7 +18,7 @@
 
 #include "predicate.h"
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 /*

@@ -18,7 +18,7 @@
 
 #include "validate.h"
 
-namespace casperbind {
+namespace Casperbind {
 namespace cpp {
 
 const Symbol* validateIntSet(const Symbol& s)

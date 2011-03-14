@@ -35,16 +35,14 @@ examples+=['int/nqueens.cpp']
 #examples+=['int/xp_nogoods.cpp']
 #examples+=['int/xp_domains.cpp']
 #examples+=['int/debug.cpp']
-examples+=['real/equation.cpp']
-examples+=['real/newton.cpp']
 
-#examples+=['real/prob_mutual.cpp']
+#examples+=['real/equation.cpp']
+#examples+=['real/newton.cpp']
 
-#examples+=['kernel/debug.cpp']
+examples+=['kernel/debug.cpp']
 #examples+=['kernel/goal_sched.cpp']
 examples+=['kernel/getversion.cpp']
 
-#examples+=['real/debug.cpp']
 
 examples+=['set/steiner.cpp']
 examples+=['set/golfer.cpp']
@@ -70,34 +68,30 @@ examples+=['set/partition.cpp']
 ##################
 
 casper_kernel=[]
-casper_kernel+=['container/range.cpp']
-casper_kernel+=['filter/common.cpp']
-casper_kernel+=['filter/gacfilter.cpp']
-casper_kernel+=['filter/bacfilter.cpp']
-casper_kernel+=['filter/valfilter.cpp']
-casper_kernel+=['goal/common.cpp']
-casper_kernel+=['goal/heuristic.cpp']
-casper_kernel+=['goal/scheduler.cpp']
-casper_kernel+=['memory.cpp']
-casper_kernel+=['debug.cpp']
-casper_kernel+=['solver.cpp']
-casper_kernel+=['timer.cpp']
-casper_kernel+=['scheduler.cpp']
-casper_kernel+=['cpsolver.cpp']
-casper_kernel+=['util.cpp']
-casper_kernel+=['susplist.cpp']
-casper_kernel+=['options.cpp']
+casper_kernel+=['goal/goal.cpp']
+casper_kernel+=['goal/explorer.cpp']
+casper_kernel+=['goal/terminal.cpp']
+casper_kernel+=['notify/susplist.cpp']
+casper_kernel+=['state/state.cpp']
+casper_kernel+=['state/env.cpp']
 
-casper_int=[]
-#casper_int+=['gcc/gac-core.cpp']
+casper_cp=[]
+casper_cp+=['filter/common.cpp']
+casper_cp+=['filter/dom.cpp']
+casper_cp+=['filter/bnd.cpp']
+casper_cp+=['filter/val.cpp']
+casper_cp+=['goal/heuristic.cpp']
+casper_cp+=['scheduler.cpp']
+casper_cp+=['store.cpp']
+casper_cp+=['solver.cpp']
 
-casper_int3=[]
-#casper_int3+=['cuboid.cpp']
-#casper_int3+=['goal.cpp']
-#casper_int3+=['filter.cpp']
-#casper_int3+=['common.cpp']
-#casper_int3+=['cubnut.cpp']
-#casper_int3+=['util.cpp']
+casper_util=[]
+casper_util+=['container/stdrange.cpp']
+casper_util+=['memory.cpp']
+casper_util+=['debug.cpp']
+casper_util+=['options.cpp']
+casper_util+=['timer.cpp']
+casper_util+=['util.cpp']
 
 ###################
 ##	BINDINGS 	 ##
@@ -191,14 +185,14 @@ Having being idealized to accommodate a quickly changing research environment, t
 ########### find all sources ###########
 
 library_headers = [] 
-for root,dir,files in os.walk("src/casper"):
+for root,dir,files in os.walk("casper"):
 	if '.svn' not in root and 'minicasper' not in root:
 		filelist = [ os.path.join(root,fi) for fi in files if (fi.endswith(".h") or fi.endswith(".hpp")) ]
 		for f in filelist: 
 			library_headers.append(f)
 
 library_cpps = []
-for root,dir,files in os.walk("src/casper"):
+for root,dir,files in os.walk("casper"):
 	if '.svn' not in root and 'minicasper' not in root:        
 		filelist = [ os.path.join(root,fi) for fi in files if fi.endswith(".cpp") ]
 		for f in filelist: 
@@ -207,14 +201,14 @@ for root,dir,files in os.walk("src/casper"):
 library_sources = library_headers+library_cpps
 
 example_sources = []
-for root,dir,files in os.walk("src/examples"):
+for root,dir,files in os.walk("examples"):
 	if '.svn' not in root:        
 		filelist = [ os.path.join(root,fi) for fi in files ]
 		for f in filelist: 
 			example_sources.append(f)
 
 cspxml_sources = []
-for root,dir,files in os.walk("src/minicasper"):
+for root,dir,files in os.walk("minicasper"):
 	if '.svn' not in root:        
 		filelist = [ os.path.join(root,fi) for fi in files ]
 		for f in filelist: 
@@ -277,7 +271,7 @@ import sys
 # user defined environment
 env = Environment(ENV=os.environ,
                   variables = vars,
-				  CPPPATH=['#src','#src/casper/thirdparty'],
+				  CPPPATH=['#','#thirdparty'],
 				  CPPDEFINES = defined_macros,				  
 				  CXXFILESUFFIX='.cpp'
 				 )
@@ -373,6 +367,7 @@ def getBuildFlags(env,debug_level,optimize_level):
 			link_flags += ['-static']
 		if env['cpp0x']:
 			build_flags += ['-std=gnu++0x']
+		build_flags += ['-Wfatal-errors']
 		#build_flags += ['-ffast-math']
 		#link_flags += ['-ffast-math']	
 		#factor = 64
@@ -409,14 +404,12 @@ import commands
 import time
 import re
 
-# try to guess current revision, first from svninfo and then consulting the REVISION file
+# try to guess current revision, first from git and then consulting the REVISION file
 def getRevision():
 	revision = -1
-	(svninfo_status,svninfo_output) = commands.getstatusoutput("svn info")
-	if svninfo_status==0:
-		tmp=re.findall("Revision: ([0-9]+)",svninfo_output)
-		if len(tmp)>0:
-			revision = tmp[0]
+	(gitdescribe_status,gitdescribe_output) = commands.getstatusoutput("git describe --always")
+	if gitdescribe_status==0:
+		revision = gitdescribe_output
 	if revision==-1:
 		f=open("REVISION", "r")
 		revision = f.readline()[:-1]
@@ -432,7 +425,7 @@ version_macros = defined_macros+\
 				[("CASPER_VERSION_MAJOR",str(casper_version_major))]+ \
 				[("CASPER_VERSION_MINOR",str(casper_version_minor))]+ \
 				[("CASPER_VERSION_RELEASE",str(casper_version_release))]+ \
-				[("CASPER_REVISION",casper_revision)]+ \
+				[("CASPER_REVISION",str(casper_revision))]+ \
 				[("CASPER_BUILDFLAGS",build_str)]
 				#+ \
 				#[("CASPER_BUILDDATE",time.asctime())]
@@ -459,7 +452,20 @@ Help(vars.GenerateHelpText(env))
        
 ############ support for preprocessing macro headers ############
 
-macros = Glob("src/casper/kernel/macro/*.m")
+import fnmatch
+import os
+import string
+
+def RecursiveGlob(rootdir,pattern):
+	matches = []
+	for root, dirnames, filenames in os.walk(rootdir):
+	  for filename in fnmatch.filter(filenames, pattern):
+	      matches.append(os.path.join(root, filename))
+	return matches
+
+macros = RecursiveGlob("casper/","*.m")
+macros_h = [string.replace(i,".m",".h") for i in macros]
+#env.NoClean(macros_h)
 
 def preprocessMacros(env):
 	env.Append(CPPSUFFIXES='.m')
@@ -478,8 +484,6 @@ def preprocessMacros(env):
  
 	Alias("macros",macro_targets)
 
-macros_h = Glob("src/casper/kernel/macro/*.h")
-env.NoClean(macros_h)
 
 if env["CC"].find('gcc')>=0:
 	preprocessMacros(env)
@@ -497,14 +501,14 @@ Export("env")
 
 env['PREFIX']='build/'+MODE
 env['ID'] = 0
-env.VariantDir(env['PREFIX'], 'src', duplicate=0)
+env.VariantDir(env['PREFIX'], '.', duplicate=0)
 
 denv['PREFIX']='msvs-ide/build/debug/'
 denv['ID'] = 1
-denv.VariantDir(denv['PREFIX'], 'src', duplicate=0)
+denv.VariantDir(denv['PREFIX'], '.', duplicate=0)
 renv['PREFIX']='msvs-ide/build/release/'
 renv['ID'] = 2
-renv.VariantDir(renv['PREFIX'], 'src', duplicate=0)
+renv.VariantDir(renv['PREFIX'], '.', duplicate=0)
 
 ############ support for building library ############
 
@@ -519,8 +523,10 @@ versionObjs[denv['ID']] = defineVersionObj(denv)
 casper_srcs=[]
 for i in casper_kernel:
 	casper_srcs+=["casper/kernel/"+i]
-for i in casper_int:
-	casper_srcs+=["casper/int/"+i]
+for i in casper_cp:
+	casper_srcs+=["casper/cp/"+i]
+for i in casper_util:
+	casper_srcs+=["casper/util/"+i]
 
 def defineLibrary(env):
 	casper_objs=[]
@@ -586,12 +592,12 @@ for i in casper_srcs:
 	
 for i in minicasper_srcs:
 	minicasper_objs+=env.Object(env['PREFIX']+"/"+i,
-				CPPPATH=['#src','../../phd/src/'])
+				CPPPATH=['#','../../phd/src/'])
 
 #add external (phd) sources (TEMPORARY)
 for i in minicasper_phd:
 	minicasper_objs += env.Object('../../phd/src/'+i,
-				CPPPATH=['#src','../../phd/src/'])
+				CPPPATH=['#','../../phd/src/'])
 
 libminicasper=env.Library(target=env['PREFIX']+"/minicasper/minicasper",source=minicasper_objs)
 
@@ -601,7 +607,7 @@ Alias('minicasper',libminicasper)
 
 # bindings_cpp library
 
-gen_casper_preds = env.Command('src/bindings/cpp/casperpreds.h',None,'python src/bindings/cpp/genpreds.py > $TARGET')
+gen_casper_preds = env.Command('bindings/cpp/casperpreds.h',None,'python src/bindings/cpp/genpreds.py > $TARGET')
 
 casperbind_cpp_srcs = []
 for i in casperbind_cpp:
@@ -742,7 +748,7 @@ Alias('minicasper-cspxml',minicasper_cspxml_exe)
 import platform
 platform_info = platform.uname()
 SYSFLAGS = '-DBUILD_FLAGS=\'\"'+str(build_flags)+'\"\' \
-			-DCASPER_REVISION='+casper_revision
+			-DCASPER_REVISION='+str(casper_revision)
 
 ############ support for testing ###############
 
@@ -766,13 +772,13 @@ def runTests(env,target,source):
 				"--buildenv-flags="+getVersionInfo("--flags"),\
 				"--timeout=30",\
 				"--memout=900000000",\
-				"--sample-count=3",\
-				"--product-note="+GetOption('notes')]
-
+				"--sample-count=3"]
+	if GetOption('notes')!=None:
+		benchArgs += ["--product-note="+GetOption('notes')]
 	cmd = [source[0].abspath]+benchArgs
 	if not subprocess.call(cmd):
 		import testcmp
-		(couteq,cerreq,tgavg,mgavg) = testcmp.compare("test/BenchmarkResults.xml","test/BenchmarkResults.xml.correct")
+		(couteq,cerreq,tgavg,mgavg) = testcmp.compare("test/BenchmarkResults.xml.correct","test/BenchmarkResults.xml")
 		if not couteq:
 			print "FAILED: different stdout!"
 		if not cerreq:

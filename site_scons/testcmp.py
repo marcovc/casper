@@ -9,8 +9,9 @@ def getTestsField(filename,field):
   testsuite = doc.documentElement
   tests = testsuite.xpath('.//test')
   for test in tests:
-    testName=test.xpath('string(name)')
-    r[testName]=test.xpath(field)
+    if test.xpath('string(result)')=="ok":
+      testName=test.xpath('string(name)')
+      r[testName]=test.xpath(field)
   return r
   
 def compare(file1,file2):
@@ -21,9 +22,12 @@ def compare(file1,file2):
   secs2=getTestsField(file2,"number(secs)")
 
   tgavg=1.0
+  countPositive = 0
   for i in secs1.keys():
-    tgavg *= float(secs2[i])/float(secs1[i])
-  tgavg=pow(tgavg,1.0/len(secs1.keys()))
+    if  float(secs1[i])>0 and float(secs2[i])>0:
+      countPositive+=1
+      tgavg *= float(secs2[i])/float(secs1[i])
+  tgavg=pow(tgavg,1.0/countPositive)
 
   kbs1=getTestsField(file1,"number(kb)")
   kbs2=getTestsField(file2,"number(kb)")

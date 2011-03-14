@@ -19,7 +19,7 @@
 #include "print.h"
 #include "visitor.h"
 
-using namespace casperbind::cpp;
+using namespace Casperbind::cpp;
 
 SymStream& operator<<(SymStream& os, const casperbind::cpp::Index& s);
 
@@ -444,7 +444,7 @@ SymStream& operator<<(SymStream& os, const Symbol& s)
 {
 	SharedSymbol::assertVersionIn(0,0,0,0,1,0);
 
-	using namespace casperbind::cpp;
+	using namespace Casperbind::cpp;
 	switch (s.getType())
 	{
 		case Symbol::sArray:
