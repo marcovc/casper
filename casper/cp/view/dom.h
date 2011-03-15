@@ -47,7 +47,7 @@ struct DomView
 			(Eval)BndView<Eval,View>(store,v).min(),
 			(Eval)BndView<Eval,View>(store,v).max())
 	{
-		store.getEnv().getStats().signalNewIntDomain();	// FIXME
+		store.getStats().signalNewIntDomain();	// FIXME
 		store.post( v == Var<Eval,Dom>(store,&d) );
 	}
 

@@ -35,13 +35,8 @@ Solver::Solver() :
 
 ostream& operator<<(ostream& os, const Casper::CP::SolverStats& s)
 {
-	os << "== Environment ==\n";
-	os << static_cast<const Casper::Env&>(s.solver).getStats() << std::endl;
-	os << "== State ==\n";
 	os << static_cast<const Casper::State&>(s.solver).getStats() << std::endl;
-	os << "== Store ==\n";
 	os << static_cast<const Casper::CP::Store&>(s.solver).getStats() << std::endl;
-	os << "== Current Explorer ==\n";
 	os << s.solver.pExplorer->getStats();
 	return os;
 }

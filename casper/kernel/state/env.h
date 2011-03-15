@@ -32,47 +32,9 @@ namespace Casper {
 
 struct EnvStats
 {
-	counter countBoolDomains;
-	counter countIntDomains;
-	counter countSetDomains;
-	counter countRangeDomains;
-
-	counter	countBoolDomainUpdates;
-	counter	countIntDomainUpdates;
-	counter	countSetDomainUpdates;
-	counter	countRangeDomainUpdates;
-
 	Util::CPUTimer		cpuTimer;
 
-	EnvStats() : countBoolDomains(0),
-				 countIntDomains(0),
-				 countSetDomains(0),
-				 countRangeDomains(0),
-				 countBoolDomainUpdates(0),
-				 countIntDomainUpdates(0),
-				 countSetDomainUpdates(0),
-				 countRangeDomainUpdates(0),
-				 cpuTimer("CPU time"){}
-
-	void signalBoolDomainUpdate()	{ countBoolDomainUpdates++; }
-	void signalIntDomainUpdate()	{ countIntDomainUpdates++; }
-	void signalSetDomainUpdate()	{ countSetDomainUpdates++; }
-	void signalRangeDomainUpdate()	{ countRangeDomainUpdates++; }
-
-	void signalNewBoolDomain()	{ countBoolDomains++; }
-	void signalNewIntDomain()	{ countIntDomains++; }
-	void signalNewSetDomain()	{ countSetDomains++; }
-	void signalNewRangeDomain()	{ countRangeDomains++; }
-
-	counter getNbBoolDomains() const {	return countBoolDomains;	}
-	counter getNbIntDomains() const {	return countIntDomains;	}
-	counter getNbSetDomains() const {	return countSetDomains;	}
-	counter getNbRangeDomains() const {	return countRangeDomains;	}
-
-	counter getNbBoolDomainUpdates() const {	return countBoolDomainUpdates;	}
-	counter getNbIntDomainUpdates() const {	return countIntDomainUpdates;	}
-	counter getNbSetDomainUpdates() const {	return countSetDomainUpdates;	}
-	counter getNbRangeDomainUpdates() const {	return countRangeDomainUpdates;	}
+	EnvStats() : cpuTimer("CPU time"){}
 
 	const Util::CPUTimer& getCPUTimer() const {	return cpuTimer;	}
 	Util::CPUTimer& getCPUTimer()  {	return cpuTimer;	}

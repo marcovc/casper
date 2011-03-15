@@ -30,7 +30,7 @@ struct VarDomCreator< SetFD<T> >
 	SetFD<T>* operator()(Store& store, InputIterator b, InputIterator e)
 	{ 
 		SetFD<T>* ret = new (store) SetFD<T>(store,b,e);
-		store.getEnv().getStats().signalNewSetDomain();
+		store.getStats().signalNewSetDomain();
 		return ret;	
 	}
 
@@ -40,14 +40,14 @@ struct VarDomCreator< SetFD<T> >
 						InputIterator2 pb, InputIterator2 pe)
 	{ 
 		SetFD<T>* ret = new (store) SetFD<T>(store,ib,ie,pb,pe);
-		store.getEnv().getStats().signalNewSetDomain();
+		store.getStats().signalNewSetDomain();
 		return ret;	
 	}
 	
 	SetFD<T>* operator()(Store& store, const Util::StdRange<T>& rPoss)
 	{	
 		SetFD<T>* ret = new (store) SetFD<T>(store,rPoss);
-		store.getEnv().getStats().signalNewSetDomain();
+		store.getStats().signalNewSetDomain();
 		return ret;	
 	}
 	
@@ -55,14 +55,14 @@ struct VarDomCreator< SetFD<T> >
 										const Util::StdRange<T>& rPoss)
 	{	
 		SetFD<T>* ret = new (store) SetFD<T>(store,rIn,rPoss);
-		store.getEnv().getStats().signalNewSetDomain();
+		store.getStats().signalNewSetDomain();
 		return ret;	
 	}
 	
 	SetFD<T>* operator()(Store& store, const Util::StdList<T>& rPoss)
 	{	
 		SetFD<T>* ret = new (store) SetFD<T>(store,rPoss);
-		store.getEnv().getStats().signalNewSetDomain();
+		store.getStats().signalNewSetDomain();
 		return ret;	
 	}
 	
@@ -70,7 +70,7 @@ struct VarDomCreator< SetFD<T> >
 										const Util::StdList<T>& rPoss)
 	{	
 		SetFD<T>* ret = new (store) SetFD<T>(store,rIn,rPoss);
-		store.getEnv().getStats().signalNewSetDomain();
+		store.getStats().signalNewSetDomain();
 		return ret;	
 	}
 		

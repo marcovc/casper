@@ -22,14 +22,6 @@
 
 ostream& operator<<(ostream& os, const Casper::EnvStats& s)
 {
-	os  << left << setw (30) << "Number of Boolean domains" << ":" <<  std::setw (10) << std::right
-							  << s.getNbBoolDomains() << std::endl
-	   << left << setw (30) << "Number of integer domains" << ":" <<  std::setw (10) << std::right
-							  << s.getNbIntDomains() << std::endl
-	   << left << setw (30) << "Number of set domains" << ":" <<  std::setw (10) << std::right
-							  << s.getNbSetDomains() << std::endl
-	   << left << setw (30) << "Number of range domains" << ":" <<  std::setw (10) << std::right
-							  << s.getNbRangeDomains();
 	return os;
 }
 

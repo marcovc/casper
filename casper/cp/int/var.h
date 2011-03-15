@@ -57,7 +57,7 @@ FD<FD_TP_LIST(1)>* VarDomCreator<FD<FD_TP_LIST(1)> >::operator()(Store& store)
 	FD<FD_TP_LIST(1)>* ret = new (store) FD<FD_TP_LIST(1)>(store,
 						limits<typename FD<FD_TP_LIST(1)>::Value>::min(),
 						limits<typename FD<FD_TP_LIST(1)>::Value>::max());
-	store.getEnv().getStats().signalNewIntDomain();
+	store.getStats().signalNewIntDomain();
 	return ret;
 }
 
@@ -68,7 +68,7 @@ FD<FD_TP_LIST(1)>* VarDomCreator<FD<FD_TP_LIST(1)> >::operator()(Store& store,
 	assert(min <= max);
 	FD<FD_TP_LIST(1)>* ret =
 		new (store) FD<FD_TP_LIST(1)>(store,min,max);
-	store.getEnv().getStats().signalNewIntDomain();
+	store.getStats().signalNewIntDomain();
 	return ret;
 }
 
@@ -76,7 +76,7 @@ template<FD_TP_SPEC(1)>
 FD<FD_TP_LIST(1)>* VarDomCreator<FD<FD_TP_LIST(1)> >::operator()(Store& store, const T1& i)
 {
 	FD<FD_TP_LIST(1)>* ret = new (store) FD<FD_TP_LIST(1)>(store,i,i);
-	store.getEnv().getStats().signalNewIntDomain();
+	store.getStats().signalNewIntDomain();
 	return ret;
 }
 
@@ -89,7 +89,7 @@ FD<FD_TP_LIST(1)>* VarDomCreator<FD<FD_TP_LIST(1)> >::operator()(Store& store,
 	//assert(min <= max);
 	FD<FD_TP_LIST(1)>* ret =
 		new (store) FD<FD_TP_LIST(1)>(store,min,max);
-	store.getEnv().getStats().signalNewIntDomain();
+	store.getStats().signalNewIntDomain();
 	return ret;
 }
 
@@ -100,7 +100,7 @@ FD<FD_TP_LIST(1)>* VarDomCreator<FD<FD_TP_LIST(1)> >::operator()
 	//assert(min <= max);
 	FD<FD_TP_LIST(1)>* ret =
 		new (store) FD<FD_TP_LIST(1)>(store,l);
-	store.getEnv().getStats().signalNewIntDomain();
+	store.getStats().signalNewIntDomain();
 	return ret;
 }
 
@@ -125,21 +125,21 @@ struct VarDomCreator<BD>
 	BD* operator()(Store& store)
 	{
 		BD* ret = new (store) BD(store,false,true);
-		store.getEnv().getStats().signalNewBoolDomain();
+		store.getStats().signalNewBoolDomain();
 		return ret;
 	}
 
 	BD* operator()(Store& store, bool i)
 	{
 		BD* ret = new (store) BD(store,i,i);
-		store.getEnv().getStats().signalNewBoolDomain();
+		store.getStats().signalNewBoolDomain();
 		return ret;
 	}
 
 	BD* operator()(Store& store, bool l,bool h)
 	{
 		BD* ret = new (store) BD(store,l,h);
-		store.getEnv().getStats().signalNewBoolDomain();
+		store.getStats().signalNewBoolDomain();
 		return ret;
 	}
 

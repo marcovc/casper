@@ -34,10 +34,28 @@ struct StoreStats
 	counter countPropagations;
 	counter countFilters;
 
+	counter countBoolDomains;
+	counter countIntDomains;
+	counter countSetDomains;
+	counter countRangeDomains;
+
+	counter	countBoolDomainUpdates;
+	counter	countIntDomainUpdates;
+	counter	countSetDomainUpdates;
+	counter	countRangeDomainUpdates;
+
 	StoreStats() :
 				countFPComputations(0),
 				countPropagations(0),
-				countFilters(0) {}
+				countFilters(0),
+				countBoolDomains(0),
+				countIntDomains(0),
+				countSetDomains(0),
+				countRangeDomains(0),
+				countBoolDomainUpdates(0),
+				countIntDomainUpdates(0),
+				countSetDomainUpdates(0),
+				countRangeDomainUpdates(0){}
 
 	void signalPropagation()
 	{ ++countPropagations; }
@@ -56,6 +74,27 @@ struct StoreStats
 
 	counter	getNbFPComputations()	const
 	{	return countFPComputations;	}
+
+	void signalBoolDomainUpdate()	{ countBoolDomainUpdates++; }
+	void signalIntDomainUpdate()	{ countIntDomainUpdates++; }
+	void signalSetDomainUpdate()	{ countSetDomainUpdates++; }
+	void signalRangeDomainUpdate()	{ countRangeDomainUpdates++; }
+
+	void signalNewBoolDomain()	{ countBoolDomains++; }
+	void signalNewIntDomain()	{ countIntDomains++; }
+	void signalNewSetDomain()	{ countSetDomains++; }
+	void signalNewRangeDomain()	{ countRangeDomains++; }
+
+	counter getNbBoolDomains() const {	return countBoolDomains;	}
+	counter getNbIntDomains() const {	return countIntDomains;	}
+	counter getNbSetDomains() const {	return countSetDomains;	}
+	counter getNbRangeDomains() const {	return countRangeDomains;	}
+
+	counter getNbBoolDomainUpdates() const {	return countBoolDomainUpdates;	}
+	counter getNbIntDomainUpdates() const {	return countIntDomainUpdates;	}
+	counter getNbSetDomainUpdates() const {	return countSetDomainUpdates;	}
+	counter getNbRangeDomainUpdates() const {	return countRangeDomainUpdates;	}
+
 };
 
 

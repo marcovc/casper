@@ -27,7 +27,15 @@
 
 ostream& operator<<(ostream& os, const Casper::CP::StoreStats& s)
 {
-	os  << left << setw (30) << "Number of filters" << ":" <<  std::setw (10) << std::right
+	os  << left << setw (30) << "Number of Boolean domains" << ":" <<  std::setw (10) << std::right
+							  << s.getNbBoolDomains() << std::endl
+	   << left << setw (30) << "Number of integer domains" << ":" <<  std::setw (10) << std::right
+							  << s.getNbIntDomains() << std::endl
+	   << left << setw (30) << "Number of set domains" << ":" <<  std::setw (10) << std::right
+							  << s.getNbSetDomains() << std::endl
+	   << left << setw (30) << "Number of range domains" << ":" <<  std::setw (10) << std::right
+							  << s.getNbRangeDomains() << std::endl
+	   << left << setw (30) << "Number of filters" << ":" <<  std::setw (10) << std::right
 							  << s.getNbFilters() << std::endl
 	   << left << setw (30) << "Number of filter executions" << ":" <<  std::setw (10) << std::right
 							  << s.getNbPropagations() << std::endl

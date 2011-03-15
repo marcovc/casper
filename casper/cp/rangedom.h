@@ -238,35 +238,35 @@ template<class> struct VarDomCreator;
 template<class T>
 struct VarDomCreator<RangeDom<T> >
 {
-	RangeDom<T>* operator()(Env& env)
+	RangeDom<T>* operator()(Store& store)
 	{
-		RangeDom<T>* ret = new (env) RangeDom<T>(env);
-		env.getStats().signalNewRangeDomain(ret);
+		RangeDom<T>* ret = new (store) RangeDom<T>(store);
+		store.getStats().signalNewRangeDomain();
 		return ret;
 	}
 
-	RangeDom<T>* operator()(Env& env,
+	RangeDom<T>* operator()(Store& store,
 							const T& min, const T& max)
 	{
 		assert(min <= max);
-		RangeDom<T>* ret = new (env) RangeDom<T>(env,min,max);
-		env.getStats().signalNewRangeDomain(ret);
+		RangeDom<T>* ret = new (store) RangeDom<T>(store,min,max);
+		store.getStats().signalNewRangeDomain();
 		return ret;
 	}
 
-	RangeDom<T>* operator()(Env& env, const T& i)
+	RangeDom<T>* operator()(Store& store, const T& i)
 	{
-		RangeDom<T>* ret = new (env) RangeDom<T>(env,i);
-		env.getStats().signalNewRangeDomain(ret);
+		RangeDom<T>* ret = new (store) RangeDom<T>(store,i);
+		store.getStats().signalNewRangeDomain();
 		return ret;
 	}
 
 	template<class T1,class T2>
-	RangeDom<T>* operator()(Env& env,const T1& min, const T2& max)
+	RangeDom<T>* operator()(Store& store,const T1& min, const T2& max)
 	{
 		assert(min <= max);
-		RangeDom<T>* ret = new (env) RangeDom<T>(env,min,max);
-		env.getStats().signalNewRangeDomain(ret);
+		RangeDom<T>* ret = new (store) RangeDom<T>(store,min,max);
+		store.getStats().signalNewRangeDomain();
 		return ret;
 	}
 
@@ -297,7 +297,7 @@ struct BndView<Eval1,Util::StdRange<Eval2> >
 	{ return ub >= max() and lb <= min();	}
 	void attach(INotifiable* f) { 	}
 	void detach(INotifiable* f) {	}
-	Util::StdRange<Eval2> getView() const	{ return v;	}
+	Util::StdRange<Eval2> getObj() const	{ return v;	}
 
 	Util::StdRange<Eval2> v;
 };
@@ -320,7 +320,7 @@ struct BndView<Eval1,Var<Eval2,RangeDom<Eval2> > >
 
 	void attach(INotifiable* f) { 	v.domain().attachOnBounds(f); }
 	void detach(INotifiable* f) {	v.domain().detachOnBounds(f); }
-	Var<Eval2,RangeDom<Eval2> >  getView() const	{ return v;	}
+	Var<Eval2,RangeDom<Eval2> >  getObj() const	{ return v;	}
 
 	Var<Eval2,RangeDom<Eval2> >	v;
 };
