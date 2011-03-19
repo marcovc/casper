@@ -23,6 +23,7 @@
 #include <casper/kernel/notify/notifier.h>
 #include <casper/util/pimpl.h>
 #include <casper/kernel/state/env.h>
+#include <casper/kernel/rel/rel.h>
 
 namespace Casper {
 
@@ -112,7 +113,19 @@ struct GetPEnv<ParExpr<T> >
 	{ return &s.getEnv(); }
 };
 
+typedef ParExpr<int>	IntParExpr;
+typedef ParExpr<bool>	BoolParExpr;
+typedef ParExpr<double>	DoubleParExpr;
+
 } // Casper
+
+
+template<class T>
+std::ostream& operator<<(std::ostream& os, const Casper::ParExpr<T>& v)
+{
+	os << v.value();
+	return os;
+}
 
 #endif /* CASPER_KERNEL_PAR_EXPR_H_ */
 

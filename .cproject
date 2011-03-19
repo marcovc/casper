@@ -70,7 +70,7 @@
 					<target name="example-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 						<buildCommand>scons</buildCommand>
 						<buildArguments>-j 3 debug_level=3</buildArguments>
-						<buildTarget>build/debug/examples/int/ortholatin</buildTarget>
+						<buildTarget>build/debug/examples/lp/debug</buildTarget>
 						<stopOnError>false</stopOnError>
 						<useDefaultCommand>false</useDefaultCommand>
 						<runAllBuilders>true</runAllBuilders>

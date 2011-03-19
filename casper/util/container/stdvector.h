@@ -134,6 +134,17 @@ struct StdVector
 			::new(&data[i++]) Elem(*(b++));
 	}
 
+	StdVector(std::initializer_list<int> l) :
+		mHeap(stdHeap),
+		_size(std::distance(l.begin(),l.end())),
+		data((Elem*)mHeap.allocate(_size*sizeof(Elem)))
+	{
+		uint i = 0;
+		auto b = l.begin();
+		while (b != l.end())
+			::new(&data[i++]) Elem(*(b++));
+	}
+
 	~StdVector()
 	{
 		for (uint i = 0; i < _size; i++)
@@ -195,11 +206,6 @@ struct StdVector
 
 } // Util
 
-namespace Traits {
-template<class T>
-struct GetEval<Util::StdVector<T> >
-{	typedef Seq<T>	Type;	};
-} // Traits
 
 } // Casper
 

@@ -119,6 +119,7 @@ struct GetPEnv<Par<T> >
 
 typedef Par<int>	IntPar;
 typedef Par<bool>	BoolPar;
+typedef Par<double>	DoublePar;
 
 } // Casper
 

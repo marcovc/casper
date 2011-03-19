@@ -55,6 +55,9 @@ examples+=['cp/set/hamming.cpp']
 #examples+=['cp/set/bacp.cpp']
 examples+=['cp/set/partition.cpp']
 
+
+examples+=['lp/debug.cpp']
+
 ##################
 ##	LIBRARY		##
 ##################
@@ -84,6 +87,10 @@ casper_util+=['debug.cpp']
 casper_util+=['options.cpp']
 casper_util+=['timer.cpp']
 casper_util+=['util.cpp']
+
+casper_lp=[]
+casper_lp+=['driver.cpp']
+casper_lp+=['solver.cpp']
 
 ###################
 ##	BINDINGS 	 ##
@@ -235,6 +242,7 @@ vars.Add(BoolVariable('asserts', 'extra run-time checks', False))
 vars.Add(BoolVariable('log', 'enable builtin debugger', False))
 vars.Add(BoolVariable('static_link', 'static link', False))
 vars.Add(BoolVariable('cpp0x', 'enable c++0x extensions', True))
+vars.Add(BoolVariable('lp', 'builds interface to glpk (requires preinstalled glpk library)', True))
 vars.Add(PathVariable('install_prefix', 'installation prefix', '.'))
 vars.Add(PathVariable('boost_path','path where boost libraries are installed',None))
 vars.Add(PathVariable('gmp_path','path where gmp library is installed',None))
@@ -305,6 +313,8 @@ if not env['safe_rounding'] or \
 	confCommon.env.Append(CPPDEFINES = ['CASPER_UNSAFE_ROUNDING'])
 if env['profile']:
 	confCommon.CheckLib( library='gcov', autoadd=1)
+if env['lp']:
+	confCommon.CheckLib( library='glpk', autoadd=1)
 confCommon.CheckLib(library='boost_program_options',language='C++', autoadd=1)
 confCommon.Finish();
 
@@ -519,6 +529,8 @@ for i in casper_cp:
 	casper_srcs+=["casper/cp/"+i]
 for i in casper_util:
 	casper_srcs+=["casper/util/"+i]
+for i in casper_lp:
+	casper_srcs+=["casper/lp/"+i]
 
 def defineLibrary(env):
 	casper_objs=[]

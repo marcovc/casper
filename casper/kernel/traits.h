@@ -29,6 +29,7 @@ struct Goal;
 // forward declarations of classes defined in /util
 namespace Util {
 template<class,int> struct StdArray;
+template<class> struct StdVector;
 template<class> struct StdList;
 template<class> struct StdSList;
 template<class> struct StdRange;
@@ -86,6 +87,10 @@ struct GetEval<Util::StdArray<T,dims> >
 {	typedef Seq<typename Traits::GetEval<T>::Type>	Type;	};
 
 template<class T>
+struct GetEval<Util::StdVector<T> >
+{	typedef Seq<typename Traits::GetEval<T>::Type>	Type;	};
+
+template<class T>
 struct GetEval<Util::StdSList<T> >
 {	typedef Seq<typename Traits::GetEval<T>::Type>	Type;	};
 
@@ -112,6 +117,10 @@ struct GetElem;
 
 template<class T,int dims>
 struct GetElem<Util::StdArray<T,dims> >
+{	typedef T	Type;	};
+
+template<class T>
+struct GetElem<Util::StdVector<T> >
 {	typedef T	Type;	};
 
 template<class T>

@@ -122,6 +122,10 @@ struct RangeDom
 
 	bool 	empty() const { return lb > ub; }
 
+	bool lowerBounded() const {	return lb > limits<T>::negInf();	}
+	bool upperBounded() const {	return ub < limits<T>::posInf();	}
+	bool bounded() const {	return lowerBounded() and upperBounded();	}
+
 	bool updateMin(const Value& v);
 	bool updateMax(const Value& v);
 	bool updateRange(const Value& min,const Value& max);
