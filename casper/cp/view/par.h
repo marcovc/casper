@@ -27,15 +27,15 @@ namespace Casper {
 
 
 /**
- * 	ParView over groundness testing.
+ * 	ConstParView over groundness testing.
  * 	\ingroup Views
  **/
 template<class View>
-struct ParViewRel1<Ground,View,bool> : IParExpr<bool>
+struct ConstParView1<Ground,View,bool> : IConstPar<bool>
 {
 	typedef typename Traits::GetEval<View>::Type	ViewEval;
-	ParViewRel1(Env& env, const View& p1) :
-		IParExpr<bool>(env),p1(env,p1) {}
+	ConstParView1(Env& env, const View& p1) :
+		IConstPar<bool>(env),p1(env,p1) {}
 	bool value() const
 	{	return p1.ground();	}
 	void attach(INotifiable* f) { 	p1.attach(f); }

@@ -22,7 +22,7 @@
 #include <casper/kernel/notify/notifiable.h>
 #include <casper/kernel/notify/notifier.h>
 #include <casper/cp/store.h>
-#include <casper/kernel/par/parexpr.h>
+#include <casper/kernel/par/par.h>
 
 //#include <casper/kernel/notify/susplist.h>
 //#include <casper/kernel/relation.h>
@@ -96,11 +96,11 @@ struct ExprMatch<ValView<Eval,View>,expression::Value>
 {	static const bool value = true;	};
 
 template<class Eval>
-struct ExprMatch<ParExpr<Eval>,expression::Par>
+struct ExprMatch<Par<Eval>,expression::Par>
 {	static const bool value = true;	};
 
 template<class Eval,class View>
-struct ExprMatch<ParView<Eval,View>,expression::Par>
+struct ExprMatch<ConstParView<Eval,View>,expression::Par>
 {	static const bool value = true;	};
 
 template<class Func,class View>
@@ -143,7 +143,7 @@ bool isValExpr(const View& v)
 {	return ExprMatch<View,expression::Value>::value;	}
 
 template<class View>
-bool isParExpr(const View& v)
+bool isPar(const View& v)
 {	return ExprMatch<View,expression::Par>::value;	}
 
 template<class View>

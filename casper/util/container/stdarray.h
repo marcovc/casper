@@ -467,7 +467,7 @@ template<class> struct GetPEnv;
 
 template<class T,int Dims>
 struct GetPEnv<Util::StdArray<T,Dims> >
-{	PEnv* operator()(const Util::StdArray<T,Dims>& v)
+{	Env* operator()(const Util::StdArray<T,Dims>& v)
 	{	assert(v.size()>0); return getPEnv(v[0]); }
 };
 
@@ -491,18 +491,18 @@ template<class T, int I>
 std::istream& operator>>(std::istream& is, Casper::Util::StdArray<T,I>& v)
 {
 	char sep;
-	is >> ws >> sep;
+	is >> std::ws >> sep;
 	assert(sep == '{');
 	if (!v.empty())
 	{
- 		is >> ws >> v[0];
+ 		is >> std::ws >> v[0];
 		for (unsigned int n = 1; n < v.size(); n++)
 		{
-			is >> ws >> sep >> ws >> v[n];
+			is >> std::ws >> sep >> std::ws >> v[n];
 			assert(sep == ',');
 		}
 	}
-	is >> ws >> sep;
+	is >> std::ws >> sep;
 	assert(sep == '}');
 	return is;
 }

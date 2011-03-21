@@ -31,9 +31,9 @@ namespace Casper {
  * Expr
  *********************/
 
-template<class,class> struct ParView;
-template<class,class,class> struct ParViewRel1;
-template<class,class,class,class> struct ParViewRel2;
+template<class,class> struct ConstParView;
+template<class,class,class> struct ConstParView1;
+template<class,class,class,class> struct ConstParView2;
 
 /**
  *	Interface to a delayed expression.
@@ -41,7 +41,7 @@ template<class,class,class,class> struct ParViewRel2;
  *  \ingroup Expressions
  */
 template<class T>
-struct IParExpr : INotifier
+struct IConstPar : INotifier
 {
 	/// Returns the current evaluation of the expression.
 	virtual T 		value() const = 0;
@@ -49,7 +49,7 @@ struct IParExpr : INotifier
 	Env&		getEnv() const {	return env; }
 
 	/// Creates a new IMutExpr.
-	IParExpr(Env& env) : env(env) {}
+	IConstPar(Env& env) : env(env) {}
 	bool notify() { assert(0); return true; }
 
 	Env&				env;
@@ -61,32 +61,32 @@ struct IParExpr : INotifier
  *  \ingroup Expressions
  */
 template<class Eval>
-struct ParExpr : Util::PImplIdiom<IParExpr<Eval> >
+struct ParExpr : Util::PImplIdiom<IConstPar<Eval> >
 {
 	/// Expression type.
 	typedef ParExpr<Eval>	Self;
 
 	/// Parent type.
-	typedef Util::PImplIdiom<IParExpr<Eval> > Super;
+	typedef Util::PImplIdiom<IConstPar<Eval> > Super;
 
 	/// Constructor from a generic object.
 	template<class T1>
 	ParExpr(Env& env, const T1& t) :
-		Super(new (env) ParView<Eval,T1>(env,t)) {}
+		Super(new (env) ConstParView<Eval,T1>(env,t)) {}
 
 	/// Constructor from an unary relation.
 	template<class Func,class T1>
 	ParExpr(Env& env, const Rel1<Func,T1>& r) :
-		Super(new (env) ParViewRel1<Func,T1,Eval>(env,r.p1)) {}
+		Super(new (env) ConstParView1<Func,T1,Eval>(env,r.p1)) {}
 
 	/// Constructor from a binary relation.
 	template<class Func,class T1,class T2>
 	ParExpr(Env& env, const Rel2<Func,T1,T2>& r) :
-		Super(new (env) ParViewRel2<Func,T1,T2,Eval>(env,r.p1,r.p2)) {}
+		Super(new (env) ConstParView2<Func,T1,T2,Eval>(env,r.p1,r.p2)) {}
 
 	ParExpr(Env& env, const ParExpr<Eval>& t) : Super(t) {}
 
-	ParExpr(IParExpr<Eval>* m) : Super(m)	{}
+	ParExpr(IConstPar<Eval>* m) : Super(m)	{}
 
 	/// Returns the current evaluation of the expression.
 	Eval value() const { return Super::pImpl->value(); }

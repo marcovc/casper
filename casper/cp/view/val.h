@@ -555,7 +555,7 @@ template<class Eval>
 struct ValView<Eval,Casper::Par<Eval> >
 {
 	ValView(Store& store, const Casper::Par<Eval>& p1) :
-		env(p1.getEnv()),val(p1.value()) {}
+		state(p1.getState()),val(p1.value()) {}
 	Eval value() const {	return val;}
 	bool setValue(const Eval& v)
 	{	return v == val;	}
@@ -564,35 +564,13 @@ struct ValView<Eval,Casper::Par<Eval> >
 	void attach(INotifiable* f) {}
 	void detach(INotifiable* f) {}
 	Casper::Par<Eval>	getObj() const
-	{	return Casper::Par<Eval>(env,val);	}
+	{	return Casper::Par<Eval>(state,val);	}
 
-	Env&	env;
+	State&	state;
 	const Eval	val;
 };
 
 
-/**
- * 	ValView over MutExpr.
- * 	\ingroup Views
- **/
-template<class Eval>
-struct ValView<Eval,Casper::ParExpr<Eval> >
-{
-	ValView(Store& store, const Casper::ParExpr<Eval>& p1) :
-		env(p1.getEnv()),val(p1.value())	{}
-	Eval value() const {	return val;}
-	bool setValue(const Eval& v)
-	{	return v == val;	}
-
-	bool ground() const { return true; }
-	void attach(INotifiable* f) {}
-	void detach(INotifiable* f) {}
-	Casper::ParExpr<Eval>	getView() const
-	{	return Casper::ParExpr<Eval>(env,val);	}
-
-	Env&	env;
-	Eval	val;
-};
 } // CP
 
 

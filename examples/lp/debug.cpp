@@ -31,9 +31,7 @@ int main()
 	solver.setObjective(Solver::Maximize,{0},{1},0);
 	solver.postLessEqual({0,1},{1,1},0.3);
 	solver.solve();
-	DoubleParExpr p0(env);
-	solver.bindValue(0,p0);
-	cout << p0 << " " << solver.getValue(1) << " " << solver.getObjValue() << endl;
+	cout << solver.getValue(0) << " " << solver.getValue(1) << " " << solver.getObjValue() << endl;
 
 	env.getState().restoreCP();
 	solver.setObjective(Solver::Minimize,{0},{1},0);

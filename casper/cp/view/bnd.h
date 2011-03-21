@@ -28,7 +28,6 @@
 
 namespace Casper {
 
-template<class> struct ParExpr;
 
 namespace Traits {
 template<class EvalT,class View>
@@ -1907,7 +1906,7 @@ template<class Eval>
 struct BndView<Eval,Par<Eval> >
 {
 	BndView(Store& store, const Par<Eval>& p1) :
-		env(p1.getEnv()),val(p1.value())	{}
+		state(p1.getState()),val(p1.value())	{}
 	Eval min() const {	return val;}
 	Eval max() const {	return val;}
 	bool updateMin(const Eval& v) 	{ return v <= min(); }
@@ -1919,38 +1918,12 @@ struct BndView<Eval,Par<Eval> >
 	void attach(INotifiable* f) {}
 	void detach(INotifiable* f) 	{}
 	Par<Eval>	getObj() const
-	{	return Par<Eval>(env,val);	}
+	{	return Par<Eval>(state,val);	}
 
-	Env&	env;
+	State&	state;
 	Eval	val;
 };
 
-
-/**
- * 	BndView over MutExpr.
- * 	\ingroup Views
- **/
-template<class Eval>
-struct BndView<Eval,Casper::ParExpr<Eval> >
-{
-	BndView(Store& store, const Casper::ParExpr<Eval>& p1) :
-		env(p1.getEnv()),val(p1.value())	{}
-	Eval min() const {	return val;}
-	Eval max() const {	return val;}
-	bool updateMin(const Eval& v) 	{ return v <= min(); }
-	bool updateMax(const Eval& v)   { return v >= max(); }
-	void range(Eval& l,Eval& u) const {	l = u = val; }
-	bool updateRange(const Eval& l, const Eval& u)
-	{	return l <= val and val <= u;	}
-
-	void attach(INotifiable* f) {}
-	void detach(INotifiable* f) 	{}
-	Casper::ParExpr<Eval>	getObj() const
-	{	return Casper::ParExpr<Eval>(env,val);	}
-
-	Env&	env;
-	Eval	val;
-};
 
 } // CP
 } // Casper

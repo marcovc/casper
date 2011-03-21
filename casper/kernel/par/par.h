@@ -20,72 +20,72 @@
 #ifndef CASPER_KERNEL_PAR_PAR_H_
 #define CASPER_KERNEL_PAR_PAR_H_
 
-#include <casper/kernel/notify/susplist.h>
+#include <casper/util/pimpl.h>
 
 namespace Casper {
 
 /**
- * A Par object represents a parameter in a model. It provides copy-by-reference
+ *	Interface to a delayed expression.
+ *
+ *  \ingroup Expressions
+ */
+template<class T>
+struct IConstPar
+{
+	/// Returns the current evaluation of the expression.
+	virtual T 		value() const = 0;
+};
+
+template<class,class> struct ConstParView;
+
+/**
+ * A Par object is like a typed version of a logical variable. It provides copy-by-reference
  * and reversible policies to plain c++ types.
  */
 template<class T>
-class Par
+struct Par : Util::PImplIdiom<Reversible<IConstPar<T>*> >
 {
 	public:
 
-	typedef T						Data;
-	typedef Par<Data> 				Self;
+	typedef T						Eval;
+	typedef Par<Eval> 				Self;
 
-
-	/// The type of the variable domain
-	typedef Reversible<Data>		RData;
-	typedef RData*					PRData;
+	typedef IConstPar<T> Iface;
+	typedef Reversible<Iface*> 	RPIface;
+	typedef Util::PImplIdiom<Reversible<IConstPar<T>*> > Super;
 
 	/// The default constructor
-	Par(Env& env) : env(env),
-					pData(new (env) RData(env)),
-					updateSL(env) {}
+	Par(State& state) :
+		Super(new (state) RPIface(state,new (state) ConstParView<Eval,Eval>(state,Eval())))
+	{}
 
 	/// Builds a new parameter pointing to the data of \a s.
-	Par(const Self& s) : env(s.getEnv()),
-							pData(s.pData),
-							updateSL(s.updateSL)	{ }
+	Par(const Self& s) : Super(s) { }
 
-	/// A constructor with one parameter
-	Par(Env& env, const T& p1) : env(env),
-		pData(new (env) RData(env,p1)),updateSL(env)	{}
+	/// Constructor from a generic object.
+	template<class T1>
+	Par(State& state, const T1& t) :
+		Super(new (state) RPIface(state, new (state) ConstParView<Eval,T1>(state,t))) {}
 
 	~Par() {}
 
-	Env&		getEnv()	const	{	return env;	}
+	/// Returns the value of the expression
+	Eval value() const {	assert(Super::getPImpl()!=NULL); return Super::getImpl().get()->value();	}
 
-	/// Returns the value of the variable
-	const Data& value() const {return (*pData).get();}
-
-	/// Returns a pointer to the value of the variable
-	//PRData& pValue() {return pData;}
-
-	//operator const Data&() const { return value();	}
-
-	//friend ostream& operator<< <>(ostream& os, const Self& f);
-
-	/// Makes the variable domain point to the value of \a s
-	bool operator=(const Self& s)
+	template<class T1>
+	const Self& operator=(const T1& t)
 	{
-		*pData = s.value();
-		return updateSL.notifyAll();
+		Super::getImpl() = new (getState()) ConstParView<Eval,T1>(getState(),t);
+		return *this;
 	}
 
-	/// Assign \a s to the variable
-	bool operator=(const Data& s)
-	{
-		*pData = s;
-		return updateSL.notifyAll();
-	}
+	State& getState() const {	return this->getImpl().getState();	}
 
 	const Self& operator++()
-	{	(*pData)=(*pData).get()+1;	return *this;	}
+	{	*this = value()+1; return *this;	}
 
+	bool operator==(const Self& other) const
+	{	return value() == other.value(); }
 
 	// no because it takes precedence to constraints posted on variable
 	//operator const Data&() const { return *pData; }
@@ -96,13 +96,9 @@ class Par
 	//{	return *pData;	}
 
 	/// Registers notifiable \a f on value update event
-	void attachOnUpdate(INotifiable*	f) { updateSL.attach(f); }
-	void detachOnUpdate(INotifiable*	f) { updateSL.detach(f); }
+//	void attachOnUpdate(INotifiable*	f) { updateSL.attach(f); }
+//	void detachOnUpdate(INotifiable*	f) { updateSL.detach(f); }
 
-	private:
-	Env&				env;
-	PRData 				pData;
-	EventSuspList		updateSL;
 };
 
 namespace Traits {
@@ -111,11 +107,6 @@ struct GetEval<Par<T> >
 {	typedef	T	Type;	};
 } // Traits
 
-template<class T>
-struct GetPEnv<Par<T> >
-{	Env* operator()(const Par<T>& v)
-	{ return &v.getEnv(); }
-};
 
 typedef Par<int>	IntPar;
 typedef Par<bool>	BoolPar;

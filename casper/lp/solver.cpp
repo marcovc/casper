@@ -148,9 +148,9 @@ double Solver::getObjValue() const
 	return driver.getObjValue();
 }
 
-struct GetValue : IParExpr<double>
+struct GetValue : IConstPar<double>
 {
-	typedef IParExpr<double> Super;
+	typedef IConstPar<double> Super;
 	GetValue(const Solver& solver,uint idx) :
 		Super(solver.getEnv()),solver(solver),idx(idx) {}
 	double value() const
