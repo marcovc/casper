@@ -47,7 +47,7 @@ namespace Detail {
 	(must be an integer, eg. int,short,unsigned char,etc).
 	\note requirement (outdated?) : sizeof( \a type ) > \a size + 1
  */
-template<typename T, int maxSize, class Alloc = allocator<bool> >
+template<typename T, int maxSize, class Alloc = std::allocator<bool> >
 class BitsetA : private Vector<bool>
 {
 	public:
@@ -75,7 +75,7 @@ class BitsetA : private Vector<bool>
 
 	class Iterator;
 	//friend class Iterator;
-	class Iterator : public std::iterator<bidirectional_iterator_tag,
+	class Iterator : public std::iterator<std::bidirectional_iterator_tag,
 									 	  const InternalValue,
 									 	  Difference>
 	{
@@ -181,7 +181,8 @@ template<class T, int maxSize,class AllocT>
 typename BitsetA<T,maxSize,AllocT>::Iterator&
 BitsetA<T,maxSize,AllocT>::Iterator::operator++() // pre-increment
 {
-	while (!(*pOwner)[++curVal] && curVal<maxSize)
+	//while (!(*pOwner)[++curVal] && curVal<maxSize)
+	while (++curVal<maxSize and !(*pOwner)[curVal])
 		;
 	return *this;
 }
@@ -258,13 +259,10 @@ template<class T, int maxSize,class AllocT>
 typename BitsetA<T,maxSize,AllocT>::Iterator
 BitsetA<T,maxSize,AllocT>::upperBound(const Key& k) const
 {
-	Iterator ret(this,k);
+	Iterator ret(this,k+1);
 	while (ret.curVal<maxSize && !(*this)[ret.curVal])
 		++ret.curVal;
-	if (ret.curVal < maxSize)
-		return ++ret;
-	else
-		return ret;
+	return ret;
 }
 
 template<class T, int maxSize,class AllocT>
@@ -443,7 +441,7 @@ struct SelectElement<Bitset<Size>,T,Container,CompareT>
 	Writes the contents of the bitset to an ostream.
 */
 template<class T, int maxSize,class AllocT>
-ostream& operator<<(ostream& o, const Casper::Detail::BitsetA<T,maxSize,AllocT>& a)
+std::ostream& operator<<(std::ostream& o, const Casper::Detail::BitsetA<T,maxSize,AllocT>& a)
 {
 	o << "{";
 	for (typename Casper::Detail::BitsetA<T,maxSize,AllocT>::Iterator it = a.begin();
