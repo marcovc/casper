@@ -31,12 +31,13 @@ template<class Eval,class View>
 struct BBMinimizeExplorer : ISinglePathExplorer
 {
 	BBMinimizeExplorer(Store& store,const View& v) :
-		ISinglePathExplorer(store),v(store,v),
-			best(limits<Eval>::max()) {}
+		ISinglePathExplorer(store),store(store),v(store,v),
+			best(this->v.max()) {}
 
 //	bool execute(Goal g)
 //	{	return SinglePathExplorer::execute(g and optPivot(solver(),*this,atSolution));}
 
+#if 1
 	bool discard(bool atSolution) //const
 	{
 		if (v.min() > best)
@@ -49,16 +50,34 @@ struct BBMinimizeExplorer : ISinglePathExplorer
 			best = v.max()-1;
 			return false;
 		}
+
 		return !v.updateMax(best);
 	}
+#else
+	bool discard(bool atSolution) //const
+	{
+		//std::cout << atSolution << " : " << v.min() << " " << v.max() << " best=" << best << std::endl;
 
+		if (!(v.min()<=best and v.updateMax(best)/* and store.valid()*/))
+			return true;
+
+		best = std::min(best,v.max());
+
+		if (atSolution)
+			best = best - 1;
+
+		return false;
+	}
+#endif
+
+	Store&					store;
 	BndView<Eval,View>		v;
 	Eval					best;
 //	bool					atSolution;
 };
 
 template<class View>
-IExplorer* bbMinimize(Store& store,const View& v)
+ISinglePathExplorer* bbMinimize(Store& store,const View& v)
 {	return new (store)
 	BBMinimizeExplorer<typename Casper::Traits::GetEval<View>::Type,View>(store,v);	}
 

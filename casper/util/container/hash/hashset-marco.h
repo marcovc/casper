@@ -402,6 +402,10 @@ namespace Traits {
 template<class T,class E,class H>
 struct GetElem<StdHashSet<T,E,H> >
 {	typedef T Type; 	};
+
+template<class T,class E,class H>
+struct GetTermElem<StdHashSet<T,E,H> >
+{	typedef typename GetTermElem<T>::Type Type; 	};
 } // Traits
 
 } // Util

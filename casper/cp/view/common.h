@@ -49,6 +49,20 @@ template<class,class,class>			struct DomView;
 //template<class,class,class>			struct DomViewRel1;
 //template<class,class,class,class>	struct DomViewRel2;
 
+template<class,class,class>
+struct ChkViewRel1;
+
+template<class,class,class,class,class>
+struct ChkViewRel2;
+
+template<class,class,class,class,class,class,class>
+struct ChkViewRel3;
+
+template<class,class,class,class,class,class,class,class,class>
+struct ChkViewRel4;
+
+template<class,class,class,class,class,class,class,class,class,class,class>
+struct ChkViewRel5;
 
 
 namespace Traits {
@@ -100,7 +114,7 @@ struct ExprMatch<Par<Eval>,expression::Par>
 {	static const bool value = true;	};
 
 template<class Eval,class View>
-struct ExprMatch<ConstParView<Eval,View>,expression::Par>
+struct ExprMatch<ParView<Eval,View>,expression::Par>
 {	static const bool value = true;	};
 
 template<class Func,class View>

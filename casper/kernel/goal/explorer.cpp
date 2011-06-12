@@ -21,6 +21,8 @@
 #include <casper/util/util.h>
 #include <casper/kernel/goal/terminal.h>
 
+#include <casper/kernel/rel.h>
+
 using namespace std;
 
 ostream& operator<<(ostream& os, const Casper::ExplorerStats& s)
@@ -70,23 +72,31 @@ bool IExplorer::executeLoop()
 		//solver().log(this,"Explorer",Util::Logger::goalSchedIterate);
 		//std::cout << solver().stats().curLevel << ": mustSucceed: " << mustSucceed() << std::endl;
 		Goal g = pCurGoal->execute(*this);
-		if (mValid) //and (/*mustSucceed() or solver().valid()*/))
+		if (mValid)
 		{
-			if (g.getPImpl() == NULL)
+			if (g.getPImpl() == NULL) // pCurGoal == succeed()
 			{
-				if (goals.empty() and acceptSolution())
+				if (goals.empty())
 				{
-					stats.signalNewSolution();
-					return true;
+					if (acceptSolution())
+					{
+						stats.signalNewSolution();
+						return true;
+					}
+					else
+						goto branchLabel; //return false;
 				}
 				pCurGoal = goals.top();
 				goals.pop();
+				if (pCurGoal == static_cast<IGoal*>(NULL))
+				{	assert(goals.empty());	return false; }
 			}
-			else
+			else	// pCurGoal != succeed() and pCurGoal != fail()
 				pCurGoal = g.getPImpl();
 		}
         else
 		{
+        	branchLabel:
 			//cout << "BT\n";
 			branch();
             if (pCurGoal == static_cast<IGoal*>(NULL))
@@ -116,6 +126,20 @@ double LIFOSearchPath::getRank(int treeDepth) const
 	return r;
 }
 
+void LIFOSearchPath::getId(uint maxDepth, counter& lb, counter& ub) const
+{
+	assert(maxDepth>=depth);
+	lb = ub = 0;
+	counter depth = fails.size();
+	ub = ::pow(2,maxDepth-depth-1);
+	for (auto it = fails.begin(); it != fails.end(); ++it)
+	{
+		if (*it)
+			lb += ::pow(2,maxDepth-depth);
+		--depth;
+	}
+	ub += lb;
+}
 
 // ********** SinglePathExplorer *************
 

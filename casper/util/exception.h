@@ -32,6 +32,11 @@ struct IndexError : std::runtime_error
 	IndexError() : std::runtime_error("index error") {}
 };
 
+struct IndexOutOfBounds : std::runtime_error
+{
+	IndexOutOfBounds() : std::runtime_error("array index out of bounds") {}
+};
+
 struct TimeOut : std::runtime_error
 {
 	TimeOut() : std::runtime_error("process timed out") {}
@@ -55,7 +60,7 @@ struct DivisionByZero : std::runtime_error
 struct NoFilter: std::runtime_error
 {
 	NoFilter(std::string c) : std::runtime_error(
-			std::string("no filter for constraint: ")+c)
+			std::string("no CP::Filter object found for constraint: ")+c)
 	{}
 };
 
@@ -75,9 +80,27 @@ struct NonReifiable : std::runtime_error
 	{}
 };
 
-struct EnvExtract : std::runtime_error
+struct InvalidOperation : std::runtime_error
 {
-	EnvExtract() : std::runtime_error("could not extract environment from object") {}
+	InvalidOperation(std::string c) : std::runtime_error(
+			std::string("invalid operation: ")+c)
+	{}
+};
+
+struct NotGround : std::runtime_error
+{
+	NotGround() : std::runtime_error("expecting a ground expression")
+	{}
+};
+
+struct Extract : std::runtime_error
+{
+	Extract(std::string obj) : std::runtime_error("could not extract "+obj+" from object") {}
+};
+
+struct NonLinear : std::runtime_error
+{
+	NonLinear() : std::runtime_error("unexpected non-linear expression") {}
 };
 
 } // Exception

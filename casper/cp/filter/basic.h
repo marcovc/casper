@@ -26,6 +26,8 @@
 
 #include <casper/cp/filter/common.h>
 
+#include <casper/cp/view/val.h>
+
 namespace Casper {
 
 namespace CP {
@@ -47,7 +49,7 @@ struct NoFilter : IFilter
 	}
 	bool execute()
 	{
-		cerr << "Error: Trying to execute an unimplemented filter " << endl;
+		std::cerr << "Error: Trying to execute an unimplemented filter " << std::endl;
 	//		 << fname << endl;
 		assert(0);
 		return false;
@@ -55,6 +57,43 @@ struct NoFilter : IFilter
 	void attach(INotifiable* pParent)	{ }
 	void detach(INotifiable* pParent)	{ }
 };
+
+template<class Cond,class Func>
+struct When : IFilter
+{
+	When(Store& store, const Cond& cond, const Func& func) :
+		IFilter(store),cond(store,cond),func(func)
+	{}
+	bool execute()
+	{
+		if (!cond.ground())
+			return true;
+		if (cond.value() and !func())
+			return false;
+		detach(f);
+		return true;
+	}
+	void attach(INotifiable* f)
+	{
+		this->f = f;
+		cond.attach(f);
+	}
+	void detach(INotifiable* f)
+	{
+		cond.detach(f);
+	}
+	Cost cost() const
+	{	return constantLo;	}
+
+	ValView<bool,Cond> cond;
+	Func func;
+	INotifiable* f;
+};
+
+template<class Cond,class Func>
+bool Store::when(const Cond& cond, const Func& func)
+{	return this->post(new (*this) When<Cond,Func>(*this,cond,func));	}
+
 
 } // CP
 } // Casper

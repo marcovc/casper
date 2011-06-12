@@ -233,9 +233,9 @@ struct DomFilterView2<Less,Eval1,View1,Eval2,View2> :
 // dom view over element expression
 template<class View1,class View2,class Eval>
 struct DomView<Eval,Rel2<Element,View1,View2> > :
-	DomView<Eval,Var<Eval,typename Traits::GetDom<typename Casper::Traits::GetElem<View1>::Type>::Type> >
+	DomView<Eval,Var<Eval,typename Traits::GetDom<typename Casper::Traits::GetTermElem<View1>::Type>::Type> >
 {
-	typedef typename Traits::GetDom<typename Casper::Traits::GetElem<View1>::Type>::Type Dom;
+	typedef typename Traits::GetDom<typename Casper::Traits::GetTermElem<View1>::Type>::Type Dom;
 	typedef DomView<Eval,Var<Eval,Dom> >	Super;
 
 
@@ -246,7 +246,7 @@ struct DomView<Eval,Rel2<Element,View1,View2> > :
 		else
 		{
 			Var<Eval,Dom> v(s,Detail::VarDomCreator<Dom>().unionOf(s,p1));
-			s.post(element(p1,p2,v));
+			postDomFilter(s,elementEqual(p1,p2,v));
 			return v.pDomain();
 		}
 	}

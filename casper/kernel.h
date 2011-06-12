@@ -36,7 +36,7 @@
 #include <casper/kernel/par/view.h>
 
 // rel
-#include <casper/kernel/rel/rel.h>
+#include <casper/kernel/rel.h>
 
 // reversible
 #include <casper/kernel/reversible/array.h>

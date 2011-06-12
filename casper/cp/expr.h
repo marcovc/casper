@@ -406,8 +406,17 @@ struct DomExpr : Util::PImplIdiom<IDomExpr<DomT> >
 namespace Traits {
 template<class Eval,class DomT>
 struct GetDom<DomExpr<Eval,DomT> >
-{	typedef DomT	Type;	};
+{	typedef DomT	Type;
+};
 } // Traits
+
+typedef BndExpr<int>	IntBndExpr;
+typedef BndExpr<bool>	BoolBndExpr;
+typedef BndExpr<double>	DoubleBndExpr;
+typedef BndExpr<float>	FloatBndExpr;
+
+typedef ValExpr<int>	IntValExpr;
+typedef ValExpr<bool>	BoolValExpr;
 
 
 } // CP

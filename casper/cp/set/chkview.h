@@ -111,7 +111,7 @@ struct ChkViewRel2<Contained,Set<Elem>,View1,Set<Elem>,View2>
 			store(store),x(store,p1),y(store,p2) {}
 	bool isTrue() const	// when lub(x) C glb(y)
 	{
-		return x->cardMin() <= y->cardMax() and
+		return x->minCard() <= y->maxCard() and
 			   Casper::Util::contained(x->beginIn(),x->endIn(),
 								 y->beginIn(),y->endIn()) and
 			   Casper::Util::contained(x->beginPoss(),x->endPoss(),
@@ -119,7 +119,7 @@ struct ChkViewRel2<Contained,Set<Elem>,View1,Set<Elem>,View2>
 	}
 	bool canBeTrue() const 	// when glb(x) C lub(y)
 	{
-		return x->cardMin() <= y->cardMax() and
+		return x->minCard() <= y->maxCard() and
 				!makeDiffIt(makeInIt(*x),makeLUBIt(*y)).valid();
 	}
 	bool setToTrue()
@@ -130,7 +130,7 @@ struct ChkViewRel2<Contained,Set<Elem>,View1,Set<Elem>,View2>
 	bool setToFalse()
 	{
 		detach(pOwner);
-		throw Exception::NoFilter("NotContained(set,set)");
+		throw Exception::NoFilter("not contained(set,set)");
 	}
 
 	void attach(INotifiable* f)
@@ -280,7 +280,7 @@ struct ChkViewRel3<Intersect,Set<Elem>,View1,Set<Elem>,View2,
 		return store.post(intersect(x.getObj(),y.getObj(),z.getObj()));
 	}
 	bool setToFalse()		// FIXME: using views instead of auxvar
-	{	throw Exception::NoFilter("NotIntersect(set,set,set)");	}
+	{	throw Exception::NoFilter("not intersect(set,set,set)");	}
 
 	void attach(INotifiable* f)
 	{ 	pOwner=f; x->attachOnDomain(f); y->attachOnDomain(f); z->attachOnDomain(f);}
@@ -335,7 +335,7 @@ struct ChkViewRel3<Union,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3>
 		return store.post(union_(x.getObj(),y.getObj(),z.getObj()));
 	}
 	bool setToFalse()
-	{	throw Exception::NoFilter("NotUnion(set,set,set)");	}
+	{	throw Exception::NoFilter("not union(set,set,set)");	}
 
 	void attach(INotifiable* f)
 	{ 	pOwner=f; x->attachOnDomain(f); y->attachOnDomain(f); z->attachOnDomain(f);}
@@ -352,6 +352,61 @@ struct ChkViewRel3<Union,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3>
 	INotifiable*	pOwner;
 };
 
+// WARNING: not tested
+// FIXME: this should be incremental (i.e. use deltas)
+template<class Elem,class View1>
+struct ChkViewRel1<Partition,Seq<Set<Elem> >,View1>
+{
+	ChkViewRel1(Store& store, const View1& p1) :
+			store(store),x(store,p1) {}
+	bool isTrue() const // is it true if no 'lub' set intersect with another 'lub' set
+	{
+		if (!canBeTrue())
+			return false;
+		for (uint i = 0; i < x.size(); ++i)
+			for (uint j = i+1; j < x.size(); ++j)
+				if (Util::intersect(x[i]->beginPoss(),x[i]->endPoss(),
+								    x[j]->beginPoss(),x[j]->endPoss()))
+					return false;
+		for (uint i = 0; i < x.size(); ++i)
+			for (uint j = 0; j < x.size(); ++j)
+				if (i!=j)
+					if (Util::intersect(x[i]->beginIn(),x[i]->endIn(),
+										x[j]->beginPoss(),x[j]->endPoss()))
+						return false;
+		return true;
+	}
+
+	bool canBeTrue() const 	// it can be true if no two 'glb' sets intersect
+	{
+		for (uint i = 0; i < x.size(); ++i)
+			for (uint j = i+1; j < x.size(); ++j)
+				if (Util::intersect(x[i]->beginIn(),x[i]->endIn(),
+								    x[j]->beginIn(),x[j]->endIn()))
+					return false;
+		return true;
+	}
+	bool setToTrue()
+	{
+		detach(pOwner);
+		return store.post(partition(x.getObj()));
+	}
+	bool setToFalse()
+	{
+		detach(pOwner);
+		throw Exception::NoFilter("not Partition(sets)");
+	}
+
+	void attach(INotifiable* f) { 	pOwner=f; x->attachOnDomain(f); }
+	void detach(INotifiable* f) {	x->detachOnDomain(f); }
+
+	Rel1<Disjoint,View1> getObj()  const
+	{ 	return Rel1<Disjoint,View1>(x.getObj());	}
+
+	Store&	store;
+	DomArrayView<Set<Elem>,View1> x;
+	INotifiable*	pOwner;
+};
 
 } // CP
 } // Casper

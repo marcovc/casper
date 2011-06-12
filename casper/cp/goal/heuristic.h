@@ -135,7 +135,7 @@ struct SelectVarAll : IVarSelector
 		assert(bestIdx>=0);
 		return bestIdx;
 	}
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type	ElemEval;
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type	ElemEval;
 	DomArrayView<ElemEval,View> doms;
 	TermCond terminate;
 	Evaluator ev;
@@ -177,7 +177,7 @@ struct SelectVarAllRR : IVarSelector
 		selected[bestIdx] = true;
 		return bestIdx;
 	}
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type	ElemEval;
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type	ElemEval;
 	DomArrayView<ElemEval,View> doms;
 	TermCond terminate;
 	Array<bool> 	selected;
@@ -329,7 +329,7 @@ struct SelectVarLex : IVarSelector
 			curIdx = 0;
 		return curIdx++;
 	}
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type	ElemEval;
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type	ElemEval;
 	DomArrayView<ElemEval,View> vars;
 	Reversible<uint> curIdx;
 	TermCond		termCond;
@@ -347,17 +347,17 @@ namespace Detail { \
 template<class View,class TermCond=GroundTermCond> \
 struct SelectVar##name : \
 	Detail::SelectVarAll<View,TermCond, Detail::name##Evaluator<\
-	typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type> > \
+	typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type> > \
 { \
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type EEval; \
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type EEval; \
 	SelectVar##name(Store& s,const View& vars,const TermCond& tc = TermCond()) : \
 		Detail::SelectVarAll<View,TermCond,Detail::name##Evaluator<EEval> >(s,vars,tc) {} \
 }; \
 template<class View,class TermCond=GroundTermCond> \
 struct SelectVar##name##RR : Detail::SelectVarAllRR<View,TermCond, Detail::name##Evaluator<\
-	typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type> > \
+	typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type> > \
 { \
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type EEval; \
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type EEval; \
 	SelectVar##name##RR(Store& s,const View& vars,const TermCond& tc = TermCond()) : \
 		Detail::SelectVarAllRR<View,TermCond,Detail::name##Evaluator<EEval> >(s,vars,tc) {} \
 };\

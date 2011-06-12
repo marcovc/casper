@@ -112,9 +112,9 @@ struct ViewArray : Util::StdVector<Elem>
  */
 template<class Eval,class View>
 struct BndArrayView :
-	Detail::ViewArray<BndView<Eval,typename Casper::Traits::GetElem<View>::Type> >
+	Detail::ViewArray<BndView<Eval,typename Casper::Traits::GetTermElem<View>::Type> >
 {
-	typedef typename Casper::Traits::GetElem<View>::Type	SElem;
+	typedef typename Casper::Traits::GetTermElem<View>::Type	SElem;
 	typedef BndView<Eval,SElem>	Elem;
 	typedef Detail::ViewArray<Elem> Super;
 
@@ -126,12 +126,20 @@ struct BndArrayView :
 		return r;
 	}
 	BndArrayView(Store& store, const View& p1) :
-		Super(store,getSize(p1))
+		Super(store,getSize(p1)),store(store)
 	{
 		uint i = 0;
 		for (Util::IterationView<View>	it(p1); it.valid(); it.iterate())
 			::new(&Super::operator[](i++)) Elem(store,it.value());
 	}
+	View getObj() const
+	{
+		View ret(store,this->size());
+		for (uint i = 0; i < this->size(); ++i)
+			ret[i] = Super::operator[](i).getObj();
+		return ret;
+	}
+	Store& store;
 };
 
 /**
@@ -220,6 +228,9 @@ struct ArrayViewElem
 		return ArrayDimsTraits<Rel>::count(pv,nesting);
 	}
 
+	Rel getObj()  const
+	{ 	return pv;	}
+
 	ArrayView						array;
 	IdxView							index;
 	Rel								pv;
@@ -256,9 +267,9 @@ struct BndArrayView<Eval,Rel2<Element,ArrayView,IdxView> > :
  */
 template<class Eval,class View>
 struct ValArrayView :
-	Detail::ViewArray<ValView<Eval,typename Casper::Traits::GetElem<View>::Type> >
+	Detail::ViewArray<ValView<Eval,typename Casper::Traits::GetTermElem<View>::Type> >
 {
-	typedef typename Casper::Traits::GetElem<View>::Type	SElem;
+	typedef typename Casper::Traits::GetTermElem<View>::Type	SElem;
 	typedef ValView<Eval,SElem>	Elem;
 	typedef Detail::ViewArray<Elem> Super;
 
@@ -287,9 +298,9 @@ struct ValArrayView :
 
 template<class Eval,class View>
 struct DomArrayView :
-	Detail::ViewArray<DomView<Eval,typename Casper::Traits::GetElem<View>::Type> >
+	Detail::ViewArray<DomView<Eval,typename Casper::Traits::GetTermElem<View>::Type> >
 {
-	typedef typename Casper::Traits::GetElem<View>::Type	SElem;
+	typedef typename Casper::Traits::GetTermElem<View>::Type	SElem;
 	typedef DomView<Eval,SElem>	Elem;
 	typedef Detail::ViewArray<Elem> Super;
 
@@ -400,7 +411,7 @@ namespace Detail {
 template<class View>
 struct FindMin
 {
-	typedef	typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type	Eval;
+	typedef	typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type	Eval;
 	Eval	operator()(Store& s,const View& v)
 	{
 		BndArrayView<Eval,View>	a(s,v);
@@ -416,7 +427,7 @@ struct FindMin
 template<class View>
 struct FindMax
 {
-	typedef	typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type	Eval;
+	typedef	typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type	Eval;
 	Eval	operator()(Store& s,const View& v)
 	{
 		BndArrayView<Eval,View>	a(s,v);

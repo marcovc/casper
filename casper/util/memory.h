@@ -349,7 +349,7 @@ inline void*	RDynamicHeap::allocate(size_t s) throw(Exception::HeapOverflow)
 #else
 		if (s >= initSize)
 			curBulk = std::max(curBulk,
-					 static_cast<uint>(ceil(::log(s)/logFactor-logInitSizeOverLogFactor)));
+					 static_cast<uint>(::ceil(::log(s)/logFactor-logInitSizeOverLogFactor)));
 #endif
 		try {
 		if (mem[curBulk] == NULL)

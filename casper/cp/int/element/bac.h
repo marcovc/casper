@@ -35,7 +35,7 @@ namespace CP {
  *  \ingroup IntFilters
  */
 template<class Eval,class ArrayView,class IdxView,class ResView>
-struct BndFilterView3<Element,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView> :
+struct BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView> :
 	IFilter
 {
     BndFilterView3(Store&,const ArrayView&,const IdxView&,const ResView&);
@@ -62,36 +62,17 @@ struct BndFilterView3<Element,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView> :
 };
 
 template<class Eval,class ArrayView,class IdxView,class ResView>
-BndFilterView3<Element,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
+BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
 	BndFilterView3(Store& store, const ArrayView& array, const IdxView& idx,
 				const ResView& res) :
     		IFilter(store),store(store),array(store,array),idx(store,idx),
     		res(store,res),on(store,false)
 {
-#ifdef CASPER_ELEMENT_IDX_1
-	this->idx.updateMin(1);
-	this->idx.updateMax(this->array.size());
-#else
-	this->idx.updateMin(0);
-	this->idx.updateMax(this->array.size()-1);
-#endif
 }
-
-#if 0
-template<class ArrayView,class IdxView,class ResView>
-Filter elementBnd(const ArrayView& array, const IdxView& idx,
-				  const ResView& res)
-{
-	typedef typename Casper::Traits::GetEval<ResView>::Type Eval;
-	typedef BndFilterView3<Element,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView> T;
-	CPSolver& s(getState(array));
-	return new (s.getHeap()) T(s,array,idx,res);
-}
-#endif
 
 template<class Eval,class ArrayView,class IdxView,class ResView>
 void
-BndFilterView3<Element,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
+BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
 attach(INotifiable* pParent)
 {
 	if (idx.min() == idx.max())
@@ -106,7 +87,7 @@ attach(INotifiable* pParent)
 
 template<class Eval,class ArrayView,class IdxView,class ResView>
 void
-BndFilterView3<Element,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
+BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
 detach(INotifiable*)
 {
 	on = false;
@@ -120,14 +101,14 @@ detach(INotifiable*)
 template<class Eval,class ArrayView,class IdxView,class ResView>
 template<class ArrayElem>
 void
-BndFilterView3<Element,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
+BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
 detach(ArrayElem v)
 {
 	//v.domain().detachOnBounds(this);
 }
 
 template<class Eval,class ArrayView,class IdxView,class ResView>
-bool BndFilterView3<Element,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
+bool BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
 notify()
 {
 	if (on)
@@ -139,8 +120,17 @@ notify()
 
 template<class Eval,class ArrayView,class IdxView,class ResView>
 bool
-BndFilterView3<Element,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::execute()
+BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::execute()
 {
+#ifdef CASPER_ELEMENT_IDX_1
+	if (!idx.updateRange(1,array.size()))
+		return false;
+#else
+	if (!idx.updateRange(0,array.size()-1))
+		return false;
+#endif
+
+
 #ifdef CASPER_ELEMENT_IDX_1
 	int ivMin = idx.min()-1;
 	int ivMax = idx.max()-1;
@@ -206,7 +196,7 @@ struct PostBndFilter2<Equal,Eval,Rel2<Element,V1,V2>,Eval,V3>
 {
     static bool post(Store& s,const Rel2<Element,V1,V2>& p1,const V3& p2)
     {
-    	return PostBndFilter3<Element,Seq<Eval>,V1,int,V2,Eval,V3>::
+    	return PostBndFilter3<ElementEqual,Seq<Eval>,V1,int,V2,Eval,V3>::
     				post(s,p1.p1,p1.p2,p2);
     }
 
@@ -218,7 +208,7 @@ struct PostBndFilter2<Equal,Eval,V1,Eval,Rel2<Element,V2,V3> >
 {
     static bool post(Store& s,const V1& p1, const Rel2<Element,V2,V3>& p2)
     {
-    	return PostBndFilter3<Element,Seq<Eval>,V2,int,V3,Eval,V1>::
+    	return PostBndFilter3<ElementEqual,Seq<Eval>,V2,int,V3,Eval,V1>::
     				post(s,p2.p1,p2.p2,p1);
     }
 };
@@ -231,120 +221,11 @@ struct PostBndFilter2<Equal,Eval,Rel2<Element,V1,V2>,Eval,Rel2<Element,V3,V4> >
     static bool post(Store& s,const Rel2<Element,V1,V2>& p1,
     						  const Rel2<Element,V3,V4>& p2)
     {
-    	return PostBndFilter3<Element,Seq<Eval>,V1,int,V2,Eval,Rel2<Element,V3,V4> >::
+    	return PostBndFilter3<ElementEqual,Seq<Eval>,V1,int,V2,Eval,Rel2<Element,V3,V4> >::
     				post(s,p1.p1,p1.p2,p2);
     }
 };
 
-#if 0
-// element as expression: introduces one auxilliary variable
-template<class View1,class View2,class Eval>
-struct BndViewRel2<Element,View1,View2,Eval> :
-	BndView<Eval,Var<Eval> >
-{
-	typedef BndView<Eval,Var<Eval> >	Super;
-	using Super::attach;
-	using Super::detach;
-
-	BndViewRel2(CPSolver& solver,const View1& p1, const View2& p2) :
-		Super(solver,
-			Var<Eval>(solver,
-				Detail::findMin(BndArrayView<Eval,View1>(solver,p1)),
-				Detail::findMax(BndArrayView<Eval,View1>(solver,p1)))),
-		f(elementBnd(p1,p2,Super::v))	{}
-
-	void attach()
-	{
-	 	Super::attach();
-		this->solver().post(f);
-	}
-
-	protected:
-	Filter			f;
-};
-#endif
-
-/*
-// element as expression: same as above for the case View1 is a VarArray.
-// tries to save the auxilliary variable creation when index is instantiated
-// at attach, which is always the case when using a Par as index.
-template<class View1,class View2,class Eval>
-struct BndViewRel2<Element,VarArray<Eval,1,View1>,View2,Eval> :
-	BndView<Eval,Var<Eval> >
-{
-	typedef BndView<Eval,Var<Eval> >	Super;
-	using Super::attach;
-	using Super::detach;
-
-	BndViewRel2(CPSolver& solver,const VarArray<Eval,1,View1>& p1,
-							  const View2& p2) :
-		Super(solver,
-			Var<Eval>(solver,
-				Detail::findMin(BndArrayView<Eval,VarArray<Eval,1,View1> >(solver,p1)),
-				Detail::findMax(BndArrayView<Eval,VarArray<Eval,1,View1> >(solver,p1)))),
-		array(p1),
-		index(solver,p2)
-		{}
-
-	void attach()
-	{
-		if (index.min()==index.max())
-			Super::v = array[index.min()];
-		else
-			this->solver().post(elementBnd(array,index,Super::v));
-		Super::attach();
-	}
-
-	protected:
-	typedef typename Casper::Traits::GetEval<View2>::Type	Eval2;
-
-	VarArray<Eval,1,View1>	array;
-	BndView<Eval2,View2>		index;
-};
-
-// element as expression: same as above for the case View1 is a VarArray<2>.
-// tries to save the auxilliary variable creation when index is instantiated
-// at attach, which is always the case when using a Par as index.
-template<class Idx1View,class Idx2View,class Dom,class Eval>
-struct BndViewRel2<Element,Rel2<Element,VarArray<Eval,2,Dom>,Idx1View>,Idx2View,Eval> :
-	BndView<Eval,Var<Eval> >
-{
-	typedef BndView<Eval,Var<Eval> >	Super;
-	using Super::attach;
-	using Super::detach;
-	typedef Rel2<Element,VarArray<Eval,2,Dom>,Idx1View>	Rel;
-
-	BndViewRel2(CPSolver& solver,const Rel& p1,
-							  const Idx2View& p2) :
-		Super(solver,
-			Var<Eval>(solver,
-				Detail::findMin(BndArrayView<Eval,VarArray<Eval,2,Dom> >(solver,p1.p1)),
-				Detail::findMax(BndArrayView<Eval,VarArray<Eval,2,Dom> >(solver,p1.p1)))),
-		array(p1.p1),
-		index1(solver,p1.p2),
-		index2(solver,p2)
-		{}
-
-	void attach()
-	{
-		if (index1.min()==index1.max())
-			if (index2.min()==index2.max())
-				Super::v = array[index1.min()][index2.min()];
-			else
-				this->solver().post(elementBnd(array[index1.min()],index2,Super::v));
-		else
-			this->solver().post(elementBnd(array,index1*array.size(1)+index2,Super::v));
-		Super::attach();
-	}
-
-	protected:
-	//typedef typename Casper::Traits::GetEval<View2>::Type	Eval2;
-
-	VarArray<Eval,2,Dom>		array;
-	BndView<int,Idx1View>		index1;
-	BndView<int,Idx2View>		index2;
-};
-*/
 
 } // CP
 } // Casper

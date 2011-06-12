@@ -20,49 +20,36 @@
 #include <casper/kernel.h>
 #include <casper/cp/int.h>
 #include <casper/cp/solver.h>
+#include <casper/cp/int/count/dom.h>
 
 #include <iostream>
 
 using namespace Casper;
+using namespace Casper::CP;
 using namespace std;
 
 void test1()
 {
-	Env env;
-	CP::Store store(env);
-	CP::VarArray<int> x(store,2,0,1);
-	DFSExplorer explorer(env);
-	Goal g(env,post(store,x[0]==0) or post(store,x[0]==1));
-	cout << explorer.explore(g) << endl;
-	cout << x << endl;
-	cout << env.getStats() << endl;
-	cout << env.getState().getStats() << endl;
-	cout << store.getStats() << endl;
-	cout << explorer.getStats() << endl;
-}
-
-void test2()
-{
-	using namespace CP;
 	Solver solver;
-	BoolVarArray x(solver,4,0,1);
-	IntPar i(solver);
-	Goal g(solver,
-		forAll(i,range(0,3)) (
-			post(solver,x[i]==false) or post(solver,x[i]==true)
-		)
-	);
-	bool found = solver.solve(g);
+	IntVar n(solver,2,3);
+
+	IntVarArray x(solver,4,0,5);
+
+	solver.post(countEqual(n,x,1),postDomFilter);
+
+	bool found = solver.solve(label(solver,x));
+
 	while (found)
 	{
-		cout << x << endl;
+		cout << n << " : " << x << endl;
 		found = solver.next();
 	}
 	cout << solver.getStats() << endl;
 }
 
+
 int main()
 {
-	test2();
+	test1();
 }
 

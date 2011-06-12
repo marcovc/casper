@@ -22,6 +22,8 @@
 #include <casper/cp/scheduler.h>
 #include <casper/cp/filter/weightedfilter.h>
 
+using namespace std;
+
 #define CASPER_SHEAP_INIT_SIZE		static_cast<uint>(1024)
 #define CASPER_SHEAP_GROW_RATIO		1.5
 

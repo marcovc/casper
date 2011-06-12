@@ -111,7 +111,7 @@ template<class View>
 FD<FD_TP_LIST(1)>* VarDomCreator<FD<FD_TP_LIST(1)> >::unionOf(Store& store, const View& v)
 {
 	DomArrayView<T1,View> doms(store,v);
-	set<int> u;
+	std::set<int> u;
 	for (uint i = 0; i < doms.size(); i++)
 		u.insert(doms[i]->begin(),doms[i]->end());
 	return operator()(store,u.begin(),u.end());
@@ -173,7 +173,7 @@ BD* VarDomCreator<BD>::unionOf(Store& store, const View& v)
 
 
 template<FD_TP_SPEC(1)>
-ostream& operator<<(std::ostream& os,
+std::ostream& operator<<(std::ostream& os,
 					const Casper::CP::Var<T1,Casper::CP::FD<FD_TP_LIST(1)> >& v)
 {
 	os << v.domain()

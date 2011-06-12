@@ -68,8 +68,12 @@ struct ExplorerStats
 	counter getMaxDepth() const
 	{	return maxDepth;	}
 
+	counter getCurDepth() const
+	{	return curDepth;	}
+
 	counter getNbSolutions() const
 	{	return countSolutions;	}
+
 };
 
 struct IGoal;
@@ -111,7 +115,7 @@ struct IExplorer
 		//solver().removeCP();
 	}
 	void pushAnd(Goal g)
-	{	goals.push(g.getPImpl());	}
+	{	assert(g.getPImpl()); goals.push(g.getPImpl());	}
 
 	void pushOr(Goal left,Goal right)
 	{
@@ -177,6 +181,9 @@ struct LIFOSearchPath : ISearchPath
 	uint getRightDepth() const	{	return rightDepth;	}
 	double getEvaluation() const	{	return eval;	}
 	double getRank(int treeDepth = -1) const;
+
+	// for debugging
+	void getId(uint maxDepth, counter& lb, counter& ub) const;
 
 	//protected:
 	typedef	Util::StdSList<uint>	Fails;
@@ -536,6 +543,8 @@ struct LDSRange : DFSExplorer
 
 
 Goal explore(State& state,IExplorer& gs, Goal g);
+
+
 
 };
 

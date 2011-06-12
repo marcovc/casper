@@ -52,14 +52,15 @@ struct Store;
 
 // converts a view to a checkview
 template<class Eval,class View>
-struct ChkViewWrapper;
+struct BndChkViewWrapper;
 
 template<class> struct CChkView;
+template<class> struct ChkView;
 
 template<class View>
-struct ChkViewWrapper<bool,View>
+struct BndChkViewWrapper<bool,View>
 {
-	ChkViewWrapper(Store& store,const View& v) :
+	BndChkViewWrapper(Store& store,const View& v) :
 		v(store,v) {}
 	bool min() const
 	{	return v.isTrue();	}
@@ -81,31 +82,6 @@ struct ChkViewWrapper<bool,View>
 	CChkView<View>	v;
 };
 
-// FIXME: this is needed because of the minicasper mess
-template<class View>
-struct ChkViewWrapper<int,View>
-{
-	ChkViewWrapper(Store& store,const View& v) :
-		v(store,v) {}
-	int min() const
-	{	return static_cast<int>(v.isTrue());	}
-	int max() const
-	{	return static_cast<int>(v.canBeTrue());	}
-	bool updateMin(const int& val)
-	{	return val==0 or v.isTrue() or v.setToTrue();	}
-	bool updateMax(const int& val)
-	{	return val!=0 or !v.canBeTrue() or v.setToFalse();	}
-	// TODO: improve:
-	void range(int& l,int& u) const
-	{	l = min(); u = max();	}
-	bool updateRange(const int& l, const int& u)
-	{	return updateMin(l) and updateMax(u);	}
-	void attach(INotifiable* f) { v.attach(f);	}
-	void detach(INotifiable* f) { v.detach(f);	}
-	View getObj()  const { return v.getObj(); }
-
-	CChkView<View>	v;
-};
 
 // specializations for bndview over boolean (reificable) expressions
 
@@ -114,30 +90,30 @@ struct ChkViewWrapper<int,View>
  * 	\ingroup Views
  **/
 template<class Eval,class View>
-struct BndView : ChkViewWrapper<Eval,View>
+struct BndView : BndChkViewWrapper<Eval,View>
 {
 	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
 
 	BndView(Store& store, const View& v) :
-		ChkViewWrapper<Eval,View>(store,v) {}
+		BndChkViewWrapper<Eval,View>(store,v) {}
 };
 
 template<class F,class View1,class Eval>
-struct BndViewRel1 : ChkViewWrapper<Eval,Rel1<F,View1> >
+struct BndViewRel1 : BndChkViewWrapper<Eval,Rel1<F,View1> >
 {
 	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
 
 	BndViewRel1(Store& store, const View1& v) :
-		ChkViewWrapper<Eval,Rel1<F,View1> >(store,rel<F>(v)) {}
+		BndChkViewWrapper<Eval,Rel1<F,View1> >(store,rel<F>(v)) {}
 };
 
 template<class F,class View1,class View2,class Eval>
-struct BndViewRel2 : ChkViewWrapper<Eval,Rel2<F,View1,View2> >
+struct BndViewRel2 : BndChkViewWrapper<Eval,Rel2<F,View1,View2> >
 {
 	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
 
 	BndViewRel2(Store& store, const View1& v1, const View2& v2) :
-		ChkViewWrapper<Eval,Rel2<F,View1,View2> >(store,rel<F>(v1,v2)) {}
+		BndChkViewWrapper<Eval,Rel2<F,View1,View2> >(store,rel<F>(v1,v2)) {}
 };
 
 /**
@@ -395,16 +371,14 @@ struct BndViewRel3<IfThenElse,View1,View2,View3,Eval>
 
 		if (v > p2.max())
 		{
-			c1.setToFalse();
 			p2.detach(pOwner);
-			return p3.updateMin(v);
+			return p3.updateMin(v) and c1.setToFalse() and pOwner->notify();
 		}
 		else
 		if (v > p3.max())
 		{
-			c1.setToTrue();
 			p3.detach(pOwner);
-			return p2.updateMin(v);
+			return p2.updateMin(v) and c1.setToTrue() and pOwner->notify();
 		}
 		return true;
 	}
@@ -417,16 +391,14 @@ struct BndViewRel3<IfThenElse,View1,View2,View3,Eval>
 
 		if (v < p2.min())
 		{
-			c1.setToFalse();
 			p2.detach(pOwner);
-			return p3.updateMax(v);
+			return p3.updateMax(v) and c1.setToFalse() and pOwner->notify();
 		}
 		else
 		if (v < p3.min())
 		{
-			c1.setToTrue();
 			p3.detach(pOwner);
-			return p2.updateMax(v);
+			return p2.updateMax(v) and c1.setToTrue() and pOwner->notify();
 		}
 		return true;
 	}
@@ -780,6 +752,7 @@ struct BndViewRel3<InRange,View,Eval,Eval,Eval>
 	mutable Reversible<Eval>	ub;
 };
 #endif
+
 
 /**
  *	BndView over multiplication.

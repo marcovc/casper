@@ -16,23 +16,24 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-#ifndef _M_CASPER_KERNEL_PAR_OP_PAREXPR
-#define _M_CASPER_KERNEL_PAR_OP_PAREXPR
+#ifndef _M_CASPER_LP_OP_VAR
+#define _M_CASPER_LP_OP_VAR
  
 #include <casper/kernel/rel/macros.h>
 
-#define AT_ParExpr(M1)				ParExpr< AT_ ## M1 >
-#define AD_ParExpr(M1)				AD_ ## M1
+#define AT_LPVar			LP::Var
+#define AD_LPVar			
 
 namespace Casper {
 
-REL_FROM_UNARY_OPERATORS(ParExpr(T1))
-REL_FROM_BINARY_OPERATORS(ParExpr(T1),T)
-REL_FROM_BINARY_NONBOOL(int,ParExpr(int))
-REL_FROM_BINARY_NONBOOL(double,ParExpr(double))
-REL_FROM_BINARY_NONBOOL(float,ParExpr(float))
-REL_FROM_BINARY_OPERATORS(bool,ParExpr(bool))
+REL_FROM_ARITH_OPERATORS(LPVar,T)
+REL_FROM_ARITH_OPERATORS(double,LPVar)
+REL_FROM_COMPARISON_OPERATORS(LPVar,T)
+REL_FROM_COMPARISON_OPERATORS(double,LPVar)
 
-} // Casper
-  
-#endif /*_M_CASPER_KERNEL_PAR_OP_PAREXPR*/
+REL_FROM_SYM_OPERATOR(LPVar)
+
+
+}
+
+#endif // _M_CASPER_LP_OP_VAR

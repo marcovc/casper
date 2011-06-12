@@ -101,6 +101,19 @@ namespace Traits {
 template<class Eval,class Dom>
 struct GetElem<CP::Var<Set<Eval>,Dom> >
 {	typedef Eval	Type;	};
+/*
+template<class Eval,class Dom>
+struct GetTermElem<CP::Var<Set<Eval>,Dom> >
+{	typedef Eval	Type;	};
+*/
+template<class T>
+struct GetSetElem
+{	typedef T Type;	};
+
+template<class T>
+struct GetSetElem<Set<T> >
+{	typedef T Type;	};
+
 } // Traits
 
 

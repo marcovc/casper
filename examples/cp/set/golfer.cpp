@@ -109,7 +109,7 @@ void golfers(uint w, uint g, uint s, uint labeling, const Util::ExampleOptions& 
 								forAll(wi,range(0,w-1)) (
 									tryAll(gi,range(0,g-1),
 										post(solver,member(pi,vars[wi][gi])),
-										post(solver,notMember(pi,vars[wi][gi]))
+										post(solver,!member(pi,vars[wi][gi]))
 							))));
 	}
 	else

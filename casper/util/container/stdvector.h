@@ -26,6 +26,7 @@
 
 #include <casper/util/memory.h>
 #include <string.h>
+#include <casper/util/iteration.h>
 
 //using namespace std;
 
@@ -134,7 +135,7 @@ struct StdVector
 			::new(&data[i++]) Elem(*(b++));
 	}
 
-	StdVector(std::initializer_list<int> l) :
+	StdVector(const std::initializer_list<Elem>& l) :
 		mHeap(stdHeap),
 		_size(std::distance(l.begin(),l.end())),
 		data((Elem*)mHeap.allocate(_size*sizeof(Elem)))
@@ -144,6 +145,17 @@ struct StdVector
 		while (b != l.end())
 			::new(&data[i++]) Elem(*(b++));
 	}
+
+//	template<class T>
+//	StdVector(const T& t) :
+//		mHeap(stdHeap),
+//		_size(Casper::Util::Detail::distance(makeIt(t))),
+//		data((Elem*)mHeap.allocate(_size*sizeof(Elem)))
+//	{
+//		uint i = 0;
+//		for (IterationView<T> it(t); it.valid(); it.iterate())
+//			::new(&data[i++]) Elem(it.value());
+//	}
 
 	~StdVector()
 	{
@@ -200,7 +212,7 @@ struct StdVector
 	IHeap& getHeap() const {	return mHeap;	}
 
 	IHeap&	mHeap;
-	uint	_size;
+	const uint	_size;
 	Elem* 	data;
 };
 

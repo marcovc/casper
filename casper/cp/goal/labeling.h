@@ -191,6 +191,8 @@ struct LabelWithCall<Seq<T>,View> : IGoal
 
 	Goal execute()
 	{
+		if (!store.valid())
+			return fail();
 		int idx = varSel.select();
 		if (idx < 0)
 			return succeed();

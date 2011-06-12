@@ -126,6 +126,7 @@ struct StdList
 
 	StdList(const StdList&);
 	virtual ~StdList();
+	const StdList& operator=(const StdList& s);
 
 	Iterator begin() const;
 	Iterator end() const;
@@ -207,6 +208,14 @@ StdList<T>::StdList(InputIterator first, InputIterator last) :
 template<class T>
 StdList<T>::StdList(const StdList<T>& s) : mHeap(s.getHeap())
 {	initRange(s.begin(),s.end());	}
+
+template<class T>
+const StdList<T>& StdList<T>::operator=(const StdList<T>& s)
+{
+	clear();
+	initRange(s.begin(),s.end());
+	return *this;
+}
 
 template<class T>
 StdList<T>::~StdList()

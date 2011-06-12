@@ -26,6 +26,28 @@ namespace Casper {
 namespace CP {
 
 
+// converts a view to a checkview
+template<class Eval,class View>
+struct ValChkViewWrapper;
+
+template<class> struct CChkView;
+template<class> struct ChkView;
+
+template<class View>
+struct ValChkViewWrapper<bool,View>
+{
+	ValChkViewWrapper(Store& store,const View& v) :
+		v(store,v) {}
+	bool value() const { assert(ground()); return v.isTrue(); }
+	bool setValue(const bool& val) { return val?v.setToTrue():v.setToFalse();	}
+	bool ground() const { return v.isTrue() or !v.canBeTrue(); }
+	void attach(INotifiable* f) { v.attach(f); }
+	void detach(INotifiable* f) { v.detach(f); }
+	View getObj()  const { return v.getObj(); }
+
+	CChkView<View>	v;
+};
+
 /********************
  * Value View
  *********************/
@@ -39,8 +61,41 @@ struct ValView;
  **/
 
 template<class Eval,class View>
-struct ValView //: NoView
-{	ValView(Store&, const View&) { assert(0); }	};
+struct ValView : ValChkViewWrapper<Eval,View>
+{
+	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
+
+	ValView(Store& store, const View& v) :
+		ValChkViewWrapper<Eval,View>(store,v) {}
+};
+
+
+template<class F,class View1,class Eval>
+struct ValViewRel1 : ValChkViewWrapper<Eval,Rel1<F,View1> >
+{
+	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
+
+	ValViewRel1(Store& store, const View1& v) :
+		ValChkViewWrapper<Eval,Rel1<F,View1> >(store,rel<F>(v)) {}
+};
+
+template<class F,class View1,class View2,class Eval>
+struct ValViewRel2 : ValChkViewWrapper<Eval,Rel2<F,View1,View2> >
+{
+	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
+
+	ValViewRel2(Store& store, const View1& v1, const View2& v2) :
+		ValChkViewWrapper<Eval,Rel2<F,View1,View2> >(store,rel<F>(v1,v2)) {}
+};
+
+template<class F,class View1,class View2,class View3,class Eval>
+struct ValViewRel3 : ValChkViewWrapper<Eval,Rel3<F,View1,View2,View3> >
+{
+	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
+
+	ValViewRel3(Store& store, const View1& v1, const View2& v2,const View3& v3) :
+		ValChkViewWrapper<Eval,Rel3<F,View1,View2,View3> >(store,rel<F>(v1,v2,v3)) {}
+};
 
 /**
  * 	ValView over a literal type.
@@ -99,9 +154,12 @@ struct ValView<int,uint>
 //};
 
 // TODO: reification here
+
+
 template<class,class,class>			struct ValViewRel1;
 template<class,class,class,class>	struct ValViewRel2;
 template<class,class,class,class,class>	struct ValViewRel3;
+
 
 /**
  * 	ValView over a Rel1 relation -> defer to ValViewRel1.
@@ -406,6 +464,7 @@ struct ValViewRel2<Mul,View1,View2,Eval>
 	ValView<View2Eval,View2>	p2;
 };
 
+
 /**
  * 	ValView over BndExpr.
  * 	\ingroup Views
@@ -447,50 +506,7 @@ struct ValView<Eval,DomExpr<Eval,Dom> >
 	DomExpr<Eval,Dom>	p1;
 };
 
-#if 0
-/**
- * 	ValView over BndView. \deprecated
- * 	\ingroup Views
- **/
-template<class Eval,class View>
-struct ValView<Eval,BndView<Eval,View> > : IValExpr<Eval>
-{
-	ValView(Store& store,const BndView<Eval,View>& p1) :
-		IValExpr<Eval>(store),p1(p1)	{}
-	Eval value() const { assert(ground()); return p1.min(); }
-	bool ground() const { return p1.min()==p1.max(); }
-	void attach(INotifiable* f) { 	p1.attach(f); }
-	void detach(INotifiable* f) {	p1.detach(f); }
-	BndView<Eval,View>	getObj() const	{	return p1; }
 
-	BndView<Eval,View>	p1;
-};
-#endif
-
-/**
- * 	ValView over element.
- * 	\ingroup Views
- **/
-#if 0
-template<class View1,class View2,class Eval>
-struct ValViewRel2<Element,View1,View2,Eval> : IValExpr<Eval>
-{
-	typedef Rel2<Element,View1,View2>	Rel;
-	ValViewRel2(Store& store,const View1& p1, const View2& p2) :
-		IValExpr<Eval>(store),v(store,Rel(p1,p2))
-		//array(store,p1),index(store,p2)
-		{}
-	Eval value() const { assert(ground()); return v->value(); /*return array[index.value()]->min();*/ }
-	bool ground() const
-	{	return v->ground(); /*return index.ground() && array[index.value()]->min()==array[index.value()]->max();*/ }
-	void attach(INotifiable* f) { 	v->attachOnGround(f); /*array.attach(f);index.attach(f);*/ }
-	void detach(INotifiable* f) {	v->detachOnGround(f); /*array.detach(f);index.detach(f);*/ }
-
-	DomExpr<Eval> v;
-	//DomArrayView<Eval,View1>	array;	// TODO: replace by ValArrayView
-	//ValView<Eval,View2>			index;
-};
-#else
 template<class View1,class View2,class Eval>
 struct ValViewRel2<Element,View1,View2,Eval>
 {
@@ -498,25 +514,39 @@ struct ValViewRel2<Element,View1,View2,Eval>
 	ValViewRel2(Store& store,const View1& p1, const View2& p2) :
 		array(store,p1),index(store,p2)
 		{}
-	Eval value() const { assert(ground()); return array[index.value()].value(); }
+	Eval value() const
+	{
+		assert(ground());
+		if (index.value()< CASPER_ELEMENT_ARRAY_BASE or
+			index.value() >= static_cast<int>(array.size())+CASPER_ELEMENT_ARRAY_BASE)
+			throw Exception::IndexOutOfBounds();
+		return array[index.value()].value();
+	}
 	bool setValue(const Eval& val)
 	{
 		if (!index.ground())
 			return true;
+		if (index.value()< CASPER_ELEMENT_ARRAY_BASE or
+			index.value() >= static_cast<int>(array.size())+CASPER_ELEMENT_ARRAY_BASE)
+			throw Exception::IndexOutOfBounds();
 		return array[index.value()].setValue(val);
 	}
 
 	bool ground() const
-	{	return index.ground() && array[index.value()].value()==array[index.value()].value(); }
+	{
+		return index.ground() and
+				(index.value()< CASPER_ELEMENT_ARRAY_BASE or
+				 index.value() >= static_cast<int>(array.size())+CASPER_ELEMENT_ARRAY_BASE or
+				 array[index.value()].ground());
+	}
 	void attach(INotifiable* f) { 	array.attach(f);index.attach(f); }
 	void detach(INotifiable* f) {	array.detach(f);index.detach(f); }
 	Rel2<Element,View1,View2>	getObj() const
 	{	return Rel2<Element,View1,View2>(array.getObj(),index.getObj());}
 
 	ValArrayView<Eval,View1>	array;
-	ValView<Eval,View2>			index;
+	ValView<int,View2>			index;
 };
-#endif
 
 /**
  * 	ValView over absolute value.
@@ -570,6 +600,102 @@ struct ValView<Eval,Casper::Par<Eval> >
 	const Eval	val;
 };
 
+
+template<class> struct CChkView;
+
+
+/**
+ *	ValView over an if-then-else expression
+ *	\ingroup Views
+ **/
+template<class Eval,class View1,class View2,class View3>
+struct ValViewRel3<IfThenElse,View1,View2,View3,Eval>
+{
+	ValViewRel3(Store& store, const View1& p1, const View2& p2, const View3& p3) :
+		c1(store,p1),p2(store,p2),p3(store,p3)
+		{}
+	Eval value() const
+	{
+		if (c1.isTrue())
+			return p2.value();
+		if (!c1.canBeTrue())
+			return p3.value();
+		if (p2.value()==p3.value())
+			return p2.value();
+		assert(0);
+		return 0; // FIXME: should throw
+	}
+	bool setValue(const Eval& v)
+	{
+		if (c1.isTrue())
+			return p2.setValue(v);
+		if (!c1.canBeTrue())
+			return p3.setValue(v);
+		if (p2.ground() and p3.ground())
+		{
+			if (p2.value()==v and p3.value()!=v)
+				return c1.setToTrue();
+			if (p3.value()==v and p2.value()!=v)
+				return c1.setToFalse();
+			if (p2.value()!=v and p3.value()!=v)
+				return false;
+		}
+		return true;
+	}
+	bool ground() const
+	{
+		return (c1.isTrue() and p2.ground()) or
+			   (!c1.canBeTrue() and p3.ground()) or
+			   (p2.ground() and p3.ground() and p2.value()==p3.value());
+	}
+
+	void attach(INotifiable* f) { 	c1.attach(f); p2.attach(f);	p3.attach(f); }
+	void detach(INotifiable* f) {	c1.detach(f); p2.detach(f);	p3.detach(f); }
+	Rel3<IfThenElse,View1,View2,View3> getObj()  const
+	{ 	return Rel3<IfThenElse,View1,View2,View3>(c1.getObj(),p2.getObj(),p3.getObj());	}
+
+	CChkView<View1> 	c1;
+	ValView<Eval,View2>	p2;
+	ValView<Eval,View3>	p3;
+};
+
+template<class Eval,class View>
+struct ValViewRel3<InRange,View,Eval,Eval,Eval>
+{
+	typedef ValViewRel3<InRange,View,Eval,Eval,Eval> Self;
+
+	ValViewRel3(Store& store,const View& p,Eval lb,Eval ub) :
+		v(store,p),lb(lb),ub(ub) {}
+
+	Eval value() const
+	{
+		if (lb==ub)
+			return lb;
+		if (v.ground())
+			return v.value();
+		throw Exception::NotGround();
+	}
+	bool setValue(const Eval& v)
+	{
+		if (v<lb or v>ub)
+			return false;
+		return v.setValue(v);
+	}
+	bool ground() const
+	{
+		return lb==ub or v.ground();
+	}
+
+	void attach(INotifiable* f) { 	v.attach(f);	}
+	void detach(INotifiable* f) {	v.detach(f);	}
+
+	Rel3<InRange,View,Eval,Eval> getObj()  const
+	{ 	return Rel3<InRange,View,Eval,Eval>(v.getObj(),lb,ub);	}
+
+	ValView<Eval,View>			v;
+	const Eval	lb;
+	const Eval	ub;
+};
 
 } // CP
 

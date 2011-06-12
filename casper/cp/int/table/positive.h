@@ -20,10 +20,13 @@
 #define CASPER_CP_INT_POSITIVE_H_
 
 #include <casper/cp/int/filter.h>
-#include <casper/kernel/reversible/rlist.h>
-#include <casper/kernel/reversible/rstack.h>
-#include <casper/util/container/trie.h>
+#include <casper/kernel/reversible/list.h>
+#include <casper/kernel/reversible/stack.h>
+#include <casper/util/container/stdtrie.h>
+#include <casper/util/container/stdarray.h>
 #include <casper/cp/delta.h>
+
+#include <iostream>
 
 namespace Casper {
 namespace CP {
@@ -45,7 +48,7 @@ template<class T, class View>
 struct GACSchema : IFilter
 {
 	typedef	DomArrayView<T,View>		Doms;
-	typedef typename Traits::GetDom<typename Casper::Traits::GetElem<View>::Type>::Type		Dom;
+	typedef typename Traits::GetDom<typename Casper::Traits::GetTermElem<View>::Type>::Type		Dom;
 	typedef typename Dom::Iterator	DomIterator;
 	typedef Util::StdArray<T>		Tuple;
 	typedef Tuple*			PTuple;
@@ -79,6 +82,8 @@ struct GACSchema : IFilter
 	};
 
 	GACSchema(Store& store,const View& vars, IExtRel<T>& ss) :
+		IFilter(store),
+		store(store),
 		doms(store,vars),
 		supports(store),erased(store),ss(ss),
 		firstExecution(store,true) {}
@@ -97,7 +102,7 @@ struct GACSchema : IFilter
 	Store&						store;
 	DomArrayView<T,View>		doms;
 	Supports					supports;
-	Stack<DeltaInfo>	erased;
+	Stack<DeltaInfo>			erased;
 	IExtRel<T>&					ss;
 	INotifiable*				pOwner;
 	Reversible<bool>			firstExecution;
@@ -107,15 +112,19 @@ template<class T, class View>
 void GACSchema<T,View>::printSupports()
 {
 	for (SupportIterator it = supports.begin(); it != supports.end(); ++it)
-		std::cout << *it->pTuple << std::endl;
-	std::cout << std::endl;
+	{
+		for (uint i = 0; i < (*(it->pTuple)).size(); ++i)
+			std::cout << (*(it->pTuple))[i] << " ";
+		std::cout << std::endl;
+	}
+	//	std::cout << (*it->pTuple) << std::endl;
+	//std::cout << std::endl;
 }
 
 template<class T, class View>
 bool GACSchema<T,View>::firstExecute()
 {
 	// seek initial support
-
 	for (uint i = 0; i < doms.size(); i++)
 	{
 		for (DomIterator dit = doms[i]->begin(); dit != doms[i]->end(); )
@@ -170,8 +179,6 @@ GACSchema<T,View>::seekSupport(uint varIdx, const T& val)
 	Util::StdArray<int>*	pTuple;
 	while ((pTuple = ss.seekSupport(varIdx,val)) != NULL)
 	{
-		//std::cout << "found support for (" << pVV->idxVar << "," << pVV->val << ") : " << support  << std::endl;
-
 		// validate support pTuple
 		uint i = 0;
 		for ( ; i < doms.size(); i++)
@@ -249,25 +256,25 @@ struct PosTableRel : IExtRel<T>,Util::StdArray<T,2>
 	PosTableRel(Store& store,uint nvars, int minElem,int maxElem, uint nsols) :
 		Super(store,nsols,nvars),
 		minElem(minElem),
-		curSolIdx(store,nvars,maxElem-minElem+1),
+		curSolIdx(store,nvars,maxElem-minElem+1,0),
 		nsols(nsols)
 		{}
 
 	PosTableRel(Store& store,const PosTableRel& s) :
 		Super((const Super&)s),
 		minElem(s.minElem),
-		curSolIdx(store,s.curSolIdx.size(0),s.curSolIdx.size(1)),
+		curSolIdx(store,s.curSolIdx.size(0),s.curSolIdx.size(1),0),
 		nsols(s.nsols) {}
 
 	PosTableRel(Store& store,const Util::StdArray<int,2>& s) :
 		Super(s),
 		minElem(findMin(s)),
-		curSolIdx(store,s.size(1),findMax(s)-minElem+1),
-		nsols(s.size(0)) {}
+		curSolIdx(store,s.size(1),findMax(s)-minElem+1,0),
+		nsols(s.size(0))	{}
 
 	Util::StdArray<T>* seekSupport(uint idxVar, T val)
 	{
-                if (val-minElem >= static_cast<int>(curSolIdx.size(1)) or
+        if (val-minElem >= static_cast<int>(curSolIdx.size(1)) or
                     val-minElem < 0)
 			return false;
 		for (uint i = curSolIdx[idxVar][val-minElem]; i < nsols; i++)
@@ -281,8 +288,8 @@ struct PosTableRel : IExtRel<T>,Util::StdArray<T,2>
 
 	int findMin(const Util::StdArray<int,2>& s)
 	{
-		int r = limits<int>::max();
-		for (uint i = 0; i < s.count(); i++)
+		int r = s(0);
+		for (uint i = 1; i < s.count(); i++)
 			if (s(i) < r)
 				r = s(i);
 		return r;
@@ -290,15 +297,15 @@ struct PosTableRel : IExtRel<T>,Util::StdArray<T,2>
 
 	int findMax(const Util::StdArray<int,2>& s)
 	{
-		int r = limits<int>::min();
-		for (uint i = 0; i < s.count(); i++)
+		int r = s(0);
+		for (uint i = 1; i < s.count(); i++)
 			if (s(i) > r)
 				r = s(i);
 		return r;
 	}
 
 	T					minElem;
-	Array<uint,2> 	curSolIdx;
+	Array<uint,2> 		curSolIdx;
 	uint				nsols;
 };
 
@@ -321,6 +328,7 @@ Filter gacSchema(Store& store,const View& v,const Util::StdArray<Eval,2>& ss)
 	return new (store) GACSchema<Eval,View>(store,v,*p);
 }
 
+#if 0
 template<class Eval,class View>
 Filter gacSchema(Store& store,const View& v,const Util::StdArray<Eval,1>& ss)
 {
@@ -331,6 +339,7 @@ Filter gacSchema(Store& store,const View& v,const Util::StdArray<Eval,1>& ss)
 	PosTableRel<Eval>* p = new (store) PosTableRel<Eval>(store,a);
 	return new (store) GACSchema<Eval,View>(store,v,*p);
 }
+#endif
 
 template<class Eval,class View1,class View2>
 struct PostBndFilter2<InTable,Seq<Eval>,View1,Seq<Eval>,View2>
@@ -340,7 +349,7 @@ struct PostBndFilter2<InTable,Seq<Eval>,View1,Seq<Eval>,View2>
 };
 
 template<class Eval,class View1,class View2>
-struct DomFilterFact2<InTable,Seq<Eval>,View1,Seq<Eval>,View2>
+struct PostDomFilter2<InTable,Seq<Eval>,View1,Seq<Eval>,View2>
 {
 	static bool post(Store& store,const View1& v1, const View2& v2)
 	{	return store.post(gacSchema(store,v1,v2));	}

@@ -19,6 +19,7 @@
 
 #include <casper/kernel/state/env.h>
 
+using namespace std;
 
 ostream& operator<<(ostream& os, const Casper::EnvStats& s)
 {

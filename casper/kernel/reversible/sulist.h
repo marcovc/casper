@@ -92,7 +92,7 @@ struct SUList
 
 	class Iterator;
 	friend class Iterator;
-	class Iterator : public std::iterator<bidirectional_iterator_tag,
+	class Iterator : public std::iterator<std::bidirectional_iterator_tag,
 									 	  Value,
 									 	  Difference>
 	{
@@ -551,6 +551,11 @@ struct GetEval<SUList<T,Comp> >
 template<class T,class Comp>
 struct GetElem<SUList<T,Comp> >
 {	typedef T	Type;	};
+
+template<class T,class Comp>
+struct GetTermElem<SUList<T,Comp> >
+{	typedef typename GetElem<T>::Type	Type;	};
+
 } // Traits
 
 } // Casper

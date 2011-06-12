@@ -14,7 +14,7 @@
 			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.pathentry">
 				<pathentry include="/usr/include" kind="inc" path="" system="true"/>
-				<pathentry kind="src" path=""/>
+				<pathentry excluding="mip/" kind="src" path=""/>
 				<pathentry kind="out" path=""/>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
@@ -62,22 +62,22 @@
 					<target name="example-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 						<buildCommand>scons</buildCommand>
 						<buildArguments>-j 3 optimize_level=3</buildArguments>
-						<buildTarget>build/release/examples/int/latin</buildTarget>
+						<buildTarget>build/release/examples/lp/binsearch</buildTarget>
 						<stopOnError>false</stopOnError>
 						<useDefaultCommand>false</useDefaultCommand>
 						<runAllBuilders>true</runAllBuilders>
 					</target>
 					<target name="example-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 						<buildCommand>scons</buildCommand>
-						<buildArguments>-j 3 debug_level=3</buildArguments>
-						<buildTarget>build/debug/examples/cp/int/golfer</buildTarget>
+						<buildArguments>-j 1 debug_level=3</buildArguments>
+						<buildTarget>build/debug/examples/lp/binsearch</buildTarget>
 						<stopOnError>false</stopOnError>
 						<useDefaultCommand>false</useDefaultCommand>
 						<runAllBuilders>true</runAllBuilders>
 					</target>
 					<target name="examples-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 						<buildCommand>scons</buildCommand>
-						<buildArguments>-j 3 debug_level=3</buildArguments>
+						<buildArguments>-j 1 debug_level=3</buildArguments>
 						<buildTarget>examples</buildTarget>
 						<stopOnError>false</stopOnError>
 						<useDefaultCommand>false</useDefaultCommand>
@@ -143,6 +143,13 @@
 						<buildCommand>scons</buildCommand>
 						<buildArguments>debug_level=3</buildArguments>
 						<buildTarget>library</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="gcc-version" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>gcc</buildCommand>
+						<buildTarget>--version</buildTarget>
 						<stopOnError>false</stopOnError>
 						<useDefaultCommand>false</useDefaultCommand>
 						<runAllBuilders>true</runAllBuilders>

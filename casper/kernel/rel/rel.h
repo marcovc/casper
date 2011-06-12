@@ -338,8 +338,6 @@ struct SumProduct;
 
 #else
 
-NEW_REL_1(domain,Domain)
-
 NEW_REL_2(equal,Equal)
 NEW_REL_2(distinct,Distinct)       	// !=
 NEW_REL_2(less,Less)       			// <
@@ -357,13 +355,16 @@ NEW_REL_2(div,Div)						// /
 NEW_REL_1(sym,Sym)						// - (symmetric)
 //NEW_REL_1(element,Element)						// subscript operator []
 NEW_REL_2(element,Element)						// subscript operator a[b]
-NEW_REL_3(element,Element)						// a[b]==c
+NEW_REL_3(elementEqual,ElementEqual)						// a[b]==c
 
 NEW_REL_2(and_,And)						// logical and
 NEW_REL_2(or_,Or)						// logical or
 NEW_REL_2(xor_,XOr)						// logical or
 
-NEW_REL_1(ground,Ground)
+NEW_REL_1(round,Round)
+NEW_REL_1(ceil,Ceil)
+NEW_REL_1(floor,Floor)
+
 //NEW_REL_2(select,Select)
 
 NEW_REL_1(abs,Abs)
@@ -386,6 +387,7 @@ NEW_REL_2(sumProduct,SumProduct)
 NEW_REL_1(sum,Sum)
 NEW_REL_2(sumEquals,SumEquals)
 
+NEW_REL_2(ifThen,IfThen)
 NEW_REL_3(ifThenElse,IfThenElse)
 
 NEW_REL_1(cache,Cache)
@@ -400,6 +402,19 @@ NEW_REL_2(inTable,InTable)
 NEW_REL_2(notInTable,NotInTable)
 
 NEW_REL_5(cumulative,Cumulative)
+
+NEW_REL_3(min,Min)
+NEW_REL_3(max,Max)
+NEW_REL_3(maxDiff,MaxDiff)
+NEW_REL_3(argMin,ArgMin)
+NEW_REL_3(argMax,ArgMax)
+
+NEW_REL_3(forSome,ForSome)
+
+NEW_REL_2(assign,Assign)
+NEW_REL_2(selectFirst,SelectFirst)
+
+NEW_REL_3(countEqual,CountEqual)
 #endif
 
 // operators
@@ -490,6 +505,10 @@ template<class T1,class T2,class T3>
 struct GetEval<Rel3<Linear,T1,T2,T3> >
 {	typedef typename Traits::GetEval<T2>::Type Type;	};
 
+template<class T1,class T2>
+struct GetEval<Rel2<IfThen,T1,T2> >
+{	typedef	typename Traits::GetEval<T2>::Type Type;	};
+
 template<class T1,class T2,class T3>
 struct GetEval<Rel3<IfThenElse,T1,T2,T3> >
 {	typedef	typename Traits::GetEval<T2>::Type Type;	};
@@ -506,13 +525,16 @@ template<class T1,class T2,class T3,class T4>
 struct GetEval<Rel4<All,T1,T2,T3,T4> >
 {	typedef Seq<typename Traits::GetEval<T4>::Type>	Type;	};
 
+template<class T>
+struct GetSetElem;
+
 template<class T1>
 struct GetEval<Rel1<Max,T1> >
-{	typedef typename Traits::GetEval<typename Traits::GetElem<T1>::Type>::Type 	Type;	};
+{	typedef typename Traits::GetSetElem<typename Traits::GetEval<typename Traits::GetTermElem<T1>::Type>::Type>::Type 	Type;	};
 
 template<class T1>
 struct GetEval<Rel1<Min,T1> >
-{	typedef typename Traits::GetEval<typename Traits::GetElem<T1>::Type>::Type 	Type;	};
+{	typedef typename Traits::GetSetElem<typename Traits::GetEval<typename Traits::GetTermElem<T1>::Type>::Type>::Type 	Type;	};
 
 template<class T1,class T2>
 struct GetEval<Rel2<SumEquals,T1,T2> >
@@ -520,7 +542,7 @@ struct GetEval<Rel2<SumEquals,T1,T2> >
 
 template<class T1>
 struct GetEval<Rel1<Sum,T1> >
-{	typedef	typename Traits::GetEval<typename Traits::GetElem<T1>::Type>::Type	Type;	};
+{	typedef	typename Traits::GetEval<typename Traits::GetTermElem<T1>::Type>::Type	Type;	};
 
 template<class T1,class T2>
 struct GetEval<Rel2<InTable,T1,T2> >
@@ -532,7 +554,7 @@ struct GetEval<Rel2<NotInTable,T1,T2> >
 
 template<class T1,class T2>
 struct GetEval<Rel2<SumProduct,T1,T2> >
-{	typedef	typename Traits::GetEval<typename Traits::GetElem<T2>::Type>::Type	Type;	};
+{	typedef	typename Traits::GetEval<typename Traits::GetTermElem<T2>::Type>::Type	Type;	};
 
 
 template<class View1,class View2,class View3,class View4>
@@ -541,7 +563,75 @@ struct GetElem<Rel4<All,View1,View2,View3,View4> >
 
 template<class View1,class View2>
 struct GetElem<Rel2<Element,View1,View2> >
-{	typedef typename Traits::GetElem<View1>::Type	Type;	};
+{	typedef typename Traits::GetElem<typename Traits::GetElem<View1>::Type>::Type	Type;	};
+
+template<class View1,class View2,class View3,class View4>
+struct GetTermElem<Rel4<All,View1,View2,View3,View4> >
+{	typedef View4	Type;	};
+
+template<class View1,class View2>
+struct GetTermElem<Rel2<Element,View1,View2> >
+{	typedef typename Traits::GetTermElem<View1>::Type	Type;	};
+
+template<class ArrayView, class IdxView>
+struct GetEval<Rel2<Element,ArrayView,IdxView> >
+{
+	typedef typename Traits::GetEval<typename Traits::GetElem<ArrayView>::Type>::Type	Type;
+	CASPER_ASSERT_EVAL(Type);
+};
+
+template<class ArrayView, class IdxView,class EqView>
+struct GetEval<Rel3<ElementEqual,ArrayView,IdxView,EqView> >
+{	typedef bool Type;	};
+
+template<class T>
+struct GetEval<Seq<Seq<T> > >
+{	typedef typename GetEval<Seq<T> >::Type	Type;	};
+
+template<class T>
+struct GetTermElem<Seq<T> >
+{	typedef typename GetTermElem<T>::Type	Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<ArgMin,T1,T2,T3> >
+{	typedef typename Traits::GetEval<T1>::Type	Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<ArgMax,T1,T2,T3> >
+{	typedef typename Traits::GetEval<T1>::Type	Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<Min,T1,T2,T3> >
+{	typedef typename Traits::GetEval<T3>::Type	Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<Max,T1,T2,T3> >
+{	typedef typename Traits::GetEval<T3>::Type	Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<MaxDiff,T1,T2,T3> >
+{	typedef typename Traits::GetEval<T3>::Type	Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<ForSome,T1,T2,T3> >
+{	typedef bool	Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<CountEqual,T1,T2,T3> >
+{	typedef bool	Type;	};
+
+// if the user wants an int he must use cast (as in c++)
+template<class T>
+struct GetEval<Rel1<Round,T> >
+{	typedef typename Traits::GetEval<T>::Type	Type;	};
+
+template<class View1, class View2>
+struct GetEval<Rel2<Assign,View1,View2> >
+{	typedef bool	Type;	};
+
+template<class View1, class View2>
+struct GetEval<Rel2<SelectFirst,View1,View2> >
+{	typedef bool	Type;	};
 
 } // Traits
 
@@ -688,6 +778,20 @@ struct GetPEnv<Rel5<Func,T1,T2,T3,T4,T5> >
 	Env*	operator()(const Rel5<Func,T1,T2,T3,T4,T5>& r)
 	{	return getPEnv(r.p1,r.p2,r.p3,r.p4,r.p5);}
 };
+
+namespace Util {
+
+template<class ArrayT,class IndexT>
+struct IterationView<Rel2<Element,ArrayT,IndexT> > :
+	IterationView<typename ArrayT::Elem>
+{
+	typedef IterationView<typename ArrayT::Elem> Super;
+	typedef Rel2<Element,ArrayT,IndexT> RelT;
+	IterationView(const RelT& v) : Super(v.p1[v.p2.value()]) {}
+};
+
+}
+
 };
 
 

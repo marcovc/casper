@@ -27,6 +27,12 @@
 #include <casper/util/container/stdvector.h>
 
 namespace Casper {
+
+template<class,class,class>
+struct Rel2;
+
+struct Element;
+
 namespace Util {
 
 
@@ -219,80 +225,101 @@ struct StdArray
 	typedef Elem	Value;
 
 	/// Creates a new array pointing to memory of the existing array \p s.
-	StdArray(const StdArray& s) : pData(s.pData) { }
+	StdArray(const StdArray& s) : pData(s.pData),mustFree(false) { }
 
 	/// Creates a new array pointing to \p pData.
-	StdArray(PData pData) : pData(pData) {}
+	StdArray(PData pData) : pData(pData),mustFree(false) {}
 
 	/// Creates a new array initialized with the range [b,e[
 	StdArray(IHeap& heap, Iterator b, Iterator e) :
-			pData(new (heap) Data(heap,b,e)) {}
+			pData(new (heap) Data(heap,b,e)),mustFree(!heap.doesGC()) {}
 
 	/// Creates a new (uninitialized) array with room for \p n elements.
 	StdArray(IHeap& heap,uint n) :
-			pData(new (heap) Data(heap,n))	{}
+			pData(new (heap) Data(heap,n)),mustFree(!heap.doesGC())	{}
 
 	/** Creates a new array with \p p1 elements and initializes each element
 	 *  with the parameter \p p2.	*/
 	template<class T2>
 	StdArray(IHeap& heap,uint p1,const T2& p2)  :
-			pData(Detail::ArrayDataTraits<Self,dims>::initData(heap,p1,p2))
+			pData(Detail::ArrayDataTraits<Self,dims>::initData(heap,p1,p2)),
+			mustFree(!heap.doesGC())
+	{}
+
+	/** Creates a new array with \p p1 elements and initializes each element
+	 *  with the parameter \p p2.	*/
+	template<class T2>
+	StdArray(IHeap& heap,uint p1, T2& p2)  :
+			pData(Detail::ArrayDataTraits<Self,dims>::initData(heap,p1,p2)),
+			mustFree(!heap.doesGC())
 	{}
 
 	/** Creates a new 2D array with \p p1 X \p p2 elements and initializes
 	 *  each element with the parameter \p p3.	*/
 	template<class T2,class T3>
 	StdArray(IHeap& heap,uint p1,const T2& p2,const T3& p3)  :
-			pData(Detail::ArrayDataTraits<Self,dims>::initData(heap,p1,p2,p3))
+			pData(Detail::ArrayDataTraits<Self,dims>::initData(heap,p1,p2,p3)),
+			mustFree(!heap.doesGC())
 	{}
 
 	/** Creates a new 3D array with \p p1 X \p p2 X \p p3 elements and
 	 *  initializes each element with the parameter \p p4.	*/
 	template<class T2,class T3,class T4>
 	StdArray(IHeap& heap,uint p1,const T2& p2,const T3& p3,const T4& p4) :
-		 	pData(Detail::ArrayDataTraits<Self,dims>::initData(heap,p1,p2,p3,p4))
+		 	pData(Detail::ArrayDataTraits<Self,dims>::initData(heap,p1,p2,p3,p4)),
+		 	mustFree(!heap.doesGC())
 	{}
 
 	/// Creates a new array initialized with the range [b,e[ in stdHeap.
 	StdArray(Iterator b, Iterator e) :
-			pData(new (stdHeap) Data(stdHeap,b,e)) {}
+			pData(new (stdHeap) Data(stdHeap,b,e)),
+			mustFree(true){}
+
+	/// Creates a new array from an initializer list
+	StdArray(const std::initializer_list<Elem>& l) :
+		pData(new (stdHeap) Data(l)),
+		mustFree(true) {}
 
 	/// Creates a new (uninitialized) array with room for \p n elements in stdHeap.
 	StdArray(uint n) :
-			pData(new (stdHeap) Data(stdHeap,n))	{}
+			pData(new (stdHeap) Data(stdHeap,n)),
+			mustFree(true) {}
 
 	/** Creates a new array with \p p1 elements in stdHeap and initializes
 	 *  each element with the parameter \p p2.	*/
 	template<class T2>
 	StdArray(uint p1,const T2& p2)  :
-			pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap,p1,p2))
+			pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap,p1,p2)),
+			mustFree(true)
 	{}
 
 	/** Creates a new 2D array with \p p1 X \p p2 elements in stdHeap and
 	 *  initializes each element with the parameter \p p3.	*/
 	template<class T3>
 	StdArray(uint p1,uint p2,const T3& p3)  :
-			pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap,p1,p2,p3))
+			pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap,p1,p2,p3)),
+			mustFree(true)
 	{}
 
 	/** Creates a new 3D array with \p p1 X \p p2 X \p p3 elements in
 	 *  stdHeap and initializes each element with the parameter \p p4.	*/
 	template<class T4>
 	StdArray(uint p1,uint p2,uint p3,const T4& p4) :
-		 	pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap,p1,p2,p3,p4))
+		 	pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap,p1,p2,p3,p4)),
+		 	mustFree(true)
 	{}
 
 	/// Free memory
 	~StdArray()
 	{
-		if (not getHeap().doesGC())
+		if (mustFree)
 		{
 			IHeap& heap = pData->getHeap();
 			pData->~Data();
 			heap.deallocate(pData);
 		}
-		else
-			pData->~Data();
+		//else
+		//	pData->~Data();
 	}
 
 	///	Returns an Iterator pointing to the first element of the array.
@@ -396,11 +423,12 @@ struct StdArray
 	friend class Detail::ArrayTraits<T,dims-1>;
 	friend class Detail::ArrayDataTraits<Self,dims>;
 
-	PData	pData;
+	PData		pData;
+	const bool 	mustFree;
 };
 
 
-// specialization for multidimesional arrays
+// specialization for multidimensional arrays
 template<class> struct IterationView;
 template<class T,int dims>
 struct IterationView<StdArray<T,dims> >
@@ -414,7 +442,7 @@ struct IterationView<StdArray<T,dims> >
 	bool		valid() const 	{	return idx < max;	}
 	Self		next() const {	return Self(v,idx+1); }
 	uint						idx;
-	StdArray<T,dims>			v;
+	const StdArray<T,dims>&		v;
 	const uint					max;
 };
 
@@ -463,13 +491,6 @@ public:
 } // Util
 
 
-template<class> struct GetPEnv;
-
-template<class T,int Dims>
-struct GetPEnv<Util::StdArray<T,Dims> >
-{	Env* operator()(const Util::StdArray<T,Dims>& v)
-	{	assert(v.size()>0); return getPEnv(v[0]); }
-};
 
 } // Casper
 
@@ -509,10 +530,4 @@ std::istream& operator>>(std::istream& is, Casper::Util::StdArray<T,I>& v)
 
 #endif
 
-#ifndef CASPER_NO_OPERATORS
-#ifndef CASPER_UTIL_CONTAINER_OP_ARRAY_H
-#define CASPER_UTIL_CONTAINER_OP_ARRAY_H
-#include <casper/util/container/op_array.h>
-#endif
-#endif
 

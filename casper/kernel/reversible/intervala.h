@@ -165,7 +165,7 @@ class IntervalA
 
 	class Iterator;
 	friend class Iterator;
-	class Iterator : public std::iterator<bidirectional_iterator_tag,
+	class Iterator : public std::iterator<std::bidirectional_iterator_tag,
 									 	  const Value,
 									 	  Difference>
 	{
@@ -218,7 +218,7 @@ class IntervalA
 	Iterator find(const key_type& k) const;
 	Size count(const key_type& k) const;
 	Util::StdPair<Iterator, Iterator> equal_range(const key_type& k) const;
-	typedef reverse_iterator<Iterator> ReverseIterator;
+	typedef std::reverse_iterator<Iterator> ReverseIterator;
 	typedef ReverseIterator ConstReverseIterator;
 	ReverseIterator rbegin() const {return ReverseIterator(end());}
 	ReverseIterator rend() const {return ReverseIterator(begin());}

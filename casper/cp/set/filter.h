@@ -24,6 +24,7 @@
 #include <algorithm>
 
 namespace Casper {
+
 namespace CP {
 
 
@@ -1010,7 +1011,7 @@ struct BndFilterView1<Partition,Seq<Set<Elem> >,View1> : IFilter
 			first = false;
 
 			// calculate union of all values
-			set<Elem> un;
+			std::set<Elem> un;
 			for (uint i = 0; i < x.size(); ++i)
 			{
 				for (typename Dom::IIterator it = x[i]->beginIn();
@@ -1199,7 +1200,7 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,View1,Set<Elem>,View2> : IFilte
 
 
 			// get union of all values in lub(x)
-			set<Elem> un;
+			std::set<Elem> un;
 			for (uint i = 0; i < x.size(); ++i)
 			{
 				for (typename Dom1::IIterator it = x[i]->beginIn();
@@ -1415,6 +1416,17 @@ struct BndViewRel1<Min,Var<Set<Eval>,Dom>,Eval>
 	{ return Rel1<Min,Var<Set<Eval>,Dom> >(v); }
 
 	Var<Set<Eval>,Dom>	v;
+};
+
+template<class,class,class,class,class,class,class> struct PostDomFilter3;
+
+template<class Elem,class Array,class Index,class Res>
+struct PostDomFilter3<ElementEqual,Seq<Set<Elem> >,Array,int,Index,Set<Elem>,Res >
+{
+	static bool post(Store& store,const Array&, const Index&,const Res&)
+	{
+		throw Exception::InvalidOperation("ElementEqual constraint over array of set variables is not yet supported");
+	}
 };
 
 } // CP

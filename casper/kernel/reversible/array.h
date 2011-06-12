@@ -31,7 +31,7 @@
 #include <casper/kernel/reversible/array.h>
 #include <casper/kernel/reversible/reversible.h>
 
-using namespace std;
+//using namespace std;
 
 namespace Casper {
 

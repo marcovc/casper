@@ -191,6 +191,7 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 	//	Env&	getEnv() const {	return Super::solver(); }
 
 		bool operator=(const Value& v);
+		bool operator=(Iterator it);
 
 		/// Returns \p true if \p this has exactly the same elements as \a s.
 		template<FD_TP_SPEC(1)>
@@ -258,6 +259,7 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		bool erase(Iterator p, Iterator q);
 		bool updateMin(Iterator);
 		bool updateMax(Iterator);
+
 		inline bool updateMin(const Value& v);
 		inline bool updateMax(const Value& v);
 		inline bool updateRange(const Value& min,const Value& max);
@@ -350,12 +352,28 @@ uint FD<FD_TP_LIST(1)>::getAFC() const
 /**
 	\brief Assigns the value \a v to the finite domain.
 
-	If \a v is not in the domain it becomes empty.
+	If \a v is not in the domain it fails.
 */
 template<FD_TP_SPEC(1)>
 bool FD<FD_TP_LIST(1)>::operator=(const Value& v)
 {
 	Iterator it = find(v);
+	if (it == end())
+		return false;
+	if (it != begin() and !erase(begin(),it))
+		return false;
+	if (++it != end() and !erase(it,end()))
+		return false;
+	return true;
+}
+
+/**
+	\brief Assigns the value pointed by \a it to the finite domain.
+	\pre it
+*/
+template<FD_TP_SPEC(1)>
+bool FD<FD_TP_LIST(1)>::operator=(Iterator it)
+{
 	if (it == end())
 		return false;
 	if (it != begin() and !erase(begin(),it))
@@ -426,7 +444,7 @@ bool FD<FD_TP_LIST(1)>::updateMin(Iterator ith)
 {
 	triggerBeforeErase(begin(),ith);
 	Super::updateMin(ith);
-	_min = *begin();
+	_min = *ith; //*begin();
 	return triggerAfterErase();
 }
 
@@ -447,7 +465,7 @@ bool FD<FD_TP_LIST(1)>::updateMax(Iterator ith)
 {
 	triggerBeforeErase(ith,end());
 	Super::updateMax(--ith);
-	_max = *--end();
+	_max = *ith; //*--end();
 	return triggerAfterErase();
 }
 
@@ -508,7 +526,7 @@ bool FD<FD_TP_LIST(1)>::intersect(Iterator1 b,Iterator1 e)
 }
 
 
-/// Erases all values in iteratable range defined by [b,e[ from FD
+/// Erases all values in iterateable range defined by [b,e[ from FD
 /// \pre Values in the range are sorted.
 template<FD_TP_SPEC(1)>
 template<class Iterator1>
@@ -694,6 +712,7 @@ std::ostream& operator<<(std::ostream& os, const FD<FD_TP_LIST(1)>& f)
 template<FD_TP_SPEC(1)>
 std::istream& operator>>(std::istream& is, FD<FD_TP_LIST(1)>& f)
 {
+	using namespace std;
 	typedef FD<FD_TP_LIST(1)> Dom;
 	typedef typename Dom::Value	Value;
 	is >> ws;

@@ -30,7 +30,7 @@
 //#include <casper/kernel/expression.h>
 #include <casper/util/iteration.h>
 
-using namespace std;
+//using namespace std;
 
 namespace Casper {
 namespace CP {
@@ -78,7 +78,7 @@ struct VarArray : Util::StdArray<Var<T,Dom1>,dims>
 	typedef typename Super::Iterator	Iterator;
 
 	/// Creates a new VarArray pointing to an existing VarArray \p s.
-	VarArray(const VarArray& s) : Super(s),store(store) { }
+	VarArray(const VarArray& s) : Super(s),store(s.store) { }
 
 	/// Creates a new VarArray pointing to an existing VarArray \p s.
 	VarArray(Store& store, const Super& s) : Super(s),store(store) {}
@@ -198,12 +198,13 @@ template<class T, int Dims, class Dom>
 struct GetEval<CP::VarArray<T,Dims,Dom> >
 {	typedef Seq<T>	Type;	};
 
-template<class ArrayView, class IdxView>
-struct GetEval<Rel2<Element,ArrayView,IdxView> >
-{	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<ArrayView>::Type>::Type	Type;	};
-
 template<class T,int Dims,class Dom>
 struct GetElem<CP::VarArray<T,Dims,Dom> >
+{	typedef typename CP::VarArray<T,Dims,Dom>::Elem	Type;	};
+
+
+template<class T,int Dims,class Dom>
+struct GetTermElem<CP::VarArray<T,Dims,Dom> >
 {	typedef CP::Var<T,Dom>	Type;	};
 
 } // Traits
