@@ -188,7 +188,7 @@ void ValFilterView1<Distinct,IntSeq,View>::detach(INotifiable* pParent)
 template<class View>
 bool ValFilterView1<Distinct,IntSeq,View>::execute()
 {
-	typedef typename Traits::GetDom<typename Casper::Traits::GetElem<View>::Type>::Type::Iterator Iterator;
+	typedef typename Traits::GetDom<typename Casper::Traits::GetTermElem<View>::Type>::Type::Iterator Iterator;
 	for (uint i = 0; i < doms.size(); i++)
 		for (Iterator it = doms[i]->begin(); it != doms[i]->end(); )
 			if (assignedVars[*it-minValue]>=0)

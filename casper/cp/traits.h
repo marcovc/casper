@@ -33,6 +33,12 @@ template<class View>
 struct GetDom
 {	typedef typename GetDefaultDom<typename Casper::Traits::GetEval<View>::Type>::Type	 	Type;};
 
+template<class ArrayView,class IdxView>
+struct GetDom<Rel2<Element,ArrayView,IdxView> >
+{
+	typedef typename GetDom<typename Casper::Traits::GetTermElem<ArrayView>::Type>::Type	Type;
+};
+
 // FIXME: this is required to work with different domain types
 #if 0
 

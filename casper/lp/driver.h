@@ -20,14 +20,20 @@
 #ifndef CASPER_LP_DRIVER_H_
 #define CASPER_LP_DRIVER_H_
 
-#include <casper/util/container/stdvector.h>
+#include <casper/util/container/stdarray.h>
 #include <casper/kernel/state/state.h>
+#include <casper/kernel/reversible/reversible.h>
 
 namespace Casper {
 namespace LP {
 
 struct Driver
 {
+	typedef uint Idx;
+	typedef double Coeff;
+	typedef Util::StdArray<uint,1> 	Idxs;
+	typedef Util::StdArray<Coeff> 	Coeffs;
+
 	typedef enum { LB, UB, DB, Fix, Free} ConstraintType;
 
 	Driver(State& state);
@@ -35,11 +41,11 @@ struct Driver
 
 	// 0 is independent term
 	// WARNING: this is not reversible (see updateObjectiveCoef)
-	void setObjectiveCoeff(uint idx, double coef);
+	void setObjectiveCoeff(Idx idx, Coeff coef);
 
 	// 0 is independent term
 	// \note This is reversible
-	void updateObjectiveCoeff(uint idx, double coef);
+	void updateObjectiveCoeff(Idx idx, Coeff coef);
 
 	// WARNING: this is not reversible (see updateObjectiveDir)
 	void setObjectiveDir(bool upDir);
@@ -48,18 +54,19 @@ struct Driver
 	void updateObjectiveDir(bool upDir);
 
 	// \note This is reversible
-	uint addConstraint(const Util::StdVector<uint>& idxs,
-						const Util::StdVector<double>& vals,
+	uint addConstraint(const Idxs& idxs,
+						const Coeffs& coeffs,
 						ConstraintType type, double lb, double ub);
 
 	// WARNING: this is not reversible
 	void setConstraintCoeffs(uint rowId,
-								const Util::StdVector<uint>& idxs,
-							   	const Util::StdVector<double>& vals);
+								const Idxs& idxs,
+							   	const Coeffs& coeffs);
 
 	// WARNING: this is not reversible (see updateConstraintBounds)
 	void setConstraintBounds(uint rowId,ConstraintType type, double lb, double ub);
 
+	// This is effective only if the new bounds are tighter than the current bounds
 	// \note this is reversible
 	void updateConstraintBounds(uint rowId,ConstraintType type, double lb, double ub);
 
@@ -67,28 +74,40 @@ struct Driver
 	uint addVariable(ConstraintType type, double lb, double ub);
 
 	// \note This is reversible
-	uint addVariable(const Util::StdVector<uint>& idxs,
-					const Util::StdVector<double>& vals,
+	uint addVariable(const Idxs& idxs,
+					const Coeffs& coeffs,
 					ConstraintType type, double lb, double ub);
 
 	// WARNING: this is not reversible
 	void setVariableCoeffs(uint colId,
-							const Util::StdVector<uint>& idxs,
-							const Util::StdVector<double>& vals);
+							const Idxs& idxs,
+							const Coeffs& coeffs);
 
 	// WARNING: this is not reversible (see updateVariableBounds)
-	void setVariableBounds(uint colId,ConstraintType type, double lb, double ub);
+	void setVariableBounds(Idx colId,ConstraintType type, double lb, double ub);
 
+	// The provided bounds are always intersected with the current bounds to
+	// guarantee that the update is monotonic (see setVariableBounds if this is
+	// not desired)
+	// \return False if the update generates an empty range for the variable, true otherwise
 	// \note this is reversible
-	void updateVariableBounds(uint colId,ConstraintType type, double lb, double ub);
+	bool updateVariableBounds(Idx colId,ConstraintType type, double lb, double ub);
 
 	bool solve();
 
 	double getValue(uint colId) const;
 	double getObjValue() const;
 
+	void printModel(const char* fname);
+
+	uint getNbRows() const;
+	uint getNbCols() const;
+
 	State&				state;
 	void*				glpProb;
+	void*				glpSMCP;
+
+	Reversible<bool>	first;
 };
 
 } // LP

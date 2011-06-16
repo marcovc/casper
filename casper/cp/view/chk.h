@@ -262,8 +262,8 @@ struct ChkViewRel1<Not,bool,View1>
 	void attach(INotifiable* f) { 	v.attach(f);}
 	void detach(INotifiable* f) {	v.detach(f);}
 
-	View1 getObj()  const
-	{ 	return v.getObj();	}
+	Rel1<Not,View1> getObj()  const
+	{ 	return rel<Not>(v.getObj());	}
 
 	ChkView<View1>	v;
 };
@@ -285,7 +285,6 @@ struct ChkViewRel2<And,bool,View1,bool,View2>
 		detach(pOwner);
 		return store.post(rel<Or>(!p1.getObj(),!p2.getObj()));
 	}
-//	Store& store() const {	return p1.store();	}
 
 	void attach(INotifiable* f) { 	pOwner=f; p1.attach(f); p2.attach(f);}
 	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);}
@@ -386,6 +385,9 @@ struct ChkViewRel2<Distinct,Eval,View1,Eval,View2> :
 	typedef ChkViewRel1<Not,bool,Rel2<Equal,View1,View2> >	Super;
 	ChkViewRel2(Store& store, const View1& p1,const View2& p2) :
 		Super(store,rel<Equal>(p1,p2)) {}
+	Rel2<Distinct,View1,View2> getObj()  const
+	{ 	return Rel2<Distinct,View1,View2>(Super::getObj().p1.p1,Super::getObj().p1.p2);	}
+
 };
 
 // reification of greater equal
@@ -432,6 +434,9 @@ struct ChkViewRel2<LessEqual,Eval,View1,Eval,View2> :
 	typedef ChkViewRel2<GreaterEqual,Eval,View2,Eval,View1>	Super;
 	ChkViewRel2(Store& store, const View1& p1,const View2& p2) :
 			Super(store,p2,p1) {}
+	Rel2<LessEqual,View1,View2> getObj()  const
+	{ 	return Rel2<LessEqual,View1,View2>(Super::getObj().p2,Super::getObj().p1);	}
+
 };
 
 // reification of less
@@ -443,6 +448,8 @@ struct ChkViewRel2<Less,Eval,View1,Eval,View2> :
 	typedef ChkViewRel1<Not,bool,Rel2<GreaterEqual,View1,View2> >	Super;
 	ChkViewRel2(Store& store, const View1& p1,const View2& p2) :
 		Super(store,rel<GreaterEqual>(p1,p2)) {}
+	Rel2<Less,View1,View2> getObj()  const
+	{ 	return Rel2<Less,View1,View2>(Super::getObj().p1.p1,Super::getObj().p1.p2);	}
 };
 
 // reification of greater
@@ -454,6 +461,9 @@ struct ChkViewRel2<Greater,Eval,View1,Eval,View2> :
 	typedef ChkViewRel1<Not,bool,Rel2<LessEqual,View1,View2> >	Super;
 	ChkViewRel2(Store& store, const View1& p1,const View2& p2) :
 		Super(store,rel<LessEqual>(p1,p2)) {}
+	Rel2<Greater,View1,View2> getObj()  const
+	{ 	return Rel2<Greater,View1,View2>(Super::getObj().p1.p1,Super::getObj().p1.p2);	}
+
 };
 
 // FIXME: rewrite the following checkers
@@ -513,6 +523,49 @@ struct ChkViewRel2<InTable,Seq<Eval>,View1,Seq<Eval>,View2>
 	Store&	store;
 	View1 p1;
 	View2 p2;
+};
+
+// This class adapts bnd views over boolean expressions to work as checkers
+// note: this is not enabled for all checkers to avoid complex compiler error
+// messages when user makes a mistake. To use it see example below (IfThenElse).
+template<class Rel>
+struct BndView2ChkView
+{
+	BndView2ChkView(Store& s,const Rel& rel) : s(s),v(s,rel) {}
+	bool isTrue() const	// is it true?
+	{	return v.min();	}
+	bool canBeTrue() const 	// can it still be true?
+	{	return v.max();	}
+	bool setToTrue()
+	{	v.detach(pOwner); return s.post(true==v.getObj());	}
+	bool setToFalse()
+	{	v.detach(pOwner); return s.post(false==v.getObj());	}
+
+	void attach(INotifiable* f) { 	pOwner=f; v.attach(f);}
+	void detach(INotifiable* f) {	v.detach(f); }
+
+	Rel getObj()  const
+	{ 	return v.getObj();	}
+
+	Store& s;
+	BndView<bool,Rel> v;
+	INotifiable* pOwner;
+};
+
+template<class T1,class T2,class T3>
+struct ChkViewRel3<IfThenElse,bool,T1,bool,T2,bool,T3> :
+		BndView2ChkView<Rel3<IfThenElse,T1,T2,T3> >
+{
+	ChkViewRel3(Store& s, const T1& t1,const T2& t2, const T3& t3) :
+		BndView2ChkView<Rel3<IfThenElse,T1,T2,T3> >(s,rel<IfThenElse>(t1,t2,t3)) {}
+};
+
+template<class T1,class T2>
+struct ChkViewRel2<Element,Seq<bool>,T1,int,T2> :
+		BndView2ChkView<Rel2<Element,T1,T2> >
+{
+	ChkViewRel2(Store& s, const T1& t1,const T2& t2) :
+		BndView2ChkView<Rel2<Element,T1,T2> >(s,rel<Element>(t1,t2)) {}
 };
 
 } // CP

@@ -85,7 +85,7 @@ struct State
 	void removeCP();
 
 	// fires at next choice point creation or restore
-	void notifyOnNextCP(INotifiable* f) 	{	onCPSL.push(f);	}
+	void notifyOnNextCP(INotifiable* f) 	{	onNextCPSL.push(f);	}
 
 	void wakeupCPDemons();
 
@@ -117,7 +117,7 @@ struct State
 	Util::StdStack<counter>			curStateID;
 	counter							stateIDCtr;
 	counter							mFails;
-	Util::StdStack<INotifiable*>	onCPSL;
+	Util::StdStack<INotifiable*>	onNextCPSL;
 	StateStats						stats;
 };
 

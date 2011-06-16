@@ -34,18 +34,36 @@
 namespace Casper {
 namespace CP {
 
-
+#if 0
 template<class F,class,class V1> // TODO: default is to use FilterExpr1
-struct BndFilterView1 : NoFilter
-{	BndFilterView1(Store& s,const V1&) : NoFilter(s,*this) {}	};
+struct BndFilterView1
+{
+#ifdef CASPER_CPP0X
+	static_assert(sizeof(V1)==0,"Undefined specialization of BndFilterView1");
+#else
+	BndFilterView1(Store& s,const V1&) { assert(0);	}
+#endif
+};
 
 template<class,class,class V1,class,class V2>
-struct BndFilterView2 : NoFilter
-{	BndFilterView2(Store& s,const V1&,const V2&) : NoFilter(s,*this) {}	};
+struct BndFilterView2
+{
+#ifdef CASPER_CPP0X
+	static_assert(sizeof(V1)==0,"Undefined specialization of BndFilterView2");
+#else
+	BndFilterView2(Store& s,const V1&,const V2&) { assert(0);}
+#endif
+};
 
 template<class R,class E1,class V1,class E2,class V2,class E3,class V3>
-struct BndFilterView3 : NoFilter
-{	BndFilterView3(Store& s,const V1&,const V2&,const V3&) : NoFilter(s,*this) {}	};
+struct BndFilterView3
+{
+#ifdef CASPER_CPP0X
+	static_assert(sizeof(V1)==0,"Undefined specialization of BndFilterView3");
+#else
+	BndFilterView3(Store& s,const V1&,const V2&,const V3&) { assert(0);}
+#endif
+};
 
 template<class R,class E1,class V1,class E2,class V2,class E3,class V3,class E4,class V4>
 struct BndFilterView4 : NoFilter
@@ -54,19 +72,75 @@ struct BndFilterView4 : NoFilter
 template<class R,class E1,class V1,class E2,class V2,class E3,class V3,class E4,class V4,class E5,class V5>
 struct BndFilterView5 : NoFilter
 {	BndFilterView5(Store& s,const V1&,const V2&,const V3&,const V4&,const V5&) : NoFilter(s,*this) {}	};
+#else
+
+template<class Rel>
+struct ChkView2BndFilter : IFilter
+{
+	ChkView2BndFilter(Store& s,const Rel& rel) : IFilter(s),chk(s,rel) {}
+	bool execute() {	return chk.setToTrue();	}
+	void attach(INotifiable* f) {	chk.attach(f);	}
+	void detach(INotifiable* f) {	chk.detach(f);	}
+	ChkView<Rel> chk;
+};
+
+template<class F,class,class V1>
+struct BndFilterView1 : ChkView2BndFilter<Rel1<F,V1> >
+{
+	BndFilterView1(Store& s,const V1& v1) :
+		ChkView2BndFilter<Rel1<F,V1> >(s,rel<F>(v1)) {}
+};
+
+template<class F,class,class V1,class,class V2>
+struct BndFilterView2 : ChkView2BndFilter<Rel2<F,V1,V2> >
+{
+	BndFilterView2(Store& s,const V1& v1,const V2& v2) :
+		ChkView2BndFilter<Rel2<F,V1,V2> >(s,rel<F>(v1,v2)) {}
+};
+
+template<class F,class E1,class V1,class E2,class V2,class E3,class V3>
+struct BndFilterView3 : ChkView2BndFilter<Rel3<F,V1,V2,V3> >
+{
+	BndFilterView3(Store& s,const V1& v1,const V2& v2,const V3& v3) :
+		ChkView2BndFilter<Rel3<F,V1,V2,V3> >(s,rel<F>(v1,v2,v3)) {}
+};
+
+template<class F,class E1,class V1,class E2,class V2,class E3,class V3,class E4,class V4>
+struct BndFilterView4 : ChkView2BndFilter<Rel4<F,V1,V2,V3,V4> >
+{
+	BndFilterView4(Store& s,const V1& v1,const V2& v2,const V3& v3,const V4& v4) :
+		ChkView2BndFilter<Rel4<F,V1,V2,V3,V4> >(s,rel<F>(v1,v2,v3,v4)) {}
+};
+/*
+template<class F,class E1,class V1,class E2,class V2,class E3,class V3,class E4,class V4,class E5,class V5>
+struct BndFilterView5 : ChkView2BndFilter<Rel5<F,V1,V2,V3,V4,V5> >
+{
+	BndFilterView5(Store& s,const V1& v1,const V2& v2,const V3& v3,
+							const V4& v4,const V5& v5) :
+				ChkView2BndFilter(s,rel<F>(v1,v2,v3,v4,v5)) {}
+};*/
+
+
+#endif
 
 template<class Func,class Eval1,class View1>
 struct PostBndFilter1
 {
 	static bool post(Store& s,const View1& v1)
-	{	return s.post(new (s) BndFilterView1<Func,Eval1,View1>(s,v1));	}
+	{
+		return ChkViewRel1<Func,Eval1,View1>(s,v1).canBeTrue() and
+				s.post(new (s) BndFilterView1<Func,Eval1,View1>(s,v1));
+	}
 };
 
 template<class Func,class Eval1,class View1,class Eval2,class View2>
 struct PostBndFilter2
 {
 	static bool post(Store& s,const View1& v1,const View2& v2)
-	{	return s.post(new (s) BndFilterView2<Func,Eval1,View1,Eval2,View2>(s,v1,v2));	}
+	{
+		return ChkViewRel2<Func,Eval1,View1,Eval2,View2>(s,v1,v2).canBeTrue() and
+				s.post(new (s) BndFilterView2<Func,Eval1,View1,Eval2,View2>(s,v1,v2));
+	}
 };
 
 template<class Func,class Eval1,class View1,class Eval2,class View2,
@@ -74,7 +148,10 @@ template<class Func,class Eval1,class View1,class Eval2,class View2,
 struct PostBndFilter3
 {
 	static bool post(Store& s,const View1& v1,const View2& v2,const View3& v3)
-	{	return s.post(new (s) BndFilterView3<Func,Eval1,View1,Eval2,View2,Eval3,View3>(s,v1,v2,v3));	}
+	{
+		return ChkViewRel3<Func,Eval1,View1,Eval2,View2,Eval3,View3>(s,v1,v2,v3).canBeTrue() and
+				s.post(new (s) BndFilterView3<Func,Eval1,View1,Eval2,View2,Eval3,View3>(s,v1,v2,v3));
+	}
 };
 
 template<class Func,class Eval1,class View1,class Eval2,class View2,
@@ -82,7 +159,10 @@ template<class Func,class Eval1,class View1,class Eval2,class View2,
 struct PostBndFilter4
 {
 	static bool post(Store& s,const View1& v1,const View2& v2,const View3& v3,const View4& v4)
-	{	return s.post(new (s) BndFilterView4<Func,Eval1,View1,Eval2,View2,Eval3,View3,Eval4,View4>(s,v1,v2,v3,v4));}
+	{
+		return ChkViewRel4<Func,Eval1,View1,Eval2,View2,Eval3,View3,Eval4,View4>(s,v1,v2,v3,v4).canBeTrue() and
+				s.post(new (s) BndFilterView4<Func,Eval1,View1,Eval2,View2,Eval3,View3,Eval4,View4>(s,v1,v2,v3,v4));
+	}
 };
 
 template<class Func,class Eval1,class View1,class Eval2,class View2,
@@ -91,8 +171,11 @@ struct PostBndFilter5
 {
 	static bool post(Store& s,const View1& v1,const View2& v2,
 						 const View3& v3,const View4& v4,const View5& v5)
-	{	return s.post(new (s)
-			BndFilterView5<Func,Eval1,View1,Eval2,View2,Eval3,View3,Eval4,View4,Eval5,View5>(s,v1,v2,v3,v4,v5));}
+	{
+		return ChkViewRel5<Func,Eval1,View1,Eval2,View2,Eval3,View3,Eval4,View4,Eval5,View5>(s,v1,v2,v3,v4,v5).canBeTrue() and
+				s.post(new (s)
+			BndFilterView5<Func,Eval1,View1,Eval2,View2,Eval3,View3,Eval4,View4,Eval5,View5>(s,v1,v2,v3,v4,v5));
+	}
 };
 
 template<class Rel>
@@ -202,11 +285,11 @@ struct PostBndFilter
 
 	template<class Dom>
 	bool operator()(Store& s,Var<bool,Dom> v) const
-	{	return PostBndFilter()(s,BndExpr<bool>(v));	}
+	{	return PostBndFilter()(s,BndExpr<bool>(s,v));	}
 
 	template<class Dom>
 	bool operator()(Store& s,DomExpr<bool,Dom> v) const
-	{	return PostBndFilter()(s,BndExpr<bool>(v));	}
+	{	return PostBndFilter()(s,BndExpr<bool>(s,v));	}
 
 	bool operator()(Store& s,BndExpr<bool> v) const;
 
@@ -288,8 +371,8 @@ extern PostD1BndFilter postD1BndFilter;
 template<class View1,class View2>
 struct BndFilterView2<And,bool,View1,bool,View2> : IFilter
 {
-	BndFilterView2(Store& s,const View1& p1, const View2& p2) :
-		IFilter(store),store(s),p1(p1),p2(p2) {}
+	BndFilterView2(Store& store,const View1& p1, const View2& p2) :
+		IFilter(store),store(store),p1(p1),p2(p2) {}
 
 	bool execute()
 	{	return postBndFilter(store,p1) and postBndFilter(store,p2);	}
@@ -310,8 +393,8 @@ struct BndFilterView2<And,bool,View1,bool,View2> : IFilter
 template<class View1>
 struct BndFilterView1<And,Seq<bool>,View1> : IFilter
 {
-	BndFilterView1(Store& s,const View1& p1) :
-		IFilter(store),store(s),p1(s,p1) {}
+	BndFilterView1(Store& store,const View1& p1) :
+		IFilter(store),store(store),p1(store,p1) {}
 
 	bool execute()
 	{
@@ -357,6 +440,22 @@ struct BndFilterView2<Or,bool,View1,bool,View2> : IFilter
 	CChkView<View2>	c2;
 };
 
+template<class View1, class View2>
+struct PostBndFilter2<Or,bool,View1,bool,View2>
+{
+    static bool post(Store& s,const View1& p1,const View2& p2)
+    {
+    	ChkView<View1> v1(s,p1);
+    	ChkView<View2> v2(s,p2);
+    	if (v1.isTrue() or v2.isTrue())
+    		return true;
+    	if (!v1.canBeTrue())
+    		return v2.canBeTrue() and postBndFilter(s,p2);
+    	if (!v2.canBeTrue())
+    		return v1.canBeTrue() and postBndFilter(s,p1);
+    	return s.post(new (s) BndFilterView2<Or,bool,View1,bool,View2>(s,p1,p2));
+    }
+};
 
 /**
  * Enforces the exclusive disjunction of two constraints. It succeeds if
@@ -663,11 +762,11 @@ struct BndFilterView2<SumEquals,Seq<Eval>,View1,Eval,View2> : IFilter
 #else
 
 template<class Eval,class View1,class View2>
-struct BndFilterView2<SumEq,Seq<Eval>,View1,Eval,View2> : IFilter
+struct BndFilterView2<SumEquals,Seq<Eval>,View1,Eval,View2> : IFilter
 {
-	BndFilterView2(CPSolver& solver,const View1& v1, const View2& v2) :
-					IFilter(solver),
-					x(solver,v1),v(solver,v2) {}
+	BndFilterView2(Store& store,const View1& v1, const View2& v2) :
+					IFilter(store),store(store),
+					x(store,v1),v(store,v2) {}
 
 	bool execute()
 	{
@@ -678,7 +777,7 @@ struct BndFilterView2<SumEq,Seq<Eval>,View1,Eval,View2> : IFilter
 				++nground;
 		if (x.size()-nground == 3)
 		{
-			VarArray<Eval> newx(solver(),3);
+			VarArray<Eval> newx(store,3);
 			Eval s = 0;
 			uint c = 0;
 			for (uint i = 0; i < x.size(); ++i)
@@ -686,7 +785,7 @@ struct BndFilterView2<SumEq,Seq<Eval>,View1,Eval,View2> : IFilter
 					newx[c++] = x[i].getObj();
 				else
 					s += x[i].min();
-			solver().post(newx[0]+newx[1]+newx[2]==v.value()-s);
+			store.post(newx[0]+newx[1]+newx[2]==v.value()-s);
 			setInQueue(noQueue);
 			detach(pOwner);
 			return true;
@@ -694,7 +793,7 @@ struct BndFilterView2<SumEq,Seq<Eval>,View1,Eval,View2> : IFilter
 		else
 		if (x.size()-nground == 2)
 		{
-			VarArray<Eval> newx(solver(),2);
+			VarArray<Eval> newx(store,2);
 			Eval s = 0;
 			uint c = 0;
 			for (uint i = 0; i < x.size(); ++i)
@@ -702,7 +801,7 @@ struct BndFilterView2<SumEq,Seq<Eval>,View1,Eval,View2> : IFilter
 					newx[c++] = x[i].getObj();
 				else
 					s += x[i].min();
-			solver().post(newx[0]+newx[1]==v.value()-s);
+			store.post(newx[0]+newx[1]==v.value()-s);
 			setInQueue(noQueue);
 			detach(pOwner);
 			return true;
@@ -710,7 +809,7 @@ struct BndFilterView2<SumEq,Seq<Eval>,View1,Eval,View2> : IFilter
 		else
 		if (x.size()-nground == 1)
 		{
-			VarArray<Eval> newx(solver(),1);
+			VarArray<Eval> newx(store,1);
 			Eval s = 0;
 			uint c = 0;
 			for (uint i = 0; i < x.size(); ++i)
@@ -760,13 +859,13 @@ struct BndFilterView2<SumEq,Seq<Eval>,View1,Eval,View2> : IFilter
 	//	setInQueue(IFilter::noQueue);
 		return true;
 	}
-	bool entailed() const {	return false; }
 	Cost cost() const {	return linearLo; }
 	void attach(INotifiable* s)
 	{	pOwner = s; x.attach(s); v.attach(s);	}
 	void detach(INotifiable* s)
 	{	x.detach(s); v.detach(s);	}
 
+	Store&					 store;
 	BndArrayView<Eval,View1> x;
 	ValView<Eval,View2>		 v;
 	INotifiable*			 pOwner;
@@ -1062,7 +1161,7 @@ struct BndView<Eval,Filter> : BndReify<Filter>
 
 // factory for Element: optimize when index is ground
 template<class Eval,class ArrayView,class IdxView,class EvalView>
-struct PostBndFilter3<Element,Seq<Eval>,ArrayView,int,IdxView,Eval,EvalView>
+struct PostBndFilter3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,EvalView>
 {
     static bool post(Store& s,const ArrayView& p1,const IdxView& p2,const EvalView& p3)
     {
@@ -1074,7 +1173,7 @@ struct PostBndFilter3<Element,Seq<Eval>,ArrayView,int,IdxView,Eval,EvalView>
     	}
     	else
     		return s.post(new (s)
-    						BndFilterView3<Element,Seq<Eval>,ArrayView,
+    						BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,
 													int,IdxView,
 													Eval,EvalView>(s,p1,p2,p3));
     }
@@ -1118,6 +1217,10 @@ struct ElementOverGroundIdx : BndView<Eval,typename Casper::Traits::GetElem<View
 };
 #endif
 
+// if defined means that no auxiliary variable will be used for element
+//#define CASPER_CP_ELEMENT_BNDVIEW
+
+#ifndef CASPER_CP_ELEMENT_BNDVIEW
 // element as expression: may introduce one auxiliary variable
 template<class View1,class View2,class Eval>
 struct BndViewRel2<Element,View1,View2,Eval> :
@@ -1140,16 +1243,21 @@ struct BndViewRel2<Element,View1,View2,Eval> :
 	{
 		if (ValView<int,View2>(s,p2).ground())
 		{
-			uint val = ValView<int,View2>(s,p2).value();
+			int val = ValView<int,View2>(s,p2).value();
+
 			typedef typename Casper::Traits::GetElem<View1>::Type EElem;
 			Util::IterationView<View1>	it(p1);
 			for (;  it.valid() and val > 0; it.iterate())
 				--val;
+
+			if (!it.valid() or val<0)
+				throw Exception::IndexOutOfBounds();
+
 			return Super(s,Helper<EElem,Elem>()(s,it.value()));
 		}
 
 		Elem v(s,Detail::VarDomCreator<typename Elem::Dom>().unionOf(s,p1));
-		s.post(element(p1,p2,v));
+		s.post(elementEqual(p1,p2,v));
 		return Super(s,v);
 	}
 	// temp
@@ -1158,74 +1266,162 @@ struct BndViewRel2<Element,View1,View2,Eval> :
 	Viewed getObj()  const
 	{	return Viewed(viewed.p1,idx.getObj());	}
 #else
-	typedef Elem	Viewed;
-	Viewed getObj() const
-	{	return Super::getObj(); }
+	//typedef Elem	Viewed;
+	Rel2<Element,View1,View2> getObj() const
+	{	return r; /*Super::getObj(); */}
 #endif
 	BndViewRel2(Store& store,const View1& p1, const View2& p2) :
 		Super(getSuper(store,p1,p2)),
 		store(store),
-		viewed(viewed),idx(store,p2)
+		r(rel<Element>(p1,p2)),idx(store,p2)
 	{}
 
 	Store& store;
-	Viewed viewed;
+	Rel2<Element,View1,View2> r;
 	ValView<int,View2> idx;
 };
+#else
 
-#if 0
-// element as expression: introduces one auxiliary variable
+// FIXME: Test: not as strong as version above. Why?
+// does not introduce auxiliary variables but might be slower
 template<class View1,class View2,class Eval>
-struct BndViewRel2<Element,View1,View2,Eval> :
-	ITE<ExprMatch<View2,expression::Ground>::value,
-		ElementOverGroundIdx<View1,View2,Eval>,
-		ElementOverNonGroundIdx<View1,View2,Eval> >::Eval
+struct BndViewRel2<Element,View1,View2,Eval>
 {
-	typedef typename
-		ITE<ExprMatch<View2,expression::Ground>::value,
-			ElementOverGroundIdx<View1,View2,Eval>,
-			ElementOverNonGroundIdx<View1,View2,Eval> >::Eval	Super;
+	BndViewRel2(Store& store, const View1& v1, const View2& v2) :
+		a(store,v1),i(store,v2) {}
 
-	BndViewRel2(CPSolver& solver,const View1& p1, const View2& p2) :
-		Super(solver,p1,p2) {}
-};
-
-// element as expression: introduces one auxiliary variable
-template<class View1,class View2,class Eval>
-struct BndViewRel2<Element,View1,View2,Eval> :
-	BndView<Eval,BndExpr<Eval> >
-{
-	typedef BndView<Eval,BndExpr<Eval> >	Super;
-
-	static BndExpr<Eval> getBndExpr(CPSolver& s,const View1& p1,const View2& p2)
+	Eval min() const
 	{
-		if (ValExpr<int>(s,p2).ground())
+		if (i.min()<0 or i.max() >= static_cast<int>(a.size()))
+			return Casper::limits<Eval>::negInf();
+		Eval r = a[i.min()].min();
+		for (int j = i.min()+1; j <= i.max(); ++j)
+			if (a[j].min() < r)
+				r = a[j].min();
+		return r;
+	}
+
+	Eval max() const
+	{
+		if (i.min()<0 or i.max() >= static_cast<int>(a.size()))
+			return Casper::limits<Eval>::posInf();
+		Eval r = a[i.min()].max();
+		for (int j = i.min()+1; j <= i.max(); ++j)
+			if (a[j].max() > r)
+				r = a[j].max();
+		return r;
+	}
+
+	void range(Eval& lb, Eval& ub) const
+	{
+		if (i.min()<0 or i.max() >= static_cast<int>(a.size()))
 		{
-			uint val = ValExpr<int>(s,p2).value();
-			typedef typename Casper::Traits::GetElem<View1>::Type	SElem;
-			IterationView<SElem,View1>	it(p1);
-			for (;  it.valid() and val > 0; it.iterate())
-				--val;
-			return BndExpr<Eval>(s,it.value());
+			lb = Casper::limits<Eval>::negInf();
+			ub = Casper::limits<Eval>::posInf();
+			return;
 		}
-		else
+		lb = a[i.min()].min();
+		ub = a[i.min()].max();
+		for (int j = i.min()+1; j <= i.max(); ++j)
 		{
-			typedef typename Var<Eval>::Dom	Dom;
-			Var<Eval> v(s,Detail::VarDomCreator<Dom>().unionOf(s,p1));
-			s.post(element(p1,p2,v));
-			return BndExpr<Eval>(s,v);
+			if (a[j].min() < lb)
+				lb = a[j].min();
+			if (a[j].max() > ub)
+				ub = a[j].max();
 		}
 	}
 
-	typedef Rel2<Element,View1,View2>	Viewed;
-	Viewed getObj()  const {	return viewed;	}
+	bool updateMin(const Eval& m)
+	{
+		if (i.min()<0 or i.max() >= static_cast<int>(a.size()))
+			return true;
 
-	BndViewRel2(CPSolver& solver,const View1& p1, const View2& p2) :
-		Super(solver,getBndExpr(solver,p1,p2)),
-		viewed(p1,p2){}
+		// try to increase index lb
+		int mi = i.min();
+		for (; mi <= i.max(); ++mi)
+			if (a[mi].max() >= m)
+				break;
+		// try to decrease index ub
+		int ma = i.max();
+		for (; ma >= i.min(); --ma)
+			if (a[ma].max() >= m)
+				break;
+		if (mi>ma)
+			return false;
+		bool r = true;
+		if (mi > i.min())
+			r = r and i.updateMin(mi);
+		if (ma < i.max())
+			r = r and i.updateMax(ma);
+		if (mi==ma)
+			r = r and a[mi].updateMin(m);
+		return r;
+	}
 
-	Viewed viewed;
+	bool updateMax(const Eval& m)
+	{
+		if (i.min()<0 or i.max() >= static_cast<int>(a.size()))
+			return true;
+
+		// try to increase index lb
+		int mi = i.min();
+		for (; mi <= i.max(); ++mi)
+			if (a[mi].min() <= m)
+				break;
+		// try to decrease index ub
+		int ma = i.max();
+		for (; ma >= i.min(); --ma)
+			if (a[ma].min() <= m)
+				break;
+		if (mi>ma)
+			return false;
+		bool r = true;
+		if (mi > i.min())
+			r = r and i.updateMin(mi);
+		if (ma < i.max())
+			r = r and i.updateMax(ma);
+		if (mi==ma)
+			r = r and a[mi].updateMax(m);
+		return r;
+	}
+
+	bool updateRange(const Eval& lb, const Eval& ub)
+	{
+		if (i.min()<0 or i.max() >= static_cast<int>(a.size()))
+			return true;
+
+		// try to increase index lb
+		int mi = i.min();
+		for (; mi <= i.max(); ++mi)
+			if (a[mi].max() >= lb and a[mi].min() <= ub)
+				break;
+		// try to decrease index ub
+		int ma = i.max();
+		for (; ma >= i.min(); --ma)
+			if (a[ma].max() >= lb and a[ma].min() <= ub)
+				break;
+		if (mi>ma)
+			return false;
+		bool r = true;
+		if (mi > i.min())
+			r = r and i.updateMin(mi);
+		if (ma < i.max())
+			r = r and i.updateMax(ma);
+		if (mi==ma)
+			r = r and a[mi].updateRange(lb,ub);
+		return r;
+	}
+
+	void attach(INotifiable* f) {	a.attach(f); i.attach(f); }
+	void detach(INotifiable* f) {	a.detach(f); i.detach(f); }
+
+	Rel2<Element,View1,View2> getObj()  const
+	{	return rel<Element>(a.getObj(),i.getObj());	}
+
+	BndArrayView<Eval,View1>	a;
+	BndView<int,View2>	i;
 };
+
 #endif
 
 /*

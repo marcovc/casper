@@ -39,7 +39,7 @@ double getSize(const DomArrayView<int,Vars>& doms)
 template<class Vars>
 struct LabelWithImpacts : IGoal
 {
-	typedef typename Casper::Traits::GetElem<Vars>::Type	Var;
+	typedef typename Casper::Traits::GetTermElem<Vars>::Type	Var;
 	typedef typename Traits::GetDom<Var>::Type	Dom;
 	typedef typename Casper::Traits::GetEval<Var>::Type	Eval;
 	typedef typename Dom::Iterator Iterator;

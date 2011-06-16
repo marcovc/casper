@@ -87,7 +87,7 @@ operator==(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh)  \
 {\
 	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
 								   typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type>::value,\
-				  "operands to '==' operator must have equal evaluation types");\
+				 "operands to '==' operator must have equal evaluation types");\
 	return Rel2<Equal,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
 } \
 \
@@ -219,13 +219,15 @@ operator||(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh) \
  	return Rel2<Or,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
  }
 
-#define REL_FROM_UNARY_SCALAR_OPERATORS(AT_RHT) \
+#define REL_FROM_SYM_OPERATOR(AT_RHT) \
 \
 /** Symmetric unary operator.  \ingroup ArithRelations */ \
 AT_DECL(AT_RHT) \
 inline Rel1<Sym,AT_TYPE(AT_RHT) > \
 operator-(const AT_TYPE(AT_RHT)& rh) \
-{ return Rel1<Sym,AT_TYPE(AT_RHT) >(rh);} \
+{ return Rel1<Sym,AT_TYPE(AT_RHT) >(rh);}
+
+#define REL_FROM_NOT_OPERATOR(AT_RHT) \
 \
 /** Negation unary operator.  \ingroup LogicalRelations */ \
 AT_DECL(AT_RHT) \
@@ -235,13 +237,20 @@ operator!(const AT_TYPE(AT_RHT)& rh) \
 	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type,bool>::value,\
 				  "operand to '!' (not) operator must have boolean evaluation type");\
  	return Rel1<Not,AT_TYPE(AT_RHT) >(rh);\
-}\
+}
+
+#define REL_FROM_ABS_OPERATOR(AT_RHT) \
+\
 /** Absolute value unary operator.  \ingroup ArithRelations */ \
 AT_DECL(AT_RHT) \
 inline Rel1<Abs,AT_TYPE(AT_RHT) > \
 abs(const AT_TYPE(AT_RHT)& rh) \
 { return Rel1<Abs,AT_TYPE(AT_RHT) >(rh);} 
  
+#define REL_FROM_UNARY_SCALAR_OPERATORS(AT_RHT) \
+		REL_FROM_SYM_OPERATOR(AT_RHT)\
+		REL_FROM_NOT_OPERATOR(AT_RHT)\
+		REL_FROM_ABS_OPERATOR(AT_RHT)
 
 #define REL_FROM_UNARY_SET_OPERATORS(AT_RHT) \
 /** Min value (from a sequence) unary operator.  \ingroup ArithRelations */ \

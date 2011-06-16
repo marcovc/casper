@@ -23,7 +23,7 @@
 //#include <casper/kernel/reversible/reversible.h>
 #include <casper/util/debug.h>
 
-using namespace std;
+//using namespace std;
 
 namespace Casper {
 
@@ -121,7 +121,7 @@ Env& getEnv(const T& t)
 {
 	PEnv p = getPEnv(t);
 	if (p==NULL)
-		throw Exception::EnvExtract();
+		throw Exception::Extract("Env");
 	return *p;
 }
 

@@ -450,7 +450,7 @@ namespace CP {
  *  \TODO improve: 1. using deltas 2. using supports (GAC6)
  */
 template<class ArrayView,class IdxView,class EvalView>
-struct DomFilterView3<Element,IntSeq,ArrayView,int,IdxView,int,EvalView> : IFilter
+struct DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView> : IFilter
 {
 	DomFilterView3(Store&, const ArrayView&, const IdxView&, const EvalView&);
 
@@ -476,15 +476,15 @@ Filter elementDom( const ArrayView& vars, const IdxView& idx,
 */
 
 template<class ArrayView,class IdxView,class EvalView>
-DomFilterView3<Element,IntSeq,ArrayView,int,IdxView,int,EvalView>::
+DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>::
 DomFilterView3(Store& store, const ArrayView& array,
     			const IdxView& idx,const EvalView& eval) :
-    array(store,array),idx(store,idx),eval(store,eval)
+    IFilter(store),array(store,array),idx(store,idx),eval(store,eval)
 {}
 
 
 template<class ArrayView,class IdxView,class EvalView>
-void DomFilterView3<Element,IntSeq,ArrayView,int,IdxView,int,EvalView>::
+void DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>::
 attach(INotifiable* f)
 {
 	for (uint i = 0; i < array.size(); i++)
@@ -494,7 +494,7 @@ attach(INotifiable* f)
 }
 
 template<class ArrayView,class IdxView,class EvalView>
-void DomFilterView3<Element,IntSeq,ArrayView,int,IdxView,int,EvalView>::
+void DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>::
 detach(INotifiable* f)
 {
 	for (uint i = 0; i < array.size(); i++)
@@ -505,10 +505,10 @@ detach(INotifiable* f)
 
 #ifdef CASPER_ELEMENT_IDX_1
 template<class ArrayView,class IdxView,class EvalView>
-bool DomFilterView3<Element,IntSeq,ArrayView,int,IdxView,int,EvalView>::
+bool DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>::
 execute()
 {
-	typedef typename Traits::GetDom<typename Casper::Traits::GetElem<IdxView>::Type>::Type	IdxDom;
+	typedef typename Traits::GetDom<typename Casper::Traits::GetTermElem<IdxView>::Type>::Type	IdxDom;
 
 	if (idx->ground())		// FIXME: should post a gac == and detach
 		return eval->intersect(array[idx->value()-1]->begin(),
@@ -530,10 +530,10 @@ execute()
 }
 #else
 template<class ArrayView,class IdxView,class EvalView>
-bool DomFilterView3<Element,IntSeq,ArrayView,int,IdxView,int,EvalView>::
+bool DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>::
 execute()
 {
-	typedef typename Traits::GetDom<typename Casper::Traits::GetElem<IdxView>::Type>::Type	IdxDom;
+	typedef typename Traits::GetDom<IdxView>::Type	IdxDom;
 
 	if (idx->ground())		// FIXME: should post a gac == and detach
 		return eval->intersect(array[idx->value()]->begin(),
@@ -556,13 +556,13 @@ execute()
 #endif
 
 template<class ArrayView,class IdxView,class EvalView>
-struct PostDomFilter3<Element,IntSeq,ArrayView,int,IdxView,int,EvalView>
+struct PostDomFilter3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>
 {
 	static bool post(Store& s,const ArrayView& a,const IdxView& idx,
 							const EvalView& eval)
 	{
-		return s.post(Bnd(element(a,idx,eval))) and
-			   s.post(new (s) DomFilterView3<Element,IntSeq,ArrayView,
+		return postBndFilter(s,elementEqual(a,idx,eval)) and
+			   s.post(new (s) DomFilterView3<ElementEqual,IntSeq,ArrayView,
 										int,IdxView,int,EvalView>(s,a,idx,eval));
 	}
 };

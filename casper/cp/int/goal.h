@@ -35,99 +35,105 @@ namespace CP {
 
 namespace Detail {
 
-template<int I,class D>
-struct SelectValsMin<VarArray<int,I,D> > : IValSelector
+template<class View>
+struct SelectValsMin : IValSelector
 {
-	SelectValsMin(Store& store,VarArray<int,I,D> vars) : store(store),vars(vars) {}
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
+	SelectValsMin(Store& store,const View& vars) : store(store),doms(store,vars) {}
 
 	Goal select(uint idx)
 	{
-		if (vars(idx).domain().ground())
+		if (doms[idx]->ground())
 			return succeed();
 		return Goal(store,
-				post(store,vars(idx)==vars(idx).domain().min()) or
-				(post(store,vars(idx)>vars(idx).domain().min()) and callValSelector(store,this,idx))
+				post(store,doms[idx].getObj()==doms[idx]->min()) or
+				(post(store,doms[idx].getObj()>doms[idx]->min()) and callValSelector(store,this,idx))
 				);
 	}
 	Store&	store;
-	VarArray<int,I,D> vars;
+	DomArrayView<Eval,View> doms;
 };
 
-template<int I,class D>
-struct SelectValsMax<VarArray<int,I,D> > : IValSelector
+template<class View>
+struct SelectValsMax : IValSelector
 {
-	SelectValsMax(Store& store,VarArray<int,I,D> vars) : store(store),vars(vars) {}
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
+	SelectValsMax(Store& store,const View& vars) : store(store),doms(store,vars) {}
 
 	Goal select(uint idx)
 	{
-		if (vars(idx).domain().ground())
+		if (doms[idx]->ground())
 			return succeed();
 		return Goal(store,
-				post(store,vars(idx)==vars(idx).domain().max()) or
-				(post(store,vars(idx)<vars(idx).domain().max()) and callValSelector(store,this,idx))
+				post(store,doms[idx].getObj()==doms[idx]->max()) or
+				(post(store,doms[idx].getObj()<doms[idx]->max()) and callValSelector(store,this,idx))
 				);
 	}
 	Store&	store;
-	VarArray<int,I,D> vars;
+	DomArrayView<Eval,View> doms;
 };
 
-template<int I,class D>
-struct SelectValsRand<VarArray<int,I,D> > : IValSelector
+template<class View>
+struct SelectValsRand : IValSelector
 {
-	SelectValsRand(Store& store,const VarArray<int,I,D>& vars) :
-		store(store),vars(vars) {}
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
+	typedef typename CP::Traits::GetDom<typename Casper::Traits::GetTermElem<View>::Type>::Type D;
+	SelectValsRand(Store& store,const View& vars) :
+		store(store),doms(store,vars) {}
 	Goal select(uint idx)
 	{
-		if (vars(idx).domain().ground())
+		if (doms[idx]->ground())
 			return succeed();
-		uint s = vars(idx).domain().size();
+		uint s = doms[idx]->size();
 		uint r = static_cast<uint>(rand()/(double)RAND_MAX * s);
-		typename D::Iterator it = vars(idx).domain().begin();
+		typename D::Iterator it = doms[idx]->begin();
 		while (r-- > 0)
 			++it;
 		return Goal(store,
-				post(store,vars(idx) == *it) or
-				(post(store,vars(idx) != *it and callValSelector(store,this,idx)))
+				post(store,doms[idx].getObj() == *it) or
+				(post(store,doms[idx].getObj() != *it and callValSelector(store,this,idx)))
 				);
 	}
 	Store&	store;
-	VarArray<int,I,D> vars;
+	DomArrayView<Eval,View> doms;
 };
 
-template<int I,class D>
-struct SelectValMin<VarArray<int,I,D> > : IValSelector
+template<class View>
+struct SelectValMin : IValSelector
 {
-	SelectValMin(Store& store,VarArray<int,I,D> vars) : store(store),vars(vars) {}
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
+	SelectValMin(Store& store,const View& vars) : store(store),doms(store,vars) {}
 
 	Goal select(uint idx)
 	{
-		if (vars(idx).domain().ground())
+		if (doms[idx]->ground())
 			return succeed();
 		return Goal(store,
-				post(store,vars(idx)==vars(idx).domain().min()) or
-				post(store,vars(idx)>vars(idx).domain().min())
+				post(store,doms[idx].getObj()==doms[idx]->min()) or
+				post(store,doms[idx].getObj()>doms[idx]->min())
 			);
 	}
 	Store& store;
-	VarArray<int,I,D> vars;
+	DomArrayView<Eval,View> doms;
 };
 
-template<int I,class D>
-struct SelectValMax<VarArray<int,I,D> > : IValSelector
+template<class View>
+struct SelectValMax : IValSelector
 {
-	SelectValMax(Store& store,VarArray<int,I,D> vars) : store(store),vars(vars) {}
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
+	SelectValMax(Store& store,const View& vars) : store(store),doms(store,vars) {}
 
 	Goal select(uint idx)
 	{
-		if (vars(idx).domain().ground())
+		if (doms[idx]->ground())
 			return succeed();
 		return Goal(store,
-				post(store,vars(idx)==vars(idx).domain().min()) or
-				post(store,vars(idx)<vars(idx).domain().min())
-				);
+				post(store,doms[idx].getObj()==doms[idx]->max()) or
+				post(store,doms[idx].getObj()<doms[idx]->max())
+			);
 	}
 	Store& store;
-	VarArray<int,I,D> vars;
+	DomArrayView<Eval,View> doms;
 };
 
 }

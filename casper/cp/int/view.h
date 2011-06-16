@@ -348,6 +348,38 @@ bool BndViewRel2<Div,View1,View2,int>::updateRange(const int& lb,
 	return true;
 }
 
+
+/**
+ * 	ValView over integer division.
+ * 	\ingroup Views
+ **/
+template<class View1,class View2,class Eval>
+struct ValViewRel2<Div,View1,View2,Eval>
+{
+	typedef typename Casper::Traits::GetEval<View1>::Type	View1Eval;
+	typedef typename Casper::Traits::GetEval<View2>::Type	View2Eval;
+
+	ValViewRel2(Store& store, const View1& p1, const View2& p2) :
+		p1(store,p1),p2(store,p2) {}
+	Eval value() const { return p1.value() / p2.value(); }
+	bool ground() const { return p1.ground() and p2.ground(); }
+	bool setValue(const Eval& val)
+	{
+		if (p1.ground())
+			return p2.setValue(p1.value() / val);
+		if (p2.ground())
+			return p1.setValue(val * p2.value());
+		return true;
+	}
+	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
+	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
+	Rel2<Div,View1,View2>	getObj() const
+	{	return Rel2<Div,View1,View2>(p1.getObj(),p2.getObj());}
+
+	ValView<View1Eval,View1>	p1;
+	ValView<View2Eval,View2>	p2;
+};
+
 } // CP
 } // Casper
 

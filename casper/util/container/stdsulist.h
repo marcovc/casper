@@ -493,8 +493,8 @@ namespace Traits {
 template<class> struct GetEval<Util::StdSUList<T> >
 {	typedef Seq<T>	Type;	};
 
-template<class> struct GetElem<Util::StdSUList<T> >
-{	typedef T	Type;	};
+template<class> struct GetTermElem<Util::StdSUList<T> >
+{	typedef typename GetTermElem<T>::Type	Type;	};
 } // Traits
 
 } // Casper

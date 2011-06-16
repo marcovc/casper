@@ -56,7 +56,7 @@ struct PIteration<Par<T>,SetT,CondT>
 
 	Par<T> v;
 	Util::IterationView<SetT>	it;
-	ConstParView<bool,CondT>	cond;
+	ParView<bool,CondT>	cond;
 };
 
 template<class T,class SetT,class CondT>
@@ -103,7 +103,7 @@ struct PIteration<Util::StdPair<Par<T>,Par<T> >,SetT,CondT>
 	Util::IterationView<SetT>	it1;
 	SetT					s;
 	Util::IterationView<SetT>*	it2;
-	ConstParView<bool,CondT>	cond;
+	ParView<bool,CondT>	cond;
 };
 
 }

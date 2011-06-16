@@ -36,7 +36,7 @@ State::State() :
 
 		trail(getHeap()),
 		stateIDCtr(0),
-	    onCPSL(getCPHeap()),
+	    onNextCPSL(getCPHeap()),
 	    stats(*this)
 {
 		insertCP();
@@ -82,10 +82,10 @@ void State::removeCP()
 
 void State::wakeupCPDemons()
 {
-	while (!onCPSL.empty())
+	while (!onNextCPSL.empty())
 	{
-		onCPSL.top()->notify();
-		onCPSL.pop();
+		onNextCPSL.top()->notify();
+		onNextCPSL.pop();
 	}
 	// warning: having this after notification means that nothing can be
 	// allocated from this heap on the previous called notify methods

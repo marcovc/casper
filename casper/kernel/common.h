@@ -47,13 +47,16 @@
 
 #endif
 
+/// Defines is Casper treats arrays as 0 or 1 indexed based arrays
+#define CASPER_ELEMENT_ARRAY_BASE	0
+
 #define CASPER_UNTESTED(S)	\
 {std::cerr << "error: Trying to use an untested feature: " \
-			  << S << endl; assert(0); }
+			  << S << std::endl; assert(0); }
 
 #define CASPER_UNIMPLEMENTED(S)	\
 {std::cerr << "error: Trying to use an unimplemented feature: " \
-			  << S << endl; assert(0); }
+			  << S << std::endl; assert(0); }
 
 #define CASPER_SAFE_ROUNDING	// temporary
 
@@ -65,6 +68,20 @@
 
 /// Global namespace for the CaSPER library
 namespace Casper {
+
+
+/// \name Datatypes aliases
+//@{
+typedef long long 	longlong;
+/// LongLong data type, currently an alias to builtin \a unsigned_long_long type.
+typedef unsigned long long 	ulonglong;
+/// uint data type, currently an alias to builtin \a unsigned_int type.
+//typedef unsigned int uint;
+/// String data type, currently an alias to stl \a string type.
+typedef std::string	string;
+/// Integer data type with largest available size.
+typedef ulonglong counter;
+//@}
 
 /**
 	Standard defined for a generic datatype, based on the std::numeric_limits class.
@@ -91,18 +108,36 @@ struct limits<int>
 	static const int negInf()	{	return min();	}
 };
 
-/// \name Datatypes aliases
-//@{
-typedef long long 	longlong;
-/// LongLong data type, currently an alias to builtin \a unsigned_long_long type.
-typedef unsigned long long 	ulonglong;
-/// uint data type, currently an alias to builtin \a unsigned_int type.
-//typedef unsigned int uint;
-/// String data type, currently an alias to stl \a string type.
-typedef std::string	string;
-/// Integer data type with largest available size.
-typedef ulonglong counter;
-//@}
+template<>
+struct limits<uint>
+{
+	static const int max()	{	return std::numeric_limits<uint>::max();	}
+	static const int min()	{	return std::numeric_limits<uint>::min();	}
+	static const int inf()	{	return max();	}
+	static const int posInf()	{	return max();	}
+	static const int negInf()	{	return min();	}
+};
+
+template<>
+struct limits<longlong>
+{
+	static const int max()	{	return std::numeric_limits<longlong>::max();	}
+	static const int min()	{	return std::numeric_limits<longlong>::min();	}
+	static const int inf()	{	return max();	}
+	static const int posInf()	{	return max();	}
+	static const int negInf()	{	return min();	}
+};
+
+template<>
+struct limits<ulonglong>
+{
+	static const int max()	{	return std::numeric_limits<ulonglong>::max();	}
+	static const int min()	{	return std::numeric_limits<ulonglong>::min();	}
+	static const int inf()	{	return max();	}
+	static const int posInf()	{	return max();	}
+	static const int negInf()	{	return min();	}
+};
+
 
 template<class T>
 struct Seq

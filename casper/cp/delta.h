@@ -96,7 +96,7 @@ struct DomDeltaStack : INotifiable,
 template<class View>
 struct IdxDeltaStack : DeltaStack<uint>
 {
-	typedef typename Casper::Traits::GetElem<View>::Type	Elem;
+	typedef typename Casper::Traits::GetTermElem<View>::Type	Elem;
 	typedef typename Casper::Traits::GetEval<Elem>::Type	Eval;
 	typedef typename Traits::GetDom<Elem>::Type	Dom;
 	struct IdxDeltaDemon : INotifiable
@@ -176,7 +176,7 @@ struct IdxGroundDeltaStack : DeltaStack<uint>
 template<class View>
 struct IdxBoundsDeltaStack : DeltaStack<uint>
 {
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type	Eval;
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type	Eval;
 	struct IdxBoundsDeltaDemon : INotifiable
 	{
 		IdxBoundsDeltaDemon(IdxBoundsDeltaStack* pOwner, uint idx) :
@@ -225,7 +225,7 @@ template<class ArrayView>
 struct IdxDomDeltaStack :
 	DeltaStack<IdxDomDelta<typename Traits::GetDom<ArrayView>::Type> >
 {
-	typedef typename Casper::Traits::GetElem<ArrayView>::Type	Elem;
+	typedef typename Casper::Traits::GetTermElem<ArrayView>::Type	Elem;
 	typedef typename Casper::Traits::GetEval<Elem>::Type			Eval;
 	typedef typename Traits::GetDom<Elem>::Type 			Dom;
 	typedef IdxDomDelta<Dom>	IdxAndDelta;

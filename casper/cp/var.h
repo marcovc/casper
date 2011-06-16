@@ -53,7 +53,7 @@ struct VarDomCreator
 };
 };
 
-using namespace std;
+//using namespace std;
 /*
 template<class,class>
 class Var;
@@ -184,7 +184,9 @@ class Var
 namespace Traits {
 template<class Eval,class DomT>
 struct GetDom<Var<Eval,DomT> >
-{	typedef DomT	Type;	};
+{
+	typedef DomT	Type;
+};
 } // Traits
 
 } // CP
@@ -202,6 +204,7 @@ struct GetPEnv<CP::Var<T,Dom> >
 {	Env* operator()(const CP::Var<T,Dom>& v)
 	{ return &v.getStore().getEnv(); }
 };
+
 
 } // Casper
 

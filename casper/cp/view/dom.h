@@ -151,8 +151,11 @@ struct DomView<Eval,DomExpr<Eval,DomT>,DomT>
 namespace Traits {
 template<class Eval,class View,class DomT>
 struct GetDom<DomView<Eval,View,DomT> >
-{	typedef DomT	Type;	};
+{
+	typedef DomT	Type;
+};
 } // Traits
+
 
 } // CP
 

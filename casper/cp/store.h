@@ -28,6 +28,7 @@
 namespace Casper {
 namespace CP {
 
+
 struct StoreStats
 {
 	counter countFPComputations;
@@ -140,6 +141,9 @@ struct Store : INotifiable
 	bool post(const Rel4<Op,T1,T2,T3,T4>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
 
+	template<class Cond,class Func>
+	bool when(const Cond& cond, const Func& func);
+
 	IFilterSched&	filterSched() {	return *pFilterSched;	}
 	void setFilterSched(IFilterSched* p);
 
@@ -189,6 +193,6 @@ struct Store : INotifiable
 } // CP
 } // Casper
 
-ostream& operator<<(ostream& os, const Casper::CP::StoreStats& s);
+std::ostream& operator<<(std::ostream& os, const Casper::CP::StoreStats& s);
 
 #endif /* CASPER_KERNEL_CPSTORE_H_ */

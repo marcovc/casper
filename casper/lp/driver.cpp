@@ -27,7 +27,7 @@ namespace LP {
 
 // translates StdVector to glp format (1-based arrays!)
 template<class T>
-T* newGLPVector(const Util::StdVector<T>& vals)
+T* newGLPVector(const Util::StdArray<T>& vals)
 {
 	T* glpVals = new T[vals.size()+1];
 	for (uint i = 0; i < vals.size(); ++i)
@@ -37,7 +37,7 @@ T* newGLPVector(const Util::StdVector<T>& vals)
 
 // translates StdVector to glp format (1-based arrays!)
 // specialization for uint->int conversion
-int* newGLPVector(const Util::StdVector<uint>& vals)
+int* newGLPVector(const Util::StdArray<uint>& vals)
 {
 	int* glpVals = new int[vals.size()+1];
 	for (uint i = 0; i < vals.size(); ++i)
@@ -46,14 +46,21 @@ int* newGLPVector(const Util::StdVector<uint>& vals)
 }
 
 Driver::Driver(State& state) :
-		state(state)
+		state(state),first(state,true)
 {
 	glpProb = glp_create_prob();
+	glpSMCP = new glp_smcp();
+	//glp_get_bfcp(static_cast<glp_prob*>(glpProb),static_cast<glp_smcp*>(glpSMCP));
+
+	glp_init_smcp(static_cast<glp_smcp*>(glpSMCP));
+	static_cast<glp_smcp*>(glpSMCP)->msg_lev = GLP_MSG_ERR;
+	//static_cast<glp_smcp*>(glpSMCP)->presolve = GLP_ON; //GLP_MSG_ERR;
 }
 
 Driver::~Driver()
 {
 	glp_delete_prob(static_cast<glp_prob*>(glpProb));
+	delete static_cast<glp_smcp*>(glpSMCP);
 }
 
 // ---- Objective ----
@@ -167,8 +174,8 @@ struct UndoUpdateConstraintBounds : ITrailAgent
 };
 
 
-uint Driver::addConstraint(const Util::StdVector<uint>& idxs,
-						   const Util::StdVector<double>& vals,
+uint Driver::addConstraint(const Idxs& idxs,
+						   const Coeffs& vals,
 						   ConstraintType type, double lb, double ub)
 {
 	assert(idxs.size()==vals.size());
@@ -187,8 +194,8 @@ uint Driver::addConstraint(const Util::StdVector<uint>& idxs,
 
 // WARNING: this is not reversible
 void Driver::setConstraintCoeffs(uint rowId,
-								 const Util::StdVector<uint>& idxs,
-						   	   	 const Util::StdVector<double>& vals)
+								 const Idxs& idxs,
+						   	   	 const Coeffs& vals)
 {
 	assert(idxs.size()==vals.size());
 
@@ -286,8 +293,8 @@ uint Driver::addVariable(ConstraintType type, double lb, double ub)
 	return colId;
 }
 
-uint Driver::addVariable(const Util::StdVector<uint>& idxs,
-						   const Util::StdVector<double>& vals,
+uint Driver::addVariable(const Idxs& idxs,
+						   const Coeffs& vals,
 						   ConstraintType type, double lb, double ub)
 {
 	assert(idxs.size()==vals.size());
@@ -306,8 +313,8 @@ uint Driver::addVariable(const Util::StdVector<uint>& idxs,
 
 // WARNING: this is not reversible
 void Driver::setVariableCoeffs(uint colId,
-								 const Util::StdVector<uint>& idxs,
-						   	   	 const Util::StdVector<double>& vals)
+								 const Idxs& idxs,
+						   	   	 const Coeffs& vals)
 {
 	assert(idxs.size()==vals.size());
 
@@ -348,7 +355,7 @@ void Driver::setVariableBounds(uint colId,ConstraintType type, double lb, double
 }
 
 // \note this is reversible
-void Driver::updateVariableBounds(uint colId,ConstraintType type, double lb, double ub)
+bool Driver::updateVariableBounds(uint colId,ConstraintType type, double lb, double ub)
 {
 	// store undo information
 	int oldType = glp_get_col_type(static_cast<glp_prob*>(glpProb),colId);
@@ -356,10 +363,68 @@ void Driver::updateVariableBounds(uint colId,ConstraintType type, double lb, dou
 	double oldLb = glp_get_col_lb(static_cast<glp_prob*>(glpProb),colId);
 	double oldUb = glp_get_col_ub(static_cast<glp_prob*>(glpProb),colId);
 
+	// if the update does not provide any bounds then there is nothing to do
+	if (type == ConstraintType::Free)
+		return true;
+
+	// compute updated bounds
+	if (type != ConstraintType::UB)
+		lb = std::max(oldLb,lb);
+	if (type != ConstraintType::LB)
+		ub = std::min(oldUb,ub);
+
+	// if new domain is empty then return false
+	if (lb>ub)
+		return false;
+
+	// set new type
+
+	// if we are here and had a ground variable it means that nothing changed
+	if (oldType == GLP_FX)
+		return true;
+
+	// if previous type was Free, new type is 'type'
+
+	// if previous type is double bounded, new type may be double bounded or fixed
+	if (oldType == GLP_DB)
+	{
+		if (type == ConstraintType::Fix or lb==ub)
+			type = ConstraintType::Fix;
+		else
+			type = ConstraintType::DB;
+	}
+
+	// if previous type is lower bounded, new type may be:
+	if (oldType == GLP_LO)
+	{
+		if (type == ConstraintType::Fix or lb==ub)
+			type = ConstraintType::Fix;	// fixed
+		else
+		if (type == ConstraintType::UB or type == ConstraintType::DB)
+			type = ConstraintType::DB;	// double bounded
+		else
+			type = ConstraintType::LB;	// remain lower bounded
+	}
+
+	// if previous type is upper bounded, new type may be:
+	if (oldType == GLP_UP)
+	{
+		if (type == ConstraintType::Fix or lb==ub)
+			type = ConstraintType::Fix;	// fixed
+		else
+		if (type == ConstraintType::LB or type == ConstraintType::DB)
+			type = ConstraintType::DB;	// double bounded
+		else
+			type = ConstraintType::UB;	// remain upper bounded
+	}
+
+	// record undo action
 	state.trail.record(new (state) UndoUpdateVariableBounds(*this,colId,oldType,oldLb,oldUb));
 
 	// perform the update
 	setVariableBounds(colId,type,lb,ub);
+
+	return true;
 }
 
 // ---- Solve ----
@@ -379,11 +444,27 @@ struct UndoSolve : ITrailAgent
 bool Driver::solve()
 {
 	state.trail.record(new (state) UndoSolve(*this));
-	int status = glp_simplex(static_cast<glp_prob*>(glpProb),NULL);
+	if (first)
+	{
+		first = false;
+		static_cast<glp_smcp*>(glpSMCP)->presolve = GLP_ON;
+	}
+	else
+		static_cast<glp_smcp*>(glpSMCP)->presolve = GLP_OFF;
+
+	int status = glp_simplex(static_cast<glp_prob*>(glpProb),static_cast<glp_smcp*>(glpSMCP));
 	if (status!=0)
-		std::cerr << "glp_simplex error: " << status << std::endl;
-	assert(status == 0);
-	return status == 0;
+	{
+		std::cerr << "ERROR: glp_simplex return status is " << status << std::endl;
+		return false;
+	}
+	status = glp_get_status(static_cast<glp_prob*>(glpProb));
+	return status != GLP_INFEAS and status != GLP_NOFEAS and status != GLP_UNDEF;
+}
+
+void Driver::printModel(const char* fname)
+{
+	glp_write_mps(static_cast<glp_prob*>(glpProb),GLP_MPS_FILE,NULL,fname);
 }
 
 // ---- Getters ----
@@ -396,6 +477,16 @@ double Driver::getValue(uint colId) const
 double Driver::getObjValue() const
 {
 	return glp_get_obj_val(static_cast<glp_prob*>(glpProb));
+}
+
+uint Driver::getNbRows() const
+{
+	return glp_get_num_rows(static_cast<glp_prob*>(glpProb));
+}
+
+uint Driver::getNbCols() const
+{
+	return glp_get_num_cols(static_cast<glp_prob*>(glpProb));
 }
 
 } // LP

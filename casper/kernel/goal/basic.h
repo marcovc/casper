@@ -22,6 +22,8 @@
 #include <casper/kernel/goal/goal.h>
 #include <casper/kernel/goal/explorer.h>
 //#include <casper/kernel/filter/mutfilter.h>
+#include <casper/kernel/par/par.h>
+#include <casper/kernel/par/piteration.h>
 
 namespace Casper {
 
@@ -172,6 +174,47 @@ struct GoalView2<Or,bool,View1,bool,View2> : IGoal
 	Goal			g2;
 };
 
+/**
+	Assign: the left hand expression is assigned the value of the right hand expression
+*/
+template<class View1,class View2,class Eval>
+struct GoalView2<Assign,Eval,View1,Eval,View2> : IGoal
+{
+	GoalView2(State& s,const View1& v1, const View2& v2) :
+		s(s),v1(v1),v2(v2) {}
+
+  	Goal execute()
+	{
+		v1 = ParView<Eval,View2>(s,v2).value();
+		return succeed();
+	}
+
+  	State&			s;
+	View1			v1;
+	View2			v2;
+};
+
+/**
+	Select: the left hand expression is assigned the value of the right hand expression
+*/
+template<class Set,class Eval>
+struct GoalView2<SelectFirst,Eval,Par<Eval>,Seq<Eval>,Set> : IGoal
+{
+	GoalView2(State& state,const Par<Eval>& p, const Set& s) :
+		state(state),p(p),s(s) {}
+
+  	Goal execute()
+	{
+		Casper::Detail::PIteration<Par<int>,Set,bool> it(p,s,true);
+		if (it.valid())
+			return succeed();
+		return fail();
+	}
+
+  	State&					state;
+	Par<Eval>				p;
+	Set						s;
+};
 
 };
 

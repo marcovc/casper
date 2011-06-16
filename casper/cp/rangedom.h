@@ -27,6 +27,11 @@
 #include <iterator>
 
 namespace Casper {
+
+namespace LP {
+struct Var;
+};
+
 namespace CP {
 
 // range domain
@@ -107,6 +112,8 @@ struct RangeDom
 
 	const Value&	min() const { return lb;	}
 	const Value&	max() const { return ub;	}
+
+	const Value&	value() const {	assert(singleton());	return lb;	}
 
 	//Reversible<Value>&	min() { return lb;	}
 	//Reversible<Value>&	max() { return ub;	}
@@ -232,6 +239,10 @@ struct GetDefaultDom;
 template<>
 struct GetDefaultDom<double>
 {	typedef RangeDom<double>	Type;	};
+
+template<>
+struct GetDefaultDom<float>
+{	typedef RangeDom<float>	Type;	};
 }
 
 namespace Detail {
@@ -273,8 +284,36 @@ struct VarDomCreator<RangeDom<T> >
 		store.getStats().signalNewRangeDomain();
 		return ret;
 	}
+	// returned domain is the union of all domains in the array
+	template<class View>
+	RangeDom<T>*  unionOf(Store& store, const View& v);
+
+	// this should be elsewhere...
+	RangeDom<T>* operator()(Store& store, const LP::Var& v)
+	{
+		RangeDom<T>* ret = new (store) RangeDom<T>(store,limits<T>::negInf(),limits<T>::posInf());
+		store.getStats().signalNewRangeDomain();
+		return ret;
+	}
 
 };
+
+// returned domain is the union of all domains in the array
+template<class T>
+template<class View>
+RangeDom<T>* VarDomCreator<RangeDom<T> >::unionOf(Store& store, const View& v)
+{
+	DomArrayView<T,View> doms(store,v);
+	T mi = doms[0]->min();
+	T ma = doms[0]->max();
+	for (uint i = 1; i < doms.size(); i++)
+	{
+		mi = std::min(mi,doms[i]->min());
+		ma = std::max(ma,doms[i]->max());
+	}
+	return operator()(store,mi,ma);
+}
+
 } // Detail
 
 template<class Eval1,class Eval2> struct BndView;

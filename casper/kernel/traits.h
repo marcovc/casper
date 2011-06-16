@@ -21,6 +21,7 @@
 #define CASPER_KERNEL_TRAITS_H_
 
 #include <functional>
+#include <casper/kernel/common.h>
 
 namespace Casper {
 
@@ -49,6 +50,10 @@ struct GetEval;
 template<class T>
 struct GetElem;
 
+template<class T>
+struct GetTermElem;
+
+
 // IsIntegral
 
 // FIXME: replace by c++ builtin traits when ready
@@ -66,9 +71,21 @@ struct IsIntegral<bool>
 
 // GetEval
 
-template<class T>
-struct GetEval
-{	typedef	T	Type;	};
+template<>
+struct GetEval<int>
+{	typedef	int	Type;	};
+
+template<>
+struct GetEval<bool>
+{	typedef	bool	Type;	};
+
+template<>
+struct GetEval<double>
+{	typedef	double	Type;	};
+
+template<>
+struct GetEval<float>
+{	typedef	float	Type;	};
 
 template<>
 struct GetEval<uint>
@@ -110,6 +127,10 @@ template<>
 struct GetEval<std::function<Goal()> >
 {	typedef bool Type;	};
 
+template<class T>
+struct GetEval<std::initializer_list<T> >
+{	typedef Seq<typename Traits::GetEval<T>::Type> Type;	};
+
 // GetElem
 
 template<class T>
@@ -117,7 +138,7 @@ struct GetElem;
 
 template<class T,int dims>
 struct GetElem<Util::StdArray<T,dims> >
-{	typedef T	Type;	};
+{	typedef typename Util::StdArray<T,dims>::Elem	Type;	};
 
 template<class T>
 struct GetElem<Util::StdVector<T> >
@@ -158,6 +179,65 @@ struct GetElem<Util::DiffItView<T1,T2> >
 template<class T1,class T2>
 struct GetElem<Util::SymDiffItView<T1,T2> >
 {	typedef typename Traits::GetElem<T1>::Type	Type; };
+
+template<class T>
+struct GetElem<std::initializer_list<T> >
+{	typedef T Type;	};
+
+
+// GetTermElem
+
+template<class T>
+struct GetTermElem
+{	typedef T Type;	};
+
+template<class T,int dims>
+struct GetTermElem<Util::StdArray<T,dims> >
+{	typedef typename GetTermElem<T>::Type	Type;	};
+
+template<class T>
+struct GetTermElem<Util::StdVector<T> >
+{	typedef typename GetTermElem<T>::Type	Type;	};
+
+template<class T>
+struct GetTermElem<Util::StdList<T> >
+{	typedef typename GetTermElem<T>::Type	Type;	};
+
+template<class T>
+struct GetTermElem<Util::StdSList<T> >
+{	typedef typename GetTermElem<T>::Type	Type;	};
+
+template<class T>
+struct GetTermElem<Util::StdRange<T> >
+{	typedef typename GetTermElem<T>::Type	Type;	};
+
+template<class T>
+struct GetTermElem<Util::IterationView<T> >
+{	typedef typename Traits::GetTermElem<T>::Type	Type; };
+
+template<class T1,class T2>
+struct GetTermElem<Util::PredItView<T1,T2> >
+{ typedef typename Traits::GetTermElem<T1>::Type	Type; };
+
+template<class T1,class T2>
+struct GetTermElem<Util::UnionItView<T1,T2> >
+{	typedef typename Traits::GetTermElem<T1>::Type	Type; };
+
+template<class T1,class T2>
+struct GetTermElem<Util::InterItView<T1,T2> >
+{	typedef typename Traits::GetTermElem<T1>::Type	Type; };
+
+template<class T1,class T2>
+struct GetTermElem<Util::DiffItView<T1,T2> >
+{	typedef typename Traits::GetTermElem<T1>::Type	Type; };
+
+template<class T1,class T2>
+struct GetTermElem<Util::SymDiffItView<T1,T2> >
+{	typedef typename Traits::GetTermElem<T1>::Type	Type; };
+
+template<class T>
+struct GetTermElem<std::initializer_list<T> >
+{	typedef typename GetTermElem<T>::Type	Type;	};
 
 }
 }

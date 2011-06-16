@@ -23,7 +23,7 @@
 #include <boost/numeric/interval/rounded_arith.hpp>
 #include <boost/numeric/interval/rounded_transc.hpp>
 
-#include <boost/math/special_functions/next.hpp>
+//#include <boost/math/special_functions/next.hpp>
 
 #ifndef CASPER_UNSAFE_ROUNDING
 
@@ -346,11 +346,17 @@ bool isPos(const T& v)
 
 template<class T>
 T succ(const T& v)
-{	return boost::math::float_next(v); 	}
+{
+	return std::nextafter(v, std::numeric_limits<T>::max());
+	//return boost::math::float_next(v);
+}
 
 template<class T>
 T pred(const T& v)
-{	return boost::math::float_prior(v); }
+{
+	return std::nextafter(v, -std::numeric_limits<T>::max());
+//	return boost::math::float_prior(v);
+}
 
 template<class T>
 bool isCanonical(const T& min, const T& max)

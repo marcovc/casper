@@ -19,6 +19,12 @@
 #ifndef CASPER_KERNEL_VIEW_ITERATION_H_
 #define CASPER_KERNEL_VIEW_ITERATION_H_
 
+// FIXME: either this goes into kernel or traits comes to util
+#include <casper/kernel/traits.h>
+
+// FIXME: either this goes into container or common comes here
+#include <casper/util/container/common.h>
+
 namespace Casper {
 namespace Util {
 
@@ -31,6 +37,24 @@ struct IterationView
 	typedef typename View::Iterator Iterator;
 	typedef IterationView<View>	Self;
 	IterationView(const View& v) : b(v.begin()),e(v.end()) {}
+	IterationView(const IterationView& s) : b(s.b),e(s.e) {}
+	IterationView(Iterator b,Iterator e) : b(b),e(e) {}
+	void		iterate()	{	assert(valid()); ++b;	}
+	const Elem& 	value() const 	{	assert(valid()); return *b;	}
+	bool		valid() const 	{	return b!=e;	}
+	Self		next() const {	return Self(++Iterator(b),e);	}
+	Iterator	b;
+	Iterator	e;
+};
+
+// iteration view over an std::initializer_list
+template<class T>
+struct IterationView<std::initializer_list<T> >
+{
+	typedef T	Elem;
+	typedef typename std::initializer_list<T>::iterator Iterator;
+	typedef IterationView<std::initializer_list<T> >	Self;
+	IterationView(const std::initializer_list<T>& v) : b(v.begin()),e(v.end()) {}
 	IterationView(const IterationView& s) : b(s.b),e(s.e) {}
 	IterationView(Iterator b,Iterator e) : b(b),e(e) {}
 	void		iterate()	{	assert(valid()); ++b;	}
@@ -71,27 +95,17 @@ STLIterationView<T> makeSTLIt(const T& v)
 template<class View>
 struct IterationView<IterationView<View> >
 {
-	typedef typename Traits::GetElem<View>::Type	Elem;
-	typedef typename View::Iterator Iterator;
-	IterationView(const IterationView<View>& v) : b(v.b),e(v.e) {}
-	IterationView(Iterator b,Iterator e) : b(b),e(e) {}
-	void		iterate()	{	assert(valid()); ++b;	}
-	const Elem& 	value() const 	{	assert(valid()); return *b;	}
-	bool		valid() const 	{	return b!=e;	}
+	typedef typename Traits::GetElem<View>::Type Elem;
+	typedef typename IterationView<View>::Iterator Iterator;
+	IterationView(const IterationView<View>& v) : v(v) {}
+	void		iterate()	{	v.iterate(); }
+	Elem 	value() const 	{	return v.value(); }
+	bool		valid() const 	{	return v.valid();	}
 	IterationView<View>	next() const
-	{	return IterationView<View>(++Iterator(b),e);	}
-	Iterator	b;
-	Iterator	e;
+	{	return v.next(); }
+	IterationView<View> v;
 };
 
-template<class ArrayT,class IndexT>
-struct IterationView<Rel2<Element,ArrayT,IndexT> > :
-	IterationView<typename ArrayT::Elem>
-{
-	typedef IterationView<typename ArrayT::Elem> Super;
-	typedef Rel2<Element,ArrayT,IndexT> RelT;
-	IterationView(const RelT& v) : Super(v.p1[v.p2.value()]) {}
-};
 
 // View1 is iteration, Pred is a predicate function on View1
 template<class View1,class View2>
@@ -148,10 +162,10 @@ struct UnionItView
 		if (!v2.valid())
 			v1.iterate();
 		else
-		if (Detail::less(v1.value(),v2.value()))
+		if (Casper::Util::Detail::less(v1.value(),v2.value()))
 			v1.iterate();
 		else
-		if (Detail::less(v2.value(),v1.value()))
+		if (Casper::Util::Detail::less(v2.value(),v1.value()))
 			v2.iterate();
 		else
 		{
@@ -168,7 +182,7 @@ struct UnionItView
 		if (!v2.valid())
 			return v1.value();
 		else
-		if (Detail::lessEqual(v1.value(),v2.value()))
+		if (Casper::Util::Detail::lessEqual(v1.value(),v2.value()))
 			return v1.value();
 		else
 			return v2.value();
@@ -194,16 +208,16 @@ struct InterItView
 		if (!v1.valid() or !v2.valid())
 				return;
 
-		while (Detail::distinct(v2.value(),v1.value()) )
+		while (Casper::Util::Detail::distinct(v2.value(),v1.value()) )
 		{
-			while (Detail::less(v1.value(),v2.value()))
+			while (Casper::Util::Detail::less(v1.value(),v2.value()))
 			{
 				v1.iterate();
 				if (!v1.valid())
 					return;
 			}
 
-			while (Detail::less(v2.value(),v1.value()))
+			while (Casper::Util::Detail::less(v2.value(),v1.value()))
 			{
 				v2.iterate();
 				if (!v2.valid())
@@ -250,14 +264,14 @@ struct DiffItView
 	{
 		while ( v1.valid() and v2.valid())
 		{
-			while (Detail::less(v2.value(),v1.value() ))
+			while (Casper::Util::Detail::less(v2.value(),v1.value() ))
 			{
 				v2.iterate();
 				if (!v2.valid())
 					return;
 			}
 
-			if (Detail::less(v1.value(),v2.value()))
+			if (Casper::Util::Detail::less(v1.value(),v2.value()))
 				return;
 
 			v1.iterate();
@@ -300,7 +314,7 @@ struct SymDiffItView
 	void sync()
 	{
 		while ( v1.valid() and v2.valid() and
-				Detail::equal(v1.value(),v2.value()))
+				Casper::Util::Detail::equal(v1.value(),v2.value()))
 		{
 			v1.iterate();
 			v2.iterate();
@@ -534,7 +548,7 @@ void print(InputIterator b,InputIterator e)
 		std::cout << *b << " ";
 }
 
-} // Traits
+} // Detail
 
 } // Util
 } // Casper

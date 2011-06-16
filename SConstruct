@@ -57,6 +57,8 @@ examples+=['cp/set/partition.cpp']
 
 
 examples+=['lp/debug.cpp']
+examples+=['lp/tritype.cpp']
+examples+=['lp/binsearch.cpp']
 
 ##################
 ##	LIBRARY		##
@@ -91,6 +93,10 @@ casper_util+=['util.cpp']
 casper_lp=[]
 casper_lp+=['driver.cpp']
 casper_lp+=['solver.cpp']
+casper_lp+=['var.cpp']
+casper_lp+=['linearexprrepr.cpp']
+casper_lp+=['lineareqrepr.cpp']
+
 
 ###################
 ##	BINDINGS 	 ##
