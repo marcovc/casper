@@ -24,7 +24,11 @@
 #include <casper/cp/rangedom.h>
 
 #include <casper/lp/solver.h>
+<<<<<<< HEAD
 #include <casper/lp/lineareqvalview.h>
+=======
+#include <casper/lp/linearexprview.h>
+>>>>>>> fa25bff46df2547e6d3aa4b1fff1733a4435b2c6
 #include <casper/mip/traits.h>
 #include <casper/mip/view.h>
 
@@ -35,6 +39,30 @@ struct Store
 {
 	Store(CP::Store& cp, LP::Solver& lp) : cp(cp),lp(lp) {}
 
+<<<<<<< HEAD
+=======
+	template<class T>
+	struct Suspend : INotifiable
+	{
+		Suspend(Store& store, const T& r) :
+			store(store),r(r),v(store,r)
+		{
+			v.attach(this);
+		}
+		bool notify()
+		{
+			if (v.isLinear())
+			{
+				v.detach(this);
+				return store.post(r);// and store.valid();
+			}
+			return true;
+		}
+		Store& store;
+		T r;
+		LP::LinearEqView<Store,T> v;
+	};
+>>>>>>> fa25bff46df2547e6d3aa4b1fff1733a4435b2c6
 
 //	template<class T1,class T2>
 //	bool post(const Rel2<Equal,T1,T2>& r)
@@ -115,7 +143,26 @@ struct Store
 template<class T>
 bool Store::post(const T& r)
 {
+<<<<<<< HEAD
 	return LP::PostValActor<Store,T>()(*this,r);
+=======
+	// this doesn't work (must specialize e.g. for element relation)
+//	const bool hasLPVar = MIP::Traits::HasLPVar<T>::value;
+//	assert(hasLPVar);
+
+	LP::LinearEqView<Store,T> l(*this,r);
+	if (l.isTrue())
+		return true;
+	if (!l.canBeTrue())
+		return false;
+	if (l.isLinear())
+		return lp.post(l.getRepr()) and lp.valid();
+
+//	if (!cp.post(r))
+//		return false;
+	new (*this) Store::Suspend<T>(*this,r);
+	return true;
+>>>>>>> fa25bff46df2547e6d3aa4b1fff1733a4435b2c6
 }
 
 } // MIP

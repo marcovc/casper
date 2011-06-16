@@ -26,6 +26,7 @@
 //#include <casper/lp/lineareqrepr.h>
 #include <casper/lp/lineareqvalview.h>
 
+
 #include <casper/util/container/stdhashmap.h>
 
 namespace Casper {
