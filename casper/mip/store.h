@@ -24,7 +24,9 @@
 #include <casper/cp/rangedom.h>
 
 #include <casper/lp/solver.h>
+
 #include <casper/lp/lineareqvalview.h>
+
 #include <casper/mip/traits.h>
 #include <casper/mip/view.h>
 
@@ -34,17 +36,6 @@ namespace MIP {
 struct Store
 {
 	Store(CP::Store& cp, LP::Solver& lp) : cp(cp),lp(lp) {}
-
-
-//	template<class T1,class T2>
-//	bool post(const Rel2<Equal,T1,T2>& r)
-//	{	return postHelper(r);	}
-//	template<class T1,class T2>
-//	bool post(const Rel2<GreaterEqual,T1,T2>& r)
-//	{	return postHelper(r);	}
-//	template<class T1,class T2>
-//	bool post(const Rel2<LessEqual,T1,T2>& r)
-//	{	return postHelper(r);	}
 
 	template<class T>
 	bool post(const T& r);
@@ -65,52 +56,11 @@ struct Store
 
 
 //protected:
-//	template<class Func,class T1, class T2>
-//	bool postHelper(const Rel2<Func,T1,T2>& r);
-
-//	using CP::Store::post;
 
 	CP::Store&		cp;
 	LP::Solver& 	lp;
 };
 
-//template<bool,class R>
-//struct PostCPStore;
-//
-//template<class R>
-//struct PostCPStore<true,R>
-//{
-//	bool operator()(Store& store, const R& r)
-//	{	return static_cast<CP::Store&>(store).post(r);	}
-//};
-//
-//template<class Func,class T1,class T2>
-//struct PostCPStore<false,Rel2<Func,T1,T2> >
-//{
-//	bool operator()(Store& store,const Rel2<Func,T1,T2>& r)
-//	{
-//		LP::LinearExprView<Store,T1> v1(store,r.p1);
-//		LP::LinearExprView<Store,T2> v2(store,r.p2);
-//		if (v1.isLinear() and v2.isLinear())
-//			return store.lp.post(r);
-//		else
-//		{
-//			if (static_cast<CP::Store&>(store).post(r))
-//				new (store) Store::Suspend<Func,T1,T2>(store,r);
-//			return true;
-//		}
-//	}
-//};
-//
-//template<class Func,class T1, class T2>
-//bool Store::postHelper(const Rel2<Func,T1,T2>& r)
-//{
-//	const bool p1HasLPVar = MIP::Traits::HasLPVar<T1>::value;
-//	const bool p2HasLPVar = MIP::Traits::HasLPVar<T2>::value;
-//
-//	return PostCPStore<!Util::IsSameType<typename Casper::Traits::GetEval<T1>::Type,double>::value
-//				or	(!p1HasLPVar and !p2HasLPVar),Rel2<Func,T1,T2> >()(*this,r);
-//}
 
 template<class T>
 bool Store::post(const T& r)
