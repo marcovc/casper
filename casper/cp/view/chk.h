@@ -525,6 +525,35 @@ struct ChkViewRel2<InTable,Seq<Eval>,View1,Seq<Eval>,View2>
 	View2 p2;
 };
 
+template<class Eval,class View1,class View2>
+struct ChkViewRel2<SumEquals,Seq<Eval>,View1,Eval,View2>
+{
+	ChkViewRel2(Store& store, const View1& p1, const View2& p2) : store(store),p1(p1),p2(p2) {}
+	bool isTrue() const	// is it true?
+	{	return false; }
+	bool canBeTrue() const 	// can it still be true?
+	{	return true; }
+	bool setToTrue()
+	{
+		return store.post(rel<SumEquals>(p1,p2));
+	}
+	bool setToFalse()
+	{
+		assert(0); return false;
+	}
+//	Store& store() const {	return getState(p1);	}
+
+	void attach(INotifiable* f) { 	}
+	void detach(INotifiable* f) {	}
+
+	Rel2<SumEquals,View1,View2> getObj()  const
+	{ 	return Rel2<SumEquals,View1,View2>(p1);	}
+
+	Store&	store;
+	View1 p1;
+	View2 p2;
+};
+
 // This class adapts bnd views over boolean expressions to work as checkers
 // note: this is not enabled for all checkers to avoid complex compiler error
 // messages when user makes a mistake. To use it see example below (IfThenElse).
