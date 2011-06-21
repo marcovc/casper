@@ -39,6 +39,8 @@ struct Store
 
 	template<class T>
 	bool post(const T& r);
+	bool post(const LP::LinearEqRepr& r)
+	{	return lp.post(r);	}
 
 	operator Env&() { return cp; }
 	operator const Env&() const { return cp; }

@@ -344,7 +344,7 @@ bool binsearchFD_LP(int size, int maxint)
 	return found;
 }
 
-bool binsearchFD_MIP(int size, int maxint)
+bool binsearchFD_MIP(int size)
 {
 	using namespace Casper;
 
@@ -385,7 +385,7 @@ bool binsearchFD_MIP(int size, int maxint)
 
 		mip.post( ifThenElse(d[i-1] == 1,tab[m[i]]==x,
 					ifThenElse(d[i-1] == 2,tab[m[i]]>=x+1.0,
-						ifThenElse(d[i-1]==3,tab[m[i]]<=x-1.0,true))));
+						ifThen(d[i-1]==3,tab[m[i]]<=x-1.0))));
 
 		cp.post( ifThenElse(d[i-1] == 0,
 								m[i] == m[i-1] and
@@ -433,18 +433,181 @@ bool binsearchFD_MIP(int size, int maxint)
 
 	IntPar ip(env),vp(env),k(env);
 
-	Goal g(env,label(cp,labelVars,selectVarMinDom(cp,labelVars)));
+//	Goal g(env,label(cp,labelVars,selectVarMinDom(cp,labelVars)));
 //	Goal g(env,label(cp,labelVars,selectVarMinDom(cp,labelVars)) and validate(lp));
-//	Goal g(env,
-//			whileNotGround(labelVars)
-//			(
-//				assign(ip,argMin(k,nonGroundIdxs(cp,labelVars),domainSize(cp,labelVars[k]))) and
-//				selectFirst(vp,domain(cp,labelVars[ip])) and
-//				(
-//						post(cp,labelVars[ip]==vp) or
-//						post(cp,labelVars[ip]!=vp)
-//				) and validate(mip)
-//			));
+	Goal g(env,
+			whileNotGround(labelVars)
+			(
+				assign(ip,argMin(k,nonGroundIdxs(cp,labelVars),domainSize(cp,labelVars[k]))) and
+				selectFirst(vp,domain(cp,labelVars[ip])) and
+				(
+						post(cp,labelVars[ip]==vp) or
+						post(cp,labelVars[ip]!=vp)
+				) and validate(mip)
+			));
+
+	DFSExplorer explorer(env);
+
+	bool found = mip.valid() and  explorer.explore(g);
+
+	if (found)
+		cout << index << endl << l << endl << m << endl << u << endl << tab << endl << x << endl;
+	else
+		cout << "no solution found!" << endl;
+
+	cout << "CP Stats:\n" << cp.getStats() << "\nLP Stats:\n" << lp.getStats() << endl;
+	cout << "Explorer Stats:\n" << explorer.getStats() << endl;
+
+	return found;
+}
+
+bool binsearchFD_MIP_2(int size)
+{
+	using namespace Casper;
+
+	const int nbLoops = std::ceil(std::log(size+1)/std::log(2.0));
+
+	cout << "nbLoops=" << nbLoops << endl;
+
+	Env env;
+
+	CP::Store 		cp(env);
+	CP::IntVarArray index(cp,nbLoops+1,-1,size-1);
+	CP::IntVarArray m(cp,nbLoops+1,0,size-1);
+	CP::IntVarArray l(cp,nbLoops+1,0,size-1);
+	CP::IntVarArray u(cp,nbLoops+1,0,size-1);
+
+	LP::Solver lp(env);
+	LP::Var			x(lp);
+	LP::VarArray	tab(lp,size);
+
+	// preconditions
+	for (int i = 1 ; i < size; ++i)
+		lp.post(tab[i] >= tab[i-1]);
+
+	// program
+
+	cp.post( index[0] == -1 );
+	cp.post( m[0] == 0 );
+	cp.post( l[0] == 0 );
+	cp.post( u[0] == size-1 );
+
+	CP::IntVarArray d(cp,nbLoops,0,3);
+
+	MIP::Store mip(cp,lp);
+
+	for (int i = 1 ; i < nbLoops+1; ++i)
+	{
+		cp.post( (d[i-1] == 0) == (index[i-1] != -1 or l[i-1] > u[i-1]) );
+
+#if 0
+		mip.post( ifThenElse(d[i-1] == 1,tab[m[i]]==x,
+					ifThenElse(d[i-1] == 2,tab[m[i]]>=x+1.0,
+						ifThen(d[i-1]==3,tab[m[i]]<=x-1.0))));
+#else
+		INotifiable* demon = new (env) FuncNotifiable([&,i]()
+				{
+					if (!d[i-1].ground())
+						return true;
+
+					if (d[i-1].domain().value() == 1)
+					{
+						lp.post( tab[m[i].domain().min()] <= x );
+						lp.post( tab[m[i].domain().max()] >= x );
+					}
+					else
+					if (d[i-1].domain().value() == 2)
+						lp.post(tab[m[i].domain().max()] >= x + 1.0);
+					else
+					if (d[i-1].domain().value() == 3)
+						lp.post(tab[m[i].domain().min()] <= x - 1.0);
+					else
+					return true;
+					return lp.valid();
+				});
+		m[i].domain().attachOnBounds(demon);
+		d[i-1].domain().attachOnGround(demon);
+#endif
+		cp.post( ifThenElse(d[i-1] == 0,
+								m[i] == m[i-1] and
+								index[i] == index[i-1] and
+								l[i] == l[i-1] and
+								u[i] == u[i-1],
+							m[i]==(l[i-1]+u[i-1])/2 and
+							ifThenElse(d[i-1] == 1,
+									index[i]==m[i] and
+									u[i] == u[i-1] and
+									l[i] == l[i-1],
+									ifThenElse(d[i-1] == 2,
+											u[i]==m[i]-1 and l[i]==l[i-1],
+											l[i]==m[i]+1 and u[i]==u[i-1]) and
+									index[i]==index[i-1]))
+						 );
+	}
+
+	// post condition (negated)
+
+	CP::IntVar diff(cp,0,2);
+	CP::IntVar p(cp,0,tab.size()-1);
+
+#if 0
+	mip.post(ifThenElse(diff==0,tab[index[nbLoops]]>=x+1.0,
+				ifThenElse(diff==1,tab[index[nbLoops]]<=x-1.0,
+									tab[p] == x)));
+#else
+	INotifiable* demon = new (env) FuncNotifiable([&]()
+			{
+				if (!diff.ground())
+					return true;
+
+				if (diff.domain().value() == 0)
+					lp.post( tab[index[nbLoops].domain().max()] >= x+1.0 );
+				else
+				if (diff.domain().value() == 1)
+					lp.post(tab[index[nbLoops].domain().min()] <= x - 1.0);
+				else
+				{
+					lp.post(tab[p.domain().min()] <= x );
+					lp.post(tab[p.domain().max()] >= x );
+				}
+				return lp.valid();
+			});
+	p.domain().attachOnBounds(demon);
+	index[nbLoops].domain().attachOnBounds(demon);
+	diff.domain().attachOnGround(demon);
+#endif
+	cp.post( (diff==2) == (index[nbLoops]==-1) );
+
+	// collect labeling variables
+
+	CP::IntVarArray labelVars(cp,nbLoops*4+2);
+	int c = 0;
+	for (int i = 0; i < nbLoops; ++i)
+	{
+		labelVars[c++] = m[i+1];
+		labelVars[c++] = l[i+1];
+		labelVars[c++] = u[i+1];
+		labelVars[c++] = d[i];
+	}
+	labelVars[c++] = diff;
+	labelVars[c++] = p;
+
+	// solving
+
+	IntPar ip(env),vp(env),k(env);
+
+//	Goal g(env,label(cp,labelVars,selectVarMinDom(cp,labelVars)));
+//	Goal g(env,label(cp,labelVars,selectVarMinDom(cp,labelVars)) and validate(lp));
+	Goal g(env,
+			whileNotGround(labelVars)
+			(
+				assign(ip,argMin(k,nonGroundIdxs(cp,labelVars),domainSize(cp,labelVars[k]))) and
+				selectFirst(vp,domain(cp,labelVars[ip])) and
+				(
+						post(cp,labelVars[ip]==vp) or
+						post(cp,labelVars[ip]!=vp)
+				) and validate(mip)
+			));
 
 	DFSExplorer explorer(env);
 
@@ -490,10 +653,10 @@ void debug()
 
 int main(int argc,char** argv)
 {
-	if (argc!=3)
-		cout << "usage: " << argv[0] << " size maxint\n";
+	if (argc!=2 and argc!=3)
+		cout << "usage: " << argv[0] << " size [maxint]\n";
 	else
-		binsearchFD_MIP(atoi(argv[1]),atoi(argv[2]));
+		binsearchFD_MIP_2(atoi(argv[1]));
 	return 0;
 //	debug();
 }

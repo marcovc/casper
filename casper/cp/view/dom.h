@@ -148,6 +148,26 @@ struct DomView<Eval,DomExpr<Eval,DomT>,DomT>
 	Dom&	d;
 };
 
+// dom view over element expression
+template<class View1,class Eval>
+struct DomView<Eval,Rel2<Element,View1,Par<int> > >
+{
+	typedef typename Traits::GetDom<typename Casper::Traits::GetElem<View1>::Type>::Type	Dom;
+	DomView(Store& store,const Rel2<Element,View1,Par<int> >& p) :
+		store(store),v(p.p1),i(p.p2.value()),d(p.p1[i].domain()) {}
+	Dom*	operator->()			{	return &d;	}
+	Dom*	operator->() const	{	return const_cast<Dom*>(&d);	}
+	Dom&	operator*()				{	return d;	}
+	Dom&	operator*() const	{	return const_cast<Dom&>(d);	}
+	Rel2<Element,View1,Par<int> > getObj() const
+	{	return Rel2<Element,View1,Par<int> >(v,Par<int>(store,i));}
+
+	Store& store;
+	View1	v;
+	const int	i;
+	Dom&	d;
+};
+
 namespace Traits {
 template<class Eval,class View,class DomT>
 struct GetDom<DomView<Eval,View,DomT> >

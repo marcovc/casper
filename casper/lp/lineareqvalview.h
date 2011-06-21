@@ -265,13 +265,6 @@ struct LinearEqValView<Store,Rel3<IfThenElse,T1,T2,T3> >
 		return (v1.isTrue() and v2.isLinear()) or
 			   (!v1.canBeTrue() and v3.isLinear());
 	}
-	bool isTrue() const
-	{ return (v1.isTrue() and v2.isTrue()) or
-			 (!v1.canBeTrue() and v3.isTrue());}
-
-	bool canBeTrue() const
-	{ return !((v1.isTrue() and !v2.canBeTrue()) or
-			   (!v1.canBeTrue() and !v3.canBeTrue())); }
 
 	LinearEqRepr getRepr() const
 	{
