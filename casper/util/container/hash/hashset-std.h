@@ -35,15 +35,15 @@ namespace Util {
 template<class T>
 struct Hash
 {
-	uint operator()(const T& t) const
-	{	return static_cast<uint>(t);	}
+	size_t operator()(const T& t) const
+	{	return static_cast<size_t>(t);	}
 };
 
 template<class T>
 struct Hash<T*>
 {
-	uint operator()(T* const& t) const
-	{	return reinterpret_cast<uint>(t);	}
+	size_t operator()(T* const& t) const
+	{	return reinterpret_cast<size_t>(t);	}
 };
 
 /**
@@ -52,8 +52,8 @@ struct Hash<T*>
 template<class T1,class T2>
 struct Hash<StdPair<T1,T2> >
 {
-	uint operator()(const StdPair<T1,T2>& t) const
-	{	return static_cast<uint>(Hash<T1>()(t.first)+
+	size_t operator()(const StdPair<T1,T2>& t) const
+	{	return static_cast<size_t>(Hash<T1>()(t.first)+
 								 Hash<T1>()(t.second));	}
 };
 
@@ -63,7 +63,7 @@ struct Hash<StdPair<T1,T2> >
 template<>
 struct Hash<Casper::string>
 {
-	uint operator()(const Casper::string& t) const
+	size_t operator()(const Casper::string& t) const
 	{	return std::hash<const char*>()(t.c_str());	}
 };
 

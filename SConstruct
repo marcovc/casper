@@ -617,7 +617,7 @@ Alias('minicasper',libminicasper)
 
 # bindings_cpp library
 
-gen_casper_preds = env.Command('bindings/cpp/casperpreds.h',None,'python src/bindings/cpp/genpreds.py > $TARGET')
+gen_casper_preds = env.Command('bindings/cpp/casperpreds.h',None,'python bindings/cpp/genpreds.py > $TARGET')
 
 casperbind_cpp_srcs = []
 for i in casperbind_cpp:
@@ -626,7 +626,7 @@ for i in casperbind_cpp:
 casperbind_cpp_objs=[]
 for i in casperbind_cpp_srcs:
 	casperbind_cpp_objs += env.Object(env['PREFIX']+"/"+i,
-									CPPPATH=['#src'])
+									CPPPATH=['#'])
 	
 libcasperbind_cpp=env.Library(target=env['PREFIX']+"/bindings/casperbind_cpp",source=casperbind_cpp_objs)
 
@@ -641,7 +641,7 @@ for i in casperbind_cpp_tests:
 casperbind_cpp_tests_targets=[]
 for i in casperbind_cpp_tests_srcs:
 	casperbind_cpp_tests_targets += env.Program(env['PREFIX']+"/"+i,
-										CPPPATH=['#src'],
+										CPPPATH=['#'],
 										LIBPATH=[env['PREFIX']+'bindings/cpp/'],
 						   				LIBS=libcasperbind_cpp)
 

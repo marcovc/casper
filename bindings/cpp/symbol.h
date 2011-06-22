@@ -97,15 +97,15 @@ struct Symbol
 	operator const Annotation&() const;
 
 	template<class T>
-	operator const Array<T>&() const;
+	operator const Detail::Array<T>&() const;
 	template<class T,class C>
 	operator const Detail::Set<T,C>&() const;
 	template<class T>
-	operator const StdRange<T>&() const;
+	operator const Detail::StdRange<T>&() const;
 
 	// creates a copy (temp)
 	template<class T>
-	operator Array<T>() const;
+	operator Detail::Array<T>() const;
 
 	// \}
 
@@ -147,9 +147,9 @@ Symbol::operator const Detail::Set<T,C>&() const
 }
 
 template<class T>
-Symbol::operator const StdRange<T>&() const
+Symbol::operator const Detail::StdRange<T>&() const
 {
-	return skipPtrs<StdRange<T> >(*this,sRange,"StdRange");
+	return skipPtrs<Detail::StdRange<T> >(*this,sRange,"StdRange");
 }
 
 /**

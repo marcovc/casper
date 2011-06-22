@@ -22,14 +22,15 @@
 #include <sstream>
 
 #include <casper/kernel.h>
-#include <casper/int.h>
-#include <casper/int/cumulative/cumulative.h>
-#include <casper/int/table/positive.h>
+#include <casper/cp/int.h>
+#include <casper/cp/solver.h>
+#include <casper/cp/int/cumulative/cumulative.h>
+#include <casper/cp/int/table/positive.h>
 
-#include <casper/set/config.h> // temp
-#include <casper/set.h>
-#include <casper/kernel/reversible/hashmap.h>
-#include <casper/kernel/reversible/range.h>
+#include <casper/cp/set/config.h> // temp
+#include <casper/cp/set.h>
+#include <casper/util/container/stdhashmap.h>
+#include <casper/util/container/stdrange.h>
 
 #include "cpp.h"
 #include "eval.h"
@@ -43,15 +44,15 @@ enum Consistency { cDomain, cBounds, cValue };
 template<Eval eval,Consistency cons>
 struct SymbolToCasper;
 
-struct CPSolver&Impl
+struct CPSolverImpl
 {
-	Casper::CPSolver& solver;
-	Casper::VarArray<Casper::bool> boolVars;
-	Casper::VarArray<Casper::int> intVars;
-	Casper::VarArray<Casper::IntSet> intSetVars;
-	Casper::VarArray<Casper::BoolSet> boolSetVars;
-	Casper::VarArray<Casper::double> realVars;
-	typedef Casper::StdHashMap<const Variable*,int> VarIdMap;
+	Casper::CP::Solver 			solver;
+	Casper::CP::BoolVarArray 	boolVars;
+	Casper::CP::IntVarArray 	intVars;
+	Casper::CP::IntSetVarArray 	intSetVars;
+	Casper::CP::VarArray<Casper::BoolSet>	boolSetVars;
+	Casper::CP::VarArray<double> realVars;
+	typedef Casper::Util::StdHashMap<const Variable*,int> VarIdMap;
 	VarIdMap	boolVarIds;
 	VarIdMap	intVarIds;
 	VarIdMap	realVarIds;
@@ -59,7 +60,7 @@ struct CPSolver&Impl
 	VarIdMap	boolSetVarIds;
 	int 		nSols;
 
-	CPSolver&Impl(int nBoolVars, int nIntVars, int nIntSetVars, int nBoolSetVars,int nRealVars) :
+	CPSolverImpl(int nBoolVars, int nIntVars, int nIntSetVars, int nBoolSetVars,int nRealVars) :
 			boolVars(solver,nBoolVars),
 			intVars(solver,nIntVars),
 			intSetVars(solver,nIntSetVars),
@@ -78,21 +79,21 @@ struct CPSolver&Impl
 	bool getBoolVariableValue(const Variable& v);
 };
 
-int CPSolver&Impl::getIntVariableValue(const Variable& v)
+int CPSolverImpl::getIntVariableValue(const Variable& v)
 {
-	const Casper::Var<Casper::int>& r = intVars[intVarIds[&v]];
+	const Casper::CP::IntVar& r = intVars[intVarIds[&v]];
 	assert(r.ground());
 	return r.domain().value();
 }
 
-bool CPSolver&Impl::getBoolVariableValue(const Variable& v)
+bool CPSolverImpl::getBoolVariableValue(const Variable& v)
 {
-	const Casper::Var<Casper::bool>& r = boolVars[boolVarIds[&v]];
+	const Casper::CP::BoolVar& r = boolVars[boolVarIds[&v]];
 	assert(r.ground());
 	return r.domain().value();
 }
 
-void CPSolver&Impl::addVariable(const Variable& v)
+void CPSolverImpl::addVariable(const Variable& v)
 {
 	switch (v.getVariableType())
 	{
@@ -105,19 +106,19 @@ void CPSolver&Impl::addVariable(const Variable& v)
 				case Symbol::sInt:
 				{
 					const int& s = v.getDomain();
-					intVars[varId] = Casper::Var<Casper::int>(solver,s);
+					intVars[varId] = Casper::CP::IntVar(solver,s);
 					break;
 				}
 				case Symbol::sRange:
 				{
 					const IntRange& r = v.getDomain();
-					intVars[varId] = Casper::Var<Casper::int>(solver,r.getLower(),r.getUpper());
+					intVars[varId] = Casper::CP::IntVar(solver,r.getLower(),r.getUpper());
 					break;
 				}
 				case Symbol::sSet:
 				{
 					const IntSet& s = v.getDomain();
-					intVars[varId] = Casper::Var<Casper::int>(solver,s.begin(),s.end());
+					intVars[varId] = Casper::CP::IntVar(solver,s.begin(),s.end());
 					break;
 				}
 				default:
@@ -134,13 +135,13 @@ void CPSolver&Impl::addVariable(const Variable& v)
 				case Symbol::sBool:
 				{
 					const bool& s = v.getDomain();
-					boolVars[varId] = Casper::Var<Casper::bool>(solver,s);
+					boolVars[varId] = Casper::CP::BoolVar(solver,s);
 					break;
 				}
 				case Symbol::sSet:
 				{
 					const BoolSet& s = v.getDomain();
-					boolVars[varId] = Casper::Var<Casper::bool>(solver,*s.begin(),*--s.end());
+					boolVars[varId] = Casper::CP::BoolVar(solver,*s.begin(),*--s.end());
 					break;
 				}
 				default:
@@ -153,7 +154,7 @@ void CPSolver&Impl::addVariable(const Variable& v)
 	}
 }
 
-void CPSolver&Impl::addVariables(const Instance& instance)
+void CPSolverImpl::addVariables(const Instance& instance)
 {
 	const SymbolSet& vars = instance.getVariables();
 	int nBoolVars,nIntVars,nSetVars;
@@ -329,29 +330,29 @@ struct PredFunctorToCasper<Predicate::pPartition>
 
 template<Consistency cons> struct SymbolToCasper<eBool,cons>
 {
-	typedef Casper::bool Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef bool Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{	return static_cast<const Type&>(s); }
 };
 
 template<Consistency cons> struct SymbolToCasper<eInt,cons>
 {
-	typedef Casper::int Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef int Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{	return static_cast<const Type&>(s); }
 };
 
 template<Consistency cons> struct SymbolToCasper<eReal,cons>
 {
-	typedef Casper::double Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef double Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{	return static_cast<const Type&>(s); }
 };
 
 template<Consistency cons> struct SymbolToCasper<eIntSet,cons>
 {
-	typedef Casper::Array<Casper::int> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::Util::StdArray<int> Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const IntSet& a = s;
 		Type r(solver.solver.getHeap(),a.getSize());
@@ -364,8 +365,8 @@ template<Consistency cons> struct SymbolToCasper<eIntSet,cons>
 
 template<Consistency cons> struct SymbolToCasper<eBoolSet,cons>
 {
-	typedef Casper::Array<Casper::bool> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::Util::StdArray<bool> Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const BoolSet& a = s;
 		Type r(solver.solver.getHeap(),a.getSize());
@@ -378,8 +379,8 @@ template<Consistency cons> struct SymbolToCasper<eBoolSet,cons>
 
 template<Consistency cons> struct SymbolToCasper<eBoolArray,cons>
 {
-	typedef Casper::Array<Casper::bool> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::Util::StdArray<bool> Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const BoolArray& a = s;
 		Type r(solver.solver.getHeap(),a.getSize());
@@ -391,8 +392,8 @@ template<Consistency cons> struct SymbolToCasper<eBoolArray,cons>
 
 template<Consistency cons> struct SymbolToCasper<eIntArray,cons>
 {
-	typedef Casper::Array<Casper::int> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::Util::StdArray<int> Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const IntArray a = s; // tmp (copy should be by const ref)
 		Type r(solver.solver.getHeap(),a.getSize());
@@ -404,8 +405,8 @@ template<Consistency cons> struct SymbolToCasper<eIntArray,cons>
 
 template<Consistency cons> struct SymbolToCasper<eRealArray,cons>
 {
-	typedef Casper::Array<Casper::double> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::Util::StdArray<double> Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const RealArray& a = s;
 		Type r(solver.solver.getHeap(),a.getSize());
@@ -417,8 +418,8 @@ template<Consistency cons> struct SymbolToCasper<eRealArray,cons>
 
 template<Consistency cons> struct SymbolToCasper<eIntRange,cons>
 {
-	typedef Casper::StdRange<Casper::int> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::Util::StdRange<int> Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const IntRange& a = s;
 		return Type(a.getLower(),a.getUpper());
@@ -427,8 +428,8 @@ template<Consistency cons> struct SymbolToCasper<eIntRange,cons>
 
 template<Consistency cons> struct SymbolToCasper<eRealRange,cons>
 {
-	typedef Casper::StdRange<Casper::double> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::Util::StdRange<double> Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const RealRange& a = s;
 		return Type(a.getLower(),a.getUpper());
@@ -437,11 +438,11 @@ template<Consistency cons> struct SymbolToCasper<eRealRange,cons>
 
 template<Consistency cons> struct SymbolToCasper<eBoolVar,cons>
 {
-	typedef Casper::Var<Casper::bool> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::CP::BoolVar Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const Variable& v = s;
-		typename CPSolver&Impl::VarIdMap::const_iterator it = solver.boolVarIds.find(&v);
+		auto it = solver.boolVarIds.find(&v);
 		if (it == solver.boolVarIds.end())
 			throw ENoKeyForSymbol(s);
 		return solver.boolVars[it->second];
@@ -450,11 +451,11 @@ template<Consistency cons> struct SymbolToCasper<eBoolVar,cons>
 
 template<Consistency cons> struct SymbolToCasper<eIntVar,cons>
 {
-	typedef Casper::Var<Casper::int> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::CP::IntVar Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const Variable& v = s;
-		typename CPSolver&Impl::VarIdMap::const_iterator it = solver.intVarIds.find(&v);
+		auto it = solver.intVarIds.find(&v);
 		if (it == solver.intVarIds.end())
 			throw ENoKeyForSymbol(s);
 		return solver.intVars[it->second];
@@ -463,8 +464,8 @@ template<Consistency cons> struct SymbolToCasper<eIntVar,cons>
 
 template<Consistency cons> struct SymbolToCasper<eRealVar,cons>
 {
-	typedef Casper::Var<Casper::double> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::CP::Var<double> Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const Variable& v = s;
 		return solver.realVars[solver.realVarIds[&v]];
@@ -473,8 +474,8 @@ template<Consistency cons> struct SymbolToCasper<eRealVar,cons>
 
 template<Consistency cons> struct SymbolToCasper<eIntSetVar,cons>
 {
-	typedef Casper::Var<Casper::IntSet> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::CP::IntSetVar Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const Variable& v = s;
 		return solver.intSetVars[solver.intSetVarIds[&v]];
@@ -483,8 +484,8 @@ template<Consistency cons> struct SymbolToCasper<eIntSetVar,cons>
 
 template<Consistency cons> struct SymbolToCasper<eBoolSetVar,cons>
 {
-	typedef Casper::Var<Casper::BoolSet> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::CP::Var<Casper::BoolSet> Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const Variable& v = s;
 		return solver.boolSetVars[solver.boolSetVarIds[&v]];
@@ -493,8 +494,8 @@ template<Consistency cons> struct SymbolToCasper<eBoolSetVar,cons>
 
 template<Consistency cons> struct SymbolToCasper<eIntVarArray,cons>
 {
-	typedef Casper::VarArray<Casper::int> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::CP::IntVarArray Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const SymbolArray& a = s;
 		Type r(solver.solver,a.getSize());
@@ -506,8 +507,8 @@ template<Consistency cons> struct SymbolToCasper<eIntVarArray,cons>
 
 template<Consistency cons> struct SymbolToCasper<eRealVarArray,cons>
 {
-	typedef Casper::VarArray<Casper::double> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::CP::VarArray<double> Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const SymbolArray& a = s;
 		Type r(solver.solver,a.getSize());
@@ -519,8 +520,8 @@ template<Consistency cons> struct SymbolToCasper<eRealVarArray,cons>
 
 template<Consistency cons> struct SymbolToCasper<eBoolVarArray,cons>
 {
-	typedef Casper::VarArray<Casper::bool> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::CP::BoolVarArray Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const SymbolArray& a = s;
 		Type r(solver.solver,a.getSize());
@@ -532,8 +533,8 @@ template<Consistency cons> struct SymbolToCasper<eBoolVarArray,cons>
 
 template<Consistency cons> struct SymbolToCasper<eIntSetVarArray,cons>
 {
-	typedef Casper::VarArray<Casper::IntSet> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::CP::IntSetVarArray Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const SymbolArray& a = s;
 		Type r(solver.solver,a.getSize());
@@ -545,8 +546,8 @@ template<Consistency cons> struct SymbolToCasper<eIntSetVarArray,cons>
 
 template<Consistency cons> struct SymbolToCasper<eBoolSetVarArray,cons>
 {
-	typedef Casper::VarArray<Casper::BoolSet> Type;
-	Type operator()(CPSolver& solver,const Symbol& s)
+	typedef Casper::CP::VarArray<Casper::BoolSet> Type;
+	Type operator()(CPSolverImpl& solver,const Symbol& s)
 	{
 		const SymbolArray& a = s;
 		Type r(solver.solver,a.getSize());
@@ -559,20 +560,20 @@ template<Consistency cons> struct SymbolToCasper<eBoolSetVarArray,cons>
 template<Predicate::Functor f,Eval e1,Consistency cons>
 struct Pred1ToCasper
 {
-	Casper::BndExpr<Casper::bool> operator()(CPSolver& solver,const Predicate& p) const
+	Casper::CP::BndExpr<bool> operator()(CPSolverImpl& solver,const Predicate& p) const
 	{
 		typedef typename PredFunctorToCasper<f>::Type 	Func;
 		typedef typename SymbolToCasper<e1,cons>::Type 	Op1;
 
 		Op1 op1(SymbolToCasper<e1,cons>()(solver,p[0]));
-		return Casper::BndExpr<Casper::bool>(solver.solver,Casper::Rel1<Func,Op1>(op1));
+		return Casper::CP::BndExpr<bool>(solver.solver,Casper::Rel1<Func,Op1>(op1));
 	}
 };
 
 template<Predicate::Functor f,Eval e1,Eval e2,Consistency cons>
 struct Pred2ToCasper
 {
-	Casper::BndExpr<Casper::bool> operator()(CPSolver& solver,const Predicate& p) const
+	Casper::CP::BndExpr<bool> operator()(CPSolverImpl& solver,const Predicate& p) const
 	{
 		typedef typename PredFunctorToCasper<f>::Type 	Func;
 		typedef typename SymbolToCasper<e1,cons>::Type 	Op1;
@@ -580,14 +581,15 @@ struct Pred2ToCasper
 
 		Op1 op1(SymbolToCasper<e1,cons>()(solver,p[0]));
 		Op2 op2(SymbolToCasper<e2,cons>()(solver,p[1]));
-		return Casper::BndExpr<Casper::bool>(solver.solver,Casper::Rel2<Func,Op1,Op2>(op1,op2));
+		return Casper::CP::BndExpr<bool>(solver.solver,Casper::Rel2<Func,Op1,Op2>(op1,op2));
 	}
 };
+
 
 template<Predicate::Functor f,Eval e1,Eval e2,Eval e3,Consistency cons>
 struct Pred3ToCasper
 {
-	Casper::BndExpr<Casper::bool> operator()(CPSolver& solver,const Predicate& p) const
+	Casper::CP::BndExpr<bool> operator()(CPSolverImpl& solver,const Predicate& p) const
 	{
 		typedef typename PredFunctorToCasper<f>::Type 	Func;
 		typedef typename SymbolToCasper<e1,cons>::Type 	Op1;
@@ -597,7 +599,7 @@ struct Pred3ToCasper
 		Op1 op1(SymbolToCasper<e1,cons>()(solver,p[0]));
 		Op2 op2(SymbolToCasper<e2,cons>()(solver,p[1]));
 		Op3 op3(SymbolToCasper<e3,cons>()(solver,p[2]));
-		return Casper::BndExpr<Casper::bool>(solver.solver,Casper::Rel3<Func,Op1,Op2,Op3>(op1,op2,op3));
+		return Casper::CP::BndExpr<bool>(solver.solver,Casper::Rel3<Func,Op1,Op2,Op3>(op1,op2,op3));
 	}
 };
 
@@ -605,7 +607,7 @@ struct Pred3ToCasper
 template<class Ret,Expression::Operator f,Eval e1,Consistency cons>
 struct Expr1ToCasper
 {
-	Ret operator()(CPSolver& solver,const Expression& p) const
+	Ret operator()(CPSolverImpl& solver,const Expression& p) const
 	{
 		typedef typename ExprFunctorToCasper<f>::Type 	Func;
 		typedef typename SymbolToCasper<e1,cons>::Type 	Op1;
@@ -617,7 +619,7 @@ struct Expr1ToCasper
 template<class Ret,Expression::Operator f,Eval e1,Eval e2,Consistency cons>
 struct Expr2ToCasper
 {
-	Ret operator()(CPSolver& solver,const Expression& p) const
+	Ret operator()(CPSolverImpl& solver,const Expression& p) const
 	{
 		typedef typename ExprFunctorToCasper<f>::Type 	Func;
 		typedef typename SymbolToCasper<e1,cons>::Type 	Op1;
@@ -632,7 +634,7 @@ struct Expr2ToCasper
 template<class Ret,Expression::Operator f,Eval e1,Eval e2,Eval e3,Consistency cons>
 struct Expr3ToCasper
 {
-	Ret operator()(CPSolver& solver,const Expression& p) const
+	Ret operator()(CPSolverImpl& solver,const Expression& p) const
 	{
 		typedef typename ExprFunctorToCasper<f>::Type 	Func;
 		typedef typename SymbolToCasper<e1,cons>::Type 	Op1;
@@ -648,7 +650,7 @@ struct Expr3ToCasper
 
 #include "casperpreds.h"
 
-bool CPSolver&Impl::addConstraints(const Instance& instance)
+bool CPSolverImpl::addConstraints(const Instance& instance)
 {
 	for (SymbolSet::Iterator it = instance.getConstraints().begin();
 			it != instance.getConstraints().end(); ++it)
@@ -661,27 +663,27 @@ bool CPSolver&Impl::addConstraints(const Instance& instance)
 	return true;
 }
 
-bool CPSolver&Impl::solve()
+bool CPSolverImpl::solve()
 {
 	// FIXME
 	bool r;
 	if (nSols == 0)
-		r = solver.solve(label(intVars));
+		r = solver.solve(label(solver,intVars));
 	if (nSols>0)
 		r = solver.next();
 	nSols += r;
 	return r;
 }
 
-void CPSolver&Impl::printSolution()
+void CPSolverImpl::printSolution()
 {
-	cout << intVars << endl;
+	std::cout << intVars << std::endl;
 }
 
-void CPSolver&Impl::printStats()
+void CPSolverImpl::printStats()
 {
-	cout << solver.stats() << endl;
-	cout << solver.totalTime() << endl;
+	std::cout << solver.getStats() << std::endl;
+	std::cout << solver.getCPUTimer() << std::endl;
 }
 
 
@@ -703,7 +705,7 @@ void countVars(const Variable& v,int& nBoolVars, int& nIntVars, int& nRealVars)
 	}
 }
 
-CPSolver::CPSolver&(const Instance& instance)
+CPSolver::CPSolver(const Instance& instance)
 {
 	// count int vars and set vars
 	int nBoolVars,nIntVars,nIntSetVars,nBoolSetVars,nRealVars;
@@ -722,7 +724,7 @@ CPSolver::CPSolver&(const Instance& instance)
 		countVars(static_cast<const Variable&>(*it),nBoolVars,nIntVars,nRealVars);
 
 	// create solver instance
-	pImpl = new CPSolver&Impl(nBoolVars,nIntVars,nIntSetVars,nBoolSetVars,nRealVars);
+	pImpl = new CPSolverImpl(nBoolVars,nIntVars,nIntSetVars,nBoolSetVars,nRealVars);
 
 	// add variables
 	pImpl->addVariables(instance);

@@ -44,7 +44,7 @@ struct VarDomCreator<FD<FD_TP_LIST(1)> >
 								  InputIterator min,
 								  InputIterator max);
 
-	FD<FD_TP_LIST(1)>* operator()(Store& store,const Util::StdList<StdRange<T1> >& l);
+	FD<FD_TP_LIST(1)>* operator()(Store& store,const Util::StdList<Util::StdRange<T1> >& l);
 
 	// returned domain is the union of all domains in the array
 	template<class View>
@@ -95,7 +95,7 @@ FD<FD_TP_LIST(1)>* VarDomCreator<FD<FD_TP_LIST(1)> >::operator()(Store& store,
 
 template<FD_TP_SPEC(1)>
 FD<FD_TP_LIST(1)>* VarDomCreator<FD<FD_TP_LIST(1)> >::operator()
-							(Store& store,const Util::StdList<StdRange<T1> >& l)
+							(Store& store,const Util::StdList<Util::StdRange<T1> >& l)
 {
 	//assert(min <= max);
 	FD<FD_TP_LIST(1)>* ret =

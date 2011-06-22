@@ -93,7 +93,7 @@
 					</target>
 					<target name="bindings_cpp-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 						<buildCommand>scons</buildCommand>
-						<buildArguments>-j 3 optimize_level=3</buildArguments>
+						<buildArguments>-j 8 optimize_level=3</buildArguments>
 						<buildTarget>casperbind_cpp</buildTarget>
 						<stopOnError>false</stopOnError>
 						<useDefaultCommand>false</useDefaultCommand>
@@ -149,7 +149,16 @@
 					</target>
 					<target name="gcc-version" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 						<buildCommand>gcc</buildCommand>
+						<buildArguments/>
 						<buildTarget>--version</buildTarget>
+						<stopOnError>false</stopOnError>
+						<useDefaultCommand>false</useDefaultCommand>
+						<runAllBuilders>true</runAllBuilders>
+					</target>
+					<target name="bindings_cpp-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+						<buildCommand>scons</buildCommand>
+						<buildArguments>-j 8 debug_level=3</buildArguments>
+						<buildTarget>casperbind_cpp</buildTarget>
 						<stopOnError>false</stopOnError>
 						<useDefaultCommand>false</useDefaultCommand>
 						<runAllBuilders>true</runAllBuilders>

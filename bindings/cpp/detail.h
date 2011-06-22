@@ -24,10 +24,12 @@
 #include <sstream>
 #include <algorithm>
 #include <set>
+#include "container.h"
 
 
 namespace Casperbind {
 namespace cpp {
+
 namespace Detail {
 
 /// Generic ranges.
@@ -239,6 +241,128 @@ InsertIterator<Container> inserter(Container& s)
 
 }
 
+
+}
+}
+
+
+
+namespace Casperbind {
+namespace cpp {
+
+
+template<class T>
+Symbol::operator const Detail::Array<T>&() const
+{
+	const Detail::Array<T>& r = skipPtrs<Detail::Array<T> >(*this,sArray,"Array");
+	assert(r.getElemType() == Detail::getElemType<T>());
+	return r;
+}
+
+/**
+ * Heterogeneous array of (shared) objects
+ * \ingroup CasperBindingsCPP
+ */
+
+typedef Detail::Array<SharedSymbol>	SymbolArray;
+
+/**
+ * Heterogeneous set of (shared) objects
+ * \ingroup CasperBindingsCPP
+ */
+
+typedef Detail::Set<SharedSymbol,Detail::LtSharedSymbol>	SymbolSet;
+
+/**
+ * Closed interval of something.Set<SharedSymbol>
+ * \ingroup CasperBindingsCPP
+ */
+typedef Detail::StdRange<SharedSymbol> SymbolRange;
+
+/**
+ * Multidimensional array of booleans
+ * \ingroup CasperBindingsCPP
+ */
+typedef Detail::Array<bool> BoolArray;
+
+/**
+ * Multidimensional array of integers
+ * \ingroup CasperBindingsCPP
+ */
+typedef Detail::Array<int> IntArray;
+
+/**
+ * Multidimensional array of reals
+ * \ingroup CasperBindingsCPP
+ */
+typedef Detail::Array<double> RealArray;
+
+/**
+ * Set of booleans
+ * \ingroup CasperBindingsCPP
+ */
+typedef Detail::Set<bool> BoolSet;
+
+/**
+ * Set of integers
+ * \ingroup CasperBindingsCPP
+ */
+typedef Detail::Set<int> IntSet;
+
+/**
+ * Set of realse
+ * \ingroup CasperBindingsCPP
+ */
+typedef Detail::Set<double> RealSet;
+
+//TODO
+typedef Detail::StdRange<SymbolSet> SetRange;
+
+
+/**
+ * Closed integer interval.
+ * \ingroup CasperBindingsCPP
+ */
+typedef Detail::StdRange<int> IntRange;
+
+
+
+/**
+ * Closed real interval.
+ * \ingroup CasperBindingsCPP
+ */
+typedef Detail::StdRange<double> RealRange;
+
+
+template<class T>
+Symbol::operator Detail::Array<T>() const
+{
+	//const Array<T>& r = skipPtrs<Array<T> >(*this,sArray,"Array");
+	//assert(r.getElemType() == Detail::getElemType<T>());
+	//return r;
+
+	const Detail::Array<T>& r = skipPtrs<Detail::Array<T> >(*this,sArray,"Array");
+	if (r.getElemType() == Detail::getElemType<T>())
+		return r;
+	if (r.getElemType()==Container::sSymbol)
+	{
+		const SymbolArray& r1 = skipPtrs<SymbolArray>(*this,sArray,"Array");
+		Detail::Array<T> r(r1.getSize());
+		for (int i = 0; i < r1.getSize(); ++i)
+			r[i] = r1[i];
+		return r;
+	}
+	assert(0);
+}
+
+inline SymbolArray makeSymbolArray(SharedSymbol arg1)
+{ 	return Detail::makeArray<SharedSymbol>(arg1); }
+
+inline SymbolArray makeSymbolArray(SharedSymbol arg1,SharedSymbol arg2)
+{ 	return Detail::makeArray<SharedSymbol>(arg1,arg2); }
+
+inline SymbolArray makeSymbolArray(SharedSymbol arg1,SharedSymbol arg2,SharedSymbol arg3)
+{ 	return Detail::makeArray<SharedSymbol>(arg1,arg2,arg3); }
 
 }
 }

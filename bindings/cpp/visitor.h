@@ -25,14 +25,14 @@
 // general interface
 
 struct IVisitor
-{	virtual void operator()(const casperbind::cpp::Symbol& s) = 0; };
+{	virtual void operator()(const Casperbind::cpp::Symbol& s) = 0; };
 
-void visitTopDown(const casperbind::cpp::Symbol& s, IVisitor& v);
+void visitTopDown(const Casperbind::cpp::Symbol& s, IVisitor& v);
 
 // useful visits
-void collectType(const casperbind::cpp::Symbol& s,
-				 casperbind::cpp::Symbol::Type type,
-				 std::set<const casperbind::cpp::Symbol*>& collection);
+void collectType(const Casperbind::cpp::Symbol& s,
+				 Casperbind::cpp::Symbol::Type type,
+				 std::set<const Casperbind::cpp::Symbol*>& collection);
 
 
 #endif /* CASPER_BINDINGS_CPP_VISITOR_H_ */

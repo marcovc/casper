@@ -22,8 +22,8 @@
 #include <algorithm>
 #include <vector>
 #include <casper/kernel/common.h>
-#include <casper/util/container/vector.h>
-#include <casper/util/container/slist.h>
+#include <casper/util/container/stdvector.h>
+#include <casper/util/container/stdslist.h>
 #include <casper/cp/int/cumulative/common.h>
 
 /**
@@ -120,7 +120,7 @@ struct BndFilterView5<Cumulative,Seq<X>,Start,Seq<X>,Duration,
 	    {	return b1->end < b2->end; }
 	};
 
-	Detail::scheduling::Sweep<VarArray<int>,Start,Duration,End,Height> sweep;
+	Detail::Scheduling::Sweep<VarArray<int>,Start,Duration,End,Height> sweep;
 };
 
 template<class X,class Y,class Start,class Duration,class End,class Height,class Capacity>
@@ -267,7 +267,7 @@ uint BndFilterView5<Cumulative,Seq<X>,Start,Seq<X>,Duration,
 			   Seq<X>,End,Seq<Y>,Height,Y,Capacity>::findSc(Util::StdSList<Y>& sc,
 												   Util::StdVector<uint>& h2i)
 {
-	Util::StdVector<bool>	c(stdHeap,capacity+1,false);
+	Util::StdVector<bool>	c(Util::stdHeap,capacity+1,false);
 	uint k = 0;
 	for (uint i = 0; i < n; i++)
 	{

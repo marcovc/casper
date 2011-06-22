@@ -21,6 +21,7 @@
 
 #include <casper/cp/expr.h>
 #include <casper/util/container/stdarray.h>
+#include <casper/util/container/stdrange.h>
 #include <casper/cp/vararray.h>
 #include <casper/util/iteration.h>
 #include <casper/cp/view/dom.h>
@@ -804,26 +805,24 @@ struct BndViewRel1<Sum,View1,Eval>
 };
 #endif
 
-template<class> struct StdRange;
 
 template<class View1,class View2,class Eval>
 struct BndViewRel2<SumProduct,View1,View2,Eval> :
-	BndViewRel1<Sum,Rel4<All,Par<int>,StdRange<int>,bool,
+	BndViewRel1<Sum,Rel4<All,Par<int>,Casper::Util::StdRange<int>,bool,
 		Rel2<Mul,Rel2<Element,View1,Par<int> >,
 				 Rel2<Element,View2,Par<int> > > >,Eval>
 {
-	typedef Rel4<All,Par<int>,StdRange<int>,bool,
+	typedef Rel4<All,Par<int>,Casper::Util::StdRange<int>,bool,
 				Rel2<Mul,Rel2<Element,View1,Par<int> >,
 						 Rel2<Element,View2,Par<int> > > > Agg;
+	typedef BndViewRel1<Sum,Agg,Eval> Super;
 	Agg agg(Store& store,const View1& v1, const View2& v2)
 	{
 		BndArrayView<Eval,View1> b1(store,v1);
 		Par<int> i(store);
-		return all(i,range(0,b1.size()-1),true,v1[i]*v2[i]);
+		return all(i,range(0,b1.size()-1),true,element(v1,i)*element(v2,i));
 	}
-	typedef BndViewRel1<Sum,Rel4<All,Par<int>,StdRange<int>,bool,
-			Rel2<Mul,Rel2<Element,View1,Par<int> >,
-					 Rel2<Element,View2,Par<int> > > >,Eval> Super;
+
 	BndViewRel2(Store& store,const View1& v1, const View2& v2) :
 		Super(store,agg(store,v1,v2))
 		{}

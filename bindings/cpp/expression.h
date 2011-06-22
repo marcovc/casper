@@ -22,6 +22,7 @@
 
 #include "symbol.h"
 #include "container.h"
+#include "detail.h"
 
 namespace Casperbind {
 namespace cpp {
@@ -44,19 +45,19 @@ struct Constant : Symbol
  * Symbol for a boolean (bool) constant
  * \ingroup CasperBindingsCPP
  */
-typedef Detail::Constant<bool,Symbol::sBool>			bool;
+typedef Detail::Constant<bool,Symbol::sBool>			Bool;
 
 /**
  * Symbol for an integral (int) constant
  * \ingroup CasperBindingsCPP
  */
-typedef Detail::Constant<int,Symbol::sInt>			int;
+typedef Detail::Constant<int,Symbol::sInt>			Int;
 
 /**
  *  Symbol for a real (double) constant.
  *  \ingroup CasperBindingsCPP
  */
-typedef Detail::Constant<double,Symbol::sDouble>	double;
+typedef Detail::Constant<double,Symbol::sDouble>	Double;
 
 /**
  *  Symbol for a string constant.

@@ -175,8 +175,7 @@ struct Filter : Util::PImplIdiom<IFilter>
 //	Filter(Store& s,const View& v, const FilterFactory& f = FilterFactory()) :
 //		Super(f(s,v).getPImpl())	{}
 
-/*	Filter(CPSolver& s,BndExpr<bool> b);
-
+/*
 	Filter(CPSolver& s,ValExpr<bool> b);
 
 	template<class Dom>

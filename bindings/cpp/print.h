@@ -25,7 +25,7 @@
 struct SymStream
 {
 	std::ostream& os;
-	const casperbind::cpp::Index index;
+	const Casperbind::cpp::Index index;
 	bool bShowVariableContents;
 	bool bShowSetContents;
 	bool bShowArrayContents;
@@ -37,7 +37,7 @@ struct SymStream
 	bool bShowIdentifier;
 
 	SymStream(std::ostream& s) : os(s) { showAll(true); }
-	SymStream(std::ostream& s,const casperbind::cpp::Index& index) :
+	SymStream(std::ostream& s,const Casperbind::cpp::Index& index) :
 		os(s),index(index) { showAll(true); }
 
 	void showAll(bool val)
@@ -93,10 +93,10 @@ struct SymStream
  * 	Streams a text representation of \a s to \a os.
  *  \ingroup CasperBindingsCPPProcessors
  */
-SymStream& operator<<(SymStream& os, const casperbind::cpp::Symbol& s);
+SymStream& operator<<(SymStream& os, const Casperbind::cpp::Symbol& s);
 
 
-inline std::ostream& operator<<(std::ostream& os, const casperbind::cpp::Symbol& s)
+inline std::ostream& operator<<(std::ostream& os, const Casperbind::cpp::Symbol& s)
 {
 	SymStream ss(os);
 	ss << s;

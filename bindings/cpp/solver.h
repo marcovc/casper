@@ -26,13 +26,13 @@
 namespace Casperbind {
 namespace cpp {
 
-struct CPSolver&Impl;
+struct CPSolverImpl;
 
-struct CPSolver&
+struct CPSolver
 {
-	CPSolver&Impl* pImpl;
+	CPSolverImpl* pImpl;
 
-	CPSolver&(const Instance& instance);
+	CPSolver(const Instance& instance);
 
 	bool solve();
 	bool next();
@@ -51,7 +51,7 @@ inline unsigned int getCaSPERVersionMinor()
 inline unsigned int getCaSPERVersionRelease()
 {	return Casper::getVersionRelease(); }
 
-inline unsigned int getCaSPERRevision()
+inline std::string getCaSPERRevision()
 {	return Casper::getRevision(); }
 
 inline std::string getCaSPERVersion()

@@ -127,10 +127,10 @@ void Symbol::assertVersionIn(unsigned int lbMajor,
 	}
 }
 
-SharedSymbol::SharedSymbol(bool i) : pData(new bool(i)) {}
-SharedSymbol::SharedSymbol(int i) : pData(new int(i)) {}
-SharedSymbol::SharedSymbol(unsigned int i) : pData(new int(i)) {}
-SharedSymbol::SharedSymbol(double i)  : pData(new double(i)) {}
+SharedSymbol::SharedSymbol(bool i) : pData(new Bool(i)) {}
+SharedSymbol::SharedSymbol(int i) : pData(new Int(i)) {}
+SharedSymbol::SharedSymbol(unsigned int i) : pData(new Int(i)) {}
+SharedSymbol::SharedSymbol(double i)  : pData(new Double(i)) {}
 
 }
 }

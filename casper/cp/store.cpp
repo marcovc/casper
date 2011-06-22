@@ -101,6 +101,11 @@ bool Store::post(IFilter* f)
 	return true;
 }
 
+bool Store::post(const BndExpr<bool>& b)
+{
+	return post(new (*this) BndFilterView<BndExpr<bool> >(*this,b));
+}
+
 void Store::setFilterWeighting(bool val)
 {	weightFilters = val;	}
 

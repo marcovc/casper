@@ -21,9 +21,9 @@
 
 #include <vector>
 #include <algorithm>
-#include <casper/util/container/list.h>
-#include <casper/util/container/vector.h>
-#include <casper/util/container/slist.h>
+#include <casper/util/container/stdlist.h>
+#include <casper/util/container/stdvector.h>
+#include <casper/util/container/stdslist.h>
 
 namespace Casper {
 namespace CP {
@@ -228,10 +228,10 @@ sweep(const int& m, const Y& limit, bool lb)
 
 	// sweep
 //	Util::StdVector<Y> contribution(stdHeap,n,lb?limits<Y>::min:limits<Y>::max);
-	Util::StdVector<Y> contribution(stdHeap,n,initContrib);
+	Util::StdVector<Y> contribution(Util::stdHeap,n,initContrib);
 	Util::StdList<int>	listPrune;
 
-	typename vector<Event*>::iterator it = sev.begin();
+	typename std::vector<Event*>::iterator it = sev.begin();
 	X d = (*it)->date;
 	int nbTask = 0;
 	Y sumHeight = 0;

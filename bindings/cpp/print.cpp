@@ -21,7 +21,7 @@
 
 using namespace Casperbind::cpp;
 
-SymStream& operator<<(SymStream& os, const casperbind::cpp::Index& s);
+SymStream& operator<<(SymStream& os, const Casperbind::cpp::Index& s);
 
 
 template<class T>
@@ -478,9 +478,9 @@ SymStream& operator<<(SymStream& os, const Symbol& s)
 }
 
 
-SymStream& operator<<(SymStream& os, const casperbind::cpp::Index& s)
+SymStream& operator<<(SymStream& os, const Casperbind::cpp::Index& s)
 {
-	typedef casperbind::cpp::Index::KeysTo KeysTo;
+	typedef Casperbind::cpp::Index::KeysTo KeysTo;
 	os << "{";
 	for (KeysTo::const_iterator it = s.keysTo.begin();
 			it != s.keysTo.end(); ++it)

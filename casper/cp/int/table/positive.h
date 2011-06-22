@@ -328,7 +328,7 @@ Filter gacSchema(Store& store,const View& v,const Util::StdArray<Eval,2>& ss)
 	return new (store) GACSchema<Eval,View>(store,v,*p);
 }
 
-#if 0
+#if 1
 template<class Eval,class View>
 Filter gacSchema(Store& store,const View& v,const Util::StdArray<Eval,1>& ss)
 {

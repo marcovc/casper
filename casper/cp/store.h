@@ -107,6 +107,7 @@ struct IFilter;
 
 struct Filter;
 struct IFilterSched;
+template<class> struct BndExpr;
 
 struct Store : INotifiable
 {
@@ -123,6 +124,7 @@ struct Store : INotifiable
 
 	bool post(const Filter&);
 	bool post(IFilter*);
+	bool post(const BndExpr<bool>& b);
 
 	// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class PostFilter = PostBndFilter>

@@ -22,6 +22,7 @@
 
 #include "symbol.h"
 #include "container.h"
+#include "detail.h"
 
 namespace Casperbind {
 namespace cpp {
