@@ -679,7 +679,19 @@ struct ParView3<ForSome,Par<int>,Set,Expr,bool> : IPar<bool>
 };
 
 
+template<class Eval>
+struct ParView2<RandInRange,Eval,Eval,Eval> : IPar<Eval>
+{
+	ParView2(State& state, const Eval& lb, const Eval& ub) :
+		lb(lb),ub(ub) {}
+	Eval value() const
+	{
+		return static_cast<Eval>(::rand()/static_cast<double>(RAND_MAX) * (ub-lb) + lb);
+	}
 
+	const Eval lb;
+	const Eval ub;
+};
 
 };
 

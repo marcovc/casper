@@ -415,6 +415,8 @@ NEW_REL_2(assign,Assign)
 NEW_REL_2(selectFirst,SelectFirst)
 
 NEW_REL_3(countEqual,CountEqual)
+
+NEW_REL_2(randInRange,RandInRange)
 #endif
 
 // operators
@@ -624,6 +626,10 @@ struct GetEval<Rel3<CountEqual,T1,T2,T3> >
 template<class T>
 struct GetEval<Rel1<Round,T> >
 {	typedef typename Traits::GetEval<T>::Type	Type;	};
+
+template<class T>
+struct GetEval<Rel2<RandInRange,T,T> >
+{	typedef T Type;	};
 
 template<class View1, class View2>
 struct GetEval<Rel2<Assign,View1,View2> >
