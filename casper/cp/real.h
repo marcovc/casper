@@ -22,7 +22,7 @@
 
 #include <casper/kernel.h>
 
-#include <casper/real/filter.h>
-#include <casper/real/view.h>
+#include <casper/cp/real/filter.h>
+#include <casper/cp/real/view.h>
 
 #endif /* CASPER_REAL_H_ */

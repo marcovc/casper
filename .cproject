@@ -70,7 +70,7 @@
 					<target name="example-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 						<buildCommand>scons</buildCommand>
 						<buildArguments>-j 1 debug_level=3</buildArguments>
-						<buildTarget>build/debug/examples/lp/binsearch</buildTarget>
+						<buildTarget>build/debug/examples/cp/real/inverse</buildTarget>
 						<stopOnError>false</stopOnError>
 						<useDefaultCommand>false</useDefaultCommand>
 						<runAllBuilders>true</runAllBuilders>
@@ -149,7 +149,6 @@
 					</target>
 					<target name="gcc-version" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 						<buildCommand>gcc</buildCommand>
-						<buildArguments/>
 						<buildTarget>--version</buildTarget>
 						<stopOnError>false</stopOnError>
 						<useDefaultCommand>false</useDefaultCommand>

@@ -19,7 +19,10 @@
 #ifndef CASPER_REAL_FILTER_H_
 #define CASPER_REAL_FILTER_H_
 
+#include <casper/cp/filter/bnd.h>
+
 namespace Casper {
+namespace CP {
 
 ///	Enforces the Greater binary relation between two double views
 template<class View1,class View2>
@@ -27,7 +30,7 @@ struct BndFilterView2<Greater,double,View1,double,View2> :
 	BndFilterView2<GreaterEqual,double,View1,double,View2>
 {
 	typedef BndFilterView2<GreaterEqual,double,View1,double,View2> Super;
-	BndFilterView2(CPSolver& solver, const View1& p1,const View2& p2) :
+	BndFilterView2(Store& solver, const View1& p1,const View2& p2) :
 		BndFilterView2<GreaterEqual,double,View1,double,View2>(solver,p1,p2){}
 	bool execute()
 	{
@@ -45,7 +48,7 @@ struct BndFilterView2<Greater,double,View1,double,View2> :
 template<class View1,class View2>
 struct BndFilterView2<Distinct,double,View1,double,View2> : IFilter
 {
-	BndFilterView2(CPSolver& solver, const View1& p1,const View2& p2) :
+	BndFilterView2(Store& solver, const View1& p1,const View2& p2) :
 		IFilter(solver),p1(solver,p1),p2(solver,p2) {}
 	bool execute()
 	{
@@ -66,6 +69,7 @@ struct BndFilterView2<Distinct,double,View1,double,View2> : IFilter
 	BndView<double,View2> p2;
 };
 
-}
+} // CP
+} // Casper
 
 #endif /* CASPER_REAL_FILTER_H_ */

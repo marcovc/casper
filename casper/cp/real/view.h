@@ -19,16 +19,17 @@
 #ifndef CASPER_REAL_VIEW_H_
 #define CASPER_REAL_VIEW_H_
 
-#include <casper/kernel/rangedom.h>
-#include <casper/kernel/view/common.h>
+#include <casper/cp/rangedom.h>
+#include <casper/cp/view/common.h>
 
 namespace Casper {
+namespace CP {
 
 template<class T>
 struct IDomExpr<RangeDom<T> > : INotifier
 {
 	typedef RangeDom<T> Dom;
-	IDomExpr(CPSolver& solver) : mSolver(solver) {}
+	IDomExpr(Store& solver) : mSolver(solver) {}
 	virtual ~IDomExpr()	{}
 
 	///	Returns a pointer to the domain of the expression.
@@ -46,10 +47,12 @@ struct IDomExpr<RangeDom<T> > : INotifier
 
 	bool notify() { assert(0); return true; }
 	/// Return CPSolver& object associated with the expression.
-	CPSolver&		solver() const {	return mSolver; }
+	Store&		solver() const {	return mSolver; }
 
-	CPSolver&				mSolver;
+	Store&				mSolver;
 };
-}
+
+} // CP
+} // Casper
 
 #endif /* CASPER_REAL_VIEW_H_ */

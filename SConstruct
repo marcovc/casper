@@ -38,6 +38,7 @@ examples+=['cp/int/nqueens.cpp']
 
 #examples+=['cp/real/equation.cpp']
 #examples+=['cp/real/newton.cpp']
+examples+=['cp/real/inverse.cpp']
 
 examples+=['kernel/debug.cpp']
 #examples+=['kernel/goal_sched.cpp']

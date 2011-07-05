@@ -21,6 +21,7 @@
 #include <casper/cp/filter/common.h>
 #include <casper/cp/scheduler.h>
 #include <casper/cp/filter/weightedfilter.h>
+#include <casper/cp/filter/bnd.h>
 
 using namespace std;
 
