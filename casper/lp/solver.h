@@ -80,6 +80,7 @@ struct Solver
 //	DoublePar 		getObjValuePar() const;
 
 	double getValue(uint idx) const;
+	void getActivityRange(uint idx, double& lb, double& ub) const;
 
 	Env&	getEnv() const {	return env;	}
 

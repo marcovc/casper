@@ -255,6 +255,11 @@ double Solver::getValue(uint idx) const
 	return driver.getValue(idx);
 }
 
+void Solver::getActivityRange(uint idx, double& lb, double& ub) const
+{
+	driver.getActivityRange(idx,lb,ub);
+}
+
 double Solver::getObjValue() const
 {
 	return driver.getObjValue();

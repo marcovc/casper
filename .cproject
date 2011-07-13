@@ -62,7 +62,7 @@
 					<target name="example-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 						<buildCommand>scons</buildCommand>
 						<buildArguments>-j 3 optimize_level=3</buildArguments>
-						<buildTarget>build/release/examples/lp/binsearch</buildTarget>
+						<buildTarget>build/release/examples/cp/real/inverse</buildTarget>
 						<stopOnError>false</stopOnError>
 						<useDefaultCommand>false</useDefaultCommand>
 						<runAllBuilders>true</runAllBuilders>
@@ -70,7 +70,7 @@
 					<target name="example-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 						<buildCommand>scons</buildCommand>
 						<buildArguments>-j 1 debug_level=3</buildArguments>
-						<buildTarget>build/debug/examples/cp/real/inverse</buildTarget>
+						<buildTarget>build/debug/examples/lp/debug</buildTarget>
 						<stopOnError>false</stopOnError>
 						<useDefaultCommand>false</useDefaultCommand>
 						<runAllBuilders>true</runAllBuilders>

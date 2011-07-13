@@ -1519,7 +1519,7 @@ template<class View1,class View2,class Eval>
 bool BndViewRel2<Div,View1,View2,Eval>::updateRange(const Eval& lb,
 													const Eval& ub)
 {
-	StdRange<Eval> r(lb,ub);
+	Util::StdRange<Eval> r(lb,ub);
 	Eval mmin,mmax;
 	range(mmin,mmax);
 	if (lb>mmax or ub<mmin)
@@ -1804,6 +1804,7 @@ struct BndViewRel1<Sqr,View1,Eval>
 
 	BndView<Eval,View1>	p1;
 };
+
 
 /**
  *	BndView over exponential.
