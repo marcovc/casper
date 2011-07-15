@@ -474,6 +474,22 @@ double Driver::getValue(uint colId) const
 	return glp_get_col_prim(static_cast<glp_prob*>(glpProb),colId);
 }
 
+void Driver::getActivityRange(uint colId,double& lb, double& ub) const
+{
+	glp_prob* const p = static_cast<glp_prob*>(glpProb);
+
+	if (!glp_bf_exists(p))
+		glp_factorize(p);
+
+	const int k = glp_get_num_rows(p) + colId;
+
+	glp_print_ranges(static_cast<glp_prob*>(glpProb),0,NULL,0,"sens.txt");
+	if (glp_get_col_stat(p,colId) != GLP_BS)
+		glp_analyze_bound(p, k, &ub, NULL, &lb, NULL);
+	else
+		glp_analyze_coef(p, k, NULL, NULL, &ub, NULL, NULL, &lb);
+}
+
 double Driver::getObjValue() const
 {
 	return glp_get_obj_val(static_cast<glp_prob*>(glpProb));

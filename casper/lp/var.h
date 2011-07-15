@@ -41,6 +41,8 @@ struct Var
 	double getCurValue() const;
 	uint getId() const { return id;	}
 
+	void getActivityRange(double& lb, double& ub) const;
+
 	Solver& solver;
 	Reversible<uint> id;
 };

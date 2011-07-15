@@ -100,6 +100,20 @@ struct GroundTermCond
 	}
 };
 
+struct SizeTermCond
+{
+	SizeTermCond(double s) : s(s) {}
+	template<class Eval,class View>
+	bool operator()(const DomArrayView<Eval,View>& v) const
+	{
+		for (uint i = 0; i < v.size(); i++)
+			if (v[i]->max()-v[i]->min() > s)
+				return false;
+		return true;
+	}
+	const double s;
+};
+
 // some popular heuristics
 
 namespace Detail {
@@ -369,6 +383,11 @@ VarSelector selectVar##name(Store& s,const Vars& vars, bool roundRobin = true) \
 		return new (s) Detail::SelectVar##name##RR<Vars>(s,vars);\
 	else\
 		return new (s) Detail::SelectVar##name<Vars>(s,vars);\
+}\
+template<class Vars,class TermCond>\
+VarSelector selectVar##name(Store& s,const Vars& vars, const TermCond& tc) \
+{\
+	return new (s) Detail::SelectVar##name##RR<Vars,TermCond>(s,vars,tc);\
 }
 
 
@@ -473,18 +492,18 @@ namespace Detail {
 template<class View>
 struct SelectHalfMin : IValSelector
 {
-	typedef typename Casper::Traits::GetEval<View>::Type::Elem	ElemEval;
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type ElemEval;
 	SelectHalfMin(Store& s,const View& vars) :
-		store(store),vars(s,vars) {}
+		store(s),vars(s,vars) {}
 	Goal select(uint idx)
 	{
 		ElemEval midpoint = Util::median(vars[idx].min(),vars[idx].max());
 		if (Casper::Traits::IsIntegral<ElemEval>::value)
-			return post(store,vars[idx].getObj() <= midpoint) or
-				   post(store,vars[idx].getObj() > midpoint);
+			return Goal(store,post(store,vars[idx].getObj() <= midpoint) or
+							  post(store,vars[idx].getObj() > midpoint));
 		else
-			return post(store,vars[idx].getObj() <= midpoint) or
-				   post(store,vars[idx].getObj() >= midpoint);
+			return Goal(store,post(store,vars[idx].getObj() <= midpoint) or
+							  post(store,vars[idx].getObj() >= midpoint));
 	}
 	Store&						store;
 	BndArrayView<ElemEval,View> vars;

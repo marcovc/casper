@@ -96,6 +96,8 @@ struct Driver
 	bool solve();
 
 	double getValue(uint colId) const;
+	void getActivityRange(uint colId, double& min, double& max) const;
+
 	double getObjValue() const;
 
 	void printModel(const char* fname);

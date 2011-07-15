@@ -20,6 +20,8 @@
 ##	EXAMPLES	##
 ##################
 
+extra_example_libs={}
+
 examples=[]
 examples+=['cp/int/golomb.cpp']
 examples+=['cp/int/golfer.cpp']
@@ -39,6 +41,7 @@ examples+=['cp/int/nqueens.cpp']
 #examples+=['cp/real/equation.cpp']
 #examples+=['cp/real/newton.cpp']
 examples+=['cp/real/inverse.cpp']
+extra_example_libs['examples/cp/real/inverse.cpp']=['gsl']
 
 examples+=['kernel/debug.cpp']
 #examples+=['kernel/goal_sched.cpp']
@@ -576,9 +579,12 @@ for i in examples:
 def defineExamples(env):
 	example_targets=[]
 	for i in example_srcs:
+		extra_libs = []
+		if extra_example_libs.has_key(i):
+			extra_libs = extra_example_libs[i]
 		example_targets += env.Program(env['PREFIX']+'/'+i,
 						 LIBPATH=[env['PREFIX']+libpath]+confCommonEnv['LIBPATH'],
-						   LIBS=example_libs)
+						   LIBS=example_libs+extra_libs)
 	return example_targets
 
 example_targets=defineExamples(env)	

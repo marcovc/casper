@@ -39,8 +39,13 @@ const Var& Var::operator=(const Var& s)
 double Var::getCurValue() const
 {	return solver.getValue(id);	}
 
-}
-}
+
+void Var::getActivityRange(double& lb, double& ub) const
+{	solver.getActivityRange(id,lb,ub);	}
+
+
+} // LP
+} // Casper
 
 std::ostream& operator<<(std::ostream& os, const Casper::LP::Var& v)
 {
