@@ -18,7 +18,10 @@
 #include <gsl/gsl_fit.h>
 
 #include <map>
+<<<<<<< HEAD
 #include <list>
+=======
+>>>>>>> branch 'master' of git@mvctrash.unfuddle.com:mvctrash/casper.git
 #include <fstream>
 
 #include <math.h>
@@ -171,6 +174,7 @@ struct MyTermCond
 	BndExpr<bool> entailed;
 };
 
+<<<<<<< HEAD
 double gaussPrimitive(double x, double m, double s)
 {
 	return -s*erf((m-x)/(sqrt(2.0)*s))/(2*s);
@@ -185,6 +189,8 @@ struct Solution
 	double vol;
 };
 
+=======
+>>>>>>> branch 'master' of git@mvctrash.unfuddle.com:mvctrash/casper.git
 int solve(vector<int>& lambda, vector<double>& rr,
 		  map<int,double>& ma, map<int,double>& mb,
 		  map<int,double>& aw, map<int,double>& bw)
@@ -226,9 +232,15 @@ int solve(vector<int>& lambda, vector<double>& rr,
 
 		double factor;
 		if (lambda[i]==670)
+<<<<<<< HEAD
 			factor = 0.006 * 3;
 		else
 			factor = 0.005 * 3;
+=======
+			factor = 0.06;
+		else
+			factor = 0.05;
+>>>>>>> branch 'master' of git@mvctrash.unfuddle.com:mvctrash/casper.git
 		solver.post( r[i] == 0.044 * b / (a+b) );
 		solver.post( rr[i]*(1-factor) <= r[i] );
 		solver.post( rr[i]*(1+factor) >= r[i] );
@@ -248,8 +260,20 @@ int solve(vector<int>& lambda, vector<double>& rr,
 	lvars[2] = a_cdom_440;
 //	lvars[3] = r;
 
+<<<<<<< HEAD
 	std::list<Solution> solutions;
+=======
+	cout << "first prop: " << found << endl;
+	//MyTermCond termCond(0.01,entailed);
+	SizeTermCond termCond(0.01);
+	found = found and solver.solve(label(solver,lvars,selectVarMaxDom(solver,lvars,termCond),selectHalfMin(solver,lvars)));
+	while (found)
+	{
+//		cout << lvars << " " << entailed << endl;
+		cout << lvars << endl;
+>>>>>>> branch 'master' of git@mvctrash.unfuddle.com:mvctrash/casper.git
 
+<<<<<<< HEAD
 	// consider this many r's
 	const int nr = 3;
 
@@ -390,6 +414,19 @@ int solve(vector<int>& lambda, vector<double>& rr,
 		acc += pjoint_post;
 	}
 	cout << "acc = " << acc << endl;
+=======
+		double erfmin = erf()
+//		cout << "a_chl " << a_chl << endl;
+//		cout << "b_chl " << b_chl << endl;
+//		cout << "a_cdom " << a_cdom << endl;
+//		cout << "a_nppm " << a_nppm << endl;
+//		cout << "b_nppm " << b_nppm << endl;
+//		cout << "a " << a << endl;
+//		cout << "b " << b << endl;
+		found = solver.next();
+	}
+	cout << solver.getStats() << endl;
+>>>>>>> branch 'master' of git@mvctrash.unfuddle.com:mvctrash/casper.git
 	return 1;
 
 }
