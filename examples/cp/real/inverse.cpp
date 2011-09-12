@@ -179,7 +179,10 @@ double gaussPrimitive(double x, double m, double s)
 
 struct Solution
 {
-	double chlMin,chlMax,nppmMin,nppmMax,cdomMin,cdomMax,vol,pr_prior,pr_post;
+	double chlMin,chlMax,nppmMin,nppmMax,cdomMin,cdomMax;
+	vector<double> rMin;
+	vector<double> rMax;
+	double vol;
 };
 
 int solve(vector<int>& lambda, vector<double>& rr,
@@ -247,12 +250,15 @@ int solve(vector<int>& lambda, vector<double>& rr,
 
 	std::list<Solution> solutions;
 
+	// consider this many r's
+	const int nr = 3;
+
 	uint nbSolutions = 0;
 	double totalVol = 0;
 
 	cout << "first prop: " << found << endl;
 	//MyTermCond termCond(0.01,entailed);
-	SizeTermCond termCond(0.001);
+	SizeTermCond termCond(0.01);
 	found = found and solver.solve(label(solver,lvars,selectVarMaxDom(solver,lvars,termCond),selectHalfMin(solver,lvars)));
 	while (found)
 	{
@@ -261,40 +267,26 @@ int solve(vector<int>& lambda, vector<double>& rr,
 		double vol = (chl.domain().max()-chl.domain().min())*
 					 (nppm.domain().max()-nppm.domain().min())*
 					 (a_cdom_440.domain().max()-a_cdom_440.domain().min());
-
-		for (int i = 0; i < 2; ++i)
+		for (int i = 0; i < nr; ++i)
 			vol *= r[i].domain().max()-r[i].domain().min();
-
 		totalVol+=vol;
 
-		double pr_prior = 1;
-		for (int i = 0; i < 2; ++i)
+
+		vector<double> rMin(nr);
+		vector<double> rMax(nr);
+		for (int i = 0; i < nr; ++i)
 		{
-			double stddev = ((lambda[i]==670)?0.006:0.005) * rr[i];
-			pr_prior *= (r[i].domain().max()-r[i].domain().min())/(6*stddev);
+			rMax[i] = r[i].domain().max();
+			rMin[i] = r[i].domain().min();
 		}
 
-		double pr_post = 1;
-		for (int i = 0; i < 2; ++i)
-		{
-			double mean = rr[i];
-			double stddev = ((lambda[i]==670)?0.006:0.005) * rr[i];
-
-			if (r[i].domain().max()>r[i].domain().min())
-				pr_post *= gaussPrimitive(r[i].domain().max(),mean,stddev)-gaussPrimitive(r[i].domain().min(),mean,stddev);
-			else
-				pr_post *= exp(-pow(r[i].domain().max()-mean,2.0)/(2*stddev*stddev))/(stddev*sqrt(2*M_PI));
-
-		}
-
-//		double pr_post = gaussIntegral(r,rr,lambda);
 
 		Solution solution = {chl.domain().min(),chl.domain().max(),
 							  nppm.domain().min(),nppm.domain().max(),
 							  a_cdom_440.domain().min(),a_cdom_440.domain().max(),
-							  vol,
-							  pr_prior,
-							  pr_post};
+							  rMin,
+							  rMax,
+							  vol};
 
 
 		solutions.push_back(solution);
@@ -313,24 +305,90 @@ int solve(vector<int>& lambda, vector<double>& rr,
 
 	cout << solver.getStats() << endl;
 
-//	double xmin = limits<double>::posInf();
-//	double xmax = limits<double>::negInf();
-//	for (auto it = solutions.begin(); it != solutions.end(); ++it)
-//	{
-//		xmin = std::min(xmin,it->chlMin);
-//		xmax = std::max(xmax,it->chlMax);
-//	}
-//	double delta = (xmax-xmin)/100.0;
-//	for (double x = xmin; x < xmax; x+=delta)
-//	{
-//		double acc = 0;
-//		for (auto it = solutions.begin(); it != solutions.end(); ++it)
-//			if (it->chlMin<=x+delta and it->chlMax>=x)
-//				acc +=
-//	}
-	double acc = 0;
+	// compute p(r) marginal distributions (two steps)
+	vector<map<double,double> > pr_prior_dist(nr);
+
+	// step 1: compute increments
+	for (int i = 0; i < nr; ++i)
+	{
+		for (auto it = solutions.begin(); it != solutions.end(); ++it)
+		{
+			const double p = (it->vol/totalVol)/(it->rMax[i]-it->rMin[i]);
+			auto sit = pr_prior_dist[i].lower_bound(it->rMin[i]);
+			if (sit!=pr_prior_dist[i].end() and sit->first == it->rMin[i])
+				sit->second += p;
+			else
+				pr_prior_dist[i][it->rMin[i]] = p;
+			sit = pr_prior_dist[i].lower_bound(it->rMax[i]);
+			if (sit!=pr_prior_dist[i].end() and sit->first == it->rMax[i])
+				sit->second -= p;
+			else
+				pr_prior_dist[i][it->rMax[i]] = -p;
+		}
+	}
+	// step 2: accumulate increments
+	for (int i = 0; i < nr; ++i)
+	{
+		double acc = 0;
+		double acc_check = 0;
+		double prev_first = 0;
+		double prev_second = 0;
+		for (auto sit = pr_prior_dist[i].begin() ; sit != pr_prior_dist[i].end(); ++sit)
+		{
+			acc += sit->second;
+			sit->second = acc;
+			acc_check += prev_second * (sit->first - prev_first);
+			prev_first = sit->first;
+			prev_second = sit->second;
+		}
+		assert(std::abs(acc)<=0.0001);
+		assert(std::abs(acc_check-1)<=0.0001);
+	}
+
+	double acc=0;
 	for (auto it = solutions.begin(); it != solutions.end(); ++it)
-		acc += ((it->vol/(totalVol))/it->pr_prior)*it->pr_post;
+	{
+		// compute prior joint probability p(xyz,r)
+		double pjoint_prior = it->vol/totalVol;
+
+		// compute (integrate) marginal p(r) for current r
+		double pr_prior = 1;
+		for (int i = 0; i < nr; ++i)
+		{
+			double pri_prior = 0;
+			auto sit = pr_prior_dist[i].lower_bound(it->rMin[i]);
+			assert(sit != pr_prior_dist[i].end() and sit->first == it->rMin[i]);
+			auto prev_sit = sit;
+			++sit;
+			for ( ; sit != pr_prior_dist[i].upper_bound(it->rMax[i]); ++sit, ++prev_sit)
+				pri_prior += prev_sit->second * (sit->first-prev_sit->first);
+			assert(pri_prior>=0 and pri_prior<=1);
+			pr_prior *= pri_prior;
+		}
+		assert(pr_prior>=0 and pr_prior<=1);
+
+		// compute conditional p(xyz|r)
+		double pcond = pjoint_prior/pr_prior;
+		cout << pjoint_prior << "/" << pr_prior << "=" << pcond << endl;
+		assert(pcond>=0 and pcond <= 1);
+
+		// compute p(r) assuming normal distribution
+		double pr_post = 1;
+		for (int i = 0; i < nr; ++i)
+		{
+			double mean = rr[i];
+			double stddev = ((lambda[i]==670)?0.006:0.005) * rr[i];
+
+			if (it->rMax[i]>it->rMin[i])
+				pr_post *= gaussPrimitive(it->rMax[i],mean,stddev)-gaussPrimitive(it->rMin[i],mean,stddev);
+			else
+				pr_post *= exp(-pow(it->rMax[i]-mean,2.0)/(2*stddev*stddev))/(stddev*sqrt(2*M_PI));
+		}
+
+		// compute new joint distribuion
+		double pjoint_post = pcond*pr_post;
+		acc += pjoint_post;
+	}
 	cout << "acc = " << acc << endl;
 	return 1;
 

@@ -639,10 +639,10 @@ struct BndFilterView2<SumEquals,Seq<Eval>,View1,Eval,View2> : IFilter
 					newx[c++] = x[i].getObj();
 				else
 					s += x[i].min();
-			postBndFilter(store,newx[0]+newx[1]+newx[2]==v.value()-s);
+			bool ret = postBndFilter(store,newx[0]+newx[1]+newx[2]==v.value()-s);
 			setInQueue(noQueue);
 			detach(pOwner);
-			return true;
+			return ret;
 		}
 		else
 		if (x.size()-nground == 2)
@@ -655,10 +655,10 @@ struct BndFilterView2<SumEquals,Seq<Eval>,View1,Eval,View2> : IFilter
 					newx[c++] = x[i].getObj();
 				else
 					s += x[i].min();
-			postBndFilter(store,newx[0]+newx[1]==v.value()-s);
+			bool ret = postBndFilter(store,newx[0]+newx[1]==v.value()-s);
 			setInQueue(noQueue);
 			detach(pOwner);
-			return true;
+			return ret;
 		}
 		else
 		if (x.size()-nground == 1)

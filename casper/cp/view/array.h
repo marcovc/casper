@@ -829,6 +829,28 @@ struct BndViewRel2<SumProduct,View1,View2,Eval> :
 
 };
 
+
+// dom view over element expression
+template<class View1,class Eval>
+struct DomView<Eval,Rel2<Element,View1,Par<int> > >
+{
+	typedef typename Casper::Traits::GetElem<View1>::Type	Elem;
+	typedef typename Traits::GetDom<Elem>::Type	Dom;
+	DomView(Store& store,const Rel2<Element,View1,Par<int> >& p) :
+		store(store),v(store,p.p1),i(p.p2.value()) {}
+	Dom*	operator->()			{	return &*v[i];	}
+	Dom*	operator->() const	{	return const_cast<Dom*>(&*v[i]);	}
+	Dom&	operator*()				{	return *v[i];	}
+	Dom&	operator*() const	{	return const_cast<Dom&>(*v[i]); }
+	Rel2<Element,View1,Par<int> > getObj() const
+	{	return Rel2<Element,View1,Par<int> >(v.getObj(),Par<int>(store,i));}
+
+	Store& store;
+	DomArrayView<Eval,View1>	v;
+	const int	i;
+//	Dom&	d;
+};
+
 } // CP
 
 

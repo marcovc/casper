@@ -300,7 +300,7 @@ struct ChkViewRel3<Intersect,Set<Elem>,View1,Set<Elem>,View2,
 
 // FIXME: not tested at all
 template<class Elem,class View1,class View2,class View3>
-struct ChkViewRel3<Union,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3>
+struct ChkViewRel3<UnionEqual,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3>
 {
 	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
 	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
@@ -335,15 +335,15 @@ struct ChkViewRel3<Union,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3>
 		return store.post(union_(x.getObj(),y.getObj(),z.getObj()));
 	}
 	bool setToFalse()
-	{	throw Exception::NoFilter("not union(set,set,set)");	}
+	{	throw Exception::NoFilter("not unionEqual(set,set,set)");	}
 
 	void attach(INotifiable* f)
 	{ 	pOwner=f; x->attachOnDomain(f); y->attachOnDomain(f); z->attachOnDomain(f);}
 	void detach(INotifiable* f)
 	{	x->detachOnDomain(f); y->detachOnDomain(f); z->detachOnDomain(f);	}
 
-	Rel3<Union,View1,View2,View3> getObj()  const
-	{ 	return Rel3<Union,View1,View2,View3>(x.getObj(),y.getObj(),z.getObj());	}
+	Rel3<UnionEqual,View1,View2,View3> getObj()  const
+	{ 	return Rel3<UnionEqual,View1,View2,View3>(x.getObj(),y.getObj(),z.getObj());	}
 
 	Store& 	store;
 	DomView<Set<Elem>,View1>	x;

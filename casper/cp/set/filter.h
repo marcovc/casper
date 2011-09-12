@@ -937,6 +937,7 @@ struct BndFilterView3<UnionEqual,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3
 	Reversible<bool>			first;
 };
 
+
 /**
  * 	Enforces bound consistency on the union(setArray,set) constraint.
  */

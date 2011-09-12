@@ -42,7 +42,13 @@ struct PostBndFilter2<SumEqual,Set<Elem>,View1,Elem,View2>
 		{ return e; }
 	};
 	static bool post(Store& s, const View1& v1, const View2& v2)
-	{	return s.post(sumEqual(v1,Eval<Elem>(),v2));	}
+	{
+		return s.post(new (s) BndFilterView3<SumEqual,Set<int>,View1,
+													  Eval<Elem>,Eval<Elem>,
+													  int,View2>(s,v1,Eval<Elem>(),v2));
+
+	//	return s.post(sumEqual(v1,Eval<Elem>(),v2));
+	}
 };
 
 //#define CASPER_SETSUM_N
