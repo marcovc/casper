@@ -1260,24 +1260,18 @@ struct BndViewRel2<Element,View1,View2,Eval> :
 		s.post(elementEqual(p1,p2,v));
 		return Super(s,v);
 	}
-	// temp
-#if 0
-	typedef Rel2<Element,View1,View2>	Viewed;
-	Viewed getObj()  const
-	{	return Viewed(viewed.p1,idx.getObj());	}
-#else
-	//typedef Elem	Viewed;
+
 	Rel2<Element,View1,View2> getObj() const
-	{	return r; /*Super::getObj(); */}
-#endif
+	{	return Rel2<Element,View1,View2>(v1,idx.getObj()); }
+
 	BndViewRel2(Store& store,const View1& p1, const View2& p2) :
 		Super(getSuper(store,p1,p2)),
 		store(store),
-		r(rel<Element>(p1,p2)),idx(store,p2)
+		v1(p1),idx(store,p2)
 	{}
 
 	Store& store;
-	Rel2<Element,View1,View2> r;
+	View1 v1;
 	ValView<int,View2> idx;
 };
 #else
