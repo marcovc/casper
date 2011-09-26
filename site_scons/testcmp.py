@@ -23,10 +23,13 @@ def compare(file1,file2):
 
   tgavg=1.0
   countPositive = 0
+  countFaster = 0
   for i in secs1.keys():
     if  float(secs1[i])>0 and float(secs2[i])>0:
       countPositive+=1
       tgavg *= float(secs2[i])/float(secs1[i])
+      if float(secs2[i])>float(secs1[i]):
+	countFaster += 1
   tgavg=pow(tgavg,1.0/countPositive)
 
   kbs1=getTestsField(file1,"number(kb)")
@@ -37,7 +40,7 @@ def compare(file1,file2):
     mgavg *= float(kbs2[i])/float(kbs1[i])
   mgavg=pow(mgavg,1.0/len(kbs1.keys()))
   
-  return (couteq,cerreq,tgavg,mgavg)
+  return (couteq,cerreq,tgavg,mgavg,float(countFaster)/float(countPositive))
 
 if __name__ == "__main__":
 
@@ -51,10 +54,11 @@ if __name__ == "__main__":
 
   args = parser.parse_args()
 
-  (couteq,cerreq,tgavg,mgavg) = compare(args.file1[0],args.file2[0])
+  (couteq,cerreq,tgavg,mgavg,favg) = compare(args.file1[0],args.file2[0])
   if not couteq:
     print "different stdout!"
   if not cerreq:
     print "different stderr!"
   print "average time ratio (file2/file1) =",tgavg
   print "average memory ratio (file2/file1) =",mgavg
+  print "ratio of problems solved faster by file2 =",favg

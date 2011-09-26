@@ -795,13 +795,14 @@ def runTests(env,target,source):
 	cmd = [source[0].abspath]+benchArgs
 	if not subprocess.call(cmd):
 		import testcmp
-		(couteq,cerreq,tgavg,mgavg) = testcmp.compare("test/BenchmarkResults.xml.correct","test/BenchmarkResults.xml")
+		(couteq,cerreq,tgavg,mgavg,favg) = testcmp.compare("test/BenchmarkResults.xml.correct","test/BenchmarkResults.xml")
 		if not couteq:
 			print "FAILED: different stdout!"
 		if not cerreq:
 			print "FAILED: different stderr!"
 		print "avg time ratio of newfile/oldfile:",tgavg
 		print "avg mem ratio of newfile/oldfile:",mgavg
+		print "ratio of problems solved faster in newfile:",favg
 		
 testCmd = Command("tests.passed",benchExec,runTests)
 Depends(testCmd,example_targets+[File(benchExec)])
