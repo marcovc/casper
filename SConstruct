@@ -164,7 +164,7 @@ import os
 ########### distribution info ###########
 
 casper_version_major = 0
-casper_version_minor = 3
+casper_version_minor = 4
 casper_version_release = 0
 
 casper_version = str(casper_version_major)+'.'+\
