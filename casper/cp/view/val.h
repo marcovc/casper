@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -57,7 +57,7 @@ struct ValView;
 
 /**
  * 	ValView over a generic view. View must be convertible to Eval.
- * 	\ingroup Views
+ * 	\ingroup ValViews
  **/
 
 template<class Eval,class View>
@@ -70,36 +70,36 @@ struct ValView : ValChkViewWrapper<Eval,View>
 };
 
 
-template<class F,class View1,class Eval>
-struct ValViewRel1 : ValChkViewWrapper<Eval,Rel1<F,View1> >
+template<class F,class Expr1,class Eval>
+struct ValViewRel1 : ValChkViewWrapper<Eval,Rel1<F,Expr1> >
 {
 	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
 
-	ValViewRel1(Store& store, const View1& v) :
-		ValChkViewWrapper<Eval,Rel1<F,View1> >(store,rel<F>(v)) {}
+	ValViewRel1(Store& store, const Expr1& v) :
+		ValChkViewWrapper<Eval,Rel1<F,Expr1> >(store,rel<F>(v)) {}
 };
 
-template<class F,class View1,class View2,class Eval>
-struct ValViewRel2 : ValChkViewWrapper<Eval,Rel2<F,View1,View2> >
+template<class F,class Expr1,class Expr2,class Eval>
+struct ValViewRel2 : ValChkViewWrapper<Eval,Rel2<F,Expr1,Expr2> >
 {
 	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
 
-	ValViewRel2(Store& store, const View1& v1, const View2& v2) :
-		ValChkViewWrapper<Eval,Rel2<F,View1,View2> >(store,rel<F>(v1,v2)) {}
+	ValViewRel2(Store& store, const Expr1& v1, const Expr2& v2) :
+		ValChkViewWrapper<Eval,Rel2<F,Expr1,Expr2> >(store,rel<F>(v1,v2)) {}
 };
 
-template<class F,class View1,class View2,class View3,class Eval>
-struct ValViewRel3 : ValChkViewWrapper<Eval,Rel3<F,View1,View2,View3> >
+template<class F,class Expr1,class Expr2,class Expr3,class Eval>
+struct ValViewRel3 : ValChkViewWrapper<Eval,Rel3<F,Expr1,Expr2,Expr3> >
 {
 	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
 
-	ValViewRel3(Store& store, const View1& v1, const View2& v2,const View3& v3) :
-		ValChkViewWrapper<Eval,Rel3<F,View1,View2,View3> >(store,rel<F>(v1,v2,v3)) {}
+	ValViewRel3(Store& store, const Expr1& v1, const Expr2& v2,const Expr3& v3) :
+		ValChkViewWrapper<Eval,Rel3<F,Expr1,Expr2,Expr3> >(store,rel<F>(v1,v2,v3)) {}
 };
 
 /**
- * 	ValView over a literal type.
- * 	\ingroup Views
+ * 	ValView over a literal.
+ * 	\ingroup ValViews
  **/
 template<class Eval>
 struct ValView<Eval,Eval>
@@ -117,9 +117,8 @@ struct ValView<Eval,Eval>
 };
 
 /**
- * 	int ValView over a uint literal type.
- *  (for convenience)
- * 	\ingroup Views
+ * 	ValView over a uint literal (for convenience).
+ * 	\ingroup ValViews
  **/
 template<>
 struct ValView<int,uint>
@@ -161,7 +160,7 @@ template<class,class,class,class>	struct ValViewRel2;
 template<class,class,class,class,class>	struct ValViewRel3;
 
 
-/**
+/*
  * 	ValView over a Rel1 relation -> defer to ValViewRel1.
  * 	\ingroup Views
  **/
@@ -175,34 +174,34 @@ struct ValView<Eval,Rel1<F,View> > : ValViewRel1<F,View,Eval>
 		ValViewRel1<F,View,Eval>(v) {}
 };
 
-/**
+/*
  * 	ValView over a Rel2 relation -> defer to ValViewRel2.
  * 	\ingroup Views
  **/
-template<class Eval,class F,class View1,class View2>
-struct ValView<Eval,Rel2<F,View1,View2> > :
-	ValViewRel2<F,View1,View2,Eval>
+template<class Eval,class F,class Expr1,class Expr2>
+struct ValView<Eval,Rel2<F,Expr1,Expr2> > :
+	ValViewRel2<F,Expr1,Expr2,Eval>
 {
-	ValView(Store& store, const Rel2<F,View1,View2>& r) :
-		ValViewRel2<F,View1,View2,Eval>(store,r.p1,r.p2) {}
+	ValView(Store& store, const Rel2<F,Expr1,Expr2>& r) :
+		ValViewRel2<F,Expr1,Expr2,Eval>(store,r.p1,r.p2) {}
 	// not sure if the below constructor is ever used
-	ValView(Store& store, const ValViewRel2<F,View1,View2,Eval>& v) :
-		ValViewRel2<F,View1,View2,Eval>(v) {}
+	ValView(Store& store, const ValViewRel2<F,Expr1,Expr2,Eval>& v) :
+		ValViewRel2<F,Expr1,Expr2,Eval>(v) {}
 };
 
-/**
+/*
  * 	ValView over a Rel3 relation -> defer to ValViewRel3.
  * 	\ingroup Views
  **/
-template<class Eval,class F,class View1,class View2,class View3>
-struct ValView<Eval,Rel3<F,View1,View2,View3> > :
-	ValViewRel3<F,View1,View2,View3,Eval>
+template<class Eval,class F,class Expr1,class Expr2,class Expr3>
+struct ValView<Eval,Rel3<F,Expr1,Expr2,Expr3> > :
+	ValViewRel3<F,Expr1,Expr2,Expr3,Eval>
 {
-	ValView(Store& store, const Rel3<F,View1,View2,View3>& r) :
-		ValViewRel3<F,View1,View2,View3,Eval>(store,r.p1,r.p2,r.p3) {}
+	ValView(Store& store, const Rel3<F,Expr1,Expr2,Expr3>& r) :
+		ValViewRel3<F,Expr1,Expr2,Expr3,Eval>(store,r.p1,r.p2,r.p3) {}
 };
 
-/**
+/*
  * 	ValView over a ValExpr.
  * 	\ingroup Views
  **/
@@ -216,6 +215,10 @@ struct ValView<Eval,ValExpr<Eval> > : ValExpr<Eval>
 
 // conversion
 
+/**
+ * 	ValView over a type cast expression.
+ *  \ingroup ValViews
+ */
 template<class View,class Eval>
 struct ValViewRel1<Cast<Eval>,View,Eval>
 {
@@ -234,8 +237,8 @@ struct ValViewRel1<Cast<Eval>,View,Eval>
 };
 
 /**
- * 	ValView over symmetric.
- * 	\ingroup Views
+ * 	ValView over the symmetric of an expression.
+ * 	\ingroup ValViews
  **/
 template<class View,class Eval>
 struct ValViewRel1<Sym,View,Eval>
@@ -252,8 +255,8 @@ struct ValViewRel1<Sym,View,Eval>
 };
 
 /**
- * 	ValView over negation.
- * 	\ingroup Views
+ * 	ValView over the negation of an expression.
+ * 	\ingroup ValViews
  **/
 template<class View>
 struct ValViewRel1<Not,View,bool>
@@ -272,13 +275,13 @@ struct ValViewRel1<Not,View,bool>
 // logical
 
 /**
- * 	ValView over conjunction.
- * 	\ingroup Views
+ * 	ValView over the conjunction of two expressions.
+ * 	\ingroup ValViews
  **/
-template<class View1,class View2>
-struct ValViewRel2<And,View1,View2,bool>
+template<class Expr1,class Expr2>
+struct ValViewRel2<And,Expr1,Expr2,bool>
 {
-	ValViewRel2(Store& store, const View1& p1, const View2& p2) :
+	ValViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 	bool value() const { return p1.value() && p2.value(); }
 	bool setValue(const bool& val)
@@ -299,20 +302,20 @@ struct ValViewRel2<And,View1,View2,bool>
 	}
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
-	Rel2<And,View1,View2>	getObj() const
-	{	return Rel2<And,View1,View2>(p1.getObj(),p2.getObj());}
-	ValView<bool,View1>	p1;
-	ValView<bool,View2>	p2;
+	Rel2<And,Expr1,Expr2>	getObj() const
+	{	return Rel2<And,Expr1,Expr2>(p1.getObj(),p2.getObj());}
+	ValView<bool,Expr1>	p1;
+	ValView<bool,Expr2>	p2;
 };
 
 /**
- * 	ValView over disjunction.
- * 	\ingroup Views
+ * 	ValView over the disjunction of two expressions.
+ * 	\ingroup ValViews
  **/
-template<class View1,class View2>
-struct ValViewRel2<Or,View1,View2,bool>
+template<class Expr1,class Expr2>
+struct ValViewRel2<Or,Expr1,Expr2,bool>
 {
-	ValViewRel2(Store& store,const View1& p1, const View2& p2) :
+	ValViewRel2(Store& store,const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) 	{}
 	bool value() const { return p1.value() or p2.value(); }
 	bool setValue(const bool& val)
@@ -334,21 +337,21 @@ struct ValViewRel2<Or,View1,View2,bool>
 
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-	Rel2<Or,View1,View2>	getObj() const
-	{	return Rel2<Or,View1,View2>(p1.getObj(),p2.getObj());}
+	Rel2<Or,Expr1,Expr2>	getObj() const
+	{	return Rel2<Or,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
-	ValView<bool,View1>	p1;
-	ValView<bool,View2>	p2;
+	ValView<bool,Expr1>	p1;
+	ValView<bool,Expr2>	p2;
 };
 
 /**
- * 	ValView over XOR.
- * 	\ingroup Views
+ * 	ValView over the exclusive disjunction of two expressions.
+ * 	\ingroup ValViews
  **/
-template<class View1,class View2>
-struct ValViewRel2<XOr,View1,View2,bool>
+template<class Expr1,class Expr2>
+struct ValViewRel2<XOr,Expr1,Expr2,bool>
 {
-	ValViewRel2(Store& store,const View1& p1, const View2& p2) :
+	ValViewRel2(Store& store,const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) 	{}
 	bool value() const { return p1.value() ^ p2.value(); }
 	bool setValue(const bool& val)
@@ -362,26 +365,26 @@ struct ValViewRel2<XOr,View1,View2,bool>
 	bool ground() const { return p1.ground() and p2.ground(); }
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-	Rel2<XOr,View1,View2>	getObj() const
-	{	return Rel2<XOr,View1,View2>(p1.getObj(),p2.getObj());}
+	Rel2<XOr,Expr1,Expr2>	getObj() const
+	{	return Rel2<XOr,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
-	ValView<bool,View1>	p1;
-	ValView<bool,View2>	p2;
+	ValView<bool,Expr1>	p1;
+	ValView<bool,Expr2>	p2;
 };
 
 // arithmetic
 
 /**
- * 	ValView over addition.
- * 	\ingroup Views
+ * 	ValView over the addition of two expressions.
+ * 	\ingroup ValViews
  **/
-template<class View1,class View2,class Eval>
-struct ValViewRel2<Add,View1,View2,Eval>
+template<class Expr1,class Expr2,class Eval>
+struct ValViewRel2<Add,Expr1,Expr2,Eval>
 {
-	typedef typename Casper::Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Casper::Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Casper::Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Casper::Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ValViewRel2(Store& store,const View1& p1, const View2& p2) :
+	ValViewRel2(Store& store,const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 	Eval value() const { return p1.value() + p2.value(); }
 	bool setValue(const Eval& val)
@@ -395,24 +398,24 @@ struct ValViewRel2<Add,View1,View2,Eval>
 	bool ground() const { return p1.ground() && p2.ground(); }
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-	Rel2<Add,View1,View2>	getObj() const
-	{	return Rel2<Add,View1,View2>(p1.getObj(),p2.getObj());}
+	Rel2<Add,Expr1,Expr2>	getObj() const
+	{	return Rel2<Add,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
-	ValView<View1Eval,View1>	p1;
-	ValView<View2Eval,View2>	p2;
+	ValView<View1Eval,Expr1>	p1;
+	ValView<View2Eval,Expr2>	p2;
 };
 
 /**
- * 	ValView over subtraction.
- * 	\ingroup Views
+ * 	ValView over the subtraction of two expressions.
+ * 	\ingroup ValViews
  **/
-template<class View1,class View2,class Eval>
-struct ValViewRel2<Sub,View1,View2,Eval>
+template<class Expr1,class Expr2,class Eval>
+struct ValViewRel2<Sub,Expr1,Expr2,Eval>
 {
-	typedef typename Casper::Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Casper::Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Casper::Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Casper::Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ValViewRel2(Store& store, const View1& p1, const View2& p2) :
+	ValViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 	Eval value() const { return p1.value() - p2.value(); }
 	bool setValue(const Eval& val)
@@ -426,24 +429,24 @@ struct ValViewRel2<Sub,View1,View2,Eval>
 	bool ground() const { return p1.ground() and p2.ground(); }
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
-	Rel2<Sub,View1,View2>	getObj() const
-	{	return Rel2<Sub,View1,View2>(p1.getObj(),p2.getObj());}
+	Rel2<Sub,Expr1,Expr2>	getObj() const
+	{	return Rel2<Sub,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
-	ValView<View1Eval,View1>	p1;
-	ValView<View2Eval,View2>	p2;
+	ValView<View1Eval,Expr1>	p1;
+	ValView<View2Eval,Expr2>	p2;
 };
 
 /**
- * 	ValView over multiplication.
- * 	\ingroup Views
+ * 	ValView over the multiplication of two expressions.
+ * 	\ingroup ValViews
  **/
-template<class View1,class View2,class Eval>
-struct ValViewRel2<Mul,View1,View2,Eval>
+template<class Expr1,class Expr2,class Eval>
+struct ValViewRel2<Mul,Expr1,Expr2,Eval>
 {
-	typedef typename Casper::Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Casper::Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Casper::Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Casper::Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ValViewRel2(Store& store, const View1& p1, const View2& p2) :
+	ValViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 	Eval value() const { return p1.value() * p2.value(); }
 	bool ground() const { return p1.ground() && p2.ground(); }
@@ -457,15 +460,15 @@ struct ValViewRel2<Mul,View1,View2,Eval>
 	}
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-	Rel2<Mul,View1,View2>	getObj() const
-	{	return Rel2<Mul,View1,View2>(p1.getObj(),p2.getObj());}
+	Rel2<Mul,Expr1,Expr2>	getObj() const
+	{	return Rel2<Mul,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
-	ValView<View1Eval,View1>	p1;
-	ValView<View2Eval,View2>	p2;
+	ValView<View1Eval,Expr1>	p1;
+	ValView<View2Eval,Expr2>	p2;
 };
 
 
-/**
+/*
  * 	ValView over BndExpr.
  * 	\ingroup Views
  **/
@@ -485,7 +488,7 @@ struct ValView<Eval,BndExpr<Eval> >
 	BndExpr<Eval>	p1;
 };
 
-/**
+/*
  * 	ValView over DomExpr.
  * 	\ingroup Views
  **/
@@ -506,12 +509,15 @@ struct ValView<Eval,DomExpr<Eval,Dom> >
 	DomExpr<Eval,Dom>	p1;
 };
 
-
-template<class View1,class View2,class Eval>
-struct ValViewRel2<Element,View1,View2,Eval>
+/**
+ * 	ValView over the subscript relation (element).
+ * 	\ingroup ValViews
+ */
+template<class Expr1,class Expr2,class Eval>
+struct ValViewRel2<Element,Expr1,Expr2,Eval>
 {
-	typedef Rel2<Element,View1,View2>	Rel;
-	ValViewRel2(Store& store,const View1& p1, const View2& p2) :
+	typedef Rel2<Element,Expr1,Expr2>	Rel;
+	ValViewRel2(Store& store,const Expr1& p1, const Expr2& p2) :
 		array(store,p1),index(store,p2)
 		{}
 	Eval value() const
@@ -541,22 +547,22 @@ struct ValViewRel2<Element,View1,View2,Eval>
 	}
 	void attach(INotifiable* f) { 	array.attach(f);index.attach(f); }
 	void detach(INotifiable* f) {	array.detach(f);index.detach(f); }
-	Rel2<Element,View1,View2>	getObj() const
-	{	return Rel2<Element,View1,View2>(array.getObj(),index.getObj());}
+	Rel2<Element,Expr1,Expr2>	getObj() const
+	{	return Rel2<Element,Expr1,Expr2>(array.getObj(),index.getObj());}
 
-	ValArrayView<Eval,View1>	array;
-	ValView<int,View2>			index;
+	ValArrayView<Eval,Expr1>	array;
+	ValView<int,Expr2>			index;
 };
 
 /**
- * 	ValView over absolute value.
- * 	\ingroup Views
+ * 	ValView over the absolute value of an expression.
+ * 	\ingroup ValViews
  **/
-template<class View1,class Eval>
-struct ValViewRel1<Abs,View1,Eval>
+template<class Expr1,class Eval>
+struct ValViewRel1<Abs,Expr1,Eval>
 {
-	typedef typename Casper::Traits::GetEval<View1>::Type	View1Eval;
-	ValViewRel1(Store& store, const View1& p1) :
+	typedef typename Casper::Traits::GetEval<Expr1>::Type	View1Eval;
+	ValViewRel1(Store& store, const Expr1& p1) :
 		p1(store,p1) {}
 
 	Eval value() const { assert(ground()); return std::abs(p1.value()); }
@@ -571,15 +577,15 @@ struct ValViewRel1<Abs,View1,Eval>
 	bool ground() const { return p1.ground(); }
 	void attach(INotifiable* f) { 	p1.attach(f); }
 	void detach(INotifiable* f) {	p1.detach(f); }
-	Rel1<Abs,View1>	getObj() const
-	{	return Rel1<Abs,View1>(p1.getObj());}
+	Rel1<Abs,Expr1>	getObj() const
+	{	return Rel1<Abs,Expr1>(p1.getObj());}
 
-	ValView<View1Eval,View1>	p1;
+	ValView<View1Eval,Expr1>	p1;
 };
 
 /**
- * 	ValView over Par.
- * 	\ingroup Views
+ * 	ValView over a parameterized expression.
+ * 	\ingroup ValViews
  **/
 template<class Eval>
 struct ValView<Eval,Casper::Par<Eval> >
@@ -605,13 +611,13 @@ template<class> struct CChkView;
 
 
 /**
- *	ValView over an if-then-else expression
- *	\ingroup Views
+ *	ValView over an IfThenElse expression.
+ *	\ingroup ValViews
  **/
-template<class Eval,class View1,class View2,class View3>
-struct ValViewRel3<IfThenElse,View1,View2,View3,Eval>
+template<class Eval,class Expr1,class Expr2,class Expr3>
+struct ValViewRel3<IfThenElse,Expr1,Expr2,Expr3,Eval>
 {
-	ValViewRel3(Store& store, const View1& p1, const View2& p2, const View3& p3) :
+	ValViewRel3(Store& store, const Expr1& p1, const Expr2& p2, const Expr3& p3) :
 		c1(store,p1),p2(store,p2),p3(store,p3)
 		{}
 	Eval value() const
@@ -651,12 +657,12 @@ struct ValViewRel3<IfThenElse,View1,View2,View3,Eval>
 
 	void attach(INotifiable* f) { 	c1.attach(f); p2.attach(f);	p3.attach(f); }
 	void detach(INotifiable* f) {	c1.detach(f); p2.detach(f);	p3.detach(f); }
-	Rel3<IfThenElse,View1,View2,View3> getObj()  const
-	{ 	return Rel3<IfThenElse,View1,View2,View3>(c1.getObj(),p2.getObj(),p3.getObj());	}
+	Rel3<IfThenElse,Expr1,Expr2,Expr3> getObj()  const
+	{ 	return Rel3<IfThenElse,Expr1,Expr2,Expr3>(c1.getObj(),p2.getObj(),p3.getObj());	}
 
-	CChkView<View1> 	c1;
-	ValView<Eval,View2>	p2;
-	ValView<Eval,View3>	p3;
+	CChkView<Expr1> 	c1;
+	ValView<Eval,Expr2>	p2;
+	ValView<Eval,Expr3>	p3;
 };
 
 template<class Eval,class View>

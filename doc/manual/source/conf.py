@@ -18,7 +18,7 @@ import sys, os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 
-sys.path.append( "/home/marco/other/bin/michaeljones-breathe-69815dc/" )
+sys.path.append( "/home/marco/other/bin/michaeljones-breathe-55fe67c/" )
 
 # -- General configuration -----------------------------------------------------
 
@@ -257,6 +257,6 @@ epub_copyright = u'2011, Marco Correia'
 # Allow duplicate toc entries.
 #epub_tocdup = True
 
-breathe_projects = { u'CaSPER': "/home/marco/projects/casper/casper-"+str(version)+".x/doc/xml" }
+breathe_projects = { u'CaSPER': "/home/marco/projects/casper/repos/doc/xml" }
 
 breathe_default_project = u'CaSPER'

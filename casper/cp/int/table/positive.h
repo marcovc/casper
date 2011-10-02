@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2008-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2008-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -341,17 +341,17 @@ Filter gacSchema(Store& store,const View& v,const Util::StdArray<Eval,1>& ss)
 }
 #endif
 
-template<class Eval,class View1,class View2>
-struct PostBndFilter2<InTable,Seq<Eval>,View1,Seq<Eval>,View2>
+template<class Eval,class Expr1,class Expr2>
+struct PostBndFilter2<InTable,Seq<Eval>,Expr1,Seq<Eval>,Expr2>
 {
-	static bool post(Store& store,const View1& v1, const View2& v2)
+	static bool post(Store& store,const Expr1& v1, const Expr2& v2)
 	{	return store.post(gacSchema(store,v1,v2));	}
 };
 
-template<class Eval,class View1,class View2>
-struct PostDomFilter2<InTable,Seq<Eval>,View1,Seq<Eval>,View2>
+template<class Eval,class Expr1,class Expr2>
+struct PostDomFilter2<InTable,Seq<Eval>,Expr1,Seq<Eval>,Expr2>
 {
-	static bool post(Store& store,const View1& v1, const View2& v2)
+	static bool post(Store& store,const Expr1& v1, const Expr2& v2)
 	{	return store.post(gacSchema(store,v1,v2));	}
 };
 

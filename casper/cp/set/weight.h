@@ -32,8 +32,8 @@
 namespace Casper {
 namespace CP {
 
-template<class Elem,class View1,class View2>
-struct PostBndFilter2<SumEqual,Set<Elem>,View1,Elem,View2>
+template<class Elem,class Expr1,class Expr2>
+struct PostBndFilter2<SumEqual,Set<Elem>,Expr1,Elem,Expr2>
 {
 	template<class T>
 	struct Eval
@@ -41,11 +41,11 @@ struct PostBndFilter2<SumEqual,Set<Elem>,View1,Elem,View2>
 		const T& operator[](const T& e) const
 		{ return e; }
 	};
-	static bool post(Store& s, const View1& v1, const View2& v2)
+	static bool post(Store& s, const Expr1& v1, const Expr2& v2)
 	{
-		return s.post(new (s) BndFilterView3<SumEqual,Set<int>,View1,
+		return s.post(new (s) BndFilterView3<SumEqual,Set<int>,Expr1,
 													  Eval<Elem>,Eval<Elem>,
-													  int,View2>(s,v1,Eval<Elem>(),v2));
+													  int,Expr2>(s,v1,Eval<Elem>(),v2));
 
 	//	return s.post(sumEqual(v1,Eval<Elem>(),v2));
 	}
@@ -336,13 +336,13 @@ bool BndFilterView3<SumEqual,Set<int>,Arg1,
 // (otherwise must use an hashmap for weights)
 // * works with negative weights also
 // * needs testing
-template<class View1,class Weights,class View2>
+template<class Expr1,class Weights,class Expr2>
 struct WeightMax : IFilter
 {
-	typedef typename DomView<Set<int>,View1>::Dom	DomX;
+	typedef typename DomView<Set<int>,Expr1>::Dom	DomX;
 
-	WeightMax(Store& store,const View1& xx,
-			  const Weights& weights,const View2& yy) :
+	WeightMax(Store& store,const Expr1& xx,
+			  const Weights& weights,const Expr2& yy) :
 				  IFilter(store),x(store,xx),
 				  weights(weights),y(store,yy) {}
 
@@ -352,14 +352,14 @@ struct WeightMax : IFilter
 	void detach(INotifiable* f)
 	{	x->detachOnGLB(f); x->detachOnLUB(f); y.detach(f);	}
 
-	DomView<Set<int>,View1>			x;
+	DomView<Set<int>,Expr1>			x;
 	Weights							weights;
-	BndView<int,View2>				y;
+	BndView<int,Expr2>				y;
 	INotifiable*					pOwner;
 };
 
-template<class View1,class Weights,class View2>
-bool WeightMax<View1,Weights,View2>::execute()
+template<class Expr1,class Weights,class Expr2>
+bool WeightMax<Expr1,Weights,Expr2>::execute()
 {
 	// remove every element e where weight[e] > max
 	for (typename DomX::PIterator it = x->beginPoss();
@@ -420,10 +420,10 @@ bool WeightMax<View1,Weights,View2>::execute()
 		return x->card().updateMin(x->inSize()+1);
 }
 
-template<class View1,class Weights,class View2>
-Filter	weightMax(const View1& v1,const Weights& weights,const View2& v2)
+template<class Expr1,class Weights,class Expr2>
+Filter	weightMax(const Expr1& v1,const Weights& weights,const Expr2& v2)
 {	return new (getState(v1,v2).getHeap())
-		WeightMax<View1,Weights,View2>(getState(v1,v2),v1,weights,v2);	}
+		WeightMax<Expr1,Weights,Expr2>(getState(v1,v2),v1,weights,v2);	}
 #endif
 
 } // CP

@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -83,10 +83,10 @@ struct ValFilterView<Rel3<F,T1,T2,T3> > :
  * Enforces the conjunction of two constraints. It succeeds if both
  * constraints are satisfiable, fails otherwise.
  */
-template<class Eval1,class View1,class Eval2,class View2>
-struct ValFilterView2<And,Eval1,View1,Eval2,View2> : IFilter
+template<class Eval1,class Expr1,class Eval2,class Expr2>
+struct ValFilterView2<And,Eval1,Expr1,Eval2,Expr2> : IFilter
 {
-	ValFilterView2(Store& s,const View1& p1, const View2& p2) :
+	ValFilterView2(Store& s,const Expr1& p1, const Expr2& p2) :
 		IFilter(s),store(s),v1(p1),v2(p2) {}
 
 	bool execute()
@@ -101,8 +101,8 @@ struct ValFilterView2<And,Eval1,View1,Eval2,View2> : IFilter
 	void detach(INotifiable* s) {}
 
 	Store&				store;
-	View1	v1;
-	View2	v2;
+	Expr1	v1;
+	Expr2	v2;
 };
 
 #if 0
@@ -124,31 +124,31 @@ struct ValReify
 	Filter	neg;
 };
 
-template<class F,class View1,class Eval>
-struct ValViewRel1 : ValReify<Rel1<F,View1> >
+template<class F,class Expr1,class Eval>
+struct ValViewRel1 : ValReify<Rel1<F,Expr1> >
 {
-	typedef Rel1<F,View1> Rel;
+	typedef Rel1<F,Expr1> Rel;
 	typedef ValReify<Rel> Super;
-	ValViewRel1(CPSolver& solver, const View1& p1) :
+	ValViewRel1(CPSolver& solver, const Expr1& p1) :
 		Super(solver,Rel(p1)) {}
 };
 
-template<class F, class View1,class View2,class Eval>
-struct ValViewRel2 : ValReify<Rel2<F,View1,View2> >
+template<class F, class Expr1,class Expr2,class Eval>
+struct ValViewRel2 : ValReify<Rel2<F,Expr1,Expr2> >
 {
-	typedef Rel2<F,View1,View2> Rel;
+	typedef Rel2<F,Expr1,Expr2> Rel;
 	typedef ValReify<Rel> Super;
-	ValViewRel2(CPSolver& solver, const View1& p1, const View2& p2) :
+	ValViewRel2(CPSolver& solver, const Expr1& p1, const Expr2& p2) :
 		Super(solver,Rel(p1,p2)) {}
 };
 #endif
 
 ///	Enforces equality
 // FIXME: must use setVal when ready
-template<class Eval,class View1,class View2>
-struct ValFilterView2<Equal,Eval,View1,Eval,View2> : IFilter
+template<class Eval,class Expr1,class Expr2>
+struct ValFilterView2<Equal,Eval,Expr1,Eval,Expr2> : IFilter
 {
-	ValFilterView2(Store& store,const View1& p1,const View2& p2)
+	ValFilterView2(Store& store,const Expr1& p1,const Expr2& p2)
 			: IFilter(store),p1(store,p1), p2(store,p2) {}
 
 	bool execute()
@@ -169,16 +169,16 @@ struct ValFilterView2<Equal,Eval,View1,Eval,View2> : IFilter
 	void detach(INotifiable* s)
 	{	p1.detach(s); p2.detach(s);	}
 
-	ValView<Eval,View1>	p1;
-	ValView<Eval,View2>	p2;
+	ValView<Eval,Expr1>	p1;
+	ValView<Eval,Expr2>	p2;
 };
 
 ///	Enforces disequality
 // FIXME: must use setVal when ready
-template<class Eval,class View1,class View2>
-struct ValFilterView2<Distinct,Eval,View1,Eval,View2> : IFilter
+template<class Eval,class Expr1,class Expr2>
+struct ValFilterView2<Distinct,Eval,Expr1,Eval,Expr2> : IFilter
 {
-	ValFilterView2(Store& store,const View1& p1,const View2& p2)
+	ValFilterView2(Store& store,const Expr1& p1,const Expr2& p2)
 		: IFilter(store),p1(store,p1), p2(store,p2) {}
 
 	bool execute()
@@ -194,8 +194,8 @@ struct ValFilterView2<Distinct,Eval,View1,Eval,View2> : IFilter
 	void detach(INotifiable* s)
 	{	p1.detach(s); p2.detach(s);	}
 
-	ValView<Eval,View1>	p1;
-	ValView<Eval,View2>	p2;
+	ValView<Eval,Expr1>	p1;
+	ValView<Eval,Expr2>	p2;
 };
 
 // TODO: Dom expression from filter (reification)

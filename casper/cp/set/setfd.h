@@ -25,6 +25,7 @@
 //#include <casper/set/common.h>
 
 
+
 // required forward declarations
 namespace Casper {
 namespace CP {
@@ -72,7 +73,7 @@ struct SetFDDelta
 	The set keeps track of the last atomic prunning (a removal of a range
 	of contiguous elements), which may be consulted using the delta() method.
 
-	\ingroup Set
+	\ingroup SetDomain CPSetDataStructures
 */
 template<class T = int>
 struct SetFD

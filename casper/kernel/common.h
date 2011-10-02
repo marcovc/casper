@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2005-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2005-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -174,12 +174,8 @@ namespace Detail {
  * See website (http://proteina.di.fct.unl.pt/casper)
 */
 
-/** \defgroup Examples Examples
- * 	Examples of using CaSPER.
- */
-
-/** \defgroup Domains Domains
- * 	Domains of reasoning available in CaSPER.
+/** \defgroup CP CP
+ * 	Constraint Programming module in CaSPER.
  */
 
 /** \defgroup Kernel Kernel
@@ -189,6 +185,10 @@ namespace Detail {
 /** \defgroup Containers Containers
  * 	\ingroup Kernel
  * 	Useful reversible and standard generic containers.
+ */
+
+/** \defgroup Examples Examples
+ * 	Examples of using CaSPER.
  */
 
 };

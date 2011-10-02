@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -16,10 +16,6 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-/** \defgroup Expressions Expressions
- * 	\ingroup Kernel
- * 	Different kind of expressions may be associated with a given relation.
- */
 
 #ifndef _H_CASPER_CP_EXPRESSION
 #define _H_CASPER_CP_EXPRESSION
@@ -32,19 +28,8 @@
 namespace Casper {
 namespace CP {
 
+namespace Detail {
 
-/** \defgroup Views Views
- * 	\ingroup Kernel
- * 	A View imposes a specific interface to generic objects, usually
- *  relations.
- */
-
-/**
- *	Interface to an expression converging to
- *  a value of type \a T. The expression may be evaluated only when ground.
- *
- *  \ingroup Expressions
- */
 template<class T>
 struct IValExpr : INotifier
 {
@@ -63,11 +48,7 @@ struct IValExpr : INotifier
 	Store&				store;
 };
 
-/**
- * Interface to a (contracting) bounded expression. Allows access/update of bounds.
- *
- * \ingroup Expressions
- */
+
 template<class T>
 struct IBndExpr : INotifier
 {
@@ -103,13 +84,7 @@ struct IBndExpr : INotifier
 	Store&			store;
 };
 
-/**
- * 	Interface to a DomExpr. Allows access to every possible value of a given
- *  expression, if necessary by introducing an auxilliary domain variable
- *  (\sa Var).
- *
- * \ingroup Expressions
- */
+
 template<class Dom>
 struct IDomExpr : INotifier
 {
@@ -136,7 +111,7 @@ struct IDomExpr : INotifier
 	Store&				store;
 };
 
-namespace Detail {
+
 
 
 // wrappers
@@ -211,20 +186,18 @@ struct DomExprWrapper : IDomExpr<Dom>
  *********************/
 
 /**
- * A (contracting) bounded expression. Allows access/update of bounds.
+ * A wrapper around a BndView.
  *
- * \note This class is just a reference to an instance of IBndExpr class.
- *
- * \ingroup Expressions
+ * \ingroup CPViews
  */
 template<class Eval>
-struct BndExpr : Util::PImplIdiom<IBndExpr<Eval> >
+struct BndExpr : Util::PImplIdiom<Detail::IBndExpr<Eval> >
 {
 	typedef BndExpr<Eval>	Self;
-	typedef Util::PImplIdiom<IBndExpr<Eval> > Super;
+	typedef Util::PImplIdiom<Detail::IBndExpr<Eval> > Super;
 
 	/// Creates a bounded expression which references an existing implementation.
-	BndExpr(IBndExpr<Eval>* pImpl) : Super(pImpl) {}
+	BndExpr(Detail::IBndExpr<Eval>* pImpl) : Super(pImpl) {}
 
 	/// Creates a new bounded expression from a generic type \p T1.
 	template<class T1>
@@ -287,24 +260,21 @@ BndExpr<Eval>::BndExpr(Store& store, const T1& t) :
 
 
 /**
- *	An expression converging to a value of type \a T. The expression may be
- *  evaluated only when ground.
+ *	A wrapper around a ValView.
  *
- *  \note This class is just a reference to an instance of IValExpr class.
- *
- *  \ingroup Expressions
+ *  \ingroup CPViews
  */
 template<class Eval>
-struct ValExpr : Util::PImplIdiom<IValExpr<Eval> >
+struct ValExpr : Util::PImplIdiom<Detail::IValExpr<Eval> >
 {
 	/// Expression type.
 	typedef ValExpr<Eval>	Self;
 
 	/// Parent type.
-	typedef Util::PImplIdiom<IValExpr<Eval> > Super;
+	typedef Util::PImplIdiom<Detail::IValExpr<Eval> > Super;
 
 	/// Creates a value expression which references an existing implementation.
-	ValExpr(IValExpr<Eval>* pImpl) : Super(pImpl) {}
+	ValExpr(Detail::IValExpr<Eval>* pImpl) : Super(pImpl) {}
 
 	/// Creates a new value expression from a generic object.
 	template<class T1>
@@ -340,21 +310,17 @@ struct ValExpr : Util::PImplIdiom<IValExpr<Eval> >
  * Domain Expression
  ********************/
 
-namespace Traits {
 template<class T>
 struct GetDefaultDom;
-} // Traits
+
 
 /**
- * 	Allows access to every possible value of a given expression, if necessary
- *  by introducing an auxilliary domain variable (\sa Var).
+ * 	A wrapper around a DomView.
  *
- *  \note This class is just a reference to an instance of IDomExpr class.
- *
- * \ingroup Expressions
+ * \ingroup CPViews
  */
 template<class Eval,class DomT = typename Traits::GetDefaultDom<Eval>::Type>
-struct DomExpr : Util::PImplIdiom<IDomExpr<DomT> >
+struct DomExpr : Util::PImplIdiom<Detail::IDomExpr<DomT> >
 {
 	/// Domain type.
 	typedef	DomT	Dom;
@@ -363,10 +329,10 @@ struct DomExpr : Util::PImplIdiom<IDomExpr<DomT> >
 	typedef DomExpr<Eval,Dom>	Self;
 
 	/// Parent type.
-	typedef Util::PImplIdiom<IDomExpr<Dom> > Super;
+	typedef Util::PImplIdiom<Detail::IDomExpr<Dom> > Super;
 
 	/// Creates a domain expression which references an existing implementation.
-	DomExpr(IDomExpr<DomT>* pImpl) : Super(pImpl) {}
+	DomExpr(Detail::IDomExpr<DomT>* pImpl) : Super(pImpl) {}
 
 	/// Constructor from a generic object.
 	template<class T1>
@@ -403,12 +369,12 @@ struct DomExpr : Util::PImplIdiom<IDomExpr<DomT> >
 	Store&	getStore() const { return Super::pImpl->getStore(); }
 };
 
-namespace Traits {
+template<class Eval>
+struct GetDom;
 template<class Eval,class DomT>
 struct GetDom<DomExpr<Eval,DomT> >
-{	typedef DomT	Type;
-};
-} // Traits
+{	typedef DomT	Type; };
+
 
 typedef BndExpr<int>	IntBndExpr;
 typedef BndExpr<bool>	BoolBndExpr;

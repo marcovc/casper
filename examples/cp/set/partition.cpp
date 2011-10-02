@@ -8,22 +8,17 @@
  *   (at your option) any later version.                                   *
  ***************************************************************************/
 
-#include <casper/cp/set/config.h>
-
 #include <casper/kernel.h>
-#include <casper/cp/solver.h>
 #include <casper/cp/set.h>
 #include <casper/cp/int.h>
-#include <iostream>
-
-#include <casper/cp/set/weight.h>
 #include <casper/util/options.h>
 
 #include <boost/math/special_functions/factorials.hpp>
+#include <iostream>
 
 using namespace Casper;
 using namespace Casper::CP;
-using namespace std;
+//using namespace std;
 
 #if 0
 /**
@@ -392,16 +387,16 @@ void partition(uint nvalues, uint nsets, int optimum = -2)
 	bool ret = solver.solve( greedyLabeling(solver,vars) );
 
 	if (optimum==-2 or optimum>=0)
-		cout << ret << endl << vars << endl;
+		std::cout << ret << std::endl << vars << std::endl;
 	else
 		while (ret)
 		{
-			cout << vars << " : " << maxSums << " optimimum="
-						<< ((float)total)/nsets << endl;
+			std::cout << vars << " : " << maxSums << " optimimum="
+						<< ((float)total)/nsets << std::endl;
 			ret = solver.next();
 		}
-	cout << solver.getStats() << endl
-				 << solver.getCPUTimer() << endl;
+	std::cout << solver.getStats() << std::endl
+				 << solver.getCPUTimer() << std::endl;
 }
 
 
@@ -409,8 +404,8 @@ int main(int argc, char** argv)
 {
 	if (argc != 3 and argc != 4)
 	{
-		cout << "usage: " << argv[0] << " nvalues nsets [optimum]\n";
-		cout << "set optimum=-2 for perfect partition, optimum=-1 for minimization\n";
+		std::cout << "usage: " << argv[0] << " nvalues nsets [optimum]\n";
+		std::cout << "set optimum=-2 for perfect partition, optimum=-1 for minimization\n";
 		return 1;
 	}
 	::partition(atoi(argv[1]),atoi(argv[2]),argc==3?-1:atoi(argv[3]));

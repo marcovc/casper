@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -29,13 +29,10 @@ namespace CP {
 // TODO: the Dom should be stored in the super class IDomExpr
 
 /**
- * 	Provides a specific domain interface to a generic view. This
- * 	interface is inferred from the \a Eval type at compilation time.
- *  The general case is to introduce an auxiliary variable
- *  bounded to the view using an equality constraint. Specializations
- *  of this class typically provide better alternatives.
- *  \ingroup Views
- **/
+ * 	DomView over a generic expression. Tries to decompose the
+ * 	expression creating one auxiliary variable and propagator.
+ * 	\ingroup DomViews
+ */
 template<class Eval,class View,
 		 class DomT = typename Traits::GetDom<View>::Type>
 struct DomView
@@ -67,8 +64,8 @@ struct DomView
 };
 
 /**
- * 	DomView over a Var.
- *  \ingroup Views
+ * 	DomView over a CP variable.
+ *  \ingroup DomViews
  **/
 template<class Eval,class DomT>
 struct DomView<Eval,Var<Eval,DomT>,DomT>
@@ -121,7 +118,7 @@ struct DomView<Eval,DomView<Eval,View,DomT>,DomT> : IDomExpr<DomT>
 };
 #endif
 
-/**
+/*
  * 	DomView over a DomExpr.
  *  \ingroup Views
  **/

@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -29,11 +29,18 @@
 namespace Casper {
 namespace CP {
 
+// this is required since doxygen sometimes
+// doesn't autolink namespace scoped things
+#ifdef DOXYGEN_PARSER
+using namespace Casper;
+using namespace Casper::CP;
+#endif
+
 
 // base:
 
 /**
- * \ingroup Search
+ * \ingroup VariableSelectors
  * Variable selectors are used with the Label goal for defining the variable
  * selection strategy.
  */
@@ -45,7 +52,7 @@ struct IVarSelector
 };
 
 /**
- *  \ingroup Search
+ *  \ingroup ValueSelectors
  *  Value selectors are used with the Label goal for defining the value selection
  *  strategy.
  *
@@ -58,7 +65,7 @@ struct IValSelector
 };
 
 /**
- * \ingroup Search
+ * \ingroup VariableSelectors
  * Wrapper to IVarSelector derived objects.
  */
 struct VarSelector : Util::PImplIdiom<IVarSelector>
@@ -73,7 +80,7 @@ struct VarSelector : Util::PImplIdiom<IVarSelector>
 };
 
 /**
- *  \ingroup Search
+ *  \ingroup ValueSelectors
  * Wrapper to IValSelector derived objects.
  */
 struct ValSelector : Util::PImplIdiom<IValSelector>
@@ -90,8 +97,8 @@ struct ValSelector : Util::PImplIdiom<IValSelector>
 
 struct GroundTermCond
 {
-	template<class Eval,class View>
-	bool operator()(const DomArrayView<Eval,View>& v) const
+	template<class Eval,class Obj>
+	bool operator()(const DomArrayView<Eval,Obj>& v) const
 	{
 		for (uint i = 0; i < v.size(); i++)
 			if (!v[i]->ground())
@@ -103,8 +110,8 @@ struct GroundTermCond
 struct SizeTermCond
 {
 	SizeTermCond(double s) : s(s) {}
-	template<class Eval,class View>
-	bool operator()(const DomArrayView<Eval,View>& v) const
+	template<class Eval,class Obj>
+	bool operator()(const DomArrayView<Eval,Obj>& v) const
 	{
 		for (uint i = 0; i < v.size(); i++)
 			if (v[i]->max()-v[i]->min() > s)
@@ -118,18 +125,18 @@ struct SizeTermCond
 
 namespace Detail {
 
-template<class View> struct SelectValsMin;
-template<class View> struct SelectValsMax;
-template<class View> struct SelectValsRand;
-template<class View> struct SelectValMin;
-template<class View> struct SelectValMax;
+template<class Obj> struct SelectValsMin;
+template<class Obj> struct SelectValsMax;
+template<class Obj> struct SelectValsRand;
+template<class Obj> struct SelectValMin;
+template<class Obj> struct SelectValMax;
 
 // selects the variable which minimizes Evaluator from all possible variables
-template<class View,class TermCond,class Evaluator>
+template<class Obj,class TermCond,class Evaluator>
 struct SelectVarAll : IVarSelector
 {
-	SelectVarAll(Store& store,const View& vars,const TermCond& tc = TermCond()) :
-		doms(store,vars),terminate(tc) {}
+	SelectVarAll(Store& store,const Obj& obj,const TermCond& tc = TermCond()) :
+		doms(store,obj),terminate(tc) {}
 	int select()
 	{
 		typedef typename Evaluator::Eval Eval;
@@ -149,19 +156,19 @@ struct SelectVarAll : IVarSelector
 		assert(bestIdx>=0);
 		return bestIdx;
 	}
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type	ElemEval;
-	DomArrayView<ElemEval,View> doms;
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<Obj>::Type>::Type	ElemEval;
+	DomArrayView<ElemEval,Obj> doms;
 	TermCond terminate;
 	Evaluator ev;
 };
 
 // selects the variable which minimizes Evaluator and which was not selected
 // yet in the current round of selections (round robin)
-template<class View,class TermCond,class Evaluator>
+template<class Obj,class TermCond,class Evaluator>
 struct SelectVarAllRR : IVarSelector
 {
-	SelectVarAllRR(Store& store,const View& vars,const TermCond& tc = TermCond()) :
-		doms(store,vars),terminate(tc),selected(store,doms.size(),false) {}
+	SelectVarAllRR(Store& store,const Obj& obj,const TermCond& tc = TermCond()) :
+		doms(store,obj),terminate(tc),selected(store,doms.size(),false) {}
 
 	int select()
 	{
@@ -191,8 +198,8 @@ struct SelectVarAllRR : IVarSelector
 		selected[bestIdx] = true;
 		return bestIdx;
 	}
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type	ElemEval;
-	DomArrayView<ElemEval,View> doms;
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<Obj>::Type>::Type	ElemEval;
+	DomArrayView<ElemEval,Obj> doms;
 	TermCond terminate;
 	Array<bool> 	selected;
 	Evaluator ev;
@@ -325,26 +332,26 @@ struct MaxDomOverWeightedDegreeEvaluator
 };
 
 /**
- *  \ingroup Search
+ *  \ingroup CPSearch
  * 	Variable heuristic that selects variables lexicographically.
  **/
-template<class View,class TermCond = GroundTermCond>
+template<class Obj,class TermCond = GroundTermCond>
 struct SelectVarLex : IVarSelector
 {
-	SelectVarLex(Store& s,const View& vars,const TermCond& tc = TermCond()) :
-		vars(s,vars),
+	SelectVarLex(Store& s,const Obj& obj,const TermCond& tc = TermCond()) :
+		obj(s,obj),
 		curIdx(s,0),
 		termCond(tc) {}
 	int select()
 	{
-		if (termCond(vars))
+		if (termCond(obj))
 			return -1;
-		if (curIdx >= vars.size())
+		if (curIdx >= obj.size())
 			curIdx = 0;
 		return curIdx++;
 	}
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type	ElemEval;
-	DomArrayView<ElemEval,View> vars;
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<Obj>::Type>::Type	ElemEval;
+	DomArrayView<ElemEval,Obj> obj;
 	Reversible<uint> curIdx;
 	TermCond		termCond;
 };
@@ -352,42 +359,42 @@ struct SelectVarLex : IVarSelector
 }
 
 // FIXME: leaking - must delay Label goal
-template<class View>
-VarSelector selectVarLex(Store& s,const View& view)
-{return new Detail::SelectVarLex<View>(s,view);}
+template<class Obj>
+VarSelector selectVarLex(Store& s,const Obj& obj)
+{return new Detail::SelectVarLex<Obj>(s,obj);}
 
 #define CASPER_DEF_VAR_SELECT(name) \
 namespace Detail { \
-template<class View,class TermCond=GroundTermCond> \
+template<class Obj,class TermCond=GroundTermCond> \
 struct SelectVar##name : \
-	Detail::SelectVarAll<View,TermCond, Detail::name##Evaluator<\
-	typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type> > \
+	Detail::SelectVarAll<Obj,TermCond, Detail::name##Evaluator<\
+	typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<Obj>::Type>::Type> > \
 { \
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type EEval; \
-	SelectVar##name(Store& s,const View& vars,const TermCond& tc = TermCond()) : \
-		Detail::SelectVarAll<View,TermCond,Detail::name##Evaluator<EEval> >(s,vars,tc) {} \
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<Obj>::Type>::Type EEval; \
+	SelectVar##name(Store& s,const Obj& obj,const TermCond& tc = TermCond()) : \
+		Detail::SelectVarAll<Obj,TermCond,Detail::name##Evaluator<EEval> >(s,obj,tc) {} \
 }; \
-template<class View,class TermCond=GroundTermCond> \
-struct SelectVar##name##RR : Detail::SelectVarAllRR<View,TermCond, Detail::name##Evaluator<\
-	typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type> > \
+template<class Obj,class TermCond=GroundTermCond> \
+struct SelectVar##name##RR : Detail::SelectVarAllRR<Obj,TermCond, Detail::name##Evaluator<\
+	typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<Obj>::Type>::Type> > \
 { \
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type EEval; \
-	SelectVar##name##RR(Store& s,const View& vars,const TermCond& tc = TermCond()) : \
-		Detail::SelectVarAllRR<View,TermCond,Detail::name##Evaluator<EEval> >(s,vars,tc) {} \
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<Obj>::Type>::Type EEval; \
+	SelectVar##name##RR(Store& s,const Obj& obj,const TermCond& tc = TermCond()) : \
+		Detail::SelectVarAllRR<Obj,TermCond,Detail::name##Evaluator<EEval> >(s,obj,tc) {} \
 };\
 }\
-template<class Vars>\
-VarSelector selectVar##name(Store& s,const Vars& vars, bool roundRobin = true) \
+template<class Obj>\
+VarSelector selectVar##name(Store& s,const Obj& obj, bool roundRobin = true) \
 {\
 	if (roundRobin)\
-		return new (s) Detail::SelectVar##name##RR<Vars>(s,vars);\
+		return new (s) Detail::SelectVar##name##RR<Obj>(s,obj);\
 	else\
-		return new (s) Detail::SelectVar##name<Vars>(s,vars);\
+		return new (s) Detail::SelectVar##name<Obj>(s,obj);\
 }\
-template<class Vars,class TermCond>\
-VarSelector selectVar##name(Store& s,const Vars& vars, const TermCond& tc) \
+template<class Obj,class TermCond>\
+VarSelector selectVar##name(Store& s,const Obj& obj, const TermCond& tc) \
 {\
-	return new (s) Detail::SelectVar##name##RR<Vars,TermCond>(s,vars,tc);\
+	return new (s) Detail::SelectVar##name##RR<Obj,TermCond>(s,obj,tc);\
 }
 
 
@@ -410,7 +417,7 @@ CASPER_DEF_VAR_SELECT(MaxDomOverWeightedDegree)
 
 /**
  * \defgroup VariableSelectors Variable Selectors
- * \ingroup Search
+ * \ingroup CPSearch
  *
  * Variable selectors are function objects which compute the index of the next
  * variable to enumerate during search. They are used to implement variable
@@ -423,12 +430,12 @@ CASPER_DEF_VAR_SELECT(MaxDomOverWeightedDegree)
  * \li \f$ \textrm{afc}\left(c\right) \f$ is the Accumulated Failure Count of the
  * propagator \f$ c \f$, i.e. the number of times \f$ c \f$ has failed since
  * the begining of search
- * \li \f$ \left.d\left(\textrm{vars}\right)\right|_{x=v} \f$ is the resulting domain of
- *  \a vars after \f$ x=v \f$ is added to the constraint store and propagated
+ * \li \f$ \left.d\left(\textrm{obj}\right)\right|_{x=v} \f$ is the resulting domain of
+ *  \a obj after \f$ x=v \f$ is added to the constraint store and propagated
  *
  * Most variable selectors accept a boolean argument \a roundRobin which when set to \p true
  * guarantees a fair selection policy: a variable may be selected for the n'th
- * time if all variables have been already selected at least n-1 times.
+ * time only if all variables have been already selected at least n-1 times.
  *
  * \sa VarSelector
  */
@@ -438,101 +445,101 @@ CASPER_DEF_VAR_SELECT(MaxDomOverWeightedDegree)
  */
 //@{
 /**
- * \fn template<class Vars> VarSelector selectVarLex(const Vars& vars)
- * Selects variables by their position in the list or array \a view, possibly restarting
+ * \fn template<class Obj> VarSelector selectVarLex(Store& store, const Obj& obj)
+ * Selects variables by their position in the list or array \a obj, possibly restarting
  * from the first position after all variables have been selected
  *
- * \fn template<class Vars> VarSelector selectVarMinDom(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which minimizes \f$\left|d\left(x\right)\right|\f$
+ * \fn template<class Obj> VarSelector selectVarMinDom(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which minimizes \f$\left|d\left(x\right)\right|\f$
  *
- * \fn template<class Vars> VarSelector selectVarMaxDom(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which maximizes \f$\left|d\left(x\right)\right|\f$
+ * \fn template<class Obj> VarSelector selectVarMaxDom(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which maximizes \f$\left|d\left(x\right)\right|\f$
  *
- * \fn template<class Vars> VarSelector selectVarMinMinElem(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which minimizes \f$\left\lfloor d\left(x\right)\right\rfloor \f$
+ * \fn template<class Obj> VarSelector selectVarMinMinElem(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which minimizes \f$\left\lfloor d\left(x\right)\right\rfloor \f$
  *
- * \fn template<class Vars> VarSelector selectVarMinMaxElem(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which minimizes \f$\left\lceil d\left(x\right)\right\rceil \f$
+ * \fn template<class Obj> VarSelector selectVarMinMaxElem(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which minimizes \f$\left\lceil d\left(x\right)\right\rceil \f$
  *
- * \fn template<class Vars> VarSelector selectVarMaxMinElem(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which maximizes \f$\left\lfloor d\left(x\right)\right\rfloor \f$
+ * \fn template<class Obj> VarSelector selectVarMaxMinElem(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which maximizes \f$\left\lfloor d\left(x\right)\right\rfloor \f$
  *
- * \fn template<class Vars> VarSelector selectVarMaxMaxElem(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which maximizes \f$\left\lceil d\left(x\right)\right\rceil \f$
+ * \fn template<class Obj> VarSelector selectVarMaxMaxElem(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which maximizes \f$\left\lceil d\left(x\right)\right\rceil \f$
  *
- * \fn template<class Vars> VarSelector selectVarMinDegree(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which minimizes \f$ \left|C\left(x\right)\right| \f$
+ * \fn template<class Obj> VarSelector selectVarMinDegree(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which minimizes \f$ \left|C\left(x\right)\right| \f$
  *
- * \fn template<class Vars> VarSelector selectVarMaxDegree(const Vars& view, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which maximizes \f$ \left|C\left(x\right)\right| \f$
+ * \fn template<class Obj> VarSelector selectVarMaxDegree(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which maximizes \f$ \left|C\left(x\right)\right| \f$
  *
- * \fn template<class Vars> VarSelector selectVarMinDomOverDegree(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which minimizes \f$ \left|d\left(x\right)\right|/\left|C\left(x\right)\right| \f$
+ * \fn template<class Obj> VarSelector selectVarMinDomOverDegree(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which minimizes \f$ \left|d\left(x\right)\right|/\left|C\left(x\right)\right| \f$
  *
- * \fn template<class Vars> VarSelector selectVarMaxDomOverDegree(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which maximizes \f$ \left|d\left(x\right)\right|/\left|C\left(x\right)\right| \f$
+ * \fn template<class Obj> VarSelector selectVarMaxDomOverDegree(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which maximizes \f$ \left|d\left(x\right)\right|/\left|C\left(x\right)\right| \f$
  *
- * \fn template<class Vars> VarSelector selectVarMinWeightedDegree(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which minimizes \f$ \sum_{c\in C\left(x\right)}\textrm{afc}\left(c\right) \f$
+ * \fn template<class Obj> VarSelector selectVarMinWeightedDegree(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which minimizes \f$ \sum_{c\in C\left(x\right)}\textrm{afc}\left(c\right) \f$
  *
- * \fn template<class Vars> VarSelector selectVarMaxWeightedDegree(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which maximizes \f$ \sum_{c\in C\left(x\right)}\textrm{afc}\left(c\right) \f$
+ * \fn template<class Obj> VarSelector selectVarMaxWeightedDegree(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which maximizes \f$ \sum_{c\in C\left(x\right)}\textrm{afc}\left(c\right) \f$
  *
- * \fn template<class Vars> VarSelector selectVarMinDomOverWeightedDegree(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which minimizes \f$ \left|d\left(x\right)\right|/\sum_{c\in C\left(x\right)}\textrm{afc}\left(c\right) \f$
+ * \fn template<class Obj> VarSelector selectVarMinDomOverWeightedDegree(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which minimizes \f$ \left|d\left(x\right)\right|/\sum_{c\in C\left(x\right)}\textrm{afc}\left(c\right) \f$
  *
- * \fn template<class Vars> VarSelector selectVarMaxDomOverWeightedDegree(const Vars& vars, bool roundRobin = true)
- * Selects the variable \f$x\in\f$\a vars which maximizes \f$ \left|d\left(x\right)\right|/\sum_{c\in C\left(x\right)}\textrm{afc}\left(c\right) \f$
+ * \fn template<class Obj> VarSelector selectVarMaxDomOverWeightedDegree(Store& store, const Obj& obj, bool roundRobin = true)
+ * Selects the variable \f$x\in\f$\a obj which maximizes \f$ \left|d\left(x\right)\right|/\sum_{c\in C\left(x\right)}\textrm{afc}\left(c\right) \f$
  */
 //@}
 
 
 namespace Detail {
 
-template<class View>
+template<class Obj>
 struct SelectHalfMin : IValSelector
 {
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<View>::Type>::Type ElemEval;
-	SelectHalfMin(Store& s,const View& vars) :
-		store(s),vars(s,vars) {}
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<Obj>::Type>::Type ElemEval;
+	SelectHalfMin(Store& s,const Obj& obj) :
+		store(s),obj(s,obj) {}
 	Goal select(uint idx)
 	{
-		ElemEval midpoint = Util::median(vars[idx].min(),vars[idx].max());
+		ElemEval midpoint = Util::median(obj[idx].min(),obj[idx].max());
 		if (Casper::Traits::IsIntegral<ElemEval>::value)
-			return Goal(store,post(store,vars[idx].getObj() <= midpoint) or
-							  post(store,vars[idx].getObj() > midpoint));
+			return Goal(store,post(store,obj[idx].getObj() <= midpoint) or
+							  post(store,obj[idx].getObj() > midpoint));
 		else
-			return Goal(store,post(store,vars[idx].getObj() <= midpoint) or
-							  post(store,vars[idx].getObj() >= midpoint));
+			return Goal(store,post(store,obj[idx].getObj() <= midpoint) or
+							  post(store,obj[idx].getObj() >= midpoint));
 	}
 	Store&						store;
-	BndArrayView<ElemEval,View> vars;
+	BndArrayView<ElemEval,Obj> obj;
 };
 
-template<class View>
+template<class Obj>
 struct SelectHalfMax : IValSelector
 {
-	typedef typename Casper::Traits::GetEval<View>::Type::Elem	ElemEval;
-	SelectHalfMax(Store& s,const View& vars) :
-		store(s),vars(s,vars) {}
+	typedef typename Casper::Traits::GetEval<Obj>::Type::Elem	ElemEval;
+	SelectHalfMax(Store& s,const Obj& obj) :
+		store(s),obj(s,obj) {}
 	Goal select(uint idx)
 	{
-		ElemEval midpoint = Util::median(vars[idx].min(),vars[idx].max());
+		ElemEval midpoint = Util::median(obj[idx].min(),obj[idx].max());
 		if (Casper::Traits::IsIntegral<ElemEval>::value)
-			return post(store,vars[idx].getObj() > midpoint) or
-				   post(store,vars[idx].getObj() <= midpoint);
+			return Goal(store,post(store,obj[idx].getObj() > midpoint) or
+							  post(store,obj[idx].getObj() <= midpoint));
 		else
-			return post(store,vars[idx].getObj() >= midpoint) or
-				   post(store,vars[idx].getObj() <= midpoint);
+			return Goal(store,post(store,obj[idx].getObj() >= midpoint) or
+							  post(store,obj[idx].getObj() <= midpoint));
 	}
 	Store&						store;
-	BndArrayView<ElemEval,View> vars;
+	BndArrayView<ElemEval,Obj> obj;
 };
 }
 
 /**
  * \defgroup ValueSelectors Value Selectors
- * \ingroup Search
+ * \ingroup CPSearch
  *
  * Value selectors are function objects that specify the value selection
  * strategy during search.
@@ -547,60 +554,60 @@ struct SelectHalfMax : IValSelector
  * 	For a given variable \f$ x \f$ returns the goal
  *  \f$ x=v_1 \vee x=v_2 \vee \ldots \vee x=v_{\left|d\left(x\right)\right|} \f$
  **/
-template<class View>
-ValSelector selectValsMin(Store& s,const View& view)
-{return new (s) Detail::SelectValsMin<View>(s,view);}
+template<class Obj>
+ValSelector selectValsMin(Store& s,const Obj& obj)
+{return new (s) Detail::SelectValsMin<Obj>(s,obj);}
 
 /**
  * 	For a given variable \f$ x \f$ returns the goal
  *  \f$ x=v_{\left|d\left(x\right)\right|} \vee \ldots \vee x=v_2 \vee x=v_1\f$
  **/
-template<class View>
-ValSelector selectValsMax(Store& s,const View& view)
-{return new (s) Detail::SelectValsMax<View>(s,view);}
+template<class Obj>
+ValSelector selectValsMax(Store& s,const Obj& obj)
+{return new (s) Detail::SelectValsMax<Obj>(s,obj);}
 
 /**
  * 	For a given variable \f$ x \f$ returns the goal
  *  \f$ x=p_1 \vee x=p_2 \vee \ldots \vee x=p_{\left|d\left(x\right)\right|} \f$
  *  where \f$\mathbf{p}\f$ is a random permutation of \f$v_1\ldots v_{\left|d\left(x\right)\right|}\f$
  **/
-template<class View>
-ValSelector selectValsRand(Store& s,const View& view)
-{return new (s) Detail::SelectValsRand<View>(s,view);}
+template<class Obj>
+ValSelector selectValsRand(Store& s,const Obj& obj)
+{return new (s) Detail::SelectValsRand<Obj>(s,obj);}
 
 /**
  * 	For a given variable \f$ x \f$ returns the goal
  *  \f$ x=v_1 \vee x\neq v_1\f$
  **/
-template<class View>
-ValSelector selectValMin(Store& s,const View& view)
-{return new (s) Detail::SelectValMin<View>(s,view);}
+template<class Obj>
+ValSelector selectValMin(Store& s,const Obj& obj)
+{return new (s) Detail::SelectValMin<Obj>(s,obj);}
 
 /**
  * 	For a given variable \f$ x \f$ returns the goal
  *  \f$ x=v_{\left|d\left(x\right)\right|} \vee x\neq v_{\left|d\left(x\right)\right|}\f$
  **/
-template<class View>
-ValSelector selectValMax(Store& s,const View& view)
-{return new (s) Detail::SelectValMax<View>(s,view);}
+template<class Obj>
+ValSelector selectValMax(Store& s,const Obj& obj)
+{return new (s) Detail::SelectValMax<Obj>(s,obj);}
 
 /**
  * 	For a given variable \f$ x \f$ returns the goal
  *  \f$ x\leq\left(v_1+v_{\left|d\left(x\right)\right|}\right)/2 \vee
  *      x>\left(v_1+v_{\left|d\left(x\right)\right|}\right)/2 \f$
  **/
-template<class View>
-ValSelector selectHalfMin(Store& s,const View& view)
-{return new (s) Detail::SelectHalfMin<View>(s,view);}
+template<class Obj>
+ValSelector selectHalfMin(Store& s,const Obj& obj)
+{return new (s) Detail::SelectHalfMin<Obj>(s,obj);}
 
 /**
  * 	For a given variable \f$ x \f$ returns the goal
  *  \f$ x>\left(v_1+v_{\left|d\left(x\right)\right|}\right)/2 \vee
  *  x\leq\left(v_1+v_{\left|d\left(x\right)\right|}\right)/2 \f$
  **/
-template<class View>
-ValSelector selectHalfMax(Store& s,const View& view)
-{return new (s) Detail::SelectHalfMax<View>(s,view);}
+template<class Obj>
+ValSelector selectHalfMax(Store& s,const Obj& obj)
+{return new (s) Detail::SelectHalfMax<Obj>(s,obj);}
 
 //@}
 
@@ -617,7 +624,7 @@ struct CallValSelector : IGoal
 }
 
 /**
- *  \ingroup Goals
+ *  \ingroup Search
  * 	Goal that simply calls the given value selector. Use this to create
  *  recursive value selectors.
  **/

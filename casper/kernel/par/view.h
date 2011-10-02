@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -93,33 +93,33 @@ struct ParView<Eval,Rel1<F,View> > : ParView1<F,View,Eval>
  * 	ParView over a Rel2 relation -> defer to ParView2.
  * 	\ingroup Views
  **/
-template<class Eval,class F,class View1,class View2>
-struct ParView<Eval,Rel2<F,View1,View2> > :
-	ParView2<F,View1,View2,Eval>
+template<class Eval,class F,class Expr1,class Expr2>
+struct ParView<Eval,Rel2<F,Expr1,Expr2> > :
+	ParView2<F,Expr1,Expr2,Eval>
 {
-//	using ParView2<F,View1,View2,Eval>::attach;
-//	using ParView2<F,View1,View2,Eval>::detach;
+//	using ParView2<F,Expr1,Expr2,Eval>::attach;
+//	using ParView2<F,Expr1,Expr2,Eval>::detach;
 
-	ParView(State& state, const Rel2<F,View1,View2>& r) :
-		ParView2<F,View1,View2,Eval>(state,r.p1,r.p2) {}
+	ParView(State& state, const Rel2<F,Expr1,Expr2>& r) :
+		ParView2<F,Expr1,Expr2,Eval>(state,r.p1,r.p2) {}
 	// not sure if the below constructor is ever used
-	ParView(State& state, const ParView2<F,View1,View2,Eval>& v) :
-		ParView2<F,View1,View2,Eval>(v) {}
+	ParView(State& state, const ParView2<F,Expr1,Expr2,Eval>& v) :
+		ParView2<F,Expr1,Expr2,Eval>(v) {}
 };
 
 /**
  * 	ParView over a Rel3 relation -> defer to ParView3.
  * 	\ingroup Views
  **/
-template<class Eval,class F,class View1,class View2,class View3>
-struct ParView<Eval,Rel3<F,View1,View2,View3> > :
-	ParView3<F,View1,View2,View3,Eval>
+template<class Eval,class F,class Expr1,class Expr2,class Expr3>
+struct ParView<Eval,Rel3<F,Expr1,Expr2,Expr3> > :
+	ParView3<F,Expr1,Expr2,Expr3,Eval>
 {
-//	using ParView3<F,View1,View2,View3,Eval>::attach;
-//	using ParView3<F,View1,View2,View3,Eval>::detach;
+//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::attach;
+//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::detach;
 
-	ParView(State& state, const Rel3<F,View1,View2,View3>& r) :
-		ParView3<F,View1,View2,View3,Eval>(state,r.p1,r.p2,r.p3) {}
+	ParView(State& state, const Rel3<F,Expr1,Expr2,Expr3>& r) :
+		ParView3<F,Expr1,Expr2,Expr3,Eval>(state,r.p1,r.p2,r.p3) {}
 };
 
 
@@ -182,41 +182,41 @@ struct ParView1<Not,View,bool> : IPar<bool>
  * 	ParView over conjunction.
  * 	\ingroup Views
  **/
-template<class View1,class View2>
-struct ParView2<And,View1,View2,bool> : IPar<bool>
+template<class Expr1,class Expr2>
+struct ParView2<And,Expr1,Expr2,bool> : IPar<bool>
 {
-	ParView2(State& state,const View1& p1,const View2& p2) :
+	ParView2(State& state,const Expr1& p1,const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() && p2.value(); }
 
 //	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 //	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
 
-	Rel2<And,View1,View2> getObj()  const
+	Rel2<And,Expr1,Expr2> getObj()  const
 	{ return p1.getObj() and p2.getObj(); }
-	ParView<bool,View1>	p1;
-	ParView<bool,View2>	p2;
+	ParView<bool,Expr1>	p1;
+	ParView<bool,Expr2>	p2;
 };
 
 /**
  * 	ParView over disjunction.
  * 	\ingroup Views
  **/
-template<class View1,class View2>
-struct ParView2<Or,View1,View2,bool> : IPar<bool>
+template<class Expr1,class Expr2>
+struct ParView2<Or,Expr1,Expr2,bool> : IPar<bool>
 {
-	ParView2(State& state,const View1& p1, const View2& p2) :
+	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) 	{}
 	bool value() const { return p1.value() || p2.value(); }
 
 //	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 //	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
 
-	Rel2<Or,View1,View2> getObj()  const
+	Rel2<Or,Expr1,Expr2> getObj()  const
 	{ return p1.getObj() or p2.getObj(); }
 
-	ParView<bool,View1>	p1;
-	ParView<bool,View2>	p2;
+	ParView<bool,Expr1>	p1;
+	ParView<bool,Expr2>	p2;
 };
 
 // arithmetic
@@ -225,216 +225,216 @@ struct ParView2<Or,View1,View2,bool> : IPar<bool>
  * 	ParView over addition.
  * 	\ingroup Views
  **/
-template<class View1,class View2,class Eval>
-struct ParView2<Add,View1,View2,Eval> : IPar<Eval>
+template<class Expr1,class Expr2,class Eval>
+struct ParView2<Add,Expr1,Expr2,Eval> : IPar<Eval>
 {
-	typedef typename Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ParView2(State& state,const View1& p1, const View2& p2) :
+	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	Eval value() const { return p1.value() + p2.value(); }
 
 //	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 //	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
 
-	Rel2<Add,View1,View2> getObj()  const
+	Rel2<Add,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()+p2.getObj(); }
 
-	ParView<View1Eval,View1>	p1;
-	ParView<View2Eval,View2>	p2;
+	ParView<View1Eval,Expr1>	p1;
+	ParView<View2Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over subtraction.
  * 	\ingroup Views
  **/
-template<class View1,class View2,class Eval>
-struct ParView2<Sub,View1,View2,Eval> : IPar<Eval>
+template<class Expr1,class Expr2,class Eval>
+struct ParView2<Sub,Expr1,Expr2,Eval> : IPar<Eval>
 {
-	typedef typename Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ParView2(State& state,const View1& p1, const View2& p2) :
+	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	Eval value() const { return p1.value() - p2.value(); }
 
 //	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 //	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
 
-	Rel2<Sub,View1,View2> getObj()  const
+	Rel2<Sub,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()-p2.getObj(); }
 
-	ParView<View1Eval,View1>	p1;
-	ParView<View2Eval,View2>	p2;
+	ParView<View1Eval,Expr1>	p1;
+	ParView<View2Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over multiplication.
  * 	\ingroup Views
  **/
-template<class View1,class View2,class Eval>
-struct ParView2<Mul,View1,View2,Eval> : IPar<Eval>
+template<class Expr1,class Expr2,class Eval>
+struct ParView2<Mul,Expr1,Expr2,Eval> : IPar<Eval>
 {
-	typedef typename Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ParView2(State& state, const View1& p1, const View2& p2) :
+	ParView2(State& state, const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	Eval value() const { return p1.value() * p2.value(); }
 
 //	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 //	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
 
-	Rel2<Mul,View1,View2> getObj()  const
+	Rel2<Mul,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()*p2.getObj(); }
 
-	ParView<View1Eval,View1>	p1;
-	ParView<View2Eval,View2>	p2;
+	ParView<View1Eval,Expr1>	p1;
+	ParView<View2Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over equality relation.
  * 	\ingroup Views
  **/
-template<class View1,class View2>
-struct ParView2<Equal,View1,View2,bool> : IPar<bool>
+template<class Expr1,class Expr2>
+struct ParView2<Equal,Expr1,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ParView2(State& state,const View1& p1, const View2& p2) :
+	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() == p2.value(); }
 
 //	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 //	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
 
-	Rel2<Equal,View1,View2> getObj()  const
+	Rel2<Equal,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()==p2.getObj(); }
 
-	ParView<View1Eval,View1>	p1;
-	ParView<View2Eval,View2>	p2;
+	ParView<View1Eval,Expr1>	p1;
+	ParView<View2Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over inequality.
  * 	\ingroup Views
  **/
-template<class View1,class View2>
-struct ParView2<Greater,View1,View2,bool> : IPar<bool>
+template<class Expr1,class Expr2>
+struct ParView2<Greater,Expr1,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ParView2(State& state, const View1& p1, const View2& p2) :
+	ParView2(State& state, const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() > p2.value(); }
 
 //	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 //	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
 
-	Rel2<Greater,View1,View2> getObj()  const
+	Rel2<Greater,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()>p2.getObj(); }
 
-	ParView<View1Eval,View1>	p1;
-	ParView<View2Eval,View2>	p2;
+	ParView<View1Eval,Expr1>	p1;
+	ParView<View2Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over inequality.
  * 	\ingroup Views
  **/
-template<class View1,class View2>
-struct ParView2<GreaterEqual,View1,View2,bool> : IPar<bool>
+template<class Expr1,class Expr2>
+struct ParView2<GreaterEqual,Expr1,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ParView2(State& state,const View1& p1, const View2& p2) :
+	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() >= p2.value(); }
 
 //	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 //	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
 
-	Rel2<GreaterEqual,View1,View2> getObj()  const
+	Rel2<GreaterEqual,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()>=p2.getObj(); }
 
-	ParView<View1Eval,View1>	p1;
-	ParView<View2Eval,View2>	p2;
+	ParView<View1Eval,Expr1>	p1;
+	ParView<View2Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over inequality.
  * 	\ingroup Views
  **/
-template<class View1,class View2>
-struct ParView2<Less,View1,View2,bool> : IPar<bool>
+template<class Expr1,class Expr2>
+struct ParView2<Less,Expr1,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ParView2(State& state,const View1& p1, const View2& p2) :
+	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() < p2.value(); }
 
 //	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 //	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
 
-	Rel2<Less,View1,View2> getObj()  const
+	Rel2<Less,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()<p2.getObj(); }
 
-	ParView<View1Eval,View1>	p1;
-	ParView<View2Eval,View2>	p2;
+	ParView<View1Eval,Expr1>	p1;
+	ParView<View2Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over inequality.
  * 	\ingroup Views
  **/
-template<class View1,class View2>
-struct ParView2<LessEqual,View1,View2,bool> : IPar<bool>
+template<class Expr1,class Expr2>
+struct ParView2<LessEqual,Expr1,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ParView2(State& state,const View1& p1, const View2& p2) :
+	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() <= p2.value(); }
 
 //	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 //	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
 
-	Rel2<LessEqual,View1,View2> getObj()  const
+	Rel2<LessEqual,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()<=p2.getObj(); }
 
-	ParView<View1Eval,View1>	p1;
-	ParView<View2Eval,View2>	p2;
+	ParView<View1Eval,Expr1>	p1;
+	ParView<View2Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over disequality.
  * 	\ingroup Views
  **/
-template<class View1,class View2>
-struct ParView2<Distinct,View1,View2,bool> : IPar<bool>
+template<class Expr1,class Expr2>
+struct ParView2<Distinct,Expr1,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ParView2(State& state,const View1& p1, const View2& p2) :
+	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() != p2.value(); }
 
 //	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 //	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
 
-	Rel2<Distinct,View1,View2> getObj()  const
+	Rel2<Distinct,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()!=p2.getObj(); }
 
-	ParView<View1Eval,View1>	p1;
-	ParView<View2Eval,View2>	p2;
+	ParView<View1Eval,Expr1>	p1;
+	ParView<View2Eval,Expr2>	p2;
 };
 
 template<class View,class Eval>

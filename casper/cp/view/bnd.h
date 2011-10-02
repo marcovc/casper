@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -27,6 +27,7 @@
 #include <cmath>
 
 namespace Casper {
+
 
 
 namespace Traits {
@@ -86,8 +87,8 @@ struct BndChkViewWrapper<bool,View>
 // specializations for bndview over boolean (reificable) expressions
 
 /**
- * 	BndView over a generic view.
- * 	\ingroup Views
+ * 	A BndView allows to access or update the bounds of an associated expression.
+ * 	\ingroup BndViews
  **/
 template<class Eval,class View>
 struct BndView : BndChkViewWrapper<Eval,View>
@@ -98,28 +99,28 @@ struct BndView : BndChkViewWrapper<Eval,View>
 		BndChkViewWrapper<Eval,View>(store,v) {}
 };
 
-template<class F,class View1,class Eval>
-struct BndViewRel1 : BndChkViewWrapper<Eval,Rel1<F,View1> >
+template<class F,class Expr1,class Eval>
+struct BndViewRel1 : BndChkViewWrapper<Eval,Rel1<F,Expr1> >
 {
 	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
 
-	BndViewRel1(Store& store, const View1& v) :
-		BndChkViewWrapper<Eval,Rel1<F,View1> >(store,rel<F>(v)) {}
+	BndViewRel1(Store& store, const Expr1& v) :
+		BndChkViewWrapper<Eval,Rel1<F,Expr1> >(store,rel<F>(v)) {}
 };
 
-template<class F,class View1,class View2,class Eval>
-struct BndViewRel2 : BndChkViewWrapper<Eval,Rel2<F,View1,View2> >
+template<class F,class Expr1,class Expr2,class Eval>
+struct BndViewRel2 : BndChkViewWrapper<Eval,Rel2<F,Expr1,Expr2> >
 {
 	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
 
-	BndViewRel2(Store& store, const View1& v1, const View2& v2) :
-		BndChkViewWrapper<Eval,Rel2<F,View1,View2> >(store,rel<F>(v1,v2)) {}
+	BndViewRel2(Store& store, const Expr1& v1, const Expr2& v2) :
+		BndChkViewWrapper<Eval,Rel2<F,Expr1,Expr2> >(store,rel<F>(v1,v2)) {}
 };
 
 /**
  * 	BndView over a literal type. Literal
  *  must support <= and >= operations.
- * 	\ingroup Views
+ * 	\ingroup BndViews
  **/
 template<class Eval>
 struct BndView<Eval,Eval>
@@ -148,9 +149,8 @@ struct BndView<Eval,Eval>
 };
 
 /**
- * 	int BndView over a uint literal type.
- *  (for convenience)
- * 	\ingroup Views
+ * 	BndView over a uint literal type (for convenience).
+ * 	\ingroup BndViews
  **/
 template<>
 struct BndView<int,uint>
@@ -201,9 +201,8 @@ template<class,class,class>			struct BndViewRel1;
 template<class,class,class,class>	struct BndViewRel2;
 template<class,class,class,class,class>	struct BndViewRel3;
 
-/**
+/*
  *	BndView over a Rel1 relation -> defers to BndViewRel1
- *	\ingroup Views
  **/
 template<class Eval,class F,class View>
 struct BndView<Eval,Rel1<F,View> > : BndViewRel1<F,View,Eval>
@@ -217,40 +216,37 @@ struct BndView<Eval,Rel1<F,View> > : BndViewRel1<F,View,Eval>
 		BndViewRel1<F,View,Eval>(v) {}
 };
 
-/**
+/*
  *	BndView over a Rel2 relation -> defers to BndViewRel2
- *	\ingroup Views
  **/
-template<class Eval,class F,class View1,class View2>
-struct BndView<Eval,Rel2<F,View1,View2> > :
-	BndViewRel2<F,View1,View2,Eval>
+template<class Eval,class F,class Expr1,class Expr2>
+struct BndView<Eval,Rel2<F,Expr1,Expr2> > :
+	BndViewRel2<F,Expr1,Expr2,Eval>
 {
 	CASPER_ASSERT_BNDVIEW_EVAL(Eval)
 
-	BndView(Store& store, const Rel2<F,View1,View2>& r) :
-		BndViewRel2<F,View1,View2,Eval>(store,r.p1,r.p2) {}
+	BndView(Store& store, const Rel2<F,Expr1,Expr2>& r) :
+		BndViewRel2<F,Expr1,Expr2,Eval>(store,r.p1,r.p2) {}
 	// not sure if the below constructor is ever used
-	BndView(Store& store, const BndViewRel2<F,View1,View2,Eval>& v) :
-		BndViewRel2<F,View1,View2,Eval>(v) {}
+	BndView(Store& store, const BndViewRel2<F,Expr1,Expr2,Eval>& v) :
+		BndViewRel2<F,Expr1,Expr2,Eval>(v) {}
 };
 
-/**
+/*
  *	BndView over a Rel3 relation -> defers to BndViewRel3
- *	\ingroup Views
  **/
-template<class Eval,class F,class View1,class View2,class View3>
-struct BndView<Eval,Rel3<F,View1,View2,View3> > :
-	BndViewRel3<F,View1,View2,View3,Eval>
+template<class Eval,class F,class Expr1,class Expr2,class Expr3>
+struct BndView<Eval,Rel3<F,Expr1,Expr2,Expr3> > :
+	BndViewRel3<F,Expr1,Expr2,Expr3,Eval>
 {
 	CASPER_ASSERT_BNDVIEW_EVAL(Eval)
 
-	BndView(Store& store, const Rel3<F,View1,View2,View3>& r) :
-		BndViewRel3<F,View1,View2,View3,Eval>(store,r.p1,r.p2,r.p3) {}
+	BndView(Store& store, const Rel3<F,Expr1,Expr2,Expr3>& r) :
+		BndViewRel3<F,Expr1,Expr2,Expr3,Eval>(store,r.p1,r.p2,r.p3) {}
 };
 
-/**
+/*
  *	BndView over a BndExpr
- *	\ingroup Views
  **/
 template<class Eval>
 struct BndView<Eval,BndExpr<Eval> >
@@ -275,9 +271,8 @@ struct BndView<Eval,BndExpr<Eval> >
 	BndExpr<Eval>	r;
 };
 
-/**
+/*
  *	BndView over a DomExpr
- *	\ingroup Views
  **/
 template<class Eval,class Dom>
 struct BndView<Eval,DomExpr<Eval,Dom> > :
@@ -307,6 +302,10 @@ struct BndView<Eval,DomView<Eval,View,Dom> > : BndView<Eval,Var<Eval,Dom> >
 
 // ******** conversion **********
 
+/**
+ * 	BndView over a type cast  expression.
+ * 	\ingroup BndViews
+ */
 template<class View,class Eval>
 struct BndViewRel1<Cast<Eval>,View,Eval>
 {
@@ -337,13 +336,13 @@ struct BndViewRel1<Cast<Eval>,View,Eval>
 
 
 /**
- *	BndView over an if-then-else expression
- *	\ingroup Views
+ *	BndView over an IfThenElse expression.
+ *	\ingroup BndViews
  **/
-template<class Eval,class View1,class View2,class View3>
-struct BndViewRel3<IfThenElse,View1,View2,View3,Eval>
+template<class Eval,class Expr1,class Expr2,class Expr3>
+struct BndViewRel3<IfThenElse,Expr1,Expr2,Expr3,Eval>
 {
-	BndViewRel3(Store& store, const View1& p1, const View2& p2, const View3& p3) :
+	BndViewRel3(Store& store, const Expr1& p1, const Expr2& p2, const Expr3& p3) :
 		c1(store,p1),p2(store,p2),p3(store,p3)
 		{}
 	Eval min() const
@@ -409,25 +408,25 @@ struct BndViewRel3<IfThenElse,View1,View2,View3,Eval>
 
 	void attach(INotifiable* f) { 	pOwner=f;c1.attach(f); p2.attach(f);	p3.attach(f); }
 	void detach(INotifiable* f) {	c1.detach(f); p2.detach(f);	p3.detach(f); }
-	Rel3<IfThenElse,View1,View2,View3> getObj()  const
-	{ 	return Rel3<IfThenElse,View1,View2,View3>(c1.getObj(),p2.getObj(),p3.getObj());	}
+	Rel3<IfThenElse,Expr1,Expr2,Expr3> getObj()  const
+	{ 	return Rel3<IfThenElse,Expr1,Expr2,Expr3>(c1.getObj(),p2.getObj(),p3.getObj());	}
 
-	CChkView<View1> 	c1;
-	BndView<Eval,View2>	p2;
-	BndView<Eval,View3>	p3;
+	CChkView<Expr1> 	c1;
+	BndView<Eval,Expr2>	p2;
+	BndView<Eval,Expr3>	p3;
 	INotifiable*		pOwner;
 };
 
 // ********** arithmetic ************
 
 /**
- *	BndView over minimum of two values.
- *	\ingroup Views
+ *	BndView over the minimum of two expressions.
+ *	\ingroup BndViews
  **/
-template<class View1,class View2,class Eval>
-struct BndViewRel2<Min,View1,View2,Eval>
+template<class Expr1,class Expr2,class Eval>
+struct BndViewRel2<Min,Expr1,Expr2,Eval>
 {
-	BndViewRel2(Store& store, const View1& p1, const View2& p2) :
+	BndViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 	Eval min() const
 	{	return std::min(p1.min(),p2.min());	}
@@ -460,21 +459,21 @@ struct BndViewRel2<Min,View1,View2,Eval>
 
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f); }
 	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f); }
-	Rel2<Min,View1,View2>	getObj() const
-	{	return 	Rel2<Min,View1,View2>(p1.getObj(),p2.getObj());	}
+	Rel2<Min,Expr1,Expr2>	getObj() const
+	{	return 	Rel2<Min,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
 
-	BndView<Eval,View1>	p1;
-	BndView<Eval,View2>	p2;
+	BndView<Eval,Expr1>	p1;
+	BndView<Eval,Expr2>	p2;
 };
 
 /**
- *	BndView over maximum of two values.
- *	\ingroup Views
+ *	BndView over the maximum of two expressions.
+ *	\ingroup BndViews
  **/
-template<class View1,class View2,class Eval>
-struct BndViewRel2<Max,View1,View2,Eval>
+template<class Expr1,class Expr2,class Eval>
+struct BndViewRel2<Max,Expr1,Expr2,Eval>
 {
-	BndViewRel2(Store& store, const View1& p1, const View2& p2) :
+	BndViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 	Eval max() const
 	{	return std::max(p1.max(),p2.max());	}
@@ -507,16 +506,16 @@ struct BndViewRel2<Max,View1,View2,Eval>
 
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f); }
 	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f); }
-	Rel2<Max,View1,View2>	getObj() const
-	{	return 	Rel2<Max,View1,View2>(p1.getObj(),p2.getObj());	}
+	Rel2<Max,Expr1,Expr2>	getObj() const
+	{	return 	Rel2<Max,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
 
-	BndView<Eval,View1>	p1;
-	BndView<Eval,View2>	p2;
+	BndView<Eval,Expr1>	p1;
+	BndView<Eval,Expr2>	p2;
 };
 
 /**
- *	BndView over symmetric.
- *	\ingroup Views
+ *	BndView over the symmetric of an expression.
+ *	\ingroup BndViews
  **/
 template<class View,class Eval>
 struct BndViewRel1<Sym,View,Eval>
@@ -551,18 +550,18 @@ struct BndViewRel1<Sym,View,Eval>
 };
 
 /**
- *	BndView over addition.
- *	\ingroup Views
+ *	BndView over the addition of two expressions.
+ *	\ingroup BndViews
  **/
-template<class View1,class View2,class Eval>
-struct BndViewRel2<Add,View1,View2,Eval>
+template<class Expr1,class Expr2,class Eval>
+struct BndViewRel2<Add,Expr1,Expr2,Eval>
 {
-/*	static_assert(IsEqual<typename Casper::Traits::GetEval<View1>::Type,Eval>::value,
+/*	static_assert(IsEqual<typename Casper::Traits::GetEval<Expr1>::Type,Eval>::value,
 				  "'Add' operands must evaluate to the same type");
-	static_assert(IsEqual<typename Casper::Traits::GetEval<View2>::Type,Eval>::value,
+	static_assert(IsEqual<typename Casper::Traits::GetEval<Expr2>::Type,Eval>::value,
 				  "'Add' operands must evaluate to the same type");
 */
-	BndViewRel2(Store& store,const View1& p1, const View2& p2) :
+	BndViewRel2(Store& store,const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 	Eval min() const
 	{ return Util::addLb<Eval>(p1.min(),p2.min()); }
@@ -580,25 +579,25 @@ struct BndViewRel2<Add,View1,View2,Eval>
 			   p2.updateMax(Util::subUb<Eval>(v,p1.min()));}
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-	Rel2<Add,View1,View2> getObj()  const
-	{ 	return Rel2<Add,View1,View2>(p1.getObj(),p2.getObj());	}
+	Rel2<Add,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<Add,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
 
-	BndView<Eval,View1>	p1;
-	BndView<Eval,View2>	p2;
+	BndView<Eval,Expr1>	p1;
+	BndView<Eval,Expr2>	p2;
 };
 
 
 /**
- *	BndView over subtraction.
- *	\ingroup Views
+ *	BndView over the subtraction of two expressions.
+ *	\ingroup BndViews
  **/
-template<class View1,class View2,class Eval>
-struct BndViewRel2<Sub,View1,View2,Eval>
+template<class Expr1,class Expr2,class Eval>
+struct BndViewRel2<Sub,Expr1,Expr2,Eval>
 {
-//	typedef typename Casper::Traits::GetEval<View1>::Type	View1Eval;
-//	typedef typename Casper::Traits::GetEval<View2>::Type	View2Eval;
+//	typedef typename Casper::Traits::GetEval<Expr1>::Type	View1Eval;
+//	typedef typename Casper::Traits::GetEval<Expr2>::Type	View2Eval;
 
-	BndViewRel2(Store& store,const View1& p1, const View2& p2) :
+	BndViewRel2(Store& store,const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 	Eval min() const { return Util::subLb(p1.min(),p2.max()); }
 	Eval max() const { return Util::subUb(p1.max(),p2.min()); }
@@ -620,14 +619,14 @@ struct BndViewRel2<Sub,View1,View2,Eval>
 	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
 
 #if 1
-	Rel2<Sub,View1,View2> getObj()  const
-	{ 	return Rel2<Sub,View1,View2>(p1.getObj(),p2.getObj());	}
+	Rel2<Sub,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<Sub,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
 #else
-	Rel2<Sub,typename BndView<Eval,View1>::Viewed,typename BndView<Eval,View2>::Viewed> getObj()  const
-	{ 	return Rel2<Sub,typename BndView<Eval,View1>::Viewed,typename BndView<Eval,View2>::Viewed>(p1.getObj(),p2.getObj());	}
+	Rel2<Sub,typename BndView<Eval,Expr1>::Viewed,typename BndView<Eval,Expr2>::Viewed> getObj()  const
+	{ 	return Rel2<Sub,typename BndView<Eval,Expr1>::Viewed,typename BndView<Eval,Expr2>::Viewed>(p1.getObj(),p2.getObj());	}
 #endif
-	BndView<Eval,View1>	p1;
-	BndView<Eval,View2>	p2;
+	BndView<Eval,Expr1>	p1;
+	BndView<Eval,Expr2>	p2;
 };
 
 
@@ -755,13 +754,13 @@ struct BndViewRel3<InRange,View,Eval,Eval,Eval>
 
 
 /**
- *	BndView over multiplication.
- *	\ingroup Views
+ *	BndView over the multiplication of two expressions.
+ *	\ingroup BndViews
  **/
-template<class View1,class View2,class Eval>
-struct BndViewRel2<Mul,View1,View2,Eval>
+template<class Expr1,class Expr2,class Eval>
+struct BndViewRel2<Mul,Expr1,Expr2,Eval>
 {
-	BndViewRel2(Store& store, const View1& p1, const View2& p2) :
+	BndViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 
 	inline Eval min() const;
@@ -776,11 +775,11 @@ struct BndViewRel2<Mul,View1,View2,Eval>
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
 
-	Rel2<Mul,View1,View2> getObj()  const
-	{ 	return Rel2<Mul,View1,View2>(p1.getObj(),p2.getObj());	}
+	Rel2<Mul,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<Mul,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
 
-	BndView<Eval,View1>	p1;
-	BndView<Eval,View2>	p2;
+	BndView<Eval,Expr1>	p1;
+	BndView<Eval,Expr2>	p2;
 };
 
 namespace Detail {
@@ -842,16 +841,16 @@ void mulRange(const P1& p1, const P2& p2,Eval& lb, Eval& ub)
 
 };
 
-template<class View1,class View2,class Eval>
-void BndViewRel2<Mul,View1,View2,Eval>::range(Eval& lb, Eval& ub) const
+template<class Expr1,class Expr2,class Eval>
+void BndViewRel2<Mul,Expr1,Expr2,Eval>::range(Eval& lb, Eval& ub) const
 {	
 	lb = limits<Eval>::negInf();
 	ub = limits<Eval>::posInf();
 	Detail::mulRange(p1,p2,lb,ub);
 }
 
-template<class View1,class View2,class Eval>
-inline Eval BndViewRel2<Mul,View1,View2,Eval>::min() const
+template<class Expr1,class Expr2,class Eval>
+inline Eval BndViewRel2<Mul,Expr1,Expr2,Eval>::min() const
 {
 	using Util::mulLb;
 	using Util::isNeg;
@@ -888,8 +887,8 @@ inline Eval BndViewRel2<Mul,View1,View2,Eval>::min() const
 	return std::min(mulLb(xl,yu),mulLb(xu,yl));
 }
 
-template<class View1,class View2,class Eval>
-inline Eval BndViewRel2<Mul,View1,View2,Eval>::max() const
+template<class Expr1,class Expr2,class Eval>
+inline Eval BndViewRel2<Mul,Expr1,Expr2,Eval>::max() const
 {
 	using Util::mulUb;
 	using Util::isNeg;
@@ -936,8 +935,8 @@ template<class Eval,class P1,class P2> Eval divMax(const P1&,const P2&);
 
 template<class T> struct StdRange;
 
-template<class View1,class View2,class Eval>
-bool BndViewRel2<Mul,View1,View2,Eval>::updateMin(const Eval& zl)
+template<class Expr1,class Expr2,class Eval>
+bool BndViewRel2<Mul,Expr1,Expr2,Eval>::updateMin(const Eval& zl)
 {
 	using Util::divLb;
 	using Util::divUb;
@@ -1008,8 +1007,8 @@ bool BndViewRel2<Mul,View1,View2,Eval>::updateMin(const Eval& zl)
 	return true;
 }
 
-template<class View1,class View2,class Eval>
-bool BndViewRel2<Mul,View1,View2,Eval>::updateMax(const Eval& zu)
+template<class Expr1,class Expr2,class Eval>
+bool BndViewRel2<Mul,Expr1,Expr2,Eval>::updateMax(const Eval& zu)
 {
 	using Util::divLb;
 	using Util::divUb;
@@ -1080,8 +1079,8 @@ bool BndViewRel2<Mul,View1,View2,Eval>::updateMax(const Eval& zu)
 	return true;
 }
 
-template<class View1,class View2,class Eval>
-bool BndViewRel2<Mul,View1,View2,Eval>::updateRange(const Eval& zl,
+template<class Expr1,class Expr2,class Eval>
+bool BndViewRel2<Mul,Expr1,Expr2,Eval>::updateRange(const Eval& zl,
 													const Eval& zu)
 {
 	using Util::divLb;
@@ -1213,8 +1212,8 @@ bool BndViewRel2<Mul,View1,View2,Eval>::updateRange(const Eval& zl,
 }
 
 #if 0
-template<class View1,class View2,class Eval>
-bool BndViewRel2<Mul,View1,View2,Eval>::updateRange(const Eval& lb,
+template<class Expr1,class Expr2,class Eval>
+bool BndViewRel2<Mul,Expr1,Expr2,Eval>::updateRange(const Eval& lb,
 													const Eval& ub)
 {
 	StdRange<Eval> r(lb,ub);
@@ -1243,16 +1242,16 @@ bool BndViewRel2<Mul,View1,View2,Eval>::updateRange(const Eval& lb,
 #endif
 
 /**
- *	BndView over division.
- *	\ingroup Views
+ *	BndView over the division of two expressions.
+ *	\ingroup BndViews
  **/
-template<class View1,class View2,class Eval>
-struct BndViewRel2<Div,View1,View2,Eval>
+template<class Expr1,class Expr2,class Eval>
+struct BndViewRel2<Div,Expr1,Expr2,Eval>
 {
-//	typedef typename Casper::Traits::GetEval<View1>::Type	View1Eval;
-//	typedef typename Casper::Traits::GetEval<View2>::Type	View2Eval;
+//	typedef typename Casper::Traits::GetEval<Expr1>::Type	View1Eval;
+//	typedef typename Casper::Traits::GetEval<Expr2>::Type	View2Eval;
 
-	BndViewRel2(Store& store, const View1& p1, const View2& p2) :
+	BndViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) /*,
 		r(store)*/ {}
 
@@ -1269,11 +1268,11 @@ struct BndViewRel2<Div,View1,View2,Eval>
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
 
-	Rel2<Div,View1,View2> getObj()  const
-	{ 	return Rel2<Div,View1,View2>(p1.getObj(),p2.getObj());	}
+	Rel2<Div,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<Div,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
 
-	BndView<Eval,View1> 		p1;
-	BndView<Eval,View2> 		p2;
+	BndView<Eval,Expr1> 		p1;
+	BndView<Eval,Expr2> 		p2;
 };
 
 namespace Detail {
@@ -1393,8 +1392,8 @@ struct DivRange
 };
 }
 
-template<class View1,class View2,class Eval>
-Eval BndViewRel2<Div,View1,View2,Eval>::min() const
+template<class Expr1,class Expr2,class Eval>
+Eval BndViewRel2<Div,Expr1,Expr2,Eval>::min() const
 {
 	using Util::isPos;
 	using Util::isNeg;
@@ -1449,8 +1448,8 @@ Eval BndViewRel2<Div,View1,View2,Eval>::min() const
 	return limits<Eval>::negInf();
 }
 
-template<class View1,class View2,class Eval>
-Eval BndViewRel2<Div,View1,View2,Eval>::max() const
+template<class Expr1,class Expr2,class Eval>
+Eval BndViewRel2<Div,Expr1,Expr2,Eval>::max() const
 {
 	using Util::isPos;
 	using Util::isNeg;
@@ -1506,8 +1505,8 @@ Eval BndViewRel2<Div,View1,View2,Eval>::max() const
 }
 
 
-template<class View1,class View2,class Eval>
-void BndViewRel2<Div,View1,View2,Eval>::range(Eval& lb, Eval& ub) const
+template<class Expr1,class Expr2,class Eval>
+void BndViewRel2<Div,Expr1,Expr2,Eval>::range(Eval& lb, Eval& ub) const
 {
 	lb = limits<Eval>::negInf();
 	ub = limits<Eval>::posInf();
@@ -1515,8 +1514,8 @@ void BndViewRel2<Div,View1,View2,Eval>::range(Eval& lb, Eval& ub) const
 }
 
 
-template<class View1,class View2,class Eval>
-bool BndViewRel2<Div,View1,View2,Eval>::updateRange(const Eval& lb,
+template<class Expr1,class Expr2,class Eval>
+bool BndViewRel2<Div,Expr1,Expr2,Eval>::updateRange(const Eval& lb,
 													const Eval& ub)
 {
 	Util::StdRange<Eval> r(lb,ub);
@@ -1545,17 +1544,17 @@ bool BndViewRel2<Div,View1,View2,Eval>::updateRange(const Eval& lb,
 }
 
 /**
- *	BndView over mod(x,y).
+ *	BndView over the modulo of an expression.
  *  \warning Works with positive intervals only.
  *  \note Does not compute the tightest interval. I don't think
  *  the smallest interval can be obtained in constant time.
  *  \todo Generalize to negative intervals.
- *	\ingroup Views
+ *	\ingroup BndViews
  **/
-template<class View1,class View2,class Eval>
-struct BndViewRel2<Mod,View1,View2,Eval>
+template<class Expr1,class Expr2,class Eval>
+struct BndViewRel2<Mod,Expr1,Expr2,Eval>
 {
-	BndViewRel2(Store& store, const View1& p1, const View2& p2) :
+	BndViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 	Eval min() const;
 	Eval max() const;
@@ -1566,15 +1565,15 @@ struct BndViewRel2<Mod,View1,View2,Eval>
 	{	return updateMin(l) and updateMax(u);	}
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f); }
 	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f); }
-	Rel2<Mod,View1,View2> getObj()  const
-	{ 	return Rel2<Mod,View1,View2>(p1.getObj(),p2.getObj());	}
+	Rel2<Mod,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<Mod,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
 
-	BndView<Eval,View1>	p1;
-	BndView<Eval,View2>	p2;
+	BndView<Eval,Expr1>	p1;
+	BndView<Eval,Expr2>	p2;
 };
 
-template<class View1,class View2,class Eval>
-Eval BndViewRel2<Mod,View1,View2,Eval>::min() const
+template<class Expr1,class Expr2,class Eval>
+Eval BndViewRel2<Mod,Expr1,Expr2,Eval>::min() const
 {
 	assert(p1.min()>=0);
 	assert(p2.min()>0);
@@ -1591,8 +1590,8 @@ Eval BndViewRel2<Mod,View1,View2,Eval>::min() const
 								(Dmax/dmin)*dmax));
 }
 
-template<class View1,class View2,class Eval>
-Eval BndViewRel2<Mod,View1,View2,Eval>::max() const
+template<class Expr1,class Expr2,class Eval>
+Eval BndViewRel2<Mod,Expr1,Expr2,Eval>::max() const
 {
 	assert(p1.min()>=0);
 	assert(p2.min()>0);
@@ -1620,8 +1619,8 @@ Eval BndViewRel2<Mod,View1,View2,Eval>::max() const
 	return std::min(Dmax-qmin*dmin,dmax-1);
 }
 
-template<class View1,class View2,class Eval>
-bool BndViewRel2<Mod,View1,View2,Eval>::updateMin(const Eval& v)
+template<class Expr1,class Expr2,class Eval>
+bool BndViewRel2<Mod,Expr1,Expr2,Eval>::updateMin(const Eval& v)
 {
 	Eval rmin = min();
 	Eval rmax = max();
@@ -1654,8 +1653,8 @@ bool BndViewRel2<Mod,View1,View2,Eval>::updateMin(const Eval& v)
 	return r;
 }
 
-template<class View1,class View2,class Eval>
-bool BndViewRel2<Mod,View1,View2,Eval>::updateMax(const Eval& v)
+template<class Expr1,class Expr2,class Eval>
+bool BndViewRel2<Mod,Expr1,Expr2,Eval>::updateMax(const Eval& v)
 {
 	Eval rmin = min();
 	Eval rmax = max();
@@ -1684,13 +1683,13 @@ bool BndViewRel2<Mod,View1,View2,Eval>::updateMax(const Eval& v)
 }
 
 /**
- *	BndView over absolute value.
- *	\ingroup Views
+ *	BndView over the absolute value of an expression.
+ *	\ingroup BndViews
  **/
-template<class View1,class Eval>
-struct BndViewRel1<Abs,View1,Eval>
+template<class Expr1,class Eval>
+struct BndViewRel1<Abs,Expr1,Eval>
 {
-	BndViewRel1(Store& store, const View1& p1) :
+	BndViewRel1(Store& store, const Expr1& p1) :
 		p1(store,p1) {}
 	Eval min() const
 	{
@@ -1746,23 +1745,23 @@ struct BndViewRel1<Abs,View1,Eval>
 
 	void attach(INotifiable* f) { 	p1.attach(f); }
 	void detach(INotifiable* f) {	p1.detach(f); }
-	Rel1<Abs,View1> getObj()  const
-	{ 	return Rel1<Abs,View1>(p1.getObj());	}
+	Rel1<Abs,Expr1> getObj()  const
+	{ 	return Rel1<Abs,Expr1>(p1.getObj());	}
 
 
-	BndView<Eval,View1>	p1;
+	BndView<Eval,Expr1>	p1;
 };
 
 /**
- *	BndView over square.
- *	\ingroup Views
+ *	BndView over the square of an expression.
+ *	\ingroup BndViews
  **/
-template<class View1,class Eval>
-struct BndViewRel1<Sqr,View1,Eval>
+template<class Expr1,class Eval>
+struct BndViewRel1<Sqr,Expr1,Eval>
 {
-//	typedef typename Casper::Traits::GetEval<View1>::Type	View1Eval;
+//	typedef typename Casper::Traits::GetEval<Expr1>::Type	View1Eval;
 
-	BndViewRel1(Store& store, const View1& p1) :
+	BndViewRel1(Store& store, const Expr1& p1) :
 		p1(store,p1) {}
 	Eval min() const
 	{
@@ -1799,23 +1798,23 @@ struct BndViewRel1<Sqr,View1,Eval>
 
 	void attach(INotifiable* f) { 	p1.attach(f); }
 	void detach(INotifiable* f) {	p1.detach(f); }
-	Rel1<Sqr,View1> getObj()  const
-	{ 	return Rel1<Sqr,View1>(p1.getObj());	}
+	Rel1<Sqr,Expr1> getObj()  const
+	{ 	return Rel1<Sqr,Expr1>(p1.getObj());	}
 
-	BndView<Eval,View1>	p1;
+	BndView<Eval,Expr1>	p1;
 };
 
 
 /**
- *	BndView over exponential.
- *	\ingroup Views
+ *	BndView over the exponential of an expression.
+ *	\ingroup BndViews
  **/
-template<class View1,class Eval>
-struct BndViewRel1<Exp,View1,Eval>
+template<class Expr1,class Eval>
+struct BndViewRel1<Exp,Expr1,Eval>
 {
-//	typedef typename Casper::Traits::GetEval<View1>::Type	View1Eval;
+//	typedef typename Casper::Traits::GetEval<Expr1>::Type	View1Eval;
 
-	BndViewRel1(Store& store, const View1& p1) :
+	BndViewRel1(Store& store, const Expr1& p1) :
 		p1(store,p1) {}
 	Eval min() const 	{	return Util::expLb<Eval>(p1.min());	}
 	Eval max() const 	{	return Util::expUb<Eval>(p1.max());	}
@@ -1830,22 +1829,22 @@ struct BndViewRel1<Exp,View1,Eval>
 
 	void attach(INotifiable* f) { 	p1.attach(f); }
 	void detach(INotifiable* f) {	p1.detach(f); }
-	Rel1<Exp,View1> getObj()  const
-	{ 	return Rel1<Exp,View1>(p1.getObj());	}
+	Rel1<Exp,Expr1> getObj()  const
+	{ 	return Rel1<Exp,Expr1>(p1.getObj());	}
 
-	BndView<Eval,View1>	p1;
+	BndView<Eval,Expr1>	p1;
 };
 
 /**
- *	BndView over logarithm.
- *	\ingroup Views
+ *	BndView over the logarithm of an expression.
+ *	\ingroup BndViews
  **/
-template<class View1,class Eval>
-struct BndViewRel1<Log,View1,Eval>
+template<class Expr1,class Eval>
+struct BndViewRel1<Log,Expr1,Eval>
 {
-//	typedef typename Casper::Traits::GetEval<View1>::Type	View1Eval;
+//	typedef typename Casper::Traits::GetEval<Expr1>::Type	View1Eval;
 
-	BndViewRel1(Store& store, const View1& p1) :
+	BndViewRel1(Store& store, const Expr1& p1) :
 		p1(store,p1) {}
 	Eval min() const
 	{
@@ -1865,16 +1864,16 @@ struct BndViewRel1<Log,View1,Eval>
 	void attach(INotifiable* f) { 	p1.attach(f); }
 	void detach(INotifiable* f) {	p1.detach(f); }
 
-	Rel1<Log,View1> getObj()  const
-	{ 	return Rel1<Log,View1>(p1.getObj());	}
+	Rel1<Log,Expr1> getObj()  const
+	{ 	return Rel1<Log,Expr1>(p1.getObj());	}
 
-	BndView<Eval,View1>	p1;
+	BndView<Eval,Expr1>	p1;
 };
 
 
 /**
- * 	BndView over Par.
- * 	\ingroup Views
+ * 	BndView over a parameterized expression.
+ * 	\ingroup BndViews
  **/
 template<class Eval>
 struct BndView<Eval,Par<Eval> >

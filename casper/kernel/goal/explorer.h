@@ -78,6 +78,11 @@ struct ExplorerStats
 
 struct IGoal;
 
+/**
+ * 	Defines an explorer. An explorer is used to explore a search tree (i.e. a Goal).
+ * 	\ingroup Search
+ *
+ */
 struct IExplorer
 {
     typedef IExplorer				Self;
@@ -95,6 +100,7 @@ struct IExplorer
 	IExplorer(State& state);
     ~IExplorer();
 
+    /// Searches the Goal tree until the succeed Goal is found, in which case it returns \p true.
 	bool explore(Goal g)
     {
     	state.insertCP();	// everything is undone if the solver fails
@@ -102,11 +108,14 @@ struct IExplorer
 		return executeLoop();
 	}
 
+	/// Force the explorer to fail.
 	void fail()
 	{	mValid = false;	}
 
+	/// Resumes search from the point where the last call to explore has exited.
 	bool resume();
 
+	/// Resets the search. \todo Change name to reset()
 	void restart()
 	{
 		while (pCurGoal!=NULL)
@@ -114,6 +123,7 @@ struct IExplorer
 		mValid = true;
 		//solver().removeCP();
 	}
+
 	void pushAnd(Goal g)
 	{	assert(g.getPImpl()); goals.push(g.getPImpl());	}
 
@@ -135,7 +145,9 @@ struct IExplorer
 		}
 	}
 
+	/// Returns search statistics.
 	ExplorerStats& getStats() {	return stats; }
+	/// Returns search statistics.
 	const ExplorerStats& getStats() const {	return stats; }
 
 	operator State&() {	return state; }
@@ -223,6 +235,12 @@ struct ISinglePathExplorer : IExplorer
 	LIFOSearchPath				path;
 };
 
+/**
+ * 	Depth-First search. Explores the search tree in a depth-first, left to right fashion.
+ * 	Search requires polynomial memory, but exponential time, in the worst case.
+ * 	\ingroup Search
+ *
+ */
 struct DFSExplorer : ISinglePathExplorer
 {
     DFSExplorer(State& state) :
@@ -232,9 +250,18 @@ struct DFSExplorer : ISinglePathExplorer
 	{	return false;	}
 };
 
+/**
+ * 	Returns a new DFSExplorer.
+ *  \ingroup Search
+ */
 DFSExplorer* dfs(State& state);
 
-// always follows the left branches - or fail
+/**
+ * 	Greedy search. Always assume leftmost goal on all goal disjunctions,
+ * 	and never backtrack. Search space and time are polynomial, but may fail
+ * 	to find an existing solution.
+ * 	\ingroup Search
+ */
 struct GreedyExplorer : ISinglePathExplorer
 {
 	GreedyExplorer(State& state) :
@@ -244,8 +271,17 @@ struct GreedyExplorer : ISinglePathExplorer
 	{	return getCurPath().getFailCount()==1;	}
 };
 
+/**
+ * 	Returns a new GreedyExplorer.
+ * 	\ingroup Search
+ */
 GreedyExplorer* greedy(State& state);
 
+/**
+ * 	Depth bounded discrepancy search. Only
+ * 	branches below a given depth \a k.
+ * 	\ingroup Search
+ */
 struct DDSIteration : ISinglePathExplorer
 {
 	DDSIteration(State& state,uint k) :
@@ -263,9 +299,18 @@ struct DDSIteration : ISinglePathExplorer
 	const uint k;
 };
 
+/**
+ * 	Returns a new DDSIteration.
+ * 	\ingroup Search
+ */
 DDSIteration* dds(State& state,uint k);
 
-// Incomplete Limited Discrepancy Search
+/**
+ * 	 Limited Discrepancy Search. Only branches right
+ * 	 at most \a maxDiscr times on any search path.
+ * 	 \ingroup Search
+ */
+
 struct LDSIteration : ISinglePathExplorer
 {
     LDSIteration(State& state,uint maxDiscr) :
@@ -278,6 +323,10 @@ struct LDSIteration : ISinglePathExplorer
 	const uint maxDiscr;
 };
 
+/**
+ * 	Returns a new LDSIteration.
+ * 	\ingroup Search
+ */
 LDSIteration* lds(State& state,uint maxDiscr);
 
 // FIXME: put this BB explorer in CP
@@ -285,7 +334,10 @@ namespace CP {
 struct IFilter;
 }
 
-// generic Branch and Bound search
+/**
+ * 	Branch and Bound optimization.
+ * 	\ingroup Search
+ */
 template<class Store>
 struct BBExplorer : ISinglePathExplorer
 {

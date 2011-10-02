@@ -28,10 +28,16 @@
 
 namespace Casper {
 
+/** \defgroup DataStructures Data Structures
+ * 	\ingroup Kernel
+ * 	Kernel data structures.
+ */
+
 /**
- *	Interface to a delayed expression.
+ *	An IPar subclassed object is like a typed version of a logical variable. It provides copy-by-reference
+ *  and reversible policies to plain c++ types.
  *
- *  \ingroup Expressions
+ *  \ingroup DataStructures
  */
 template<class T>
 struct IPar
@@ -45,6 +51,7 @@ template<class,class> struct ParView;
 /**
  * A Par object is like a typed version of a logical variable. It provides copy-by-reference
  * and reversible policies to plain c++ types.
+ * \ingroup DataStructures
  */
 template<class T>
 struct Par : Util::PImplIdiom<Reversible<const IPar<T>*> >

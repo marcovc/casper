@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -28,22 +28,14 @@
 namespace Casper {
 namespace CP {
 
-/**
- * \defgroup IntFilters Integer filtering
- * Filters specific to integer domain variables.
- * \ingroup Integer
- * \ingroup Filtering
- */
-/*@{*/
-
 
 template<class,class,class,class>
 struct BndDistinctD1;
 
-template<class View1,class View2>
-struct BndDistinctD1<int,View1,int,View2> : IFilter
+template<class Expr1,class Expr2>
+struct BndDistinctD1<int,Expr1,int,Expr2> : IFilter
 {
-	BndDistinctD1(Store& store, const View1& v1, const View2& v2) :
+	BndDistinctD1(Store& store, const Expr1& v1, const Expr2& v2) :
 		IFilter(store),vv2(v2),v1(store,v1),v2(store,v2) {}
 
 	bool execute()
@@ -63,9 +55,9 @@ struct BndDistinctD1<int,View1,int,View2> : IFilter
 	void detach(INotifiable* s)
 	{	v1.detach(s); v2.detach(s);	}
 
-	View2				vv2;
-	BndView<int,View1>	v1;
-	ValView<int,View2>	v2;
+	Expr2				vv2;
+	BndView<int,Expr1>	v1;
+	ValView<int,Expr2>	v2;
 };
 
 template<class,class,class,class>
@@ -74,10 +66,10 @@ struct DomDistinctD1;
 /**
 	Directional filter for disequality constraint between integers
 */
-template<class View1,class View2>
-struct DomDistinctD1<int,View1,int,View2> : IFilter
+template<class Expr1,class Expr2>
+struct DomDistinctD1<int,Expr1,int,Expr2> : IFilter
 {
-	DomDistinctD1(Store& store, const View1& p1,const View2& p2) :
+	DomDistinctD1(Store& store, const Expr1& p1,const Expr2& p2) :
 		IFilter(store),p1(store,p1),p2(store,p2) {}
 
 	bool execute()
@@ -90,18 +82,19 @@ struct DomDistinctD1<int,View1,int,View2> : IFilter
 	void attach(INotifiable* s) {	p2.attach(s); }
 	void detach(INotifiable* s) {	p2.detach(s); }
 
-	DomView<int,View1> p1;
-	ValView<int,View2> p2;
+	DomView<int,Expr1> p1;
+	ValView<int,Expr2> p2;
 };
 
 /**
-	Filter that enforces bound consistency on the disequality constraint
-	between two integer variables (attachs until groundness)
+	Enforces the disequality constraint
+	between two integer expressions.
+	\ingroup IntFilters
 */
-template<class View1,class View2>
-struct BndFilterView2<Distinct,int,View1,int,View2> : IFilter
+template<class Expr1,class Expr2>
+struct BndFilterView2<Distinct,int,Expr1,int,Expr2> : IFilter
 {
-	BndFilterView2(Store& store,const View1& p1,const View2& p2) :
+	BndFilterView2(Store& store,const Expr1& p1,const Expr2& p2) :
 		IFilter(store),p1(store,p1,p2),p2(store,p2,p1)	{ }
 
 	bool execute()
@@ -111,18 +104,19 @@ struct BndFilterView2<Distinct,int,View1,int,View2> : IFilter
 	void detach(INotifiable* s)
 	{	p1.detach(s); p2.detach(s);	}
 
-	BndDistinctD1<int,View1,int,View2> p1;
-	BndDistinctD1<int,View2,int,View1> p2;
+	BndDistinctD1<int,Expr1,int,Expr2> p1;
+	BndDistinctD1<int,Expr2,int,Expr1> p2;
 };
 
 /**
-	Filter that enforces domain consistency on the disequality constraint
-	between two integer variables (attachs until groundness)
+	Enforces domain consistency on the disequality constraint
+	between two integer expressions.
+	\ingroup IntFilters
 */
-template<class View1,class View2>
-struct DomFilterView2<Distinct,int,View1,int,View2> : IFilter
+template<class Expr1,class Expr2>
+struct DomFilterView2<Distinct,int,Expr1,int,Expr2> : IFilter
 {
-	DomFilterView2(Store& store,const View1& p1,const View2& p2) :
+	DomFilterView2(Store& store,const Expr1& p1,const Expr2& p2) :
 		IFilter(store),p1(store,p1,p2),p2(store,p2,p1)	{ }
 
 	bool execute()
@@ -132,8 +126,8 @@ struct DomFilterView2<Distinct,int,View1,int,View2> : IFilter
 	void detach(INotifiable* s)
 	{	p1.detach(s); p2.detach(s);	}
 
-	DomDistinctD1<int,View1,int,View2> p1;
-	DomDistinctD1<int,View2,int,View1> p2;
+	DomDistinctD1<int,Expr1,int,Expr2> p1;
+	DomDistinctD1<int,Expr2,int,Expr1> p2;
 };
 
 // FIXME: this should be Def consistency since it can prune more than Bnd
@@ -189,11 +183,14 @@ struct PostDomFilter2<Distinct,bool,V1,bool,V2>
 	{	return s.post(Dom(s,cast<int>(p1) != cast<int>(p2)));	}
 };
 
-///	Enforces the Greater binary relation between two integer views.
-template<class View1,class View2>
-struct BndFilterView2<Greater,int,View1,int,View2> : IFilter
+/**
+ * 	Enforces the Greater binary relation between two integer expressions.
+ * 	\ingroup IntFilters
+ */
+template<class Expr1,class Expr2>
+struct BndFilterView2<Greater,int,Expr1,int,Expr2> : IFilter
 {
-	BndFilterView2(Store& store, const View1& p1,const View2& p2) :
+	BndFilterView2(Store& store, const Expr1& p1,const Expr2& p2) :
 		IFilter(store),p1(store,p1), p2(store,p2) {}
 
 	bool execute()
@@ -209,8 +206,8 @@ struct BndFilterView2<Greater,int,View1,int,View2> : IFilter
 	void detach(INotifiable* s)
 	{	p1.detach(s); p2.detach(s);	}
 
-	BndView<int,View1> p1;
-	BndView<int,View2> p2;
+	BndView<int,Expr1> p1;
+	BndView<int,Expr2> p2;
 };
 
 template<class V1,class V2>
@@ -241,8 +238,6 @@ struct PostDomFilter2<LessEqual,int,V1,int,V2>
 	{	return s.post(Bnd(s,p1<=p2)); }
 };
 
-
-/*@}*/
 
 } // CP
 } // Casper

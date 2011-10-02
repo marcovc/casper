@@ -28,14 +28,11 @@ namespace Casper {
 namespace CP {
 
 
-/**
- * \defgroup SetFilters Set filtering
- * Filters specific to set domain variables.
- * \ingroup Set
- * \ingroup Filtering
- */
-/*@{*/
 
+/**
+ * 	ValView over the cardinality of a set expression.
+ * 	\ingroup SetViews
+ */
 template<class View>
 struct ValView<int,Rel1<Cardinal,View> >
 {
@@ -55,6 +52,10 @@ struct ValView<int,Rel1<Cardinal,View> >
 	DomView<Set<Elem>,View> v;
 };
 
+/**
+ * 	BndView over the cardinality of a set expression.
+ * 	\ingroup SetViews
+ */
 template<class View>
 struct BndView<int,Rel1<Cardinal,View> >
 {
@@ -81,6 +82,10 @@ struct BndView<int,Rel1<Cardinal,View> >
 	DomView<Set<Elem>,View> v;
 };
 
+/**
+ * 	DomView over the cardinality of a set expression.
+ * 	\ingroup SetViews
+ */
 template<class View,class Dom>
 struct DomView<int,Rel1<Cardinal,View>,Dom>
 {
@@ -104,17 +109,17 @@ struct DomView<int,Rel1<Cardinal,View>,Dom>
 };
 
 /**
- * 	Enforces Bnd on the member(elem,set) set constraint.
- *	Implements cardinal(6,7).
- *  TODO: Propagation in the Set->FD direction is missing.
+ * 	Enforces the set membership constraint.
+ *  \todo Propagation in the Set->FD direction is missing.
+ *  \ingroup SetFilters
  */
-template<class View1,class Elem,class View2>
-struct BndFilterView2<Member,Elem,View1,Set<Elem>,View2> : IFilter
+template<class Expr1,class Elem,class Expr2>
+struct BndFilterView2<Member,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 {
-	typedef typename DomView<Set<Elem>,View2>::Dom::IIterator IIterator;
-	typedef typename DomView<Set<Elem>,View2>::Dom::PIterator PIterator;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom::IIterator IIterator;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom::PIterator PIterator;
 
-	BndFilterView2(Store& s,const View1& elem, const View2& set) :
+	BndFilterView2(Store& s,const Expr1& elem, const Expr2& set) :
 		IFilter(s),elem(s,elem),set(s,set) {}
 
 	bool execute()
@@ -136,23 +141,23 @@ struct BndFilterView2<Member,Elem,View1,Set<Elem>,View2> : IFilter
 	void detach(INotifiable* s)
 	{	elem.detach(s); }
 
-	ValView<Elem,View1>	elem;
-	DomView<Set<Elem>,View2>	set;
+	ValView<Elem,Expr1>	elem;
+	DomView<Set<Elem>,Expr2>	set;
 	INotifiable*				pOwner;
 };
 
 /**
- * 	Enforces bound consistency on the notMember(elem,set) set constraint.
- *	Implements cardinal(8,9).
- *  TODO: Propagation in the Set->FD direction is missing.
+ * 	Enforces the set membership exclusion constraint.
+ *  \todo Propagation in the Set->FD direction is missing.
+ *  \ingroup SetFilters
  */
-template<class View1,class Elem,class View2>
-struct BndFilterView2<NotMember,Elem,View1,Set<Elem>,View2> : IFilter
+template<class Expr1,class Elem,class Expr2>
+struct BndFilterView2<NotMember,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 {
-	typedef typename DomView<Set<Elem>,View2>::Dom::IIterator IIterator;
-	typedef typename DomView<Set<Elem>,View2>::Dom::PIterator PIterator;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom::IIterator IIterator;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom::PIterator PIterator;
 
-	BndFilterView2(Store& s,const View1& elem, const View2& set) :
+	BndFilterView2(Store& s,const Expr1& elem, const Expr2& set) :
 		IFilter(s),elem(s,elem),set(s,set) {}
 
 	bool execute()
@@ -174,22 +179,23 @@ struct BndFilterView2<NotMember,Elem,View1,Set<Elem>,View2> : IFilter
 	void detach(INotifiable* s)
 	{	elem.detach(s); }
 
-	ValView<Elem,View1>			elem;
-	DomView<Set<Elem>,View2>	set;
+	ValView<Elem,Expr1>			elem;
+	DomView<Set<Elem>,Expr2>	set;
 	INotifiable*				pOwner;
 };
 
 /**
- * 	Enforces bound consistency on the contained(set,set) set constraint.
- *	Implements cardinal(25-28).
+ * 	Enforces the containment constraint between two set expressions.
+ *  \todo Propagation in the Set->FD direction is missing.
+ *  \ingroup SetFilters
  */
-template<class Elem,class View1,class View2>
-struct BndFilterView2<Contained,Set<Elem>,View1,Set<Elem>,View2> : IFilter
+template<class Elem,class Expr1,class Expr2>
+struct BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
-	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
 
-	BndFilterView2(Store& s,const View1& v1, const View2& v2) :
+	BndFilterView2(Store& s,const Expr1& v1, const Expr2& v2) :
 		IFilter(s),store(s),x(s,v1),y(s,v2),
 		xGLBDeltasIt(x->glbDeltas().begin()),
 		yLUBDeltasIt(y->lubDeltas().begin()),
@@ -256,8 +262,8 @@ struct BndFilterView2<Contained,Set<Elem>,View1,Set<Elem>,View2> : IFilter
 	}
 
 	Store&		store;
-	DomView<Set<Elem>,View1>			x;
-	DomView<Set<Elem>,View2>			y;
+	DomView<Set<Elem>,Expr1>			x;
+	DomView<Set<Elem>,Expr2>			y;
 	typename DomX::DeltasIterator 		xGLBDeltasIt;
 	typename DomY::DeltasIterator 		yLUBDeltasIt;
 	Reversible<bool>					first;
@@ -265,32 +271,32 @@ struct BndFilterView2<Contained,Set<Elem>,View1,Set<Elem>,View2> : IFilter
 };
 
 /**
- * 	Enforces bound consistency on the equal(set,set) set constraint. This constraint
- *  is rewritten as two \p Contained constraints, one in each direction.
- *	Implements cardinal(15-17).
+ * 	Enforces the equality constraint between two set expressions.
+ *  \todo Propagation in the Set->FD direction is missing.
+ *  \ingroup SetFilters
  */
-template<class Elem,class View1,class View2>
-struct PostBndFilter2<Equal,Set<Elem>,View1,Set<Elem>,View2>
+template<class Elem,class Expr1,class Expr2>
+struct PostBndFilter2<Equal,Set<Elem>,Expr1,Set<Elem>,Expr2>
 {
-	static bool post(Store& s, const View1& v1, const View2& v2)
+	static bool post(Store& s, const Expr1& v1, const Expr2& v2)
 	{
-		//DomView<Set<Elem>,View1> vv1(s,v1);
-		//DomView<Set<Elem>,View2> vv2(s,v2);
+		//DomView<Set<Elem>,Expr1> vv1(s,v1);
+		//DomView<Set<Elem>,Expr2> vv2(s,v2);
 		return postBndFilter(s,contained(v1,v2)) and postBndFilter(s,contained(v2,v1));
 	}
 };
 
-/**
+/*
  * 	Enforces BndD1 on the distinct(set,set) set constraint.
  *	Implements cardinal(18,19).
  */
-template<class Elem,class View1,class View2>
-struct BndD1FilterView2<Distinct,Set<Elem>,View1,Set<Elem>,View2> : IFilter
+template<class Elem,class Expr1,class Expr2>
+struct BndD1FilterView2<Distinct,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	Dom1;
-	typedef typename DomView<Set<Elem>,View2>::Dom	Dom2;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	Dom1;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	Dom2;
 
-	BndD1FilterView2(Store& s,const View1& v1, const View2& v2) :
+	BndD1FilterView2(Store& s,const Expr1& v1, const Expr2& v2) :
 		IFilter(s),store(s),x(s,v1),y(s,v2) {}
 
 	bool execute()
@@ -331,35 +337,35 @@ struct BndD1FilterView2<Distinct,Set<Elem>,View1,Set<Elem>,View2> : IFilter
 	}
 
 	Store&		store;
-	DomView<Set<Elem>,View1>	x;
-	DomView<Set<Elem>,View2>	y;
+	DomView<Set<Elem>,Expr1>	x;
+	DomView<Set<Elem>,Expr2>	y;
 	INotifiable*				pOwner;
 };
 
 /**
- * 	Enforces bound consistency on the distinct(set,set) set constraint.
- *	Implements cardinal(18-19) with extra propagation in set cardinality.
+ * 	Posts the set disequality constraint between two set expressions.
+ *  \ingroup SetFilters
  */
-template<class Elem,class View1,class View2>
-struct PostBndFilter2<Distinct,Set<Elem>,View1,Set<Elem>,View2>
+template<class Elem,class Expr1,class Expr2>
+struct PostBndFilter2<Distinct,Set<Elem>,Expr1,Set<Elem>,Expr2>
 {
-	static bool post(Store& s, const View1& v1, const View2& v2)
+	static bool post(Store& s, const Expr1& v1, const Expr2& v2)
 	{
 		return postD1BndFilter(s,distinct(v1,v2)) and
 			   postD1BndFilter(s,distinct(v2,v1));
 	}
 };
 
-template<class Elem,class View1,class View2>
+template<class Elem,class Expr1,class Expr2>
 struct BACDisjointCard : IFilter
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
-	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
 	typedef typename DomX::Value	ValX;
 	typedef typename DomY::Value	ValY;
 
 	BACDisjointCard(Store& store,
-					const View1& v1,const View2& v2) :
+					const Expr1& v1,const Expr2& v2) :
 		IFilter(store),
 		x(store,v1),
 		y(store,v2)
@@ -394,28 +400,28 @@ struct BACDisjointCard : IFilter
 		y->detachOnLUB(s);
 	}
 
-	DomView<Set<Elem>,View1>	x;
-	DomView<Set<Elem>,View2>	y;
+	DomView<Set<Elem>,Expr1>	x;
+	DomView<Set<Elem>,Expr2>	y;
 	//typename DomX::DeltasIterator 		xLUBDeltasIt;
 	//typename DomY::DeltasIterator 		yLUBDeltasIt;
 };
 
 
-template<class Elem,class View1,class View2>
-Filter disjointCard(Store& store,const View1& v1,const View2& v2)
-{	return new (store) BACDisjointCard<Elem,View1,View2>(store,v1,v2);}
+template<class Elem,class Expr1,class Expr2>
+Filter disjointCard(Store& store,const Expr1& v1,const Expr2& v2)
+{	return new (store) BACDisjointCard<Elem,Expr1,Expr2>(store,v1,v2);}
 
 /**
- * 	Enforces bound consistency on the disjoint(set,set) set constraint.
- *	Implements cardinal(20-24).
+ * 	Enforces the set disjointness constraint between two set expressions.
+ *  \ingroup SetFilters
  */
-template<class Elem,class View1,class View2>
-struct BndFilterView2<Disjoint,Set<Elem>,View1,Set<Elem>,View2> : IFilter
+template<class Elem,class Expr1,class Expr2>
+struct BndFilterView2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
-	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
 
-	BndFilterView2(Store& s,const View1& v1, const View2& v2) :
+	BndFilterView2(Store& s,const Expr1& v1, const Expr2& v2) :
 		IFilter(s),store(s),x(s,v1),y(s,v2),
 		xGLBDeltasIt(x->glbDeltas().begin()),
 		yGLBDeltasIt(y->glbDeltas().begin()),
@@ -483,18 +489,19 @@ struct BndFilterView2<Disjoint,Set<Elem>,View1,Set<Elem>,View2> : IFilter
 	}
 
 	Store&	store;
-	DomView<Set<Elem>,View1>			x;
-	DomView<Set<Elem>,View2>			y;
+	DomView<Set<Elem>,Expr1>			x;
+	DomView<Set<Elem>,Expr2>			y;
 	typename DomX::DeltasIterator 		xGLBDeltasIt;
 	typename DomY::DeltasIterator 		yGLBDeltasIt;
-	ChkViewRel2<Disjoint,Set<Elem>,View1,Set<Elem>,View2>	chk;
+	ChkViewRel2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2>	chk;
 	Reversible<bool>			first;
 	INotifiable*	pOwner;
 };
 
 /**
- * 	Enforces bound consistency on the disjoint(seq<set>) set constraint.
- *	Rewritten as a set of disjoint pairwise constraints.
+ * 	Enforces the set disequality constraint on a sequence of set expressions.
+ * 	\note Rewritten as a set of disjoint pairwise constraints.
+ *  \ingroup SetFilters
  */
 template<class Elem,class View>
 struct PostBndFilter1<Disjoint,Seq<Set<Elem> >,View>
@@ -510,15 +517,15 @@ struct PostBndFilter1<Disjoint,Seq<Set<Elem> >,View>
 	}
 };
 
-template<class Elem,class View1,class View2,class View3>
+template<class Elem,class Expr1,class Expr2,class Expr3>
 struct BACIntersectCard1 : IFilter
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
-	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
-	typedef typename DomView<Set<Elem>,View3>::Dom	DomZ;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
+	typedef typename DomView<Set<Elem>,Expr3>::Dom	DomZ;
 
 	BACIntersectCard1(Store& store,
-					  const View1& v1,const View2& v2,const View3& v3) :
+					  const Expr1& v1,const Expr2& v2,const Expr3& v3) :
 		IFilter(store),
 		x(store,v1),
 		y(store,v2),
@@ -554,31 +561,31 @@ struct BACIntersectCard1 : IFilter
 		z->detachOnLUB(s);
 	}
 
-	DomView<Set<Elem>,View1>	x;
-	DomView<Set<Elem>,View2>	y;
-	DomView<Set<Elem>,View3>	z;
+	DomView<Set<Elem>,Expr1>	x;
+	DomView<Set<Elem>,Expr2>	y;
+	DomView<Set<Elem>,Expr3>	z;
 //	typename DomX::DeltasIterator 		xLUBDeltasIt;
 //	typename DomY::DeltasIterator 		yLUBDeltasIt;
 //	typename DomZ::DeltasIterator 		zLUBDeltasIt;
 };
 
-template<class Elem,class View1,class View2,class View3>
-Filter intersectCard1(Store& store,const View1& v1,const View2& v2,const View3& v3)
-{	return new (store) BACIntersectCard1<Elem,View1,View2,View3>(store,v1,v2,v3);}
+template<class Elem,class Expr1,class Expr2,class Expr3>
+Filter intersectCard1(Store& store,const Expr1& v1,const Expr2& v2,const Expr3& v3)
+{	return new (store) BACIntersectCard1<Elem,Expr1,Expr2,Expr3>(store,v1,v2,v3);}
 
 
-template<class Elem,class View1,class View2,class View3>
+template<class Elem,class Expr1,class Expr2,class Expr3>
 struct BACIntersectCard2 : IFilter
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
-	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
-	typedef typename DomView<Set<Elem>,View3>::Dom	DomZ;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
+	typedef typename DomView<Set<Elem>,Expr3>::Dom	DomZ;
 	typedef typename DomX::Value	ValX;
 	typedef typename DomY::Value	ValY;
 	typedef typename DomZ::Value	ValZ;
 
 	BACIntersectCard2(Store& store,
-					  const View1& v1,const View2& v2,const View3& v3) :
+					  const Expr1& v1,const Expr2& v2,const Expr3& v3) :
 		IFilter(store),
 		x(store,v1),
 		y(store,v2),
@@ -617,31 +624,32 @@ struct BACIntersectCard2 : IFilter
 		z->detachOnLUB(s);
 	}
 
-	DomView<Set<Elem>,View1>	x;
-	DomView<Set<Elem>,View2>	y;
-	DomView<Set<Elem>,View3>	z;
+	DomView<Set<Elem>,Expr1>	x;
+	DomView<Set<Elem>,Expr2>	y;
+	DomView<Set<Elem>,Expr3>	z;
 	//typename DomX::DeltasIterator 		xGLBDeltasIt;
 	//typename DomY::DeltasIterator 		yLUBDeltasIt;
 	//typename DomZ::DeltasIterator 		zLUBDeltasIt;
 };
 
-template<class Elem,class View1,class View2,class View3>
-Filter intersectCard2(Store& store,View1& v1,View2& v2,View3& v3)
-{	return new (store) BACIntersectCard2<Elem,View1,View2,View3>(store,v1,v2,v3);}
+template<class Elem,class Expr1,class Expr2,class Expr3>
+Filter intersectCard2(Store& store,Expr1& v1,Expr2& v2,Expr3& v3)
+{	return new (store) BACIntersectCard2<Elem,Expr1,Expr2,Expr3>(store,v1,v2,v3);}
 
 /**
- * 	Enforces bound consistency on the intersect(set,set,set) set constraint.
- *	Implements cardinal...
+ * 	Enforces the intersection constraint among three set expressions, where the
+ * 	third is equal to the intersection of the first two.
+ *  \ingroup SetFilters
  */
-template<class Elem,class View1,class View2,class View3>
-struct BndFilterView3<Intersect,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3> : IFilter
+template<class Elem,class Expr1,class Expr2,class Expr3>
+struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3> : IFilter
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
-	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
-	typedef typename DomView<Set<Elem>,View3>::Dom	DomZ;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
+	typedef typename DomView<Set<Elem>,Expr3>::Dom	DomZ;
 
-	BndFilterView3(Store& s,const View1& v1,
-				   const View2& v2, const View3& v3) :
+	BndFilterView3(Store& s,const Expr1& v1,
+				   const Expr2& v2, const Expr3& v3) :
 		IFilter(s),store(s),x(s,v1),y(s,v2),z(s,v3),
 		xGLBDeltasIt(x->glbDeltas().begin()),
 		yGLBDeltasIt(y->glbDeltas().begin()),
@@ -747,33 +755,36 @@ struct BndFilterView3<Intersect,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3>
 	}
 
 	Store&	store;
-	DomView<Set<Elem>,View1>	x;
-	DomView<Set<Elem>,View2>	y;
-	DomView<Set<Elem>,View3>	z;
+	DomView<Set<Elem>,Expr1>	x;
+	DomView<Set<Elem>,Expr2>	y;
+	DomView<Set<Elem>,Expr3>	z;
 	typename DomX::DeltasIterator 		xGLBDeltasIt;
 	typename DomY::DeltasIterator 		yGLBDeltasIt;
 	typename DomZ::DeltasIterator 		zLUBDeltasIt;
 	Reversible<bool>			first;
 	INotifiable*	pOwner;
-	ChkViewRel3<Intersect,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3> chk;
+	ChkViewRel3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3> chk;
 };
 
-template<class Elem,class View1,class View2,class Dom>
-struct DomView<Set<Elem>,Rel2<Intersect,View1,View2>,Dom> : IDomExpr<Dom>
+/**
+ * 	DomView over an intersection between two set expressions.
+ *  \ingroup SetViews
+ */
+template<class Elem,class Expr1,class Expr2,class Dom>
+struct DomView<Set<Elem>,Rel2<Intersect,Expr1,Expr2>,Dom> //: IDomExpr<Dom>
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	Dom1;
-	typedef typename DomView<Set<Elem>,View2>::Dom	Dom2;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	Dom1;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	Dom2;
 	typedef Dom	Dom3;
 	typedef typename Dom1::Value	Val1;
 	typedef typename Dom2::Value	Val2;
 	typedef typename Dom3::Value	Val3;
 
-	DomView(Store& s, const Rel2<Intersect,View1,View2>& r) :
-		IDomExpr<Dom>(s)
+	DomView(Store& s, const Rel2<Intersect,Expr1,Expr2>& r) //:	IDomExpr<Dom>(s)
 	{
 		// FIXME: rewrite using new iteration views
-		DomView<Set<Elem>,View1>	v1(s,r.p1);
-		DomView<Set<Elem>,View2>	v2(s,r.p2);
+		DomView<Set<Elem>,Expr1>	v1(s,r.p1);
+		DomView<Set<Elem>,Expr2>	v2(s,r.p2);
 		Util::StdVector<Val1> lub1(v1->inSize()+v1->possSize());
 		Detail::setLUB(*v1,lub1);
 
@@ -786,7 +797,7 @@ struct DomView<Set<Elem>,Rel2<Intersect,View1,View2>,Dom> : IDomExpr<Dom>
 						 Util::ListInserter<Val3>(lub3));
 
 		auxD = new (s) Dom(s,lub3.begin(),lub3.end());
-		s.post( intersect(v1.getObj(),v2.getObj(),Var<Set<Elem>,Dom>(s,auxD)) );
+		s.post( intersectEqual(v1.getObj(),v2.getObj(),Var<Set<Elem>,Dom>(s,auxD)) );
 	}
 	Dom*	operator->()		{	return auxD;	}
 	Dom*	operator->() const	{	return const_cast<Dom*>(auxD);}
@@ -801,18 +812,19 @@ struct DomView<Set<Elem>,Rel2<Intersect,View1,View2>,Dom> : IDomExpr<Dom>
 };
 
 /**
- * 	Enforces bound consistency on the unionEqual(set,set,set) set constraint.
- *	Implements cardinal...
+ * 	Enforces the union constraint among three set expressions, where the
+ * 	third is equal to the union of the first two.
+ *  \ingroup SetFilters
  */
-template<class Elem,class View1,class View2,class View3>
-struct BndFilterView3<UnionEqual,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3> : IFilter
+template<class Elem,class Expr1,class Expr2,class Expr3>
+struct BndFilterView3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3> : IFilter
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
-	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
-	typedef typename DomView<Set<Elem>,View3>::Dom	DomZ;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
+	typedef typename DomView<Set<Elem>,Expr3>::Dom	DomZ;
 
-	BndFilterView3(Store& s,const View1& v1,
-				   const View2& v2, const View3& v3) :
+	BndFilterView3(Store& s,const Expr1& v1,
+				   const Expr2& v2, const Expr3& v3) :
 		IFilter(s),store(s),x(s,v1),y(s,v2),z(s,v3),
 		xLUBDeltasIt(x->lubDeltas().begin()),
 		yLUBDeltasIt(y->lubDeltas().begin()),
@@ -926,9 +938,9 @@ struct BndFilterView3<UnionEqual,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3
 
 	Store& store;
 
-	DomView<Set<Elem>,View1>	x;
-	DomView<Set<Elem>,View2>	y;
-	DomView<Set<Elem>,View3>	z;
+	DomView<Set<Elem>,Expr1>	x;
+	DomView<Set<Elem>,Expr2>	y;
+	DomView<Set<Elem>,Expr3>	z;
 
 	typename DomX::DeltasIterator 		xLUBDeltasIt;
 	typename DomY::DeltasIterator 		yLUBDeltasIt;
@@ -938,16 +950,19 @@ struct BndFilterView3<UnionEqual,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3
 };
 
 
+#if 0
 /**
- * 	Enforces bound consistency on the union(setArray,set) constraint.
+ * 	Posts the union constraint among a set of set expressions, where the
+ * 	last is equal to the union of all the others.
+ *  \ingroup SetFilters
  */
-template<class Elem,class View1,class View2>
-struct PostBndFilter2<Union,Seq<Set<Elem> >,View1,Set<Elem>,View2>
+template<class Elem,class Expr1,class Expr2>
+struct PostBndFilter2<Union,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2>
 {
-	static bool post(Store& store, const View1& a,const View2& r)
+	static bool post(Store& store, const Expr1& a,const Expr2& r)
 	{
-		typedef typename DomArrayView<Set<Elem>,View1>::Dom	Dom;
-		DomArrayView<Set<Elem>,View1> s(store,a);
+		typedef typename DomArrayView<Set<Elem>,Expr1>::Dom	Dom;
+		DomArrayView<Set<Elem>,Expr1> s(store,a);
 		assert(s.size()>1);
 		std::set<Elem> elems;
 		for (uint i = 0; i < s.size(); ++i)
@@ -969,19 +984,19 @@ struct PostBndFilter2<Union,Seq<Set<Elem> >,View1,Set<Elem>,View2>
 		return store.post(Filter(e));
 	}
 };
+#endif
 
 
 /**
- * 	Enforces bound consistency on the partition(sets) constraint.
- *  The filter is highly incremental although the propagation could
- *  probably be stronger...
+ * 	Enforces the partition constraint among a set of set expressions.
+ *  \ingroup SetFilters
  */
-template<class Elem,class View1>
-struct BndFilterView1<Partition,Seq<Set<Elem> >,View1> : IFilter
+template<class Elem,class Expr1>
+struct BndFilterView1<Partition,Seq<Set<Elem> >,Expr1> : IFilter
 {
-	typedef typename Casper::Traits::GetElem<View1>::Type	SeqElem;
+	typedef typename Casper::Traits::GetElem<Expr1>::Type	SeqElem;
 	typedef typename Traits::GetDom<SeqElem>::Type		Dom;
-	//typedef typename DomView<Set<Elem>,View1>::Dom	Dom;
+	//typedef typename DomView<Set<Elem>,Expr1>::Dom	Dom;
 	typedef typename Dom::Value	Val;
 	typedef Util::StdPair<uint,typename Dom::PIterator>	P;
 
@@ -995,7 +1010,7 @@ struct BndFilterView1<Partition,Seq<Set<Elem> >,View1> : IFilter
 	typedef PossList* PPossList;
 	typedef Util::StdHashMap<Elem,PPossList>	InPoss;
 
-	BndFilterView1(Store& s,const View1& v1) :
+	BndFilterView1(Store& s,const Expr1& v1) :
 		IFilter(s),store(s),x(s,v1),
 		xGLBDeltasIt(x.size()),
 		xLUBDeltasIt(x.size()),
@@ -1148,7 +1163,7 @@ struct BndFilterView1<Partition,Seq<Set<Elem> >,View1> : IFilter
 	}
 
 	Store&	store;
-	DomArrayView<Set<Elem>,View1> x;
+	DomArrayView<Set<Elem>,Expr1> x;
 	Util::StdArray<typename Dom::DeltasIterator> 	xGLBDeltasIt;
 	Util::StdArray<typename Dom::DeltasIterator> 	xLUBDeltasIt;
 	Reversible<bool>			first;
@@ -1158,20 +1173,22 @@ struct BndFilterView1<Partition,Seq<Set<Elem> >,View1> : IFilter
 
 
 /**
- * 	Enforces bound consistency on the union(sets) constraint.
+ * 	Enforces the union constraint among a set of set expressions, where the
+ * 	last is equal to the union of all the others.
+ *  \ingroup SetFilters
  */
-template<class Elem,class View1,class View2>
-struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,View1,Set<Elem>,View2> : IFilter
+template<class Elem,class Expr1,class Expr2>
+struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2> : IFilter
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	Dom1;
-	typedef typename DomView<Set<Elem>,View2>::Dom	Dom2;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	Dom1;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	Dom2;
 	typedef typename Dom1::Value	Val;
 
 	typedef SUList<uint>	PossList;
 	typedef PossList* PPossList;
 	typedef Util::StdHashMap<Elem,PPossList>	InLUB;
 
-	BndFilterView2(Store& s,const View1& v1,const View2& v2) :
+	BndFilterView2(Store& s,const Expr1& v1,const Expr2& v2) :
 		IFilter(s),store(s),x(s,v1),z(s,v2),
 		xGLBDeltasIt(x.size()),
 		xLUBDeltasIt(x.size()),
@@ -1321,8 +1338,8 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,View1,Set<Elem>,View2> : IFilte
 	}
 
 	Store&	store;
-	DomArrayView<Set<Elem>,View1> x;
-	DomView<Set<Elem>,View2> 	z;
+	DomArrayView<Set<Elem>,Expr1> x;
+	DomView<Set<Elem>,Expr2> 	z;
 
 	Util::StdArray<typename Dom1::DeltasIterator> 	xGLBDeltasIt;
 	Util::StdArray<typename Dom1::DeltasIterator> 	xLUBDeltasIt;
@@ -1335,10 +1352,11 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,View1,Set<Elem>,View2> : IFilte
 };
 
 
-/*@}*/
 
-
-/// TODO: test, test, test, ...
+/**
+ * 	BndView over the minimum of a set variable.
+ *  \ingroup SetViews
+ */
 template<class Eval,class Dom>
 struct BndViewRel1<Min,Var<Set<Eval>,Dom>,Eval>
 {

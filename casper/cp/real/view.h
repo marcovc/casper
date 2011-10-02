@@ -25,6 +25,8 @@
 namespace Casper {
 namespace CP {
 
+namespace Detail {
+
 template<class T>
 struct IDomExpr<RangeDom<T> > : INotifier
 {
@@ -52,6 +54,7 @@ struct IDomExpr<RangeDom<T> > : INotifier
 	Store&				mSolver;
 };
 
+} // Detail
 } // CP
 } // Casper
 

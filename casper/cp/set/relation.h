@@ -27,7 +27,7 @@ NEW_REL_1(disjoint,Disjoint)
 
 ALIAS(Mul,Intersect)
 NEW_FN_2(intersect,Intersect)
-NEW_FN_3(intersect,Intersect)
+NEW_REL_3(intersectEqual,IntersectEqual)
 
 
 ALIAS(Add,Union)
@@ -56,25 +56,25 @@ template<class View>
 struct GetEval<Rel1<Cardinal,View> >
 {	typedef int		Type;	};
 
-template<class View1,class View2>
-struct GetEval<Rel2<Member,View1,View2> >
+template<class Expr1,class Expr2>
+struct GetEval<Rel2<Member,Expr1,Expr2> >
 {	typedef bool	Type;	};
 
-template<class View1,class View2>
-struct GetEval<Rel2<NotMember,View1,View2> >
+template<class Expr1,class Expr2>
+struct GetEval<Rel2<NotMember,Expr1,Expr2> >
 {	typedef bool	Type;	};
 
-template<class View1,class View2>
-struct GetEval<Rel2<Contained,View1,View2> >
+template<class Expr1,class Expr2>
+struct GetEval<Rel2<Contained,Expr1,Expr2> >
 {	typedef bool	Type;	};
 
-template<class View1,class View2>
-struct GetEval<Rel2<Disjoint,View1,View2> >
+template<class Expr1,class Expr2>
+struct GetEval<Rel2<Disjoint,Expr1,Expr2> >
 {	typedef bool	Type;	};
 
-template<class View1,class View2>
-struct GetEval<Rel2<SymDiff,View1,View2> >
-{	typedef typename Casper::Traits::GetEval<View1>::Type	Type;	};
+template<class Expr1,class Expr2>
+struct GetEval<Rel2<SymDiff,Expr1,Expr2> >
+{	typedef typename Casper::Traits::GetEval<Expr1>::Type	Type;	};
 
 template<class T1,class T2,class T3>
 struct GetEval<Rel3<UnionEqual,T1,T2,T3> >
@@ -85,7 +85,7 @@ struct GetEval<Rel2<UnionEqual,T1,T2> >
 {	typedef	bool Type;	};
 
 template<class T1,class T2,class T3>
-struct GetEval<Rel3<Intersect,T1,T2,T3> >
+struct GetEval<Rel3<IntersectEqual,T1,T2,T3> >
 {	typedef	bool Type;	};
 
 template<class T1>
@@ -96,9 +96,6 @@ template<class T1,class T2,class T3>
 struct GetEval<Rel3<SumEqual,T1,T2,T3> >
 {	typedef	bool Type;	};
 
-template<class T1,class T2>
-struct GetEval<Rel2<SumEqual,T1,T2> >
-{	typedef	bool Type;	};
 
 } // Traits
 } // Casper

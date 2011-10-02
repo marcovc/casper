@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -487,10 +487,10 @@ struct FindMax<BndArrayView<EvalT,View> >
  *	BndView over minimum of an array.
  *	\ingroup Views
  **/
-template<class View1,class Eval>
-struct BndViewRel1<Min,View1,Eval>
+template<class Expr1,class Eval>
+struct BndViewRel1<Min,Expr1,Eval>
 {
-	BndViewRel1(Store& store, const View1& p1) :
+	BndViewRel1(Store& store, const Expr1& p1) :
 		a(store,p1) {}
 	Eval min() const
 	{
@@ -533,19 +533,19 @@ struct BndViewRel1<Min,View1,Eval>
 	}
 	void attach(INotifiable* f) { 	a.attach(f); }
 	void detach(INotifiable* f) {	a.detach(f); }
-	Rel1<Min,View1>	getObj() const {	return rel<Min>(a.getObj());	}
+	Rel1<Min,Expr1>	getObj() const {	return rel<Min>(a.getObj());	}
 
-	BndArrayView<Eval,View1>	a;
+	BndArrayView<Eval,Expr1>	a;
 };
 
 /**
  *	BndView over maximum of an array.
  *	\ingroup Views
  **/
-template<class View1,class Eval>
-struct BndViewRel1<Max,View1,Eval>
+template<class Expr1,class Eval>
+struct BndViewRel1<Max,Expr1,Eval>
 {
-	BndViewRel1(Store& store, const View1& p1) :
+	BndViewRel1(Store& store, const Expr1& p1) :
 		a(store,p1) {}
 	Eval min() const
 	{
@@ -588,9 +588,9 @@ struct BndViewRel1<Max,View1,Eval>
 	}
 	void attach(INotifiable* f) { 	a.attach(f); }
 	void detach(INotifiable* f) {	a.detach(f); }
-	Rel1<Max,View1> getObj() const {	return rel<Max>(a.getObj()); }
+	Rel1<Max,Expr1> getObj() const {	return rel<Max>(a.getObj()); }
 
-	BndArrayView<Eval,View1>	a;
+	BndArrayView<Eval,Expr1>	a;
 };
 
 template<class Eval,class VarT,class SetT,class CondT,class ExprT>
@@ -653,10 +653,10 @@ struct DomArrayView<Eval,Rel4<All,VarT,SetT,CondT,ExprT> > :
  *	BndView over a Sum of values.
  *	\ingroup Views
  **/
-template<class View1,class Eval>
-struct BndViewRel1<Sum,View1,Eval>
+template<class Expr1,class Eval>
+struct BndViewRel1<Sum,Expr1,Eval>
 {
-	BndViewRel1(CPSolver& solver, const View1& p1) : v(solver,p1) {}
+	BndViewRel1(CPSolver& solver, const Expr1& p1) : v(solver,p1) {}
 	Eval min() const
 	{
 		Eval r = 0;
@@ -694,20 +694,20 @@ struct BndViewRel1<Sum,View1,Eval>
 	void attach(INotifiable* f) { 	v.attach(f); }
 	void detach(INotifiable* f) {	v.detach(f); }
 
-	Rel1<Sum,View1> getObj()  const
-	{ 	return Rel1<Sum,View1>(v.getObj());	}
+	Rel1<Sum,Expr1> getObj()  const
+	{ 	return Rel1<Sum,Expr1>(v.getObj());	}
 
-	BndArrayView<Eval,View1>	v;
+	BndArrayView<Eval,Expr1>	v;
 };
 #else
 /**
  *	BndView over a Sum of values.
  *	\ingroup Views
  **/
-template<class View1,class Eval>
-struct BndViewRel1<Sum,View1,Eval>
+template<class Expr1,class Eval>
+struct BndViewRel1<Sum,Expr1,Eval>
 {
-	BndViewRel1(Store& store, const View1& p1) :
+	BndViewRel1(Store& store, const Expr1& p1) :
 		v(store,p1),cachedMin(store),cachedMax(store),
 		cachedViewMin(store,v.size(),0),
 		cachedViewMax(store,v.size(),0) { init(); }
@@ -792,11 +792,11 @@ struct BndViewRel1<Sum,View1,Eval>
 	}
 	void detach(INotifiable* f) {	}
 
-	Rel1<Sum,View1> getObj()  const
-	{ 	return Rel1<Sum,View1>(v.getObj());	}
+	Rel1<Sum,Expr1> getObj()  const
+	{ 	return Rel1<Sum,Expr1>(v.getObj());	}
 
 
-	BndArrayView<Eval,View1>	v;
+	BndArrayView<Eval,Expr1>	v;
 	Reversible<Eval>			cachedMin;
 	Reversible<Eval>			cachedMax;
 	Vector<Eval>				cachedViewMin;
@@ -806,24 +806,24 @@ struct BndViewRel1<Sum,View1,Eval>
 #endif
 
 
-template<class View1,class View2,class Eval>
-struct BndViewRel2<SumProduct,View1,View2,Eval> :
+template<class Expr1,class Expr2,class Eval>
+struct BndViewRel2<SumProduct,Expr1,Expr2,Eval> :
 	BndViewRel1<Sum,Rel4<All,Par<int>,Casper::Util::StdRange<int>,bool,
-		Rel2<Mul,Rel2<Element,View1,Par<int> >,
-				 Rel2<Element,View2,Par<int> > > >,Eval>
+		Rel2<Mul,Rel2<Element,Expr1,Par<int> >,
+				 Rel2<Element,Expr2,Par<int> > > >,Eval>
 {
 	typedef Rel4<All,Par<int>,Casper::Util::StdRange<int>,bool,
-				Rel2<Mul,Rel2<Element,View1,Par<int> >,
-						 Rel2<Element,View2,Par<int> > > > Agg;
+				Rel2<Mul,Rel2<Element,Expr1,Par<int> >,
+						 Rel2<Element,Expr2,Par<int> > > > Agg;
 	typedef BndViewRel1<Sum,Agg,Eval> Super;
-	Agg agg(Store& store,const View1& v1, const View2& v2)
+	Agg agg(Store& store,const Expr1& v1, const Expr2& v2)
 	{
-		BndArrayView<Eval,View1> b1(store,v1);
+		BndArrayView<Eval,Expr1> b1(store,v1);
 		Par<int> i(store);
 		return all(i,range(0,b1.size()-1),true,element(v1,i)*element(v2,i));
 	}
 
-	BndViewRel2(Store& store,const View1& v1, const View2& v2) :
+	BndViewRel2(Store& store,const Expr1& v1, const Expr2& v2) :
 		Super(store,agg(store,v1,v2))
 		{}
 
@@ -831,22 +831,22 @@ struct BndViewRel2<SumProduct,View1,View2,Eval> :
 
 
 // dom view over element expression
-template<class View1,class Eval>
-struct DomView<Eval,Rel2<Element,View1,Par<int> > >
+template<class Expr1,class Eval>
+struct DomView<Eval,Rel2<Element,Expr1,Par<int> > >
 {
-	typedef typename Casper::Traits::GetElem<View1>::Type	Elem;
+	typedef typename Casper::Traits::GetElem<Expr1>::Type	Elem;
 	typedef typename Traits::GetDom<Elem>::Type	Dom;
-	DomView(Store& store,const Rel2<Element,View1,Par<int> >& p) :
+	DomView(Store& store,const Rel2<Element,Expr1,Par<int> >& p) :
 		store(store),v(store,p.p1),i(p.p2.value()) {}
 	Dom*	operator->()			{	return &*v[i];	}
 	Dom*	operator->() const	{	return const_cast<Dom*>(&*v[i]);	}
 	Dom&	operator*()				{	return *v[i];	}
 	Dom&	operator*() const	{	return const_cast<Dom&>(*v[i]); }
-	Rel2<Element,View1,Par<int> > getObj() const
-	{	return Rel2<Element,View1,Par<int> >(v.getObj(),Par<int>(store,i));}
+	Rel2<Element,Expr1,Par<int> > getObj() const
+	{	return Rel2<Element,Expr1,Par<int> >(v.getObj(),Par<int>(store,i));}
 
 	Store& store;
-	DomArrayView<Eval,View1>	v;
+	DomArrayView<Eval,Expr1>	v;
 	const int	i;
 //	Dom&	d;
 };

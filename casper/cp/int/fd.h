@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2003-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2003-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -40,6 +40,7 @@
 
 // tmp
 #include <casper/cp/scheduler.h>
+
 
 namespace Casper {
 namespace CP {
@@ -104,7 +105,7 @@ Casper::Detail::IntervalA<T,ContainerT,CompareT>
 	\param T Any integral type (\p int, \p uint, \p Short, \p Char,
 	or user-defined) that represents each element.
 
-	\ingroup Integer
+	\ingroup IntegerDomain CPIntegerDataStructures
 */
 template<class Container = Casper::Detail::List,
 		 class Element = Casper::Detail::Element,

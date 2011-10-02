@@ -18,10 +18,10 @@ using namespace std;
 
 
 ///	Enforces the Greater binary relation between two double views
-template<class View1,class View2>
+template<class Expr1,class Expr2>
 struct GreaterNotSound : IFilter
 {
-	GreaterNotSound(CPSolver& solver, const View1& p1,const View2& p2) :
+	GreaterNotSound(CPSolver& solver, const Expr1& p1,const Expr2& p2) :
 		IFilter(solver),p1(solver,p1),p2(solver,p2) {}
 	bool execute()
 	{	return p1.updateMin(Detail::succ(p2.min())) and
@@ -34,8 +34,8 @@ struct GreaterNotSound : IFilter
 	{	p1.attach(s); p2.attach(s); }
 	void detach(INotifiable* s)
 	{	p1.detach(s); p2.detach(s);	}
-	BndView<double,View1> p1;
-	BndView<double,View2> p2;
+	BndView<double,Expr1> p1;
+	BndView<double,Expr2> p2;
 };
 
 template<class T1,class T2>
@@ -43,10 +43,10 @@ Filter greaterNotSound(const T1& t1, const T2& t2)
 {	return new (getState(t1,t2).getHeap()) GreaterNotSound<T1,T2>(getState(t1,t2),t1,t2);	}
 
 ///	Enforces the Greater binary relation between two double views
-template<class View1,class View2>
+template<class Expr1,class Expr2>
 struct DistinctNotSound : IFilter
 {
-	DistinctNotSound(CPSolver& solver, const View1& p1,const View2& p2) :
+	DistinctNotSound(CPSolver& solver, const Expr1& p1,const Expr2& p2) :
 		IFilter(solver),p1(solver,p1),p2(solver,p2) {}
 	bool execute()
 	{
@@ -74,8 +74,8 @@ struct DistinctNotSound : IFilter
 	{	p1.attach(s); p2.attach(s); }
 	void detach(INotifiable* s)
 	{	p1.detach(s); p2.detach(s);	}
-	BndView<double,View1> p1;
-	BndView<double,View2> p2;
+	BndView<double,Expr1> p1;
+	BndView<double,Expr2> p2;
 };
 
 template<class T1,class T2>

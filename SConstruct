@@ -2,7 +2,7 @@
  #   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   #
  #                                                                         #
  #   Copyright:                                                            #
- #   2007-2008 - Marco Correia <marco.v.correia@gmail.com>                 #
+ #   2007-2011 - Marco Correia <marco.v.correia@gmail.com>                 #
  #                                                                         #
  #   Licensed under the Apache License, Version 2.0 (the "License");       # 
  #   you may not use this file except in compliance with the License.      # 
@@ -22,48 +22,69 @@
 
 extra_example_libs={}
 
-examples=[]
-examples+=['cp/int/golomb.cpp']
-examples+=['cp/int/golfer.cpp']
-examples+=['cp/int/langford.cpp']
-examples+=['cp/int/allinterval.cpp']
-#examples+=['cp/int/magic.cpp']
-examples+=['cp/int/ortholatin.cpp']
-examples+=['cp/int/latin.cpp']
-#examples+=['cp/int/cripto.cpp']
-examples+=['cp/int/labs.cpp']
-examples+=['cp/int/codes.cpp']
-examples+=['cp/int/nqueens.cpp']
-#examples+=['cp/int/xp_nogoods.cpp']
-#examples+=['cp/int/xp_domains.cpp']
-#examples+=['cp/int/debug.cpp']
+cp_examples=[]
+cp_examples+=['int/golomb.cpp']
+cp_examples+=['int/golfer.cpp']
+cp_examples+=['int/langford.cpp']
+cp_examples+=['int/allinterval.cpp']
+#cp_examples+=['int/magic.cpp']
+cp_examples+=['int/ortholatin.cpp']
+cp_examples+=['int/latin.cpp']
+#cp_examples+=['int/cripto.cpp']
+cp_examples+=['int/labs.cpp']
+cp_examples+=['int/codes.cpp']
+cp_examples+=['int/nqueens.cpp']
+#cp_examples+=['int/xp_nogoods.cpp']
+#cp_examples+=['int/xp_domains.cpp']
+#cp_examples+=['int/debug.cpp']
 
-#examples+=['cp/real/equation.cpp']
-#examples+=['cp/real/newton.cpp']
-examples+=['cp/real/inverse.cpp']
+#cp_examples+=['real/equation.cpp']
+#cp_examples+=['real/newton.cpp']
+cp_examples+=['real/inverse.cpp']
 extra_example_libs['examples/cp/real/inverse.cpp']=['gsl']
 
-examples+=['kernel/debug.cpp']
-#examples+=['kernel/goal_sched.cpp']
-examples+=['kernel/getversion.cpp']
+
+cp_examples+=['set/steiner.cpp']
+cp_examples+=['set/golfer.cpp']
+#cp_examples+=['set/debug.cpp']
+#cp_examples+=['set/covering.cpp']
+#cp_examples+=['set/packing.cpp']
+#cp_examples+=['set/test.cpp']
+#cp_examples+=['set/consistency.cpp']
+cp_examples+=['set/hamming.cpp']
+#cp_examples+=['set/bacp.cpp']
+cp_examples+=['set/partition.cpp']
 
 
-examples+=['cp/set/steiner.cpp']
-examples+=['cp/set/golfer.cpp']
-#examples+=['cp/set/debug.cpp']
-#examples+=['cp/set/covering.cpp']
-#examples+=['cp/set/packing.cpp']
-#examples+=['cp/set/test.cpp']
-#examples+=['cp/set/consistency.cpp']
-examples+=['cp/set/hamming.cpp']
-#examples+=['cp/set/bacp.cpp']
-examples+=['cp/set/partition.cpp']
+lp_examples=[]
+lp_examples+=['debug.cpp']
+lp_examples+=['tritype.cpp']
+lp_examples+=['binsearch.cpp']
 
+for i in lp_examples:
+	extra_example_libs['examples/lp/'+i]=['glpk']
 
-examples+=['lp/debug.cpp']
-examples+=['lp/tritype.cpp']
-examples+=['lp/binsearch.cpp']
+kernel_examples=[]
+kernel_examples+=['debug.cpp']
+#kernel_examples+=['goal_sched.cpp']
+kernel_examples+=['getversion.cpp']
 
+example_srcs=[]
+for i in kernel_examples:
+	example_srcs += ["examples/kernel/"+i]
+for i in cp_examples:
+	example_srcs += ["examples/cp/"+i]
+for i in lp_examples:
+	example_srcs += ["examples/lp/"+i]
+
+examples_for_extra_lib={}
+for k,v in extra_example_libs.iteritems():
+	for i in v:
+		if examples_for_extra_lib.has_key(i):
+			examples_for_extra_lib[i].append(k)
+		else:
+			examples_for_extra_lib[i] = [k]
+		
 ##################
 ##	LIBRARY		##
 ##################
@@ -281,7 +302,7 @@ import sys
 # user defined environment
 env = Environment(ENV=os.environ,
                   variables = vars,
-				  CPPPATH=['#','#thirdparty'],
+				  CPPPATH=['#'],
 				  CPPDEFINES = defined_macros,				  
 				  CXXFILESUFFIX='.cpp'
 				 )
@@ -322,13 +343,21 @@ if not env['safe_rounding'] or \
 	not confCommon.CheckLib( library='gmp', autoadd=1):
 	confCommon.env.Append(CPPDEFINES = ['CASPER_UNSAFE_ROUNDING'])
 if env['profile']:
-	confCommon.CheckLib( library='gcov', autoadd=1)
-if env['lp']:
-	confCommon.CheckLib( library='glpk', autoadd=1)
+	env['profile'] = confCommon.CheckLib( library='gcov', autoadd=1)	
+	if not env['profile']:
+		print "Warning: gcov library not found. No code coverage available."
 confCommon.CheckLib(library='boost_program_options',language='C++', autoadd=1)
+for (k,v) in examples_for_extra_lib.iteritems():
+	if not confCommon.CheckLib( library=k, autoadd=0):
+		print "Warning: library "+k+" not found. Examples "+v+" will not be built."
+		for i in v: 
+			example_srcs.remove(v)
 confCommon.Finish();
 
-
+if not env['lp']:
+	for i in examples_for_extra_lib['glpk']:
+		example_srcs.remove(i)
+	
 env.Append(CPPDEFINES = confCommonEnv['CPPDEFINES'])
 
 if not confCommonEnv.has_key('LIBPATH'):
@@ -343,9 +372,6 @@ if env['log']:
 if env['cpp0x']:
 	defined_macros += ['CASPER_CPP0X']
 	
-#defined_macros += ['CASPER_SETCARD_EXPLICIT']					
-
-#defined_macros += ['CASPER_SETCARD_EXPLICIT']					
 
 env.Append(CPPDEFINES = defined_macros)
 
@@ -539,8 +565,9 @@ for i in casper_cp:
 	casper_srcs+=["casper/cp/"+i]
 for i in casper_util:
 	casper_srcs+=["casper/util/"+i]
-for i in casper_lp:
-	casper_srcs+=["casper/lp/"+i]
+if env['lp']:
+	for i in casper_lp:
+		casper_srcs+=["casper/lp/"+i]
 
 def defineLibrary(env):
 	casper_objs=[]
@@ -572,10 +599,6 @@ libpath = '/casper'
 	
 example_libs+=confCommonEnv['LIBS']
 	
-example_srcs=[]
-for i in examples:
-	example_srcs += ["examples/"+i]
-
 def defineExamples(env):
 	example_targets=[]
 	for i in example_srcs:

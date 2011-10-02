@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -93,12 +93,14 @@ struct GoalView<Rel3<F,T1,T2,T3> > :
 };*/
 
 /**
-	Goal conjunction.
+	Goal conjunction. Executes \a p1 and if it succeeds then
+	executes \a p2. Fails if any of them fails, succeeds otherwise.
+	\ingroup Search
 */
-template<class View1,class View2>
-struct GoalView2<And,bool,View1,bool,View2> : IGoal
+template<class Expr1,class Expr2>
+struct GoalView2<And,bool,Expr1,bool,Expr2> : IGoal
 {
-	GoalView2(State& s,const View1& p1, const View2& p2) :
+	GoalView2(State& s,const Expr1& p1, const Expr2& p2) :
 		g1(s,p1),g2(s,p2) {}
 
 	Goal execute(IExplorer& sched)
@@ -110,10 +112,10 @@ struct GoalView2<And,bool,View1,bool,View2> : IGoal
 
 // Utilites for flatten And trees (making all subtrees branch from root)
 // Case 1/3:
-template<class View1,class View2,class View3>
-struct GoalView2<And,bool,Rel2<And,View1,View2>,bool,View3> : IGoal
+template<class Expr1,class Expr2,class Expr3>
+struct GoalView2<And,bool,Rel2<And,Expr1,Expr2>,bool,Expr3> : IGoal
 {
-	GoalView2(State& s,const Rel2<And,View1,View2>& p1, const View3& p2) :
+	GoalView2(State& s,const Rel2<And,Expr1,Expr2>& p1, const Expr3& p2) :
 		g1(s,p1),g2(s,p2) {}
 
 	Goal execute(IExplorer& sched)
@@ -124,10 +126,10 @@ struct GoalView2<And,bool,Rel2<And,View1,View2>,bool,View3> : IGoal
 };
 
 // Case 2/3:
-template<class View1,class View2,class View3>
-struct GoalView2<And,bool,View1,bool,Rel2<And,View2,View3> > : IGoal
+template<class Expr1,class Expr2,class Expr3>
+struct GoalView2<And,bool,Expr1,bool,Rel2<And,Expr2,Expr3> > : IGoal
 {
-	GoalView2(State& s,const View1& p1, const Rel2<And,View2,View3>& p2) :
+	GoalView2(State& s,const Expr1& p1, const Rel2<And,Expr2,Expr3>& p2) :
 		g1(s,p1),g2(s,p2) {}
 
 	Goal execute(IExplorer& sched)
@@ -138,12 +140,12 @@ struct GoalView2<And,bool,View1,bool,Rel2<And,View2,View3> > : IGoal
 };
 
 // Case 3/3: (because compiler doesn't like ambiguity)
-template<class View1,class View2,class View3,class View4>
-struct GoalView2<And,bool,Rel2<And,View1,View2>,
-					 bool,Rel2<And,View3,View4> > : IGoal
+template<class Expr1,class Expr2,class Expr3,class Expr4>
+struct GoalView2<And,bool,Rel2<And,Expr1,Expr2>,
+					 bool,Rel2<And,Expr3,Expr4> > : IGoal
 {
-	GoalView2(State& s,const Rel2<And,View1,View2>& p1,
-					   const Rel2<And,View3,View4>& p2) :
+	GoalView2(State& s,const Rel2<And,Expr1,Expr2>& p1,
+					   const Rel2<And,Expr3,Expr4>& p2) :
 		g1(s,p1),g2(s,p2) {}
 
 	Goal execute(IExplorer& sched)
@@ -154,14 +156,16 @@ struct GoalView2<And,bool,Rel2<And,View1,View2>,
 };
 
 /**
-	Goal disjunction (branching)
+	Goal disjunction (branching). Executes \a p1 and if it fails then
+	executes \a p2. Succeeds if any of them succeeds, fails otherwise.
+	\ingroup Search
 */
-template<class View1,class View2>
-struct GoalView2<Or,bool,View1,bool,View2> : IGoal
+template<class Expr1,class Expr2>
+struct GoalView2<Or,bool,Expr1,bool,Expr2> : IGoal
 {
-	typedef GoalView2<Or,bool,View1,bool,View2>	Self;
+	typedef GoalView2<Or,bool,Expr1,bool,Expr2>	Self;
 
-	GoalView2(State& s,const View1& p1, const View2& p2) :
+	GoalView2(State& s,const Expr1& p1, const Expr2& p2) :
 		g1(s,p1),g2(s,p2) {}
 
   	Goal execute(IExplorer& sched)
@@ -175,27 +179,30 @@ struct GoalView2<Or,bool,View1,bool,View2> : IGoal
 };
 
 /**
-	Assign: the left hand expression is assigned the value of the right hand expression
+	Assigns the evaluation of v2 to v1. Always succeeds.
+	\ingroup Search
 */
-template<class View1,class View2,class Eval>
-struct GoalView2<Assign,Eval,View1,Eval,View2> : IGoal
+template<class Expr1,class Expr2,class Eval>
+struct GoalView2<Assign,Eval,Expr1,Eval,Expr2> : IGoal
 {
-	GoalView2(State& s,const View1& v1, const View2& v2) :
+	GoalView2(State& s,const Expr1& v1, const Expr2& v2) :
 		s(s),v1(v1),v2(v2) {}
 
   	Goal execute()
 	{
-		v1 = ParView<Eval,View2>(s,v2).value();
+		v1 = ParView<Eval,Expr2>(s,v2).value();
 		return succeed();
 	}
 
   	State&			s;
-	View1			v1;
-	View2			v2;
+	Expr1			v1;
+	Expr2			v2;
 };
 
 /**
-	Select: the left hand expression is assigned the value of the right hand expression
+	Assigns the first value in the set \a s to \a p. Fails
+	if \a s is empty, succeeds otherwise.
+	\ingroup Search
 */
 template<class Set,class Eval>
 struct GoalView2<SelectFirst,Eval,Par<Eval>,Seq<Eval>,Set> : IGoal

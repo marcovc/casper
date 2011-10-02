@@ -33,11 +33,16 @@ struct GetEval<Rel3<ForAll,T1,T2,T3> >
 {	typedef	bool	Type;	};
 } // Traits
 
-template<class T,class Iter,class View>
-struct GoalView3<ForAll,T,Par<T>,Seq<T>,Iter,bool,View> : IGoal
+/**
+ * 	Executes \a v for all \a it in \a r. Succeeds if \a v
+ * 	always succeeded, fails on the first \a it that fails \a v.
+ * 	\ingroup Search
+ */
+template<class T,class Iter,class Obj>
+struct GoalView3<ForAll,T,Par<T>,Seq<T>,Iter,bool,Obj> : IGoal
 {
 	GoalView3(State& state, const Par<T>& it,
-				const Iter& r, const View& v) :
+				const Iter& r, const Obj& v) :
 		state(state),it(it),r(r),iter(this->r),v(v) {}
     Goal execute()
 	{
@@ -51,7 +56,7 @@ struct GoalView3<ForAll,T,Par<T>,Seq<T>,Iter,bool,View> : IGoal
 	Iter r;
 	//IterationView<T,Iter>	iter;
 	Util::IterationView<Iter>	iter;
-	View v;
+	Obj v;
 };
 
 }

@@ -23,6 +23,14 @@
 
 namespace Casper {
 namespace CP {
+
+// this is required since doxygen sometimes
+// doesn't autolink namespace scoped things
+#ifdef DOXYGEN_PARSER
+using namespace Casper;
+using namespace Casper::CP;
+#endif
+
 namespace Detail {
 
 // TODO: may be optimized in the case rsc=false to try to avoid completing the last loop
@@ -86,50 +94,61 @@ struct NOPInfoCollector
 }
 
 /**
- *  \ingroup Goals
- * 	Enforces singleton consistency on the set of variables \a vars.
+ *  \name Singleton Consistency
+ *	\anchor SingletonConsistency
+ *
+ *  The functions below return a new Goal that performs some kind of singleton consistency on
+ *  \a obj and \a store. The optional parameter \a i is used to collect lookahead information during
+ *  the propagation algorithm.
+ *
+*/
+/// @{
+/**
+ * 	Enforces singleton consistency on the set of variables \a obj.
  *  The optional parameter \a i is used to collect lookahead information during
  *  the propagation algorithm. \sa LAInfo
+ *  \ingroup CPSearch
  */
-template<class Vars,class InfoCollector = Detail::NOPInfoCollector>
-Goal sc(Store& store, const Vars& vars,InfoCollector i = InfoCollector())
+template<class Obj,class InfoCollector = Detail::NOPInfoCollector>
+Goal sc(Store& store, const Obj& obj,InfoCollector i = InfoCollector())
 {	return new (store)
-		Detail::SC<Vars,InfoCollector>(store,vars,false,limits<uint>::max(),i); }
+		Detail::SC<Obj,InfoCollector>(store,obj,false,limits<uint>::max(),i); }
 
 /**
- *  \ingroup Goals
- * 	Enforces restricted singleton consistency on the set of variables \a vars.
+ * 	Enforces restricted singleton consistency on the set of variables \a obj.
  *  The optional parameter \a i is used to collect lookahead information during
  *  the propagation algorithm. \sa LAInfo
+ *  \ingroup CPSearch
  */
-template<class Vars,class InfoCollector = Detail::NOPInfoCollector>
-Goal rsc(Store& store, const Vars& vars,InfoCollector i = InfoCollector())
+template<class Obj,class InfoCollector = Detail::NOPInfoCollector>
+Goal rsc(Store& store, const Obj& obj,InfoCollector i = InfoCollector())
 {	return new (store)
-		Detail::SC<Vars,InfoCollector>(store,vars,true,limits<uint>::max(),i); }
+		Detail::SC<Obj,InfoCollector>(store,obj,true,limits<uint>::max(),i); }
 
 /**
- *  \ingroup Goals
  * 	Enforces singleton consistency on the subset of variables of \a a with at
  *  least \a minSize values in its domain.
  *  The optional parameter \a i is used to collect lookahead information during
  *  the propagation algorithm. \sa LAInfo
+ *  \ingroup CPSearch
  */
-template<class Vars,class InfoCollector = Detail::NOPInfoCollector>
-Goal scMinSize(Store& store,const Vars& vars,uint minSize,InfoCollector i = InfoCollector())
+template<class Obj,class InfoCollector = Detail::NOPInfoCollector>
+Goal scMinSize(Store& store,const Obj& obj,uint minSize,InfoCollector i = InfoCollector())
 {	return new (store)
-		Detail::SC<Vars,InfoCollector>(store,vars,false,minSize,i); }
+		Detail::SC<Obj,InfoCollector>(store,obj,false,minSize,i); }
 
 /**
- *  \ingroup Goals
  * 	Enforces restricted singleton consistency on the subset of variables of \a a with at
  *  least \a minSize values in its domain.
  *  The optional parameter \a i is used to collect lookahead information during
  *  the propagation algorithm. \sa LAInfo
+ *  \ingroup CPSearch
  */
-template<class Vars,class InfoCollector = Detail::NOPInfoCollector>
-Goal rscMinSize(Store& store,const Vars& vars,uint minSize,InfoCollector i = InfoCollector())
+template<class Obj,class InfoCollector = Detail::NOPInfoCollector>
+Goal rscMinSize(Store& store,const Obj& obj,uint minSize,InfoCollector i = InfoCollector())
 {	return new (store)
-		Detail::SC<Vars,InfoCollector>(store,vars,true,minSize,i); }
+		Detail::SC<Obj,InfoCollector>(store,obj,true,minSize,i); }
+/// @}
 
 } // CP
 } // Casper

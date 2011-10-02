@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2011-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -16,29 +16,13 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
+#ifndef CASPER_CP_GOAL_H_
+#define CASPER_CP_GOAL_H_
 
-#include <casper/kernel/goal/goal.h>
-#include <casper/kernel/state/state.h>
-#include <functional>
-
-namespace Casper {
-
-namespace Detail {
-
-struct StdFunctionAsGoal : IGoal
-{
-	StdFunctionAsGoal(State& s, const std::function<Goal()>& fn)
-		:	fn(fn) {}
-	Goal execute()
-	{	return fn();	}
-	std::function<Goal()> fn;
-};
-
-}
-
-Goal::Goal(State& s, const std::function<Goal()>& fn) :
-	Super(new (s) Casper::Detail::StdFunctionAsGoal(s,fn)) {}
-
-}
+#include <casper/cp/goal/bb.h>
+#include <casper/cp/goal/heuristic.h>
+#include <casper/cp/goal/labeling.h>
+#include <casper/cp/goal/whilenotground.h>
 
 
+#endif /* CASPER_CP_GOAL_H_ */

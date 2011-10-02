@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2005-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2005-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -385,7 +385,7 @@ NEW_REL_3(linear,Linear)
 NEW_REL_2(sumProduct,SumProduct)
 
 NEW_REL_1(sum,Sum)
-NEW_REL_2(sumEquals,SumEquals)
+NEW_REL_2(sumEquals,SumEqual)
 
 NEW_REL_2(ifThen,IfThen)
 NEW_REL_3(ifThenElse,IfThenElse)
@@ -539,7 +539,7 @@ struct GetEval<Rel1<Min,T1> >
 {	typedef typename Traits::GetSetElem<typename Traits::GetEval<typename Traits::GetTermElem<T1>::Type>::Type>::Type 	Type;	};
 
 template<class T1,class T2>
-struct GetEval<Rel2<SumEquals,T1,T2> >
+struct GetEval<Rel2<SumEqual,T1,T2> >
 {	typedef bool	Type;	};
 
 template<class T1>
@@ -559,21 +559,21 @@ struct GetEval<Rel2<SumProduct,T1,T2> >
 {	typedef	typename Traits::GetEval<typename Traits::GetTermElem<T2>::Type>::Type	Type;	};
 
 
-template<class View1,class View2,class View3,class View4>
-struct GetElem<Rel4<All,View1,View2,View3,View4> >
-{	typedef View4	Type;	};
+template<class Expr1,class Expr2,class Expr3,class Expr4>
+struct GetElem<Rel4<All,Expr1,Expr2,Expr3,Expr4> >
+{	typedef Expr4	Type;	};
 
-template<class View1,class View2>
-struct GetElem<Rel2<Element,View1,View2> >
-{	typedef typename Traits::GetElem<typename Traits::GetElem<View1>::Type>::Type	Type;	};
+template<class Expr1,class Expr2>
+struct GetElem<Rel2<Element,Expr1,Expr2> >
+{	typedef typename Traits::GetElem<typename Traits::GetElem<Expr1>::Type>::Type	Type;	};
 
-template<class View1,class View2,class View3,class View4>
-struct GetTermElem<Rel4<All,View1,View2,View3,View4> >
-{	typedef View4	Type;	};
+template<class Expr1,class Expr2,class Expr3,class Expr4>
+struct GetTermElem<Rel4<All,Expr1,Expr2,Expr3,Expr4> >
+{	typedef Expr4	Type;	};
 
-template<class View1,class View2>
-struct GetTermElem<Rel2<Element,View1,View2> >
-{	typedef typename Traits::GetTermElem<View1>::Type	Type;	};
+template<class Expr1,class Expr2>
+struct GetTermElem<Rel2<Element,Expr1,Expr2> >
+{	typedef typename Traits::GetTermElem<Expr1>::Type	Type;	};
 
 template<class ArrayView, class IdxView>
 struct GetEval<Rel2<Element,ArrayView,IdxView> >
@@ -631,12 +631,12 @@ template<class T>
 struct GetEval<Rel2<RandInRange,T,T> >
 {	typedef T Type;	};
 
-template<class View1, class View2>
-struct GetEval<Rel2<Assign,View1,View2> >
+template<class Expr1, class Expr2>
+struct GetEval<Rel2<Assign,Expr1,Expr2> >
 {	typedef bool	Type;	};
 
-template<class View1, class View2>
-struct GetEval<Rel2<SelectFirst,View1,View2> >
+template<class Expr1, class Expr2>
+struct GetEval<Rel2<SelectFirst,Expr1,Expr2> >
 {	typedef bool	Type;	};
 
 } // Traits

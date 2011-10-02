@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -17,7 +17,6 @@
  \*************************************************************************/
 
 #include <casper/kernel.h>
-#include <casper/cp/solver.h>
 #include <casper/cp/int.h>
 
 #include <casper/cp/int/impacts.h>
@@ -50,7 +49,7 @@ int latin(uint n, ifstream* pF, bool la, const Util::ExampleOptions& opt)
 	// post constraints to specify that all cols are distinct
 	for (uint c = 0; c < n; c++)
 	{
-		VarArray<int> col(solver,n);
+		IntVarArray col(solver,n);
 		for (uint r = 0; r < n; r++)
 			col[r] = square[r][c];
 		solver.post(distinct(col),postDomFilter);

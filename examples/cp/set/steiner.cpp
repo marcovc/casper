@@ -8,12 +8,8 @@
  *   (at your option) any later version.                                   *
  ***************************************************************************/
 
-#include <casper/cp/set/config.h>
-
 #include <casper/kernel.h>
-#include <casper/cp/solver.h>
 #include <casper/cp/set.h>
-#include <casper/cp/int.h>
 #include <casper/util/options.h>
 
 #include <iostream>

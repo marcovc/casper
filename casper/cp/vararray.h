@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2008-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2008-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -54,11 +54,12 @@ struct VarArrayTraits
 };
 #endif
 
-/**	Multidimensional array of domain variables.
+/**
+ * 	Multidimensional array of domain variables.
  *  \param T	The type of element in each domain.
  *  \param dims	The number of dimensions of the array.
  *  \param Dom	The type of the domain.
- *  \ingroup Kernel
+ *  \ingroup CPDataStructures
  */
 template<class T, int dims = 1, class Dom1 = typename Traits::GetDefaultDom<T>::Type>
 struct VarArray : Util::StdArray<Var<T,Dom1>,dims>

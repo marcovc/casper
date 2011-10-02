@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2008-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2008-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -20,11 +20,12 @@
 #define CASPER_CP_INT_NEGATIVE_H_
 
 #include <casper/cp/int/filter.h>
-#include <casper/kernel/reversible/rlist.h>
-#include <casper/kernel/reversible/rstack.h>
-#include <casper/util/container/trie.h>
+#include <casper/kernel/reversible/list.h>
+#include <casper/kernel/reversible/stack.h>
+#include <casper/util/container/stdtrie.h>
 
 namespace Casper {
+namespace CP {
 
 #define GACSCHEMANEG_WL
 

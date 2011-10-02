@@ -37,12 +37,12 @@ NEW_REL_1(myPow,MyPow)
 
 namespace CP {
 
-template<class View1,class Eval>
-struct BndViewRel1<MyPow,View1,Eval>
+template<class Expr1,class Eval>
+struct BndViewRel1<MyPow,Expr1,Eval>
 {
 	static const double ex;
 
-	BndViewRel1(Store& store, const View1& p1) :
+	BndViewRel1(Store& store, const Expr1& p1) :
 		p1(store,p1) {}
 	Eval min() const
 	{
@@ -73,14 +73,14 @@ struct BndViewRel1<MyPow,View1,Eval>
 
 	void attach(INotifiable* f) { 	p1.attach(f); }
 	void detach(INotifiable* f) {	p1.detach(f);}
-	Rel1<MyPow,View1> getObj()  const
-	{ 	return Rel1<MyPow,View1>(p1.getObj());	}
+	Rel1<MyPow,Expr1> getObj()  const
+	{ 	return Rel1<MyPow,Expr1>(p1.getObj());	}
 
-	BndView<Eval,View1>	p1;
+	BndView<Eval,Expr1>	p1;
 };
 
-template<class View1,class Eval>
-const double BndViewRel1<MyPow,View1,Eval>::ex = 0.62;
+template<class Expr1,class Eval>
+const double BndViewRel1<MyPow,Expr1,Eval>::ex = 0.62;
 
 } // CP
 } // Casper

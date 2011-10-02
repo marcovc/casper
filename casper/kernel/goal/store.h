@@ -33,7 +33,7 @@ struct Post: IGoal
 	Goal execute()
 	{
 		if (store.post(p))
-			return !validate or store.valid();
+			return Goal(!validate or store.valid());
 		else
 			return fail();
 	}
@@ -59,10 +59,20 @@ struct Validate : IGoal
 
 } // Detail
 
-template<class Store,class T>
-Goal post(Store& s, const T& p, bool validate = true)
-{	return new (s) Detail::Post<Store,T>(s,p,validate);}
+/**
+ * 	Posts the constraint \a obj to store \a s. If \a validate is
+ * 	true then also propagate store. Succeeds if adding the constraint
+ * 	and propagating (if validate is true) succeeds. Fails otherwise.
+ * 	\ingroup Search
+ */
+template<class Store,class Obj>
+Goal post(Store& s, const Obj& obj, bool validate = true)
+{	return new (s) Detail::Post<Store,Obj>(s,obj,validate);}
 
+/**
+ * 	Propagates store \a s. Succeeds if propagation is successful, fails otherwise.
+ * 	\ingroup Search
+ */
 template<class Store>
 Goal validate(Store& s)
 {	return new (s) Detail::Validate<Store>(s);}

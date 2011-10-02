@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -43,15 +43,8 @@ struct IExplorer;
 /** \defgroup Search Search
  *
  * (Nondeterministic) search is accomplished with Goal objects.
- *	\sa Goal,Exploreruler
- */
-
-/**
- * 	\defgroup Goals Goals
- *  \ingroup Search
- *
- *  Predefined Goal objects.
- *
+ *	\sa Goal,Explorer
+ *	\ingroup Kernel
  */
 
 struct IGoal;
@@ -61,13 +54,13 @@ struct State;
 struct IGoal;
 
 /**
- * 	\ingroup Goals
+ * 	\ingroup Search
  * 	This goal succeeds when evaluated - use it to signal success.
  */
 Goal	succeed();
 
 /**
- * 	\ingroup Goals
+ * 	\ingroup Search
  * 	This goal fails when evaluated - use it to signal failure.
  */
 Goal	fail();
@@ -85,7 +78,7 @@ struct GoalView4;
 
 /**
  * 	Wrapper over an IGoal object.
- *
+ *	\ingroup Search
  */
 struct Goal : Util::PImplIdiom<IGoal>
 {
@@ -93,8 +86,10 @@ struct Goal : Util::PImplIdiom<IGoal>
 	typedef Util::PImplIdiom<IGoal> 	Super;
 
 	Goal(IGoal* g) : Super(g) {}
-	//Goal(Filter f);
-	Goal(bool cond) : Super(cond?succeed():fail()) {}
+
+	// 'explicit' below is needed to avoid creating ambiguity with an
+	// overload of && defined in the STL (at least with gcc)
+	explicit Goal(bool cond) : Super(cond?succeed():fail()) {}
 	Goal(const Goal& g) : Super(g.getPImpl())	{}
 
 	Goal(State&,const Goal& g) : Super(g.getPImpl())	{}
@@ -158,16 +153,18 @@ struct ISearchPath
 
 
 /**
- * 	A Goal represents a predicate or a logical composition of predicates, and is used
- *  to define nondeterministic search (a la Prolog). This class defines the
+ * 	A Goal represents a nondeterministic sequence of actions (or ,
+ * 	more realistically, a tree of actions),	and is used
+ *  to define nondeterministic search. This class defines the
  *  interface of a Goal, essentially a function object with a single method
  *  called execute() which returns a new Goal.
+ *  \ingroup Search
  */
 struct IGoal
 {
 	IGoal() {}
 	virtual ~IGoal() {}
-	/// Calls the current Goal, which returns a new Goal as the result.
+	/// Executes the current Goal, which returns a new Goal as the result.
 	virtual Goal execute() { assert(0); return (IGoal*)NULL; }
 	virtual Goal execute(IExplorer&) { return execute(); }
 

@@ -20,14 +20,15 @@
 #define CASPER_SET_CHKVIEW_H_
 
 #include <casper/cp/view/chk.h>
+#include <casper/cp/set/relation.h>
 
 namespace Casper {
 namespace CP {
 
-template<class Elem,class View1,class View2>
-struct ChkViewRel2<Member,Elem,View1,Set<Elem>,View2>
+template<class Elem,class Expr1,class Expr2>
+struct ChkViewRel2<Member,Elem,Expr1,Set<Elem>,Expr2>
 {
-	ChkViewRel2(Store& store, const View1& p1,const View2& p2) :
+	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
 			store(store),elem(store,p1),set(store,p2) {}
 	bool isTrue() const	// is it true?
 	{	return elem.ground() and
@@ -51,21 +52,21 @@ struct ChkViewRel2<Member,Elem,View1,Set<Elem>,View2>
 	void attach(INotifiable* f) { 	pOwner=f; elem.attach(f); set->attachOnDomain(f);}
 	void detach(INotifiable* f) {	elem.detach(f); set->detachOnDomain(f);}
 
-	Rel2<Member,View1,View2> getObj()  const
-	{ 	return Rel2<Member,View1,View2>(elem.getObj(),set.getObj());	}
+	Rel2<Member,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<Member,Expr1,Expr2>(elem.getObj(),set.getObj());	}
 
 	Store&		store;
-	ValView<Elem,View1>	elem;
-	DomView<Set<Elem>,View2>	set;
+	ValView<Elem,Expr1>	elem;
+	DomView<Set<Elem>,Expr2>	set;
 	INotifiable*	pOwner;
 };
 
 
 
-template<class Elem,class View1,class View2>
-struct ChkViewRel2<NotMember,Elem,View1,Set<Elem>,View2>
+template<class Elem,class Expr1,class Expr2>
+struct ChkViewRel2<NotMember,Elem,Expr1,Set<Elem>,Expr2>
 {
-	ChkViewRel2(Store& store, const View1& p1,const View2& p2) :
+	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
 			store(store),elem(store,p1),set(store,p2) {}
 	bool isTrue() const	// is it true?
 	{	return elem.ground() and
@@ -90,24 +91,24 @@ struct ChkViewRel2<NotMember,Elem,View1,Set<Elem>,View2>
 	void attach(INotifiable* f) { 	pOwner=f; elem.attach(f); set->attachOnDomain(f);}
 	void detach(INotifiable* f) {	elem.detach(f); set->detachOnDomain(f);}
 
-	Rel2<NotMember,View1,View2> getObj()  const
-	{ 	return Rel2<NotMember,View1,View2>(elem.getObj(),set.getObj());	}
+	Rel2<NotMember,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<NotMember,Expr1,Expr2>(elem.getObj(),set.getObj());	}
 
 	Store&	store;
-	ValView<Elem,View1>	elem;
-	DomView<Set<Elem>,View2>	set;
+	ValView<Elem,Expr1>	elem;
+	DomView<Set<Elem>,Expr2>	set;
 	INotifiable*	pOwner;
 };
 
 
 // FIXME: not tested at all
-template<class Elem,class View1,class View2>
-struct ChkViewRel2<Contained,Set<Elem>,View1,Set<Elem>,View2>
+template<class Elem,class Expr1,class Expr2>
+struct ChkViewRel2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2>
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
-	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
 
-	ChkViewRel2(Store& store, const View1& p1,const View2& p2) :
+	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
 			store(store),x(store,p1),y(store,p2) {}
 	bool isTrue() const	// when lub(x) C glb(y)
 	{
@@ -138,24 +139,24 @@ struct ChkViewRel2<Contained,Set<Elem>,View1,Set<Elem>,View2>
 	void detach(INotifiable* f)
 	{	x->detachOnDomain(f); y->detachOnDomain(f);}
 
-	Rel2<Contained,View1,View2> getObj()  const
-	{ 	return Rel2<Contained,View1,View2>(x.getObj(),y.getObj());	}
+	Rel2<Contained,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<Contained,Expr1,Expr2>(x.getObj(),y.getObj());	}
 
 	Store&	store;
-	DomView<Set<Elem>,View1>	x;
-	DomView<Set<Elem>,View2>	y;
+	DomView<Set<Elem>,Expr1>	x;
+	DomView<Set<Elem>,Expr2>	y;
 	INotifiable*	pOwner;
 };
 
 
 // FIXME: not tested at all
-template<class Elem,class View1,class View2>
-struct ChkViewRel2<Equal,Set<Elem>,View1,Set<Elem>,View2>
+template<class Elem,class Expr1,class Expr2>
+struct ChkViewRel2<Equal,Set<Elem>,Expr1,Set<Elem>,Expr2>
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
-	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
 
-	ChkViewRel2(Store& store, const View1& p1,const View2& p2) :
+	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
 			store(store),x(store,p1),y(store,p2),xCy(store,p1,p2),yCx(store,p2,p1) {}
 	bool isTrue() const	// when lub(x) = lub(y)
 	{
@@ -181,22 +182,22 @@ struct ChkViewRel2<Equal,Set<Elem>,View1,Set<Elem>,View2>
 	void detach(INotifiable* f)
 	{	x->detachOnDomain(f); y->detachOnDomain(f);}
 
-	Rel2<Equal,View1,View2> getObj()  const
-	{ 	return Rel2<Equal,View1,View2>(x.getObj(),y.getObj());	}
+	Rel2<Equal,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<Equal,Expr1,Expr2>(x.getObj(),y.getObj());	}
 
 	Store&	store;
-	DomView<Set<Elem>,View1>	x;
-	DomView<Set<Elem>,View2>	y;
+	DomView<Set<Elem>,Expr1>	x;
+	DomView<Set<Elem>,Expr2>	y;
 	INotifiable*	pOwner;
-	ChkViewRel2<Contained,Set<Elem>,View1,Set<Elem>,View2>	xCy;
-	ChkViewRel2<Contained,Set<Elem>,View2,Set<Elem>,View1>	yCx;
+	ChkViewRel2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2>	xCy;
+	ChkViewRel2<Contained,Set<Elem>,Expr2,Set<Elem>,Expr1>	yCx;
 };
 
 
-template<class Elem,class View1,class View2>
-struct ChkViewRel2<Disjoint,Set<Elem>,View1,Set<Elem>,View2>
+template<class Elem,class Expr1,class Expr2>
+struct ChkViewRel2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2>
 {
-	ChkViewRel2(Store& store, const View1& p1,const View2& p2) :
+	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
 			store(store),x(store,p1),y(store,p2) {}
 	bool isTrue() const	// is it true?
 	{
@@ -233,27 +234,27 @@ struct ChkViewRel2<Disjoint,Set<Elem>,View1,Set<Elem>,View2>
 	void attach(INotifiable* f) { 	pOwner=f; x->attachOnDomain(f); y->attachOnDomain(f);}
 	void detach(INotifiable* f) {	x->detachOnDomain(f); y->detachOnDomain(f);}
 
-	Rel2<Disjoint,View1,View2> getObj()  const
-	{ 	return Rel2<Disjoint,View1,View2>(x.getObj(),y.getObj());	}
+	Rel2<Disjoint,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<Disjoint,Expr1,Expr2>(x.getObj(),y.getObj());	}
 
 	Store&	store;
-	DomView<Set<Elem>,View1>	x;
-	DomView<Set<Elem>,View2>	y;
+	DomView<Set<Elem>,Expr1>	x;
+	DomView<Set<Elem>,Expr2>	y;
 	INotifiable*	pOwner;
 };
 
 
 // FIXME: not tested at all
-template<class Elem,class View1,class View2,class View3>
-struct ChkViewRel3<Intersect,Set<Elem>,View1,Set<Elem>,View2,
-					Set<Elem>,View3>
+template<class Elem,class Expr1,class Expr2,class Expr3>
+struct ChkViewRel3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,
+					Set<Elem>,Expr3>
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
-	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
-	typedef typename DomView<Set<Elem>,View3>::Dom	DomZ;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
+	typedef typename DomView<Set<Elem>,Expr3>::Dom	DomZ;
 
-	ChkViewRel3(Store& store, const View1& p1,const View2& p2,
-					const View3& p3) :
+	ChkViewRel3(Store& store, const Expr1& p1,const Expr2& p2,
+					const Expr3& p3) :
 			store(store),x(store,p1),y(store,p2),z(store,p3) {}
 	bool isTrue() const	// is it true?
 	{
@@ -287,27 +288,27 @@ struct ChkViewRel3<Intersect,Set<Elem>,View1,Set<Elem>,View2,
 	void detach(INotifiable* f)
 	{	x->detachOnDomain(f); y->detachOnDomain(f); z->detachOnDomain(f);	}
 
-	Rel3<Intersect,View1,View2,View3> getObj()  const
-	{ 	return Rel3<Intersect,View1,View2,View3>(x.getObj(),y.getObj(),z.getObj());	}
+	Rel3<IntersectEqual,Expr1,Expr2,Expr3> getObj()  const
+	{ 	return Rel3<IntersectEqual,Expr1,Expr2,Expr3>(x.getObj(),y.getObj(),z.getObj());	}
 
 	Store& store;
-	DomView<Set<Elem>,View1>	x;
-	DomView<Set<Elem>,View2>	y;
-	DomView<Set<Elem>,View3>	z;
+	DomView<Set<Elem>,Expr1>	x;
+	DomView<Set<Elem>,Expr2>	y;
+	DomView<Set<Elem>,Expr3>	z;
 	INotifiable*	pOwner;
 };
 
 
 // FIXME: not tested at all
-template<class Elem,class View1,class View2,class View3>
-struct ChkViewRel3<UnionEqual,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3>
+template<class Elem,class Expr1,class Expr2,class Expr3>
+struct ChkViewRel3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3>
 {
-	typedef typename DomView<Set<Elem>,View1>::Dom	DomX;
-	typedef typename DomView<Set<Elem>,View2>::Dom	DomY;
-	typedef typename DomView<Set<Elem>,View3>::Dom	DomZ;
+	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
+	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
+	typedef typename DomView<Set<Elem>,Expr3>::Dom	DomZ;
 
-	ChkViewRel3(Store& store, const View1& p1,const View2& p2,
-					const View3& p3) :
+	ChkViewRel3(Store& store, const Expr1& p1,const Expr2& p2,
+					const Expr3& p3) :
 			store(store),x(store,p1),y(store,p2),z(store,p3) {}
 
 	bool isTrue() const	// is it true?
@@ -342,22 +343,22 @@ struct ChkViewRel3<UnionEqual,Set<Elem>,View1,Set<Elem>,View2,Set<Elem>,View3>
 	void detach(INotifiable* f)
 	{	x->detachOnDomain(f); y->detachOnDomain(f); z->detachOnDomain(f);	}
 
-	Rel3<UnionEqual,View1,View2,View3> getObj()  const
-	{ 	return Rel3<UnionEqual,View1,View2,View3>(x.getObj(),y.getObj(),z.getObj());	}
+	Rel3<UnionEqual,Expr1,Expr2,Expr3> getObj()  const
+	{ 	return Rel3<UnionEqual,Expr1,Expr2,Expr3>(x.getObj(),y.getObj(),z.getObj());	}
 
 	Store& 	store;
-	DomView<Set<Elem>,View1>	x;
-	DomView<Set<Elem>,View2>	y;
-	DomView<Set<Elem>,View3>	z;
+	DomView<Set<Elem>,Expr1>	x;
+	DomView<Set<Elem>,Expr2>	y;
+	DomView<Set<Elem>,Expr3>	z;
 	INotifiable*	pOwner;
 };
 
 // WARNING: not tested
 // FIXME: this should be incremental (i.e. use deltas)
-template<class Elem,class View1>
-struct ChkViewRel1<Partition,Seq<Set<Elem> >,View1>
+template<class Elem,class Expr1>
+struct ChkViewRel1<Partition,Seq<Set<Elem> >,Expr1>
 {
-	ChkViewRel1(Store& store, const View1& p1) :
+	ChkViewRel1(Store& store, const Expr1& p1) :
 			store(store),x(store,p1) {}
 	bool isTrue() const // is it true if no 'lub' set intersect with another 'lub' set
 	{
@@ -400,11 +401,11 @@ struct ChkViewRel1<Partition,Seq<Set<Elem> >,View1>
 	void attach(INotifiable* f) { 	pOwner=f; x->attachOnDomain(f); }
 	void detach(INotifiable* f) {	x->detachOnDomain(f); }
 
-	Rel1<Disjoint,View1> getObj()  const
-	{ 	return Rel1<Disjoint,View1>(x.getObj());	}
+	Rel1<Disjoint,Expr1> getObj()  const
+	{ 	return Rel1<Disjoint,Expr1>(x.getObj());	}
 
 	Store&	store;
-	DomArrayView<Set<Elem>,View1> x;
+	DomArrayView<Set<Elem>,Expr1> x;
 	INotifiable*	pOwner;
 };
 

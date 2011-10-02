@@ -24,6 +24,13 @@
 namespace Casper {
 namespace CP {
 
+// this is required since doxygen sometimes
+// doesn't autolink namespace scoped things
+#ifdef DOXYGEN_PARSER
+using namespace Casper;
+using namespace Casper::CP;
+#endif
+
 namespace Detail {
 
 template<class Vars>
@@ -202,14 +209,23 @@ struct LabelWithImpacts : IGoal
 } // Detail
 
 /**
+ *  \name Labeling Primitives
+ *	\anchor LabelingPrimitives
+ *
+ *  The functions below return a new Goal that labels, i.e. assigns, all variables
+ *  in \a s while propagating \a store.
+ *
+*/
+/// @{
+/**
  * 	Labels \a vars using a variable and value selection strategy based on
  *  impacts (Refalo).
- * 	\ingroup Goals
- *
+ *	\ingroup CPSearch
  */
-template<class Vars>
-Goal labelWithImpacts(Store& store,const Vars& vars)
-{	return new (store) Detail::LabelWithImpacts<Vars>(store,vars);	}
+template<class Obj>
+Goal labelWithImpacts(Store& store,const Obj& s)
+{	return new (store) Detail::LabelWithImpacts<Obj>(store,s);	}
+/// @}
 
 } // CP
 } // Casper

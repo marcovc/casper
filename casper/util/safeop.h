@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2007-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2007-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -241,7 +241,7 @@ public:
   GENR_FUNC(asinh)
   GENR_FUNC(acosh)
   GENR_FUNC(atanh)
-  GENR_FUNC(pow)
+  GENR_FUNC2(pow,std::pow(x,y))
 
   T median(const T& x, const T& y) { return (x + y) / 2; }
 

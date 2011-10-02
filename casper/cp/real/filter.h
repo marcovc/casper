@@ -25,13 +25,13 @@ namespace Casper {
 namespace CP {
 
 ///	Enforces the Greater binary relation between two double views
-template<class View1,class View2>
-struct BndFilterView2<Greater,double,View1,double,View2> :
-	BndFilterView2<GreaterEqual,double,View1,double,View2>
+template<class Expr1,class Expr2>
+struct BndFilterView2<Greater,double,Expr1,double,Expr2> :
+	BndFilterView2<GreaterEqual,double,Expr1,double,Expr2>
 {
-	typedef BndFilterView2<GreaterEqual,double,View1,double,View2> Super;
-	BndFilterView2(Store& solver, const View1& p1,const View2& p2) :
-		BndFilterView2<GreaterEqual,double,View1,double,View2>(solver,p1,p2){}
+	typedef BndFilterView2<GreaterEqual,double,Expr1,double,Expr2> Super;
+	BndFilterView2(Store& solver, const Expr1& p1,const Expr2& p2) :
+		BndFilterView2<GreaterEqual,double,Expr1,double,Expr2>(solver,p1,p2){}
 	bool execute()
 	{
 		if (this->p2.min()>=this->p1.max())
@@ -45,10 +45,10 @@ struct BndFilterView2<Greater,double,View1,double,View2> :
 };
 
 ///	Enforces the Distinct binary relation between two double views
-template<class View1,class View2>
-struct BndFilterView2<Distinct,double,View1,double,View2> : IFilter
+template<class Expr1,class Expr2>
+struct BndFilterView2<Distinct,double,Expr1,double,Expr2> : IFilter
 {
-	BndFilterView2(Store& solver, const View1& p1,const View2& p2) :
+	BndFilterView2(Store& solver, const Expr1& p1,const Expr2& p2) :
 		IFilter(solver),p1(solver,p1),p2(solver,p2) {}
 	bool execute()
 	{
@@ -65,8 +65,8 @@ struct BndFilterView2<Distinct,double,View1,double,View2> : IFilter
 	void detach(INotifiable* s)
 	{	p1.detach(s); p2.detach(s);	}
 
-	BndView<double,View1> p1;
-	BndView<double,View2> p2;
+	BndView<double,Expr1> p1;
+	BndView<double,Expr2> p2;
 };
 
 } // CP

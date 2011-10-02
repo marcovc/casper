@@ -31,10 +31,16 @@ struct GetEval<Rel3<TryAll,T1,T2,T3> >
 {	typedef bool	Type;	};
 };
 
-template<class T,class Iter,class View>
-struct GoalView3<TryAll,T,Par<T>,Seq<T>,Iter,bool,View> : IGoal
+/**
+ * 	Executes \a v for all \a it in \a r. Succeeds on the first \a it that makes \a v succeed.
+ * 	Fails if, after trying to execute \a v for all \a it in \a r, v never succeeded.
+ *
+ * 	\ingroup Search
+ */
+template<class T,class Iter,class Obj>
+struct GoalView3<TryAll,T,Par<T>,Seq<T>,Iter,bool,Obj> : IGoal
 {
-	GoalView3(State& state, const Par<T>& it, const Iter& r, const View& v) :
+	GoalView3(State& state, const Par<T>& it, const Iter& r, const Obj& v) :
 		state(state),it(it),r(r),
 		iter(this->r),
 		v(v)
@@ -53,7 +59,7 @@ struct GoalView3<TryAll,T,Par<T>,Seq<T>,Iter,bool,View> : IGoal
 	Iter					r;
 	//IterationView<T,Iter>	iter;
 	Util::IterationView<Iter>	iter;
-	View					v;
+	Obj					v;
 };
 
 
@@ -65,13 +71,18 @@ struct GetEval<Rel4<TryAll,T1,T2,T3,T4> >
 {	typedef	bool	Type;	};
 } // Traits
 
-// FIXME: must create a copy of this goal in every branch as above
-template<class T,class Iter,class View1,class View2>
+/**
+ * 	Executes \a v2 for all \a it in \a r where \a v1 is true. Succeeds on the first \a it that makes \a v2 succeed.
+ * 	Fails if, after trying to execute \a v2 for all \a it in \a r where \a v1 is true, \a v2 never succeeded.
+ *
+ * 	\ingroup Search
+ */
+template<class T,class Iter,class Expr1,class Expr2>
 struct GoalView4<TryAll,T,Par<T>,Seq<T>,Iter,
-				bool,View1,bool,View2> : IGoal
+				bool,Expr1,bool,Expr2> : IGoal
 {
 	GoalView4(State& state, const Par<T>& it,
-				const Iter& r, const View1& v1,const View2& v2) :
+				const Iter& r, const Expr1& v1,const Expr2& v2) :
 		state(state),it(it),r(r),iter(this->r),v1(v1),v2(v2) {}
     Goal execute()
 	{
@@ -86,8 +97,8 @@ struct GoalView4<TryAll,T,Par<T>,Seq<T>,Iter,
 	Iter					r;
 	//IterationView<T,Iter>	iter;
 	Util::IterationView<Iter>	iter;
-	View1	v1;
-	View2	v2;
+	Expr1	v1;
+	Expr2	v2;
 };
 
 } // Casper

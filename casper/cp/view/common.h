@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -121,8 +121,8 @@ template<class Func,class View>
 struct ExprMatch<Rel1<Func,View>,expression::Relation>
 {	static const bool value = true;	};
 
-template<class Func,class View1,class View2>
-struct ExprMatch<Rel2<Func,View1,View2>,expression::Relation>
+template<class Func,class Expr1,class Expr2>
+struct ExprMatch<Rel2<Func,Expr1,Expr2>,expression::Relation>
 {	static const bool value = true;	};
 
 template<>
@@ -134,10 +134,10 @@ template<class Func,class View,class Test>
 struct ExprMatch<Rel1<Func,View>,Test>
 {	static const bool value = true;	};
 
-template<class Func,class View1,class View2,class Test>
-struct ExprMatch<Rel2<Func,View1,View2>,Test>
-{	static const bool value = ExprMatch<View1,Test>::value or
-							  ExprMatch<View2,Test>::value;	};
+template<class Func,class Expr1,class Expr2,class Test>
+struct ExprMatch<Rel2<Func,Expr1,Expr2>,Test>
+{	static const bool value = ExprMatch<Expr1,Test>::value or
+							  ExprMatch<Expr2,Test>::value;	};
 */
 template<class Func,class View>
 struct ExprMatch<Rel1<Func,View>,expression::Ground>

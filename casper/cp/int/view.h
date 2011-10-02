@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2005-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2005-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -82,10 +82,10 @@ struct ValView<Eval,Var<Eval,FD<S,E,T> > >
  *	BndView over integer division.
  *	\ingroup Views
  **/
-template<class View1,class View2>
-struct BndViewRel2<Div,View1,View2,int>
+template<class Expr1,class Expr2>
+struct BndViewRel2<Div,Expr1,Expr2,int>
 {
-	BndViewRel2(Store& store, const View1& p1, const View2& p2) :
+	BndViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 
 	int min() const;
@@ -101,11 +101,11 @@ struct BndViewRel2<Div,View1,View2,int>
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
 
-	Rel2<Div,View1,View2> getObj()  const
+	Rel2<Div,Expr1,Expr2> getObj()  const
 	{ 	return rel<Div>(p1.getObj(),p2.getObj());	}
 
-	BndView<int,View1> 		p1;
-	BndView<int,View2> 		p2;
+	BndView<int,Expr1> 		p1;
+	BndView<int,Expr2> 		p2;
 };
 
 namespace Detail {
@@ -208,8 +208,8 @@ struct IDivRange
 };
 }
 
-template<class View1,class View2>
-int BndViewRel2<Div,View1,View2,int>::min() const
+template<class Expr1,class Expr2>
+int BndViewRel2<Div,Expr1,Expr2,int>::min() const
 {
 	using Util::idivUb;
 	using Util::idivLb;
@@ -256,8 +256,8 @@ int BndViewRel2<Div,View1,View2,int>::min() const
 	return limits<int>::min();
 }
 
-template<class View1,class View2>
-int BndViewRel2<Div,View1,View2,int>::max() const
+template<class Expr1,class Expr2>
+int BndViewRel2<Div,Expr1,Expr2,int>::max() const
 {
 	using Util::idivUb;
 	using Util::idivLb;
@@ -304,16 +304,16 @@ int BndViewRel2<Div,View1,View2,int>::max() const
 	return limits<int>::max();
 };
 
-template<class View1,class View2>
-void BndViewRel2<Div,View1,View2,int>::range(int& lb, int& ub) const
+template<class Expr1,class Expr2>
+void BndViewRel2<Div,Expr1,Expr2,int>::range(int& lb, int& ub) const
 {
 	lb = limits<int>::negInf();
 	ub = limits<int>::posInf();
 	Detail::idivRange(p1,p2,lb,ub);
 }
 
-template<class View1,class View2>
-bool BndViewRel2<Div,View1,View2,int>::updateRange(const int& lb,
+template<class Expr1,class Expr2>
+bool BndViewRel2<Div,Expr1,Expr2,int>::updateRange(const int& lb,
 												const int& ub)
 {
 	Util::StdRange<int> r(lb,ub);
@@ -353,13 +353,13 @@ bool BndViewRel2<Div,View1,View2,int>::updateRange(const int& lb,
  * 	ValView over integer division.
  * 	\ingroup Views
  **/
-template<class View1,class View2,class Eval>
-struct ValViewRel2<Div,View1,View2,Eval>
+template<class Expr1,class Expr2,class Eval>
+struct ValViewRel2<Div,Expr1,Expr2,Eval>
 {
-	typedef typename Casper::Traits::GetEval<View1>::Type	View1Eval;
-	typedef typename Casper::Traits::GetEval<View2>::Type	View2Eval;
+	typedef typename Casper::Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Casper::Traits::GetEval<Expr2>::Type	View2Eval;
 
-	ValViewRel2(Store& store, const View1& p1, const View2& p2) :
+	ValViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
 		p1(store,p1),p2(store,p2) {}
 	Eval value() const { return p1.value() / p2.value(); }
 	bool ground() const { return p1.ground() and p2.ground(); }
@@ -373,11 +373,11 @@ struct ValViewRel2<Div,View1,View2,Eval>
 	}
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
 	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-	Rel2<Div,View1,View2>	getObj() const
-	{	return Rel2<Div,View1,View2>(p1.getObj(),p2.getObj());}
+	Rel2<Div,Expr1,Expr2>	getObj() const
+	{	return Rel2<Div,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
-	ValView<View1Eval,View1>	p1;
-	ValView<View2Eval,View2>	p2;
+	ValView<View1Eval,Expr1>	p1;
+	ValView<View2Eval,Expr2>	p2;
 };
 
 } // CP

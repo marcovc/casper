@@ -29,14 +29,14 @@ namespace CP {
 
 
 /**
- *  Filter for the lexicographic constraint [\ref carlsson02].
+ *  Enforces the lexicographic constraint [\ref carlsson02].
  *
  *  \ingroup IntFilters
  */
-template<class View1,class View2>
-struct BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2> : IFilter
+template<class Expr1,class Expr2>
+struct BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2> : IFilter
 {
-    BndFilterView2(Store&,const View1&,const View2&);
+    BndFilterView2(Store&,const Expr1&,const Expr2&);
 
  	bool					execute();
 	void 					attach(INotifiable* pParent);
@@ -53,20 +53,20 @@ struct BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2> : IFilter
   	AutomatonState 				automatonProcess(uint);
   	Store&						store;
     uint						n;
-	BndArrayView<int,View1>		x;
-	BndArrayView<int,View2>		y;
+	BndArrayView<int,Expr1>		x;
+	BndArrayView<int,Expr2>		y;
     Reversible<uint>			q,r,s,u;
    // Stack<uint>		toRevise;
 	INotifiable*				pParent;
 	Reversible<bool>			first;
-	Detail::IdxBoundsDeltaStack<View1>	dx;
-	Detail::IdxBoundsDeltaStack<View2>	dy;
+	Detail::IdxBoundsDeltaStack<Expr1>	dx;
+	Detail::IdxBoundsDeltaStack<Expr2>	dy;
 };
 
-template<class View1,class View2>
-BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::BndFilterView2(Store& store,
-    				   const View1& x,
-					   const View2& y) :
+template<class Expr1,class Expr2>
+BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::BndFilterView2(Store& store,
+    				   const Expr1& x,
+					   const Expr2& y) :
 			IFilter(store),
 			store(store),
     		n(x.size()),x(store,x),y(store,y),
@@ -78,11 +78,11 @@ BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::BndFilterView2(Store& store
 {	assert(x.size()==y.size());	}
 
 
-template<class View1,class View2>
-void BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::attach(INotifiable* pParent)
+template<class Expr1,class Expr2>
+void BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::attach(INotifiable* pParent)
 {
 	//assert(this->pParent==NULL);
-	typedef BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2> Self;
+	typedef BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2> Self;
 	this->pParent = pParent;
 	dx.attach(pParent);
 	dy.attach(pParent);
@@ -90,8 +90,8 @@ void BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::attach(INotifiable* pP
 	//y.attach(methodNotifier(this,&Self::yChanged));
 }
 
-template<class View1,class View2>
-void BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::detach(INotifiable* pParent)
+template<class Expr1,class Expr2>
+void BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::detach(INotifiable* pParent)
 {
 	//this->pParent = NULL;
 	//toRevise.clear(); // because some schedulers may have copies
@@ -100,26 +100,26 @@ void BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::detach(INotifiable* pP
 	dy.detach(this);
 }
 /*
-template<class View1,class View2>
+template<class Expr1,class Expr2>
 bool
-BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::xChanged()
+BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::xChanged()
 {
 	toRevise.push(x.lastIdx);
 	assert(pParent != NULL);
 	return pParent->notify();
 }
 
-template<class View1,class View2>
+template<class Expr1,class Expr2>
 bool
-BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::yChanged()
+BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::yChanged()
 {
 	toRevise.push(y.lastIdx);
 	return pParent->notify();
 }*/
 
-template<class View1,class View2>
-typename BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::AutomatonState
-BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::automatonProcess(uint i)
+template<class Expr1,class Expr2>
+typename BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::AutomatonState
+BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::automatonProcess(uint i)
 {
 	if (i == q)
 		goto state1;
@@ -204,15 +204,15 @@ BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::automatonProcess(uint i)
 	return delay;
 }
 
-template<class View1,class View2>
-bool BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::execute()
+template<class Expr1,class Expr2>
+bool BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::execute()
 {
 	if (first)
 	{
 		first = false;
 		// test if is already inconsistent
-		typename BndArrayView<int,View1>::Iterator it1 = x.begin();
-		typename BndArrayView<int,View2>::Iterator it2 = y.begin();
+		typename BndArrayView<int,Expr1>::Iterator it1 = x.begin();
+		typename BndArrayView<int,Expr2>::Iterator it2 = y.begin();
 		while (it1 != x.end())
 		{
 			if (it1->min() < it2->max())
@@ -251,19 +251,19 @@ bool BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>::execute()
 	return true;
 }
 
-template<class View1,class View2>
-struct PostBndFilter2<LessEqual,IntSeq,View1,IntSeq,View2>
+template<class Expr1,class Expr2>
+struct PostBndFilter2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>
 {
-	static bool post(Store& store,const View1& x,const View2& y)
+	static bool post(Store& store,const Expr1& x,const Expr2& y)
 	{
-		BndArrayView<int,View1>	v1(store,x);
-		BndArrayView<int,View2>	v2(store,y);
+		BndArrayView<int,Expr1>	v1(store,x);
+		BndArrayView<int,Expr2>	v2(store,y);
 		assert(v1.size()==v2.size());
 
 		if (v1.size()==1)
 			return postBndFilter(store,v1[0].getObj() <= v2[0].getObj());
 
-		return store.post(new (store) BndFilterView2<LessEqual,IntSeq,View1,IntSeq,View2>(store,x,y));
+		return store.post(new (store) BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>(store,x,y));
 	}
 };
 

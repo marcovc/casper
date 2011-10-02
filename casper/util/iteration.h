@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2007-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2007-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -107,14 +107,14 @@ struct IterationView<IterationView<View> >
 };
 
 
-// View1 is iteration, Pred is a predicate function on View1
-template<class View1,class View2>
+// Expr1 is iteration, Pred is a predicate function on Expr1
+template<class Expr1,class Expr2>
 struct PredItView
 {
-	typedef typename Traits::GetElem<View1>::Type	Elem;
-	typedef PredItView<View1,View2>	Self;
+	typedef typename Traits::GetElem<Expr1>::Type	Elem;
+	typedef PredItView<Expr1,Expr2>	Self;
 
-	PredItView(const View1& v1,const View2& v2) :
+	PredItView(const Expr1& v1,const Expr2& v2) :
 		v1(v1),v2(v2) { sync(); }
 	PredItView(const PredItView& s) : v1(s.v1),v2(s.v2) { }
 	void sync()
@@ -134,8 +134,8 @@ struct PredItView
 		return v1.value();
 	}
 	bool		valid() const 	{	return v1.valid();	}
-	View1	v1;
-	View2	v2;
+	Expr1	v1;
+	Expr2	v2;
 };
 
 
@@ -143,14 +143,14 @@ template<class T1,class T2>
 PredItView<T1,T2> makePredIt(const T1& t1,const T2& t2)
 {	return PredItView<T1,T2>(t1,t2); }
 
-// View1 and View2 are already iterations
-template<class View1,class View2>
+// Expr1 and Expr2 are already iterations
+template<class Expr1,class Expr2>
 struct UnionItView
 {
-	typedef typename Traits::GetElem<View1>::Type	Elem;
-	typedef UnionItView<View1,View2>	Self;
+	typedef typename Traits::GetElem<Expr1>::Type	Elem;
+	typedef UnionItView<Expr1,Expr2>	Self;
 
-	UnionItView(const View1& v1,const View2& v2) :
+	UnionItView(const Expr1& v1,const Expr2& v2) :
 		v1(v1),v2(v2) {}
 	UnionItView(const UnionItView& s) : v1(s.v1),v2(s.v2) {}
 	void		iterate()
@@ -188,20 +188,20 @@ struct UnionItView
 			return v2.value();
 	}
 	bool		valid() const 	{	return v1.valid() or v2.valid();	}
-	View1	v1;
-	View2	v2;
+	Expr1	v1;
+	Expr2	v2;
 };
 
 template<class T1,class T2>
 UnionItView<T1,T2> makeUnionIt(const T1& t1,const T2& t2)
 {	return UnionItView<T1,T2>(t1,t2); }
 
-// View1 and View2 are already iterations
-template<class View1,class View2>
+// Expr1 and Expr2 are already iterations
+template<class Expr1,class Expr2>
 struct InterItView
 {
-	typedef typename Traits::GetElem<View1>::Type	Elem;
-	typedef InterItView<View1,View2>	Self;
+	typedef typename Traits::GetElem<Expr1>::Type	Elem;
+	typedef InterItView<Expr1,Expr2>	Self;
 
 	void sync()
 	{
@@ -225,7 +225,7 @@ struct InterItView
 			}
 		}
 	}
-	InterItView(const View1& vv1,const View2& vv2) :
+	InterItView(const Expr1& vv1,const Expr2& vv2) :
 		v1(vv1),v2(vv2)
 	{ sync();	}
 	InterItView(const InterItView& s) : v1(s.v1),v2(s.v2) {}
@@ -244,20 +244,20 @@ struct InterItView
 		return v1.value();
 	}
 	bool		valid() const 	{	return v1.valid() and v2.valid();	}
-	View1	v1;
-	View2	v2;
+	Expr1	v1;
+	Expr2	v2;
 };
 
 template<class T1,class T2>
 InterItView<T1,T2> makeInterIt(const T1& t1,const T2& t2)
 {	return InterItView<T1,T2>(t1,t2); }
 
-// View1 and View2 are already iterations
-template<class View1,class View2>
+// Expr1 and Expr2 are already iterations
+template<class Expr1,class Expr2>
 struct DiffItView
 {
-	typedef typename Traits::GetElem<View1>::Type	Elem;
-	typedef DiffItView<View1,View2>	Self;
+	typedef typename Traits::GetElem<Expr1>::Type	Elem;
+	typedef DiffItView<Expr1,Expr2>	Self;
 
 	// find first element of v1 not in v2
 	void sync()
@@ -279,7 +279,7 @@ struct DiffItView
 		}
 	}
 
-	DiffItView(const View1& v1,const View2& v2) :
+	DiffItView(const Expr1& v1,const Expr2& v2) :
 		v1(v1),v2(v2) {	sync(); }
 	DiffItView(const DiffItView& s) : v1(s.v1),v2(s.v2) {}
 	void		iterate()
@@ -294,8 +294,8 @@ struct DiffItView
 		return v1.value();
 	}
 	bool		valid() const 	{	return v1.valid();	}
-	View1	v1;
-	View2	v2;
+	Expr1	v1;
+	Expr2	v2;
 };
 
 template<class T1,class T2>
@@ -303,12 +303,12 @@ DiffItView<T1,T2> makeDiffIt(const T1& t1,const T2& t2)
 {	return DiffItView<T1,T2>(t1,t2); }
 
 // Symmetric difference
-// View1 and View2 are already iterations
-template<class View1,class View2>
+// Expr1 and Expr2 are already iterations
+template<class Expr1,class Expr2>
 struct SymDiffItView
 {
-	typedef typename Traits::GetElem<View1>::Type	Elem;
-	typedef SymDiffItView<View1,View2>	Self;
+	typedef typename Traits::GetElem<Expr1>::Type	Elem;
+	typedef SymDiffItView<Expr1,Expr2>	Self;
 
 	// find first different element
 	void sync()
@@ -321,7 +321,7 @@ struct SymDiffItView
 		}
 	}
 
-	SymDiffItView(const View1& v1,const View2& v2) :
+	SymDiffItView(const Expr1& v1,const Expr2& v2) :
 		v1(v1),v2(v2) {	sync(); }
 	SymDiffItView(const SymDiffItView& s) : v1(s.v1),v2(s.v2) {}
 	void		iterate()
@@ -354,8 +354,8 @@ struct SymDiffItView
 			return v2.value();
 	}
 	bool		valid() const 	{	return v1.valid() or v2.valid();	}
-	View1	v1;
-	View2	v2;
+	Expr1	v1;
+	Expr2	v2;
 };
 
 
@@ -366,7 +366,7 @@ SymDiffItView<T1,T2> makeSymDiffIt(const T1& t1,const T2& t2)
 
 #ifdef CASPER_UNUSED
 // Provides a sorted view over an unsorted iteration
-// View1 is an iteration, Less is comparison operator
+// Expr1 is an iteration, Less is comparison operator
 // cost = O(n^2)
 template<class View,class Less>
 struct SortedItView

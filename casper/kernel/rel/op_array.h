@@ -2,7 +2,7 @@
 *
  *                                                                         *
  *   Copyright:                                                            *
- *   2005-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2005-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       * 
  *   you may not use this file except in compliance with the License.      * 
@@ -19,7 +19,7 @@
 *
  *                                                                         *
  *   Copyright:                                                            *
- *   2005-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2005-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       * 
  *   you may not use this file except in compliance with the License.      * 

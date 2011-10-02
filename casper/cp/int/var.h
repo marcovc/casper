@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2003-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2003-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -184,19 +184,30 @@ std::ostream& operator<<(std::ostream& os,
 	return os;
 }
 
+
+/// Integer variable \ingroup CPIntegerDataStructures
 typedef Casper::CP::Var<int> IntVar;
+/// Boolean variable \ingroup CPIntegerDataStructures
 typedef Casper::CP::Var<bool> BoolVar;
+/// Array of integer variables \ingroup CPIntegerDataStructures
 typedef Casper::CP::VarArray<int> IntVarArray;
+/// Array of Boolean variables \ingroup CPIntegerDataStructures
 typedef Casper::CP::VarArray<bool> BoolVarArray;
+/// Bidimensional matrix of integer variables \ingroup CPIntegerDataStructures
 typedef Casper::CP::VarArray<int,2> IntVarArray2;
+/// Bidimensional matrix of Boolean variables \ingroup CPIntegerDataStructures
 typedef Casper::CP::VarArray<bool,2> BoolVarArray2;
+/// Tridimensional matrix of integer variables \ingroup CPIntegerDataStructures
 typedef Casper::CP::VarArray<int,3> IntVarArray3;
+/// Tridimensional matrix of Boolean variables \ingroup CPIntegerDataStructures
 typedef Casper::CP::VarArray<bool,3> BoolVarArray3;
+/// Fourdimensional matrix of integer variables \ingroup CPIntegerDataStructures
 typedef Casper::CP::VarArray<int,4> IntVarArray4;
+/// Fourdimensional matrix of Boolean variables \ingroup CPIntegerDataStructures
 typedef Casper::CP::VarArray<bool,4> BoolVarArray4;
 
-}
-}
+} // CP
+} // Casper
 
 #endif // _H_CASPER_CP_INT_VAR
 

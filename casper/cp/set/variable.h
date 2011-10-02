@@ -90,10 +90,14 @@ struct VarDomCreator< SetFD<T> >
 } // Detail
 
 
-typedef Var<IntSet> 		IntSetVar;
-typedef VarArray<IntSet>	IntSetVarArray;
-typedef VarArray<IntSet,2>	IntSetVarArray2;
-typedef VarArray<IntSet,3>	IntSetVarArray3;
+///	Integer set variable \ingroup CPSetDataStructures
+typedef Casper::CP::Var<Casper::IntSet> 		IntSetVar;
+/// Integer set variable array \ingroup CPSetDataStructures
+typedef Casper::CP::VarArray<Casper::IntSet>	IntSetVarArray;
+/// Integer set variable bidimensional matrix \ingroup CPSetDataStructures
+typedef Casper::CP::VarArray<Casper::IntSet,2>	IntSetVarArray2;
+/// Integer set variable tridimensional matrix \ingroup CPSetDataStructures
+typedef Casper::CP::VarArray<Casper::IntSet,3>	IntSetVarArray3;
 
 } // CP
 

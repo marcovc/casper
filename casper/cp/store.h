@@ -88,12 +88,12 @@ struct StoreStats
 
 	counter getNbBoolDomains() const {	return countBoolDomains;	}
 	counter getNbIntDomains() const {	return countIntDomains;	}
-	counter getNbSetDomains() const {	return countSetDomains;	}
+	counter getNSetDomains() const {	return countSetDomains;	}
 	counter getNbRangeDomains() const {	return countRangeDomains;	}
 
 	counter getNbBoolDomainUpdates() const {	return countBoolDomainUpdates;	}
 	counter getNbIntDomainUpdates() const {	return countIntDomainUpdates;	}
-	counter getNbSetDomainUpdates() const {	return countSetDomainUpdates;	}
+	counter getNSetDomainUpdates() const {	return countSetDomainUpdates;	}
 	counter getNbRangeDomainUpdates() const {	return countRangeDomainUpdates;	}
 
 };
@@ -109,6 +109,11 @@ struct Filter;
 struct IFilterSched;
 template<class> struct BndExpr;
 
+/**
+ * 	Stores and propagates constraints.
+ * 	\ingroup Filtering
+ *
+ */
 struct Store : INotifiable
 {
 	typedef SList<IFilter*>	Filters;

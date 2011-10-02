@@ -16,14 +16,7 @@
 namespace Casper {
 namespace CP {
 
-/**
- * \defgroup SetGoals Set search
- * Goals specific to set domain variables.
- * \ingroup Set
- * \ingroup Search
- */
-/*@{*/
-	
+
 namespace Detail {
 
 
@@ -208,9 +201,6 @@ struct SelectValMin<VarArray<Set<T>,I,D> > : IValSelector
 };
 
 
-	
-			
-/*@}*/
 
 } // CP
 } // Casper

@@ -35,6 +35,10 @@ struct GetEval<Rel2<WhileNotGround,T1,T2> >
 {	typedef	bool	Type;	};
 } // Traits
 
+/**
+ * 	While \a vars are not ground, executes \a statm.
+ * 	\ingroup CPSearch
+ */
 template<class T,class Vars,class Statm>
 struct GoalView2<WhileNotGround,Seq<T>,Vars,bool,Statm> : IGoal
 {

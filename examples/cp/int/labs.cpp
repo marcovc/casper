@@ -21,7 +21,6 @@
 
 
 #include <casper/kernel.h>
-#include <casper/cp/solver.h>
 #include <casper/cp/int.h>
 #include <casper/util/options.h>
 

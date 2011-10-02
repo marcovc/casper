@@ -23,11 +23,18 @@
 namespace Casper {
 namespace CP {
 
+// this is required since doxygen sometimes
+// doesn't autolink namespace scoped things
+#ifdef DOXYGEN_PARSER
+using namespace Casper;
+using namespace Casper::CP;
+#endif
+
 /**
  * 	Maintains the information used by Look-Ahead heuristics, which is collected
  *  while performing some kind of singleton consistency.
  *  \sa sc,rsc,selectVarLAMinDomSize
- * 	\ingroup Search
+ * 	\ingroup CPDataStructures
  */
 template<class Vars>
 struct LAInfo

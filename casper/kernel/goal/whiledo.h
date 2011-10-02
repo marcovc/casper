@@ -47,6 +47,10 @@ struct GetEval<Rel3<WhileDo,T1,T2,T3> >
 {	typedef	bool	Type;	};
 } // Traits
 
+/**
+ * 	While \a cond evaluates to \p true, executes \a statm.
+ * 	\ingroup Search
+ */
 template<class Cond,class Statm>
 struct GoalView2<WhileDo,bool,Cond,bool,Statm> : IGoal
 {

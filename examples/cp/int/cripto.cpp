@@ -28,7 +28,7 @@ using namespace std;
 int main()
 {
 	CPSolver solver;
-	VarArray<int> v(solver,8,0,9);
+	IntVarArray v(solver,8,0,9);
 	enum {s,e,n,d,m,o,r,y};
 
 	solver.post( 		   v[s]*1000 + v[e]*100 + v[n]*10 + v[d] +

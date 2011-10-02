@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -446,8 +446,10 @@ namespace Casper {
 namespace CP {
 
 /**
- * 	Incomplete GAC propagation based on basic GAC3.
- *  \TODO improve: 1. using deltas 2. using supports (GAC6)
+ *  Enforces the subscript constraint (element).
+ *
+ *  \ingroup IntFilters
+ *  \todo improve: 1. using deltas 2. using supports (GAC6)
  */
 template<class ArrayView,class IdxView,class EvalView>
 struct DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView> : IFilter

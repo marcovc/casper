@@ -2,7 +2,7 @@
  *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2006-2008 - Marco Correia <marco.v.correia@gmail.com>                 *
+ *   2006-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -80,40 +80,40 @@ struct DomFilterView<Rel3<F,T1,T2,T3> > :
 
 // FIXME: this disables all GAC filters (must specialize to fix)
 #if 1
-template<class Func,class Eval1,class View1>
+template<class Func,class Eval1,class Expr1>
 struct PostDomFilter1;
 
-template<class Func,class Eval1,class View1,class Eval2,class View2>
+template<class Func,class Eval1,class Expr1,class Eval2,class Expr2>
 struct PostDomFilter2;
 
-template<class Func,class Eval1,class View1,class Eval2,class View2,
-		class Eval3,class View3>
+template<class Func,class Eval1,class Expr1,class Eval2,class Expr2,
+		class Eval3,class Expr3>
 struct PostDomFilter3;
 
 #else
 
-template<class Func,class Eval1,class View1>
+template<class Func,class Eval1,class Expr1>
 struct PostDomFilter1
 {
-	static bool post(Store& s,const View1& v1)
-	{	return s.post(new (s) DomFilterView1<Func,Eval1,View1>(s,v1));	}
+	static bool post(Store& s,const Expr1& v1)
+	{	return s.post(new (s) DomFilterView1<Func,Eval1,Expr1>(s,v1));	}
 };
 
-template<class Func,class Eval1,class View1,class Eval2,class View2>
+template<class Func,class Eval1,class Expr1,class Eval2,class Expr2>
 struct PostDomFilter2
 {
-	static bool post(Store& s,const View1& v1,const View2& v2)
-	{	return s.post (new (s) DomFilterView2<Func,Eval1,View1,Eval2,View2>(s,v1,v2);}
+	static bool post(Store& s,const Expr1& v1,const Expr2& v2)
+	{	return s.post (new (s) DomFilterView2<Func,Eval1,Expr1,Eval2,Expr2>(s,v1,v2);}
 };
 
-template<class Func,class Eval1,class View1,class Eval2,class View2,
-		class Eval3,class View3>
+template<class Func,class Eval1,class Expr1,class Eval2,class Expr2,
+		class Eval3,class Expr3>
 struct PostDomFilter3
 {
-	static bool post(Store& s,const View1& v1,const View2& v2,
-								const View3& v3)
+	static bool post(Store& s,const Expr1& v1,const Expr2& v2,
+								const Expr3& v3)
 	{	return s.post(new (s)
-			DomFilterView3<Func,Eval1,View1,Eval2,View2,Eval3,View3>(s,v1,v2,v3);}
+			DomFilterView3<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3>(s,v1,v2,v3);}
 };
 #endif
 
@@ -122,14 +122,14 @@ struct PostDomFilter3
  * Enforces the conjunction of two constraints by creating a Dom filter
  * for each constraint.
  */
-template<class Eval1,class View1,class Eval2,class View2>
-struct DomFilterView2<And,Eval1,View1,Eval2,View2> : IFilter
+template<class Eval1,class Expr1,class Eval2,class Expr2>
+struct DomFilterView2<And,Eval1,Expr1,Eval2,Expr2> : IFilter
 {
-	DomFilterView2(Store& s,const View1& p1, const View2& p2) :
+	DomFilterView2(Store& s,const Expr1& p1, const Expr2& p2) :
 		IFilter(s),
 		store(store),
-		p1(new (s) DomFilterView<View1>(s,p1)),
-		p2(new (s) DomFilterView<View2>(s,p2)) {}
+		p1(new (s) DomFilterView<Expr1>(s,p1)),
+		p2(new (s) DomFilterView<Expr2>(s,p2)) {}
 
 	bool execute()
 	{	return postDomFilter(store,p1) and postDomFilter(store,p2);	}
@@ -139,8 +139,8 @@ struct DomFilterView2<And,Eval1,View1,Eval2,View2> : IFilter
 	void detach(INotifiable* s) { p1->detach(s); p2->detach(s); }
 
 	Store&					store;
-	DomFilterView<View1>*	p1;
-	DomFilterView<View2>*	p2;
+	DomFilterView<Expr1>*	p1;
+	DomFilterView<Expr2>*	p2;
 	INotifiable* pOwner;
 };
 
@@ -149,13 +149,13 @@ struct DomFilterView2<And,Eval1,View1,Eval2,View2> : IFilter
 	one constraint is satisfiable.
 	\note It requires that both constraints are reifiable.
 */
-template<class Eval1,class View1,class Eval2,class View2>
-struct DomFilterView2<Or,Eval1,View1,Eval2,View2> : IFilter
+template<class Eval1,class Expr1,class Eval2,class Expr2>
+struct DomFilterView2<Or,Eval1,Expr1,Eval2,Expr2> : IFilter
 {
-	DomFilterView2(Store& s,const View1& p1, const View2& p2) :
+	DomFilterView2(Store& s,const Expr1& p1, const Expr2& p2) :
 		IFilter(s),store(store),p1(s,p1),p2(s,p2),
-		f1(new (s) DomFilterView<View1>(s,p1)),
-		f2(new (s) DomFilterView<View2>(s,p2)) {}
+		f1(new (s) DomFilterView<Expr1>(s,p1)),
+		f2(new (s) DomFilterView<Expr2>(s,p2)) {}
 
 	bool execute()
 	{
@@ -184,65 +184,65 @@ struct DomFilterView2<Or,Eval1,View1,Eval2,View2> : IFilter
 	{	p1.detach(s); p2.detach(s); }
 
 	Store&				store;
-	BndView<bool,View1>	p1;
-	BndView<bool,View2>	p2;
-	DomFilterView<View1>*	f1;
-	DomFilterView<View2>*	f2;
+	BndView<bool,Expr1>	p1;
+	BndView<bool,Expr2>	p2;
+	DomFilterView<Expr1>*	f1;
+	DomFilterView<Expr2>*	f2;
 	INotifiable* pOwner;
 };
 
 // --- Filters that fallback to BndFilter: ---
 
 ///	Enforces the GreaterEqual binary relation between two views.
-template<class Eval1,class View1,class Eval2,class View2>
-struct DomFilterView2<GreaterEqual,Eval1,View1,Eval2,View2> :
-	BndFilterView2<GreaterEqual,Eval1,View1,Eval2,View2>
+template<class Eval1,class Expr1,class Eval2,class Expr2>
+struct DomFilterView2<GreaterEqual,Eval1,Expr1,Eval2,Expr2> :
+	BndFilterView2<GreaterEqual,Eval1,Expr1,Eval2,Expr2>
 {
-	DomFilterView2(Store& store, const View1& p1,const View2& p2) :
-		BndFilterView2<GreaterEqual,Eval1,View1,Eval2,View2>(store,p1,p2) {}
+	DomFilterView2(Store& store, const Expr1& p1,const Expr2& p2) :
+		BndFilterView2<GreaterEqual,Eval1,Expr1,Eval2,Expr2>(store,p1,p2) {}
 };
 
 
 ///	Enforces the LessEqual binary relation between two views.
-template<class Eval1,class View1,class Eval2,class View2>
-struct DomFilterView2<LessEqual,Eval1,View1,Eval2,View2> :
-	BndFilterView2<GreaterEqual,Eval2,View2,Eval1,View1>
+template<class Eval1,class Expr1,class Eval2,class Expr2>
+struct DomFilterView2<LessEqual,Eval1,Expr1,Eval2,Expr2> :
+	BndFilterView2<GreaterEqual,Eval2,Expr2,Eval1,Expr1>
 {
-	DomFilterView2(Store& store,const View1& p1, const View2& p2) :
-		BndFilterView2<GreaterEqual,Eval2,View2,Eval1,View1>(store,p2,p1) {}
+	DomFilterView2(Store& store,const Expr1& p1, const Expr2& p2) :
+		BndFilterView2<GreaterEqual,Eval2,Expr2,Eval1,Expr1>(store,p2,p1) {}
 };
 
 ///	Enforces the Greater binary relation between two views.
-template<class Eval1,class View1,class Eval2,class View2>
-struct DomFilterView2<Greater,Eval1,View1,Eval2,View2> :
-	BndFilterView2<Greater,Eval1,View1,Eval2,View2>
+template<class Eval1,class Expr1,class Eval2,class Expr2>
+struct DomFilterView2<Greater,Eval1,Expr1,Eval2,Expr2> :
+	BndFilterView2<Greater,Eval1,Expr1,Eval2,Expr2>
 {
-	DomFilterView2(Store& store, const View1& p1,const View2& p2) :
-		BndFilterView2<Greater,Eval1,View1,Eval2,View2>(store,p1,p2) {}
+	DomFilterView2(Store& store, const Expr1& p1,const Expr2& p2) :
+		BndFilterView2<Greater,Eval1,Expr1,Eval2,Expr2>(store,p1,p2) {}
 };
 
 /// Enforces bound consistenct on less constraint between two views.
-template<class Eval1,class Eval2,class View1,class View2>
-struct DomFilterView2<Less,Eval1,View1,Eval2,View2> :
-	BndFilterView2<Greater,Eval2,View2,Eval1,View1>
+template<class Eval1,class Eval2,class Expr1,class Expr2>
+struct DomFilterView2<Less,Eval1,Expr1,Eval2,Expr2> :
+	BndFilterView2<Greater,Eval2,Expr2,Eval1,Expr1>
 {
-	DomFilterView2(Store& store, const View1& p1, const View2& p2) :
-		BndFilterView2<Greater,Eval2,View2,Eval1,View1>(store,p2,p1) {}
+	DomFilterView2(Store& store, const Expr1& p1, const Expr2& p2) :
+		BndFilterView2<Greater,Eval2,Expr2,Eval1,Expr1>(store,p2,p1) {}
 };
 
 // dom view over element expression
-template<class View1,class View2,class Eval>
-struct DomView<Eval,Rel2<Element,View1,View2> > :
-	DomView<Eval,Var<Eval,typename Traits::GetDom<typename Casper::Traits::GetTermElem<View1>::Type>::Type> >
+template<class Expr1,class Expr2,class Eval>
+struct DomView<Eval,Rel2<Element,Expr1,Expr2> > :
+	DomView<Eval,Var<Eval,typename Traits::GetDom<typename Casper::Traits::GetTermElem<Expr1>::Type>::Type> >
 {
-	typedef typename Traits::GetDom<typename Casper::Traits::GetTermElem<View1>::Type>::Type Dom;
+	typedef typename Traits::GetDom<typename Casper::Traits::GetTermElem<Expr1>::Type>::Type Dom;
 	typedef DomView<Eval,Var<Eval,Dom> >	Super;
 
 
-	static Dom* getDom(Store& s,const View1& p1,const View2& p2)
+	static Dom* getDom(Store& s,const Expr1& p1,const Expr2& p2)
 	{
 		if (ValExpr<int>(s,p2).ground())
-			return &(*DomArrayView<Eval,View1>(s,p1)[ValExpr<int>(s,p2).value()]);
+			return &(*DomArrayView<Eval,Expr1>(s,p1)[ValExpr<int>(s,p2).value()]);
 		else
 		{
 			Var<Eval,Dom> v(s,Detail::VarDomCreator<Dom>().unionOf(s,p1));
@@ -251,15 +251,15 @@ struct DomView<Eval,Rel2<Element,View1,View2> > :
 		}
 	}
 
-	DomView(Store& store,const Rel2<Element,View1,View2>& p) :
+	DomView(Store& store,const Rel2<Element,Expr1,Expr2>& p) :
 		Super(store,Var<Eval,Dom>(store,getDom(store,p.p1,p.p2))) {}
 };
 
 
 
-// TODO: DomFilterView2<Equal,Eval1,View1,Eval2,View2>
+// TODO: DomFilterView2<Equal,Eval1,Expr1,Eval2,Expr2>
 
-/* TODO: DomFilterView2<Less,bool,View1,bool,View2>
+/* TODO: DomFilterView2<Less,bool,Expr1,bool,Expr2>
  * should use DomFilterView for filters...
  *
  * example: DomFilter( (a==b) <= (distinct(vars)) ) uses Bnd distinct
@@ -280,28 +280,28 @@ struct DomView<Eval,Rel2<Element,View1,View2> > :
 struct PostDomFilter
 {
 
-	template<class Func,class View1>
-	bool operator()(Store& s,const Rel1<Func,View1>& v) const
+	template<class Func,class Expr1>
+	bool operator()(Store& s,const Rel1<Func,Expr1>& v) const
 	{
-		typedef typename Casper::Traits::GetEval<View1>::Type	Eval1;
-		typedef PostDomFilter1<Func,Eval1,View1>		Post;
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef PostDomFilter1<Func,Eval1,Expr1>		Post;
 		return Post::post(s,v.p1);
 	}
-	template<class Func,class View1,class View2>
-	bool operator()(Store& s,const Rel2<Func,View1,View2>& v) const
+	template<class Func,class Expr1,class Expr2>
+	bool operator()(Store& s,const Rel2<Func,Expr1,Expr2>& v) const
 	{
-		typedef typename Casper::Traits::GetEval<View1>::Type	Eval1;
-		typedef typename Casper::Traits::GetEval<View2>::Type	Eval2;
-		typedef PostDomFilter2<Func,Eval1,View1,Eval2,View2>	Post;
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef PostDomFilter2<Func,Eval1,Expr1,Eval2,Expr2>	Post;
 		return Post::post(s,v.p1,v.p2);
 	}
-	template<class Func,class View1,class View2,class View3>
-	bool operator()(Store& s,const Rel3<Func,View1,View2,View3>& v) const
+	template<class Func,class Expr1,class Expr2,class Expr3>
+	bool operator()(Store& s,const Rel3<Func,Expr1,Expr2,Expr3>& v) const
 	{
-		typedef typename Casper::Traits::GetEval<View1>::Type	Eval1;
-		typedef typename Casper::Traits::GetEval<View2>::Type	Eval2;
-		typedef typename Casper::Traits::GetEval<View3>::Type	Eval3;
-		typedef PostDomFilter3<Func,Eval1,View1,Eval2,View2,Eval3,View3> Post;
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
+		typedef PostDomFilter3<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3> Post;
 		return Post::post(s,v.p1,v.p2,v.p3);
 	}
 };

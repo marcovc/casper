@@ -25,4 +25,10 @@
 #include <casper/cp/real/filter.h>
 #include <casper/cp/real/view.h>
 
+#include <casper/cp/store.h>
+#include <casper/cp/solver.h>
+#include <casper/cp/var.h>
+#include <casper/cp/vararray.h>
+#include <casper/cp/view.h>
+
 #endif /* CASPER_REAL_H_ */
