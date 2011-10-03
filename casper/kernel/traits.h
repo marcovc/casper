@@ -126,9 +126,11 @@ template<>
 struct GetEval<std::function<Goal()> >
 {	typedef bool Type;	};
 
+#ifndef _MSC_VER
 template<class T>
 struct GetEval<std::initializer_list<T> >
 {	typedef Seq<typename Traits::GetEval<T>::Type> Type;	};
+#endif
 
 // GetElem
 
@@ -179,10 +181,11 @@ template<class T1,class T2>
 struct GetElem<Util::SymDiffItView<T1,T2> >
 {	typedef typename Traits::GetElem<T1>::Type	Type; };
 
+#ifndef _MSC_VER
 template<class T>
 struct GetElem<std::initializer_list<T> >
 {	typedef T Type;	};
-
+#endif
 
 // GetTermElem
 
@@ -234,10 +237,11 @@ template<class T1,class T2>
 struct GetTermElem<Util::SymDiffItView<T1,T2> >
 {	typedef typename Traits::GetTermElem<T1>::Type	Type; };
 
+#ifndef _MSC_VER
 template<class T>
 struct GetTermElem<std::initializer_list<T> >
 {	typedef typename GetTermElem<T>::Type	Type;	};
-
+#endif
 }
 }
 

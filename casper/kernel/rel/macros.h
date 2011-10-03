@@ -85,7 +85,7 @@ AT_DECL_2(AT_LHT,AT_RHT) \
 inline Rel2<Equal,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > \
 operator==(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh)  \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
 								   typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type>::value,\
 				 "operands to '==' operator must have equal evaluation types");\
 	return Rel2<Equal,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
@@ -96,7 +96,7 @@ AT_DECL_2(AT_LHT,AT_RHT) \
 inline Rel2<GreaterEqual,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > \
 operator>=(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh)  \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
 								   typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type>::value,\
 				  "operands to '>=' operator must have equal evaluation types");\
  	return Rel2<GreaterEqual,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
@@ -107,7 +107,7 @@ AT_DECL_2(AT_LHT,AT_RHT) \
 inline Rel2<LessEqual,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > \
 operator<=(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh) \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
 								   typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type>::value,\
 				  "operands to '<=' operator must have equal evaluation types");\
 	return Rel2<LessEqual,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
@@ -118,7 +118,7 @@ AT_DECL_2(AT_LHT,AT_RHT) \
 inline Rel2<Distinct,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > \
 operator!=(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh)  \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
 								   typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type>::value,\
 				  "operands to '!=' operator must have equal evaluation types");\
 	return Rel2<Distinct,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
@@ -129,7 +129,7 @@ AT_DECL_2(AT_LHT,AT_RHT) \
 inline Rel2<Greater,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > \
 operator>(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh)  \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
 								   typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type>::value,\
 				  "operands to '>' operator must have equal evaluation types");\
 	return Rel2<Greater,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
@@ -140,7 +140,7 @@ AT_DECL_2(AT_LHT,AT_RHT) \
 inline Rel2<Less,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > \
 operator<(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh)  \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
 								   typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type>::value,\
 				  "operands to '<' operator must have equal evaluation types");\
  	return Rel2<Less,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
@@ -154,7 +154,7 @@ AT_DECL_2(AT_LHT,AT_RHT) \
 inline Rel2<Add,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > \
 operator+(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh) \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
 								   typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type>::value,\
 				  "operands to '+' operator must have equal evaluation types");\
  	return Rel2<Add,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
@@ -165,7 +165,7 @@ AT_DECL_2(AT_LHT,AT_RHT) \
 inline Rel2<Sub,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > \
 operator-(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh) \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
 								   typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type>::value,\
 				  "operands to '-' operator must have equal evaluation types");\
  	return Rel2<Sub,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
@@ -176,7 +176,7 @@ AT_DECL_2(AT_LHT,AT_RHT) 	\
 inline Rel2<Mul,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > 	\
 operator*(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh) \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
 								   typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type>::value,\
 				  "operands to '*' operator must have equal evaluation types");\
  	return Rel2<Mul,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
@@ -187,7 +187,7 @@ AT_DECL_2(AT_LHT,AT_RHT) \
 inline Rel2<Div,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > \
 operator/(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh) \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,\
 								   typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type>::value,\
 				  "operands to '/' operator must have equal evaluation types");\
  	return Rel2<Div,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
@@ -200,9 +200,9 @@ AT_DECL_2(AT_LHT,AT_RHT) \
 inline Rel2<And,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > \
 operator&&(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh) \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,bool>::value,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,bool>::value,\
 				  "first operand to '&&' (and) operator must have boolean evaluation type");\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type,bool>::value,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type,bool>::value,\
 				  "second operand to '&&' (and) operator must have boolean evaluation type");\
 	return Rel2<And,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
 } \
@@ -212,9 +212,9 @@ AT_DECL_2(AT_LHT,AT_RHT) \
 inline Rel2<Or,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) > \
 operator||(const AT_TYPE(AT_LHT)& lh, const AT_TYPE(AT_RHT)& rh) \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,bool>::value,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_LHT)>::Type,bool>::value,\
 				  "first operand to '||' (or) operator must have boolean evaluation type");\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type,bool>::value,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type,bool>::value,\
 				  "second operand to '||' (or) operator must have boolean evaluation type");\
  	return Rel2<Or,AT_TYPE(AT_LHT),AT_TYPE(AT_RHT) >(lh,rh);\
  }
@@ -234,7 +234,7 @@ AT_DECL(AT_RHT) \
 inline Rel1<Not,AT_TYPE(AT_RHT) > \
 operator!(const AT_TYPE(AT_RHT)& rh) \
 {\
-	static_assert(Util::IsSameType<typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type,bool>::value,\
+	static_assert(std::is_same<typename Traits::GetEval<AT_TYPE(AT_RHT)>::Type,bool>::value,\
 				  "operand to '!' (not) operator must have boolean evaluation type");\
  	return Rel1<Not,AT_TYPE(AT_RHT) >(rh);\
 }
