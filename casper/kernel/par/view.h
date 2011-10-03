@@ -30,7 +30,7 @@ namespace Casper {
  *********************/
 
 
-template<class>	class Par;
+template<class>	struct Par;
 template<class,class,class>			struct ParView1;
 template<class,class,class,class>	struct ParView2;
 template<class,class,class,class,class>	struct ParView3;

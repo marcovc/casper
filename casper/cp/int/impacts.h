@@ -31,6 +31,11 @@ using namespace Casper;
 using namespace Casper::CP;
 #endif
 
+#ifdef _MSC_VER
+double log2( double n )  
+{  return ::log( n ) / ::log( 2.0 );  }
+#endif
+
 namespace Detail {
 
 template<class Vars>

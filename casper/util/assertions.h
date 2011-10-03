@@ -26,6 +26,7 @@ namespace Util {
 
 // check if two types are the same type
 
+/*
 template<class T1,class T2>
 struct IsSameType
 {	static const bool value;	};
@@ -39,6 +40,7 @@ const bool IsSameType<T1,T2>::value = false;
 
 template<class T>
 const bool IsSameType<T,T>::value = true;
+*/
 
 template<bool If,class Then,class Else>
 struct IfThenElse
@@ -49,43 +51,43 @@ struct IfThenElse<false,Then,Else>
 {	typedef Else Type;	};
 
 #define CASPER_ASSERT_BNDVIEW_EVAL(T) \
-	static_assert(Casper::Util::IsSameType<Eval,bool>::value or \
-				  Casper::Util::IsSameType<Eval,int>::value or \
-				  Casper::Util::IsSameType<Eval,float>::value or \
-				  Casper::Util::IsSameType<Eval,double>::value,\
+	static_assert(std::is_same<Eval,bool>::value or \
+				  std::is_same<Eval,int>::value or \
+				  std::is_same<Eval,float>::value or \
+				  std::is_same<Eval,double>::value,\
 				  "instantiation of BndView with unsupported evaluation");
 
 #define CASPER_ASSERT_CHKVIEW_EVAL(T) \
-	static_assert(Casper::Util::IsSameType<Eval,bool>::value,\
+	static_assert(std::is_same<Eval,bool>::value,\
 				  "instantiation of ChkView with unsupported evaluation");
 
 #define CASPER_IS_SCALAR_EVAL(Eval) \
-			Casper::Util::IsSameType<Eval,bool>::value or \
-			Casper::Util::IsSameType<Eval,int>::value or \
-			Casper::Util::IsSameType<Eval,float>::value or \
-			Casper::Util::IsSameType<Eval,double>::value
+			std::is_same<Eval,bool>::value or \
+			std::is_same<Eval,int>::value or \
+			std::is_same<Eval,float>::value or \
+			std::is_same<Eval,double>::value
 
 #define CASPER_IS_SET_EVAL(Eval) \
-			Casper::Util::IsSameType<Eval,Set<bool> >::value or \
-			Casper::Util::IsSameType<Eval,Set<int> >::value or \
-			Casper::Util::IsSameType<Eval,Set<float> >::value or \
-			Casper::Util::IsSameType<Eval,Set<double> >::value
+			std::is_same<Eval,Set<bool> >::value or \
+			std::is_same<Eval,Set<int> >::value or \
+			std::is_same<Eval,Set<float> >::value or \
+			std::is_same<Eval,Set<double> >::value
 
 #define CASPER_IS_SEQ_EVAL(Eval) \
-			Casper::Util::IsSameType<Eval,Seq<bool> >::value or \
-			Casper::Util::IsSameType<Eval,Seq<int> >::value or \
-			Casper::Util::IsSameType<Eval,Seq<float> >::value or \
-			Casper::Util::IsSameType<Eval,Seq<double> >::value or \
-			Casper::Util::IsSameType<Eval,Seq<Set<bool> > >::value or \
-			Casper::Util::IsSameType<Eval,Seq<Set<int> > >::value or \
-			Casper::Util::IsSameType<Eval,Seq<Set<float> > >::value or \
-			Casper::Util::IsSameType<Eval,Seq<Set<double> > >::value
+			std::is_same<Eval,Seq<bool> >::value or \
+			std::is_same<Eval,Seq<int> >::value or \
+			std::is_same<Eval,Seq<float> >::value or \
+			std::is_same<Eval,Seq<double> >::value or \
+			std::is_same<Eval,Seq<Set<bool> > >::value or \
+			std::is_same<Eval,Seq<Set<int> > >::value or \
+			std::is_same<Eval,Seq<Set<float> > >::value or \
+			std::is_same<Eval,Seq<Set<double> > >::value
 
 #define CASPER_IS_SCALAR_EVAL(Eval) \
-			Casper::Util::IsSameType<Eval,bool>::value or \
-				  Casper::Util::IsSameType<Eval,int>::value or \
-				  Casper::Util::IsSameType<Eval,float>::value or \
-				  Casper::Util::IsSameType<Eval,double>::value
+			std::is_same<Eval,bool>::value or \
+				  std::is_same<Eval,int>::value or \
+				  std::is_same<Eval,float>::value or \
+				  std::is_same<Eval,double>::value
 
 #define CASPER_ASSERT_EVAL(Eval) \
 	static_assert(CASPER_IS_SCALAR_EVAL(Eval) or CASPER_IS_SET_EVAL(Eval) \

@@ -65,7 +65,7 @@ RDynamicHeap::RDynamicHeap(uint initSize,double factor) :
 						initSize(initSize),
 						factor(factor),
 						logFactor(::log(factor)),
-						logInitSizeOverLogFactor(::log(initSize)/logFactor),
+						logInitSizeOverLogFactor(::log(static_cast<double>(initSize))/logFactor),
 				  		maxBulks(static_cast<uint>(::log(4E9)/::log(factor)))
 {
 	curBulk = 0;

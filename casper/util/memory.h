@@ -35,6 +35,11 @@
 #include <signal.h>	// temp
 
 namespace Casper {
+
+#ifdef _MSC_VER
+typedef unsigned int uint;
+#endif
+
 namespace Util {
 
 struct IHeap

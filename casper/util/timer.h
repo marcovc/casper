@@ -125,7 +125,7 @@ static inline int clock_gettime(int, struct timespec *tp)
 
 
 #include <tchar.h>
-#include <windows.h>
+#include <Windows.h>
 
 namespace Casper {
 namespace Util {
@@ -157,13 +157,33 @@ struct CPUTimer : ITimer
 	void print(std::ostream& os) const;
 };
 
-// FIXME
-/*struct WallClockTimer : CPUTimer
+// FIXME: currently this is a copy of CPUTimer
+struct WallTimer : ITimer
 {
-	WallClockTimer(string name,bool running = true) : CPUTimer(name,running) {}
-	WallClockTimer(const WallClockTimer& s) : CPUTimer(s) {}
+	LARGE_INTEGER tic,tac,freq;
+	bool isRunning;
+	WallTimer(string name,bool running = true) : ITimer(name,0),isRunning(false)
+	{ reset(); if (running) resume();	}
+	WallTimer(const CPUTimer& s) : ITimer(s),tic(s.tic),tac(s.tac),
+								freq(s.freq),isRunning(s.isRunning) {}
+	void reset()
+	{	isRunning = false;	secs = 0;	}
+	void pause()
+	{
+		QueryPerformanceCounter(&tac);
+		QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
+		secs += ((tac.QuadPart - tic.QuadPart) * 1.0 / freq.QuadPart);
+		isRunning = false;
+	}
+	void resume()
+	{
+		isRunning = true;
+		SetThreadAffinityMask(GetCurrentThread(), 1);
+		QueryPerformanceCounter(&tic);
+	}
+	bool running() const {	return isRunning;	}
 	void print(std::ostream& os) const;
-};*/
+};
 
 } // Util
 } // Casper

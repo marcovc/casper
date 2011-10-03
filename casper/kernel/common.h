@@ -21,7 +21,6 @@
 
 #ifdef _MSC_VER
 #include <iso646.h>
-typedef unsigned int uint;
 #endif
 
 #include <iostream>
@@ -70,6 +69,9 @@ typedef unsigned int uint;
 /// Global namespace for the CaSPER library
 namespace Casper {
 
+#ifdef _MSC_VER
+typedef unsigned int uint;
+#endif
 
 /// \name Datatypes aliases
 //@{

@@ -29,8 +29,8 @@ uint EventSuspList::getNbFilters() const
 {
 	uint ret = 0;
 	for (auto it = l.begin(); it != l.end(); ++it)
-		ret += (dynamic_cast<typename CP::FIFOFilterSched::FilterDemon*>(*it)!=NULL) or
-			   (dynamic_cast<typename CP::FIFOFilterSched::WeightedFilterDemon*>(*it)!=NULL);
+		ret += (dynamic_cast<CP::FIFOFilterSched::FilterDemon*>(*it)!=NULL) or
+			   (dynamic_cast<CP::FIFOFilterSched::WeightedFilterDemon*>(*it)!=NULL);
 	return ret;
 }
 
@@ -38,7 +38,7 @@ uint EventSuspList::getNbWeightedFilters() const
 {
 	uint ret = 0;
 	for (auto it = l.begin(); it != l.end(); ++it)
-		ret += (dynamic_cast<typename CP::FIFOFilterSched::WeightedFilterDemon*>(*it)!=NULL);
+		ret += (dynamic_cast<CP::FIFOFilterSched::WeightedFilterDemon*>(*it)!=NULL);
 	return ret;
 }
 
@@ -47,7 +47,7 @@ uint EventSuspList::getTotalAFC() const
 	uint ret = 0;
 	for (auto it = l.begin(); it != l.end(); ++it)
 	{
-		CP::FIFOFilterSched::WeightedFilterDemon* pf = dynamic_cast<typename CP::FIFOFilterSched::WeightedFilterDemon*>(*it);
+		CP::FIFOFilterSched::WeightedFilterDemon* pf = dynamic_cast<CP::FIFOFilterSched::WeightedFilterDemon*>(*it);
 		if (pf != NULL)
 			ret += pf->getAFC();
 	}

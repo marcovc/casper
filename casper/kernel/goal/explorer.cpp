@@ -131,11 +131,11 @@ void LIFOSearchPath::getId(uint maxDepth, counter& lb, counter& ub) const
 	assert(maxDepth>=depth);
 	lb = ub = 0;
 	counter depth = fails.size();
-	ub = ::pow(2,maxDepth-depth-1);
+	ub = ::pow(2.0,static_cast<double>(maxDepth-depth-1));
 	for (auto it = fails.begin(); it != fails.end(); ++it)
 	{
 		if (*it)
-			lb += ::pow(2,maxDepth-depth);
+			lb += ::pow(2.0,static_cast<double>(maxDepth-depth));
 		--depth;
 	}
 	ub += lb;

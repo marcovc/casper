@@ -134,7 +134,7 @@ struct StdVector
 		while (b != e)
 			::new(&data[i++]) Elem(*(b++));
 	}
-
+#ifndef _MSC_VER
 	StdVector(const std::initializer_list<Elem>& l) :
 		mHeap(stdHeap),
 		_size(std::distance(l.begin(),l.end())),
@@ -145,7 +145,7 @@ struct StdVector
 		while (b != l.end())
 			::new(&data[i++]) Elem(*(b++));
 	}
-
+#endif
 //	template<class T>
 //	StdVector(const T& t) :
 //		mHeap(stdHeap),

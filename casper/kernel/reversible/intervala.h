@@ -244,7 +244,12 @@ class IntervalA
 	void insert(InputIterator first, InputIterator last);
 	void insert(scit first, scit last);
 
+#ifndef _MVC_VER
 	friend std::ostream& ::operator<< <>(std::ostream& os, const IntervalA& f);
+#else
+	template<class T1,class Container1,class Compare1>
+	friend std::ostream& ::operator<< <>(std::ostream& os, const IntervalA<T1,Container1,Compare1>& f);
+#endif
   	//friend istream& operator>>(istream& is, IntervalA& ia);
 	bool testInternRep() const;
 
