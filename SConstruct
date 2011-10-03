@@ -302,15 +302,14 @@ import sys
 # user defined environment
 env = Environment(ENV=os.environ,
                   variables = vars,
-				  CPPPATH=['#'],
+				  CPPPATH=['#','#thirdparty/include'],
+				  LIBPATH=['#thirdparty/lib'],
 				  CPPDEFINES = defined_macros,				  
 				  CXXFILESUFFIX='.cpp'
 				 )
 
 env.EnsureSConsVersion(1, 2, 0)
  
-env['LIBPATH'] = []
-
 # example of cross-compiling to 64 bits (TODO: put this in site_scons)
 # env['ENV']['PATH']='/usr/x86_64-pc-linux-gnu:/usr/x86_64-pc-linux-gnu/lib'+env['ENV']['PATH']
 # env['CXX']='/usr/i686-pc-linux-gnu/x86_64-pc-linux-gnu/gcc-bin/4.4.2/x86_64-pc-linux-gnu-g++'
@@ -321,6 +320,7 @@ env['LIBPATH'] = []
 
 if env.has_key('boost_path'):
 	env['CPPPATH'] += [env['boost_path']]
+	env['LIBPATH'] += [env['boost_path']+'/lib/']
 if env.has_key('gmp_path'):	
 	env['CPPPATH'] += [env['gmp_path']+"/lib/"]	
 	env['LIBPATH'] += [env['gmp_path']+"/lib/"]
@@ -332,6 +332,26 @@ if compiler!='default':
 	Tool(compiler)(env)
 
 Tool('packaging')(env)
+
+############ generate the help message ############
+
+Help("""
+usage: scons [options] target
+
+targets:
+--------
+
+library             builds library		
+examples            builds all examples (and library)
+minicasper-cspxml   builds the cspxml solver executable
+msvcsolution        creates msvs projects to use with msvs IDE
+package             creates packages with the current CaSPER source and binary distribution
+   	
+options:
+--------
+""")
+
+Help(vars.GenerateHelpText(env))
 
 # common configure tests
 confCommonEnv = env.Clone()
@@ -346,12 +366,15 @@ if env['profile']:
 	env['profile'] = confCommon.CheckLib( library='gcov', autoadd=1)	
 	if not env['profile']:
 		print "Warning: gcov library not found. No code coverage available."
-confCommon.CheckLib(library='boost_program_options',language='C++', autoadd=1)
+if not confCommon.CheckLib(library='boost_program_options',language='C++', autoadd=1):
+	print "Error: library boost_program_options is required for building casper, but was not found (set boost_path option?)."
+	Exit(1)
 for (k,v) in examples_for_extra_lib.iteritems():
 	if not confCommon.CheckLib( library=k, autoadd=0):
-		print "Warning: library "+k+" not found. Examples "+v+" will not be built."
-		for i in v: 
-			example_srcs.remove(v)
+		print "Warning: library "+k+" not found. The following examples will not be built:"
+		for i in v:
+			print "\t\t"+i
+			example_srcs.remove(i)
 confCommon.Finish();
 
 if not env['lp']:
@@ -449,8 +472,11 @@ def getRevision():
 	if gitdescribe_status==0:
 		revision = gitdescribe_output
 	if revision==-1:
-		f=open("REVISION", "r")
-		revision = f.readline()[:-1]
+		try:
+			f=open("REVISION", "r")
+			revision = f.readline()[:-1]
+		except IOError:
+			revision = "unknown"
 	return revision
 
 casper_revision=getRevision()
@@ -468,25 +494,6 @@ version_macros = defined_macros+\
 				#+ \
 				#[("CASPER_BUILDDATE",time.asctime())]
 
-############ generate the help message ############
-
-Help("""
-usage: scons [options] target
-
-targets:
---------
-
-library             builds library		
-examples            builds all examples (and library)
-minicasper-cspxml   builds the cspxml solver executable
-msvcsolution        creates msvs projects to use with msvs IDE
-package             creates packages with the current CaSPER source and binary distribution
-   	
-options:
---------
-""")
-
-Help(vars.GenerateHelpText(env))
        
 ############ support for preprocessing macro headers ############
 
@@ -869,7 +876,7 @@ if env.has_key('MSVSPROJECTCOM'):
 	msvcproj_example_targets_prefix=[]
 	msvcproj_example_targets_noprefix=[]
 							  							  
-	for i,j,k in zip(examples,rexample_targets,dexample_targets):
+	for i,j,k in zip(example_srcs,rexample_targets,dexample_targets):
 		msvcproj_example_targets_prefix.append(defineMSVSExampleProject(env,'msvs-ide/',i,Flatten([j,k])))
 		msvcproj_example_targets_noprefix.append(defineMSVSExampleProject(env,'',i,Flatten([j,k])))
 	

@@ -21,13 +21,14 @@
 
 #ifdef _MSC_VER
 #include <iso646.h>
+typedef unsigned int uint;
 #endif
 
 #include <iostream>
 #include <limits>
 #include <string>
 
-#include <tr1/memory>
+//#include <tr1/memory>
 
 
 /**
@@ -111,31 +112,31 @@ struct limits<int>
 template<>
 struct limits<uint>
 {
-	static const int max()	{	return std::numeric_limits<uint>::max();	}
-	static const int min()	{	return std::numeric_limits<uint>::min();	}
-	static const int inf()	{	return max();	}
-	static const int posInf()	{	return max();	}
-	static const int negInf()	{	return min();	}
+	static const uint max()	{	return std::numeric_limits<uint>::max();	}
+	static const uint min()	{	return std::numeric_limits<uint>::min();	}
+	static const uint inf()	{	return max();	}
+	static const uint posInf()	{	return max();	}
+	static const uint negInf()	{	return min();	}
 };
 
 template<>
 struct limits<longlong>
 {
-	static const int max()	{	return std::numeric_limits<longlong>::max();	}
-	static const int min()	{	return std::numeric_limits<longlong>::min();	}
-	static const int inf()	{	return max();	}
-	static const int posInf()	{	return max();	}
-	static const int negInf()	{	return min();	}
+	static const longlong max()	{	return std::numeric_limits<longlong>::max();	}
+	static const longlong min()	{	return std::numeric_limits<longlong>::min();	}
+	static const longlong inf()	{	return max();	}
+	static const longlong posInf()	{	return max();	}
+	static const longlong negInf()	{	return min();	}
 };
 
 template<>
 struct limits<ulonglong>
 {
-	static const int max()	{	return std::numeric_limits<ulonglong>::max();	}
-	static const int min()	{	return std::numeric_limits<ulonglong>::min();	}
-	static const int inf()	{	return max();	}
-	static const int posInf()	{	return max();	}
-	static const int negInf()	{	return min();	}
+	static const ulonglong max()	{	return std::numeric_limits<ulonglong>::max();	}
+	static const ulonglong min()	{	return std::numeric_limits<ulonglong>::min();	}
+	static const ulonglong inf()	{	return max();	}
+	static const ulonglong posInf()	{	return max();	}
+	static const ulonglong negInf()	{	return min();	}
 };
 
 
