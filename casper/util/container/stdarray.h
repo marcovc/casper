@@ -275,10 +275,12 @@ struct StdArray
 			pData(new (stdHeap) Data(stdHeap,b,e)),
 			mustFree(true){}
 
+#ifndef _MSC_VER
 	/// Creates a new array from an initializer list
 	StdArray(const std::initializer_list<Elem>& l) :
 		pData(new (stdHeap) Data(l)),
 		mustFree(true) {}
+#endif
 
 	/// Creates a new (uninitialized) array with room for \p n elements in stdHeap.
 	StdArray(uint n) :

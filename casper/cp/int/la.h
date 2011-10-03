@@ -47,7 +47,7 @@ struct LAInfo
 	{
 		double s = 0;
 		for (uint i = 0; i < doms.size(); ++i)
-			s += ::log(doms[i]->size());
+			s += ::log(static_cast<double>(doms[i]->size()));
 		return s/::log(2.0);
 	}
 

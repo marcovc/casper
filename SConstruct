@@ -366,6 +366,8 @@ if env['profile']:
 	env['profile'] = confCommon.CheckLib( library='gcov', autoadd=1)	
 	if not env['profile']:
 		print "Warning: gcov library not found. No code coverage available."
+if not confCommon.CheckLib( library='glpk', autoadd=0):
+	env['lp'] = False
 if not confCommon.CheckLib(library='boost_program_options',language='C++', autoadd=1):
 	print "Error: library boost_program_options is required for building casper, but was not found (set boost_path option?)."
 	Exit(1)
@@ -379,7 +381,8 @@ confCommon.Finish();
 
 if not env['lp']:
 	for i in examples_for_extra_lib['glpk']:
-		example_srcs.remove(i)
+		if i in example_srcs:
+			example_srcs.remove(i)
 	
 env.Append(CPPDEFINES = confCommonEnv['CPPDEFINES'])
 
@@ -415,7 +418,8 @@ def getBuildFlags(env,debug_level,optimize_level):
 			build_flags += ['/Ox']
 		if env['warnings']:
 			build_flags += ['/W3']
-		build_flags += ['/EHsc','/DNOMINMAX','/FC']
+		build_flags += ['/EHsc','/DNOMINMAX','/FC','/MD']
+		link_flags += []
 	else: # assume the compiler takes gcc options
 		build_flags += ['-g${debug_level}','-O${optimize_level}']
 		if env['warnings']:
@@ -856,7 +860,7 @@ def defineMSVSLibProject(env,prefix):
 				
 def defineMSVSExampleProject(env,prefix,src,trg):							
 	return env.MSVSProject(target = (prefix+'example-'+src.replace("/","-"))[:-4] + env['MSVSPROJECTSUFFIX'],
-	                        srcs = "../src/examples/"+src,
+	                        srcs = "../"+src,
 	                        incs = [],
 	                        localincs = [],
 	                        resources = [],
@@ -868,7 +872,7 @@ def defineMSVSExampleProject(env,prefix,src,trg):
 if env.has_key('MSVSPROJECTCOM'):
 	msvcproj_lib_srcs=[]
 	for i in casper_srcs:
-		msvcproj_lib_srcs+=["../src/"+i]
+		msvcproj_lib_srcs+=["../"+i]
 
 	msvcproj_lib_target_prefix = defineMSVSLibProject(env,'msvs-ide/')
 	msvcproj_lib_target_noprefix = defineMSVSLibProject(env,'')

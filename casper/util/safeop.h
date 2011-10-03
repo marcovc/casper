@@ -212,6 +212,10 @@ public:
   T name##_down(T x,T y) { return res; } \
   T name##_up  (T x,T y) { return res; }
 
+# define GENR_FUNC_CAST(name,castas) \
+  T name##_down(T x) { return ::name(static_cast<castas>(x)); } \
+  T name##_up  (T x) { return ::name(static_cast<castas>(x)); }
+
   template<class U> T conv_down(U const &v)
   { /*assert(v != std::numeric_limits<U>::infinity() &&
   		   -v != std::numeric_limits<U>::infinity());*/
@@ -225,7 +229,7 @@ public:
   GENR_FUNC2(sub,x-y);
   GENR_FUNC2(mul,x*y);
   GENR_FUNC2(div,x/y);
-  GENR_FUNC(sqrt);
+  GENR_FUNC_CAST(sqrt,double);
 
   GENR_FUNC(exp)
   GENR_FUNC(log)
@@ -344,17 +348,45 @@ bool isPos(const T& v)
 
 // canonical
 
+namespace Detail {
+template<class T>
+struct Succ
+{	
+	T operator()(const T& t) 
+	{	return std::nextafter(v, std::numeric_limits<T>::max());	}
+};
+template<>
+struct Succ<int>
+{	
+	int operator()(const int& t) 
+	{	return t+1;	}
+};
+
+template<class T>
+struct Pred
+{	
+	T operator()(const T& t) 
+	{	return std::nextafter(v, -std::numeric_limits<T>::max());	}
+};
+template<>
+struct Pred<int>
+{	
+	int operator()(const int& t) 
+	{	return t-1;	}
+};
+} // Detail
+
 template<class T>
 T succ(const T& v)
 {
-	return std::nextafter(v, std::numeric_limits<T>::max());
+	return Detail::Succ<T>()(v);
 	//return boost::math::float_next(v);
 }
 
 template<class T>
 T pred(const T& v)
 {
-	return std::nextafter(v, -std::numeric_limits<T>::max());
+	return Detail::Pred<T>()(v);
 //	return boost::math::float_prior(v);
 }
 

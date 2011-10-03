@@ -47,6 +47,7 @@ struct IterationView
 	Iterator	e;
 };
 
+#ifndef _MSC_VER
 // iteration view over an std::initializer_list
 template<class T>
 struct IterationView<std::initializer_list<T> >
@@ -64,6 +65,7 @@ struct IterationView<std::initializer_list<T> >
 	Iterator	b;
 	Iterator	e;
 };
+#endif
 
 template<class T>
 IterationView<T> makeIt(const T& v)

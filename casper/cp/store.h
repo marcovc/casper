@@ -131,6 +131,7 @@ struct Store : INotifiable
 	bool post(IFilter*);
 	bool post(const BndExpr<bool>& b);
 
+#ifndef _MSC_VER
 	// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class PostFilter = PostBndFilter>
 	bool post(const Rel1<Op,T1>& r, const PostFilter& f = PostFilter())
@@ -147,7 +148,41 @@ struct Store : INotifiable
 	template<class Op,class T1,class T2,class T3,class T4,class PostFilter = PostBndFilter>
 	bool post(const Rel4<Op,T1,T2,T3,T4>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
+#else
+		// Adds a new constraint to the constraint store, enforced by the filter created by f
+	template<class Op,class T1>
+	bool post(const Rel1<Op,T1>& r)
+	{	return postBndFilter(*this,r);	}
 
+	template<class Op,class T1,class T2>
+	bool post(const Rel2<Op,T1,T2>& r)
+	{	return postBndFilter(*this,r);	}
+
+	template<class Op,class T1,class T2,class T3>
+	bool post(const Rel3<Op,T1,T2,T3>& r)
+	{	return postBndFilter(*this,r);	}
+
+	template<class Op,class T1,class T2,class T3,class T4>
+	bool post(const Rel4<Op,T1,T2,T3,T4>& r)
+	{	return postBndFilter(*this,r);	}
+
+	// Adds a new constraint to the constraint store, enforced by the filter created by f
+	template<class Op,class T1,class PostFilter>
+	bool post(const Rel1<Op,T1>& r, const PostFilter& f = PostFilter())
+	{	return f(*this,r);	}
+
+	template<class Op,class T1,class T2,class PostFilter>
+	bool post(const Rel2<Op,T1,T2>& r, const PostFilter& f = PostFilter())
+	{	return f(*this,r);	}
+
+	template<class Op,class T1,class T2,class T3,class PostFilter>
+	bool post(const Rel3<Op,T1,T2,T3>& r, const PostFilter& f = PostFilter())
+	{	return f(*this,r);	}
+
+	template<class Op,class T1,class T2,class T3,class T4,class PostFilter>
+	bool post(const Rel4<Op,T1,T2,T3,T4>& r, const PostFilter& f = PostFilter())
+	{	return f(*this,r);	}
+#endif
 	template<class Cond,class Func>
 	bool when(const Cond& cond, const Func& func);
 

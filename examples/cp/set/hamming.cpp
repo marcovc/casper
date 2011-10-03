@@ -47,7 +47,7 @@ void hamming(uint n, uint l, int dMin, bool maximize, const Util::ExampleOptions
 
 	// complement
 	for (uint i = 0; i < n; i++)
-		solver.post(partition(list(v0[i],v1[i])));
+		solver.post(partition(Casper::list(v0[i],v1[i])));
 
 	for (uint i = 0; i < n; i++)
 		for (uint j = i+1; j < n; j++)

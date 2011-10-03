@@ -109,10 +109,21 @@ struct NOPInfoCollector
  *  the propagation algorithm. \sa LAInfo
  *  \ingroup CPSearch
  */
+#ifndef _MSC_VER
 template<class Obj,class InfoCollector = Detail::NOPInfoCollector>
 Goal sc(Store& store, const Obj& obj,InfoCollector i = InfoCollector())
 {	return new (store)
 		Detail::SC<Obj,InfoCollector>(store,obj,false,limits<uint>::max(),i); }
+#else
+template<class Obj>
+Goal sc(Store& store, const Obj& obj)
+{	return new (store)
+		Detail::SC<Obj,Detail::NOPInfoCollector>(store,obj,false,limits<uint>::max(),Detail::NOPInfoCollector()); }
+template<class Obj,class InfoCollector>
+Goal sc(Store& store, const Obj& obj,InfoCollector i = InfoCollector())
+{	return new (store)
+		Detail::SC<Obj,InfoCollector>(store,obj,false,limits<uint>::max(),i); }
+#endif
 
 /**
  * 	Enforces restricted singleton consistency on the set of variables \a obj.
@@ -120,10 +131,21 @@ Goal sc(Store& store, const Obj& obj,InfoCollector i = InfoCollector())
  *  the propagation algorithm. \sa LAInfo
  *  \ingroup CPSearch
  */
+#ifndef _MSC_VER
 template<class Obj,class InfoCollector = Detail::NOPInfoCollector>
 Goal rsc(Store& store, const Obj& obj,InfoCollector i = InfoCollector())
 {	return new (store)
 		Detail::SC<Obj,InfoCollector>(store,obj,true,limits<uint>::max(),i); }
+#else
+template<class Obj>
+Goal rsc(Store& store, const Obj& obj)
+{	return new (store)
+		Detail::SC<Obj,Detail::NOPInfoCollector>(store,obj,true,limits<uint>::max(),Detail::NOPInfoCollector()); }
+template<class Obj,class InfoCollector>
+Goal rsc(Store& store, const Obj& obj,InfoCollector i = InfoCollector())
+{	return new (store)
+		Detail::SC<Obj,InfoCollector>(store,obj,true,limits<uint>::max(),i); }
+#endif
 
 /**
  * 	Enforces singleton consistency on the subset of variables of \a a with at
@@ -132,10 +154,21 @@ Goal rsc(Store& store, const Obj& obj,InfoCollector i = InfoCollector())
  *  the propagation algorithm. \sa LAInfo
  *  \ingroup CPSearch
  */
+#ifndef _MSC_VER
 template<class Obj,class InfoCollector = Detail::NOPInfoCollector>
 Goal scMinSize(Store& store,const Obj& obj,uint minSize,InfoCollector i = InfoCollector())
 {	return new (store)
 		Detail::SC<Obj,InfoCollector>(store,obj,false,minSize,i); }
+#else
+template<class Obj>
+Goal scMinSize(Store& store,const Obj& obj,uint minSize)
+{	return new (store)
+		Detail::SC<Obj,Detail::NOPInfoCollector>(store,obj,false,minSize,Detail::NOPInfoCollector()); }
+template<class Obj,class InfoCollector>
+Goal scMinSize(Store& store,const Obj& obj,uint minSize,InfoCollector i = InfoCollector())
+{	return new (store)
+		Detail::SC<Obj,InfoCollector>(store,obj,false,minSize,i); }
+#endif
 
 /**
  * 	Enforces restricted singleton consistency on the subset of variables of \a a with at
@@ -144,10 +177,22 @@ Goal scMinSize(Store& store,const Obj& obj,uint minSize,InfoCollector i = InfoCo
  *  the propagation algorithm. \sa LAInfo
  *  \ingroup CPSearch
  */
+#ifndef _MSC_VER
 template<class Obj,class InfoCollector = Detail::NOPInfoCollector>
 Goal rscMinSize(Store& store,const Obj& obj,uint minSize,InfoCollector i = InfoCollector())
 {	return new (store)
 		Detail::SC<Obj,InfoCollector>(store,obj,true,minSize,i); }
+#else
+template<class Obj>
+Goal rscMinSize(Store& store,const Obj& obj,uint minSize)
+{	return new (store)
+		Detail::SC<Obj,Detail::NOPInfoCollector>(store,obj,true,minSize,Detail::NOPInfoCollector()); }
+template<class Obj,class InfoCollector>
+Goal rscMinSize(Store& store,const Obj& obj,uint minSize,InfoCollector i = InfoCollector())
+{	return new (store)
+		Detail::SC<Obj,InfoCollector>(store,obj,true,minSize,i); }
+
+#endif
 /// @}
 
 } // CP

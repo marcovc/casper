@@ -28,6 +28,11 @@
 #include <casper/util/io.h>
 
 namespace Casper {
+
+#ifdef _MSC_VER
+typedef unsigned int uint;
+#endif
+
 namespace Util {
 
 
