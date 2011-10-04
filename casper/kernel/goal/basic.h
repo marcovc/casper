@@ -182,6 +182,7 @@ struct GoalView2<Or,bool,Expr1,bool,Expr2> : IGoal
 	Assigns the evaluation of v2 to v1. Always succeeds.
 	\ingroup Search
 */
+#if 0
 template<class Expr1,class Expr2,class Eval>
 struct GoalView2<Assign,Eval,Expr1,Eval,Expr2> : IGoal
 {
@@ -198,6 +199,24 @@ struct GoalView2<Assign,Eval,Expr1,Eval,Expr2> : IGoal
 	Expr1			v1;
 	Expr2			v2;
 };
+#else
+template<class Expr1,class Expr2,class Eval>
+struct GoalView2<Assign,Eval,Expr1,Eval,Expr2> : IGoal
+{
+	GoalView2(State& s,const Expr1& v1, const Expr2& v2) :
+		s(s),v1(v1),v2(v2) {}
+
+  	Goal execute()
+	{
+		Par<int>(s,v1).setValue(Par<int>(s,v2).value());
+		return succeed();
+	}
+
+  	State&			s;
+	Expr1			v1;
+	Expr2			v2;
+};
+#endif
 
 /**
 	Assigns the first value in the set \a s to \a p. Fails

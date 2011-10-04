@@ -61,7 +61,7 @@ struct IterationView<std::initializer_list<T> >
 	void		iterate()	{	assert(valid()); ++b;	}
 	const Elem& 	value() const 	{	assert(valid()); return *b;	}
 	bool		valid() const 	{	return b!=e;	}
-	Self		next() const {	return Self(++Iterator(b),e);	}
+	Self		next() const {	Iterator c(b); return Self(++c,e);	}
 	Iterator	b;
 	Iterator	e;
 };

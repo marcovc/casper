@@ -103,6 +103,7 @@ struct NonLinear : std::runtime_error
 	NonLinear() : std::runtime_error("unexpected non-linear expression") {}
 };
 
+
 } // Exception
 } // Casper
 

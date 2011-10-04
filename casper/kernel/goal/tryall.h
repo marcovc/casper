@@ -52,6 +52,10 @@ struct GoalView3<TryAll,T,Par<T>,Seq<T>,Iter,bool,Obj> : IGoal
 
 		it = iter.value();
 
+		// logically redundant: just to avoid an extra disjunction
+		if (!iter.next().valid())
+			return Goal(state,v);
+
 		return Goal(state,v or tryAll(it,iter.next(),v));
 	}
     State&				state;

@@ -163,7 +163,8 @@ uint ISinglePathExplorer::branchCP()
 	state.removeCP();        // at the next 2 returns
 	stats.signalCPRestore(); //new
 	stats.signalCPRemove();  //new
-//	std::cout << "restored and removed CP " << solver().stateID() << std::endl;
+
+	//std::cout << path.fails.size() << std::endl;
 
 	if (path.fails.empty())	// needed when there are no choice points
 		return 1;

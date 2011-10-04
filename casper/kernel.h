@@ -32,6 +32,7 @@
 
 // par
 #include <casper/kernel/par/par.h>
+#include <casper/kernel/par/pararray.h>
 //#include <casper/kernel/par/parexpr.h>
 #include <casper/kernel/par/view.h>
 

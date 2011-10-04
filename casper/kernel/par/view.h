@@ -64,6 +64,8 @@ struct ParView<Eval,Par<T> > : IPar<Eval>
 	ParView(State& state,const Par<T>& p1) :
 		p1(p1) {}
 	Eval value() const { return p1.value(); }
+	void setValue(const Eval& v)
+	{	p1 = v;	}
 
 //	void attach(INotifiable* f) { p1.attach(f); }
 //	void detach(INotifiable* f) { p1.detach(f); }
@@ -504,6 +506,8 @@ struct ParView2<Element,Array,Index,Eval> : IPar<Eval>
 	ParView2(State& state, const Array& s, const Index& idx) :
 		state(state),s(s),idx(state,idx) {}
 	Eval value() const { return ParView<Eval,ArrayElem>(state,s[idx.value()]).value();	}
+	void setValue(const Eval& v)
+	{	ParView<Eval,ArrayElem>(state,s[idx.value()]).setValue(v); }
 
 //	void attach(INotifiable* f) { 	idx.attach(f); }
 //	void detach(INotifiable* f) {	idx.detach(f); }

@@ -279,7 +279,7 @@ GreedyExplorer* greedy(State& state);
 
 /**
  * 	Depth bounded discrepancy search. Only
- * 	branches below a given depth \a k.
+ * 	branches above a given depth \a k.
  * 	\ingroup Search
  */
 struct DDSIteration : ISinglePathExplorer
@@ -288,9 +288,6 @@ struct DDSIteration : ISinglePathExplorer
 		ISinglePathExplorer(state),k(k) {}
 	bool discard(bool) //const
 	{
-		if (getCurPath().getDepth() == k and
-			getCurPath().getFailCount() == 0)
-			return true;
 		if (getCurPath().getDepth() > k and
 			getCurPath().getFailCount() == 1)
 			return true;

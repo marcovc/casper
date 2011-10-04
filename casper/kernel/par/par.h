@@ -28,6 +28,8 @@
 
 namespace Casper {
 
+template<class> struct Par;
+
 /** \defgroup DataStructures Data Structures
  * 	\ingroup Kernel
  * 	Kernel data structures.
@@ -44,6 +46,9 @@ struct IPar
 {
 	/// Returns the current evaluation of the expression.
 	virtual T 		value() const = 0;
+
+	virtual void setValue(const T& value)
+	{	throw Casper::Exception::InvalidOperation("cannot set value for current par variable"); }
 };
 
 template<class,class> struct ParView;
@@ -54,7 +59,7 @@ template<class,class> struct ParView;
  * \ingroup DataStructures
  */
 template<class T>
-struct Par : Util::PImplIdiom<Reversible<const IPar<T>*> >
+struct Par : Util::PImplIdiom<Reversible<IPar<T>*> >
 {
 	public:
 
@@ -62,7 +67,7 @@ struct Par : Util::PImplIdiom<Reversible<const IPar<T>*> >
 	typedef Par<Eval> 				Self;
 
 	typedef IPar<T> Iface;
-	typedef const IPar<T>* PIface;
+	typedef IPar<T>* PIface;
 	typedef Reversible<PIface> 	RPIface;
 	typedef Util::PImplIdiom<RPIface> Super;
 
@@ -75,7 +80,7 @@ struct Par : Util::PImplIdiom<Reversible<const IPar<T>*> >
 		Super(new (state) RPIface(state,pimpl)) {}
 
 	/// Builds a new parameter pointing to the data of \a s.
-	Par(const Self& s) : Super(s) { }
+	Par(const Self& s) : Super(s) {}
 
 	/// Constructor from a generic object.
 	template<class T1>
@@ -87,11 +92,25 @@ struct Par : Util::PImplIdiom<Reversible<const IPar<T>*> >
 	/// Returns the value of the expression
 	Eval value() const {	assert(Super::getPImpl()!=NULL); return Super::getImpl().get()->value();	}
 
+	/// Updates *this to point at t.
 	template<class T1>
 	const Self& operator=(const T1& t)
 	{
 		Super::getImpl() = new (getState()) ParView<Eval,T1>(getState(),t);
 		return *this;
+	}
+
+	/// Updates *this to point at t.
+	const Self& operator=(const Self& t)
+	{
+		static_cast<Super&>(*this) = t;
+		return *this;
+	}
+
+	void setValue(const Eval& v)
+	{
+		assert(Super::getPImpl()!=NULL);
+		Super::getImpl().get()->setValue(v);
 	}
 
 //	const Self& operator=(const Self& t)
@@ -133,11 +152,6 @@ struct GetEval<Par<T> >
 typedef Par<int>			IntPar;
 typedef Par<bool>			BoolPar;
 typedef Par<double>			DoublePar;
-
-// FIXME: should be Par<Array<T> > since number of elements may change
-typedef Util::StdArray<IntPar>	IntParArray;
-typedef Util::StdArray<BoolPar>	BoolParArray;
-typedef Util::StdArray<DoublePar>	DoubleParArray;
 
 } // Casper
 

@@ -36,7 +36,7 @@ cp_examples+=['int/codes.cpp']
 cp_examples+=['int/nqueens.cpp']
 #cp_examples+=['int/xp_nogoods.cpp']
 #cp_examples+=['int/xp_domains.cpp']
-#cp_examples+=['int/debug.cpp']
+cp_examples+=['int/debug.cpp']
 
 #cp_examples+=['real/equation.cpp']
 #cp_examples+=['real/newton.cpp']

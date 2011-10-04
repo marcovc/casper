@@ -82,7 +82,7 @@ struct SelectValsRand : IValSelector
 			++it;
 		return Goal(store,
 				post(store,doms[idx].getObj() == *it) or
-				(post(store,doms[idx].getObj() != *it and callValSelector(store,this,idx)))
+				(post(store,doms[idx].getObj() != *it) and callValSelector(store,this,idx))
 				);
 	}
 	Store&	store;
