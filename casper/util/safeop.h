@@ -356,7 +356,7 @@ struct Succ
 	{	return std::nextafter(v, std::numeric_limits<T>::max());	}
 };
 template<>
-struct Succ<int>
+struct Succ<int> 
 {	
 	int operator()(const int& t) 
 	{	return t+1;	}

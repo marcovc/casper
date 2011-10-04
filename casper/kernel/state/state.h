@@ -31,6 +31,11 @@ struct INotifiable;
 
 struct State;
 
+/**
+ * 	State statistics.
+ * 	\ingroup Search
+ *
+ */
 struct StateStats
 {
 	State&	state;			// for other stats
@@ -58,17 +63,24 @@ struct StateStats
 	void signalCPRemove()
 	{ 	curLevel--; }
 
+	/// Returns the number of times a state has been restored
 	counter	getNbRestores()	const
 	{	return countCPRestores;	}
 
+	/// Returns the number of times a new state has been created
 	counter	getNbCPs()	const
 	{	return countCPs;	}
 
+	/// Returns the maximum number of states pushed in the stack so far
 	counter	getMaxDepth()	const
 	{	return maxLevel;	}
 
 };
 
+/**
+ * 	Maintains a stack of states for non-deterministic programming.
+ * 	\ingroup Search
+ */
 struct State
 {
 	State();
@@ -79,12 +91,12 @@ struct State
 
 	/// Insert a check point (saves current state)
 	void insertCP();
-	/// Restore all changes occurred since last inserted check point
+	/// Undoes all changes occurred since last inserted check point
 	void restoreCP();
 	/// Removes last inserted check point
 	void removeCP();
 
-	// fires at next choice point creation or restore
+	/// fires \a f at next check point creation or restore
 	void notifyOnNextCP(INotifiable* f) 	{	onNextCPSL.push(f);	}
 
 	void wakeupCPDemons();
@@ -95,7 +107,14 @@ struct State
 	 *	point is restored.
 	 */
 	Util::IHeap& getHeap() {	return *glbHeap;	}
+
+	/**
+	 * 	Automatically casts a state to its reversible heap. \sa getHeap()
+	 */
 	operator Util::IHeap&() {	return *glbHeap;	}
+	/**
+	 * 	Automatically casts a state to its reversible heap. \sa getHeap()
+	 */
 	operator const Util::IHeap&() const {	return *glbHeap;	}
 
 	/**
@@ -105,9 +124,15 @@ struct State
 	 */
 	Util::IHeap& getCPHeap() {	return *cpHeap;	}
 
+	/**
+	 * 	Records a new function object \a u in the trail. This function will be
+	 *	called when restoring the last inserted check point.
+	 */
 	void record(PTrailAgent u) { trail.record(u); }
 
+	/// Returns state statistics
 	StateStats&	getStats() {	return stats; }
+	/// Returns state statistics
 	const StateStats&	getStats() const {	return stats; }
 
 	Util::IHeap*					glbHeap; 	// global heap

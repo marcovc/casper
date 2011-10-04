@@ -16,7 +16,7 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-#define EX 14
+#define EX 1
 
 #if EX==1
 
@@ -30,7 +30,7 @@ using namespace std;
 int main()
 {
 	State state;
-	IntPar v(state);
+	Reversible<int> v(state);
 	v = 2;
 	cout << "at state " << state.id() << " : " << v << endl;
 	state.insertCP();

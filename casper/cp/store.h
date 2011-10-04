@@ -28,7 +28,10 @@
 namespace Casper {
 namespace CP {
 
-
+/**
+ * 	Store statistics.
+ * 	\ingroup Filtering
+ */
 struct StoreStats
 {
 	counter countFPComputations;
@@ -124,61 +127,78 @@ struct Store : INotifiable
 	/// Returns a unique integer for each fixpoint computation
 	counter propID() const { return stats.getNbFPComputations(); }
 
+	/**
+	 * 	Enables filter weighting which is disabled by default. Filter
+	 * 	weighting must be enabled when posting a new constraint in order
+	 * 	to perform accumulated failure count (AFC) for the corresponding propagator,
+	 * 	which is required by some heuristics.
+	 */
 	void setFilterWeighting(bool);
+	/// Returns whether filter weighting is enabled.
 	bool getFilterWeighting() const;
 
+	/// Add a new filter to the store.
 	bool post(const Filter&);
 	bool post(IFilter*);
 	bool post(const BndExpr<bool>& b);
 
 #ifndef _MSC_VER
-	// Adds a new constraint to the constraint store, enforced by the filter created by f
+	/// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class PostFilter = PostBndFilter>
 	bool post(const Rel1<Op,T1>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
 
+	/// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class T2,class PostFilter = PostBndFilter>
 	bool post(const Rel2<Op,T1,T2>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
 
+	/// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class T2,class T3,class PostFilter = PostBndFilter>
 	bool post(const Rel3<Op,T1,T2,T3>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
 
+	/// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class T2,class T3,class T4,class PostFilter = PostBndFilter>
 	bool post(const Rel4<Op,T1,T2,T3,T4>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
 #else
-		// Adds a new constraint to the constraint store, enforced by the filter created by f
+	/// Adds a new constraint to the constraint store.
 	template<class Op,class T1>
 	bool post(const Rel1<Op,T1>& r)
 	{	return postBndFilter(*this,r);	}
 
+	/// Adds a new constraint to the constraint store.
 	template<class Op,class T1,class T2>
 	bool post(const Rel2<Op,T1,T2>& r)
 	{	return postBndFilter(*this,r);	}
 
+	/// Adds a new constraint to the constraint store.
 	template<class Op,class T1,class T2,class T3>
 	bool post(const Rel3<Op,T1,T2,T3>& r)
 	{	return postBndFilter(*this,r);	}
 
+	/// Adds a new constraint to the constraint store.
 	template<class Op,class T1,class T2,class T3,class T4>
 	bool post(const Rel4<Op,T1,T2,T3,T4>& r)
 	{	return postBndFilter(*this,r);	}
 
-	// Adds a new constraint to the constraint store, enforced by the filter created by f
+	/// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class PostFilter>
 	bool post(const Rel1<Op,T1>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
 
+	/// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class T2,class PostFilter>
 	bool post(const Rel2<Op,T1,T2>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
 
+	/// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class T2,class T3,class PostFilter>
 	bool post(const Rel3<Op,T1,T2,T3>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
 
+	/// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class T2,class T3,class T4,class PostFilter>
 	bool post(const Rel4<Op,T1,T2,T3,T4>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
@@ -189,12 +209,15 @@ struct Store : INotifiable
 	IFilterSched&	filterSched() {	return *pFilterSched;	}
 	void setFilterSched(IFilterSched* p);
 
+	/// Applies filters for all constraints in the store.
 	bool valid();
 	// not sure what this was for
 	//IHeap& sHeap() {	assert(0); return globalSHeap;	}
 
+	/// Returns store statistics.
 	const StoreStats& getStats() const
 	{	return stats;	}
+	/// Returns store statistics.
 	StoreStats& getStats()
 	{	return stats;	}
 
