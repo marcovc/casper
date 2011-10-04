@@ -147,32 +147,6 @@ casperbind_xcsp+= ['parser.cpp']
 casperbind_xcsp+= ['exprparser.cpp']
 
 
-##################
-##	MINICASPER	 #
-##################
-
-minicasper=[]
-minicasper+=['kernel.cpp']
-minicasper+=['expression.cpp']
-minicasper+=['operator.cpp']
-minicasper+=['int.cpp']
-minicasper+=['instance.cpp']
-
-# experimental stuff
-minicasper_phd=[]
-minicasper_phd+=['sac/constraintgraph.cpp']
-
-#########################
-##	MINICASPER-CSPXML  ##
-#########################
-
-minicasper_cspxml=[]
-minicasper_cspxml+=['converter.cpp']
-minicasper_cspxml+=['cspxmlinstance.cpp']
-minicasper_cspxml+=['symgraph.cpp']
-minicasper_cspxml+=['system.cpp']
-minicasper_cspxml+=['main.cpp']
-
 ######################################################################
 ######################################################################
 # DON'T EDIT FROM THIS POINT BELOW UNLESS YOU KNOW WHAT YOU'RE DOING #
@@ -191,7 +165,6 @@ casper_version_release = 0
 casper_version = str(casper_version_major)+'.'+\
 				 str(casper_version_minor)+'.'+\
 				 str(casper_version_release)
-casper_cspxml_version = '1.0'
 casper_license = 'Apache-2.0'
 casper_vendor = 'N/A'
 x_msi_language = 1033
@@ -216,14 +189,14 @@ Having being idealized to accommodate a quickly changing research environment, t
 
 library_headers = [] 
 for root,dir,files in os.walk("casper"):
-	if '.svn' not in root and 'minicasper' not in root:
+	if '.svn' not in root:
 		filelist = [ os.path.join(root,fi) for fi in files if (fi.endswith(".h") or fi.endswith(".hpp")) ]
 		for f in filelist: 
 			library_headers.append(f)
 
 library_cpps = []
 for root,dir,files in os.walk("casper"):
-	if '.svn' not in root and 'minicasper' not in root:        
+	if '.svn' not in root:        
 		filelist = [ os.path.join(root,fi) for fi in files if fi.endswith(".cpp") ]
 		for f in filelist: 
 			library_cpps.append(f)
@@ -236,13 +209,6 @@ for root,dir,files in os.walk("examples"):
 		filelist = [ os.path.join(root,fi) for fi in files ]
 		for f in filelist: 
 			example_sources.append(f)
-
-cspxml_sources = []
-for root,dir,files in os.walk("minicasper"):
-	if '.svn' not in root:        
-		filelist = [ os.path.join(root,fi) for fi in files ]
-		for f in filelist: 
-			cspxml_sources.append(f)
 
 
 extra_files_info = ['AUTHORS','LICENSE','NOTICE','README','REVISION']
@@ -278,6 +244,7 @@ vars.Add(PathVariable('install_prefix', 'installation prefix', '.'))
 vars.Add(PathVariable('boost_path','path where boost libraries are installed',None))
 vars.Add(PathVariable('gmp_path','path where gmp library is installed',None))
 vars.Add(PathVariable('mpfr_path','path where mpfr library is installed',None))
+vars.Add(BoolVariable('build_bindings','compile casper bindings',False))
 
 
 compiler = ARGUMENTS.get('tool', 'default')   #allows user defined compiler
@@ -343,7 +310,6 @@ targets:
 
 library             builds library		
 examples            builds all examples (and library)
-minicasper-cspxml   builds the cspxml solver executable
 msvcsolution        creates msvs projects to use with msvs IDE
 package             creates packages with the current CaSPER source and binary distribution
    	
@@ -371,6 +337,8 @@ if not confCommon.CheckLib( library='glpk', autoadd=0):
 if not confCommon.CheckLib(library='boost_program_options',language='C++', autoadd=1):
 	print "Error: library boost_program_options is required for building casper, but was not found (set boost_path option?)."
 	Exit(1)
+if not confCommon.CheckLib( library='rt', symbol='clock_gettime',autoadd=1):
+	confCommon.env.Append(CPPDEFINES = ['CASPER_NO_RT'])
 for (k,v) in examples_for_extra_lib.iteritems():
 	if not confCommon.CheckLib( library=k, autoadd=0):
 		print "Warning: library "+k+" not found. The following examples will not be built:"
@@ -627,168 +595,102 @@ Alias('examples',example_targets)
 dexample_targets = defineExamples(denv)
 rexample_targets = defineExamples(renv)
 
-############ support for building minicasper library ############
-
-minicasper_srcs=[]
-for i in minicasper:
-	minicasper_srcs+=["minicasper/"+i]
-
-minicasper_objs=[]
-
-#add casper sources
-minicasper_objs+=versionObjs[env['ID']]
-
-for i in casper_srcs:
-	minicasper_objs+=env.Object(env['PREFIX']+"/"+i)
-	
-for i in minicasper_srcs:
-	minicasper_objs+=env.Object(env['PREFIX']+"/"+i,
-				CPPPATH=['#','../../phd/src/'])
-
-#add external (phd) sources (TEMPORARY)
-for i in minicasper_phd:
-	minicasper_objs += env.Object('../../phd/src/'+i,
-				CPPPATH=['#','../../phd/src/'])
-
-libminicasper=env.Library(target=env['PREFIX']+"/minicasper/minicasper",source=minicasper_objs)
-
-Alias('minicasper',libminicasper)
-
-### support for building bindings ***
-
 # bindings_cpp library
 
-gen_casper_preds = env.Command('bindings/cpp/casperpreds.h',None,'python bindings/cpp/genpreds.py > $TARGET')
-
-casperbind_cpp_srcs = []
-for i in casperbind_cpp:
-	casperbind_cpp_srcs+=["bindings/cpp/"+i]
-
-casperbind_cpp_objs=[]
-for i in casperbind_cpp_srcs:
-	casperbind_cpp_objs += env.Object(env['PREFIX']+"/"+i,
-									CPPPATH=['#'])
+if env['build_bindings']:
+	gen_casper_preds = env.Command('bindings/cpp/casperpreds.h',None,'python bindings/cpp/genpreds.py > $TARGET')
 	
-libcasperbind_cpp=env.Library(target=env['PREFIX']+"/bindings/casperbind_cpp",source=casperbind_cpp_objs)
-
-Alias('casperbind_cpp',[gen_casper_preds,libcasperbind_cpp])
-
-# bindings_cpp tests
-
-casperbind_cpp_tests_srcs = []
-for i in casperbind_cpp_tests:
-	casperbind_cpp_tests_srcs+=["bindings/cpp/"+i]
-
-casperbind_cpp_tests_targets=[]
-for i in casperbind_cpp_tests_srcs:
-	casperbind_cpp_tests_targets += env.Program(env['PREFIX']+"/"+i,
-										CPPPATH=['#'],
-										LIBPATH=[env['PREFIX']+'bindings/cpp/'],
-						   				LIBS=libcasperbind_cpp)
-
-Alias('casperbind_cpp_tests',casperbind_cpp_tests_targets)
-
-# bindings_xcsp exec
-
-casperbind_xcsp_srcs = []
-for i in casperbind_xcsp:
-	casperbind_xcsp_srcs+=["bindings/xcsp/"+i]
-
-
-casperbind_xcsp_objs=[]
-for i in casperbind_xcsp_srcs:
-	casperbind_xcsp_objs += env.Object(env['PREFIX']+"/"+i,
-									CPPPATH=['#src','/usr/include/libxml++-2.6',
-												 '/usr/include/glibmm-2.4',
-												 '/usr/include/glib-2.0',
-												 '/usr/lib/glib-2.0/include',
-												 '/usr/lib/glibmm-2.4/include/',
-												 '/usr/lib/libxml++-2.6/include/'])
-
-# TODO: find correct include and link paths automatically  
-casperbind_xcsp_target = env.Program(env['PREFIX']+"/bindings/xcsp/casper-xcsp",
-										source=casperbind_xcsp_objs,
-										LIBS=libcasperbind_cpp+['xml++-2.6'])
-
-Alias('casperbind_xcsp',casperbind_xcsp_target)
-
-
-### support for building fzn-casper ###
-
-casperbind_fzn_target_libpath = confCommonEnv['LIBPATH']
-casperbind_fzn_target_libs = confCommonEnv['LIBS']+[libcasperbind_cpp]+[libcasper]
-							     
-casperbind_fzn_target = env.Program(env['PREFIX']+'/bindings/fzn/fzn-casper',
-									[env['PREFIX']+'/bindings/fzn/parser.yy',
-									  env['PREFIX']+'/bindings/fzn/lexer.ll',
-									  env['PREFIX']+'/bindings/fzn/driver.cpp',
-									  env['PREFIX']+'/bindings/fzn/main.cpp'],
-									  CPPPATH=['#src','#src/bindings/fzn','#src/bindings/cpp',
-									  '#build/'+MODE+'/bindings/fzn'],
-									  LIBS=casperbind_fzn_target_libs,
-									  LIBPATH=casperbind_fzn_target_libpath)
-
-Alias('casperbind_fzn',casperbind_fzn_target)
-
-### support for building py-casper ###
-
-pycasper_ifaces=['main.i']
-
-pycasper_objs=[]
-for i in pycasper_ifaces:
-	pycasper_objs += env.SharedObject(env['PREFIX']+"/bindings/py/"+i,
-									 CCFLAGS=' -fPIC -Wall -std=c++0x',
-									 CPPPATH=['#src','/usr/include/python2.6'],
-									 SWIGFLAGS = '-c++ -python -Isrc -Wall');
-
-pycasper_target_libpath = confCommonEnv['LIBPATH']
-pycasper_target_libs = confCommonEnv['LIBS']+[libcasperbind_cpp]+[libcasper]
-
-pycasper_lib=env.SharedLibrary(target=env['PREFIX']+'/bindings/py/casper',
-							   source=pycasper_objs,SHLIBPREFIX='_',
-							   LIBPATH=pycasper_target_libpath,
-							   LIBS=pycasper_target_libs)
-
-Alias('casperbind_py',pycasper_lib)
+	casperbind_cpp_srcs = []
+	for i in casperbind_cpp:
+		casperbind_cpp_srcs+=["bindings/cpp/"+i]
+	
+	casperbind_cpp_objs=[]
+	for i in casperbind_cpp_srcs:
+		casperbind_cpp_objs += env.Object(env['PREFIX']+"/"+i,
+										CPPPATH=['#'])
+		
+	libcasperbind_cpp=env.Library(target=env['PREFIX']+"/bindings/casperbind_cpp",source=casperbind_cpp_objs)
+	
+	Alias('casperbind_cpp',[gen_casper_preds,libcasperbind_cpp])
+	
+	# bindings_cpp tests
+	
+	casperbind_cpp_tests_srcs = []
+	for i in casperbind_cpp_tests:
+		casperbind_cpp_tests_srcs+=["bindings/cpp/"+i]
+	
+	casperbind_cpp_tests_targets=[]
+	for i in casperbind_cpp_tests_srcs:
+		casperbind_cpp_tests_targets += env.Program(env['PREFIX']+"/"+i,
+											CPPPATH=['#'],
+											LIBPATH=[env['PREFIX']+'bindings/cpp/'],
+							   				LIBS=libcasperbind_cpp)
+	
+	Alias('casperbind_cpp_tests',casperbind_cpp_tests_targets)
+	
+	# bindings_xcsp exec
+	
+	casperbind_xcsp_srcs = []
+	for i in casperbind_xcsp:
+		casperbind_xcsp_srcs+=["bindings/xcsp/"+i]
+	
+	
+	casperbind_xcsp_objs=[]
+	for i in casperbind_xcsp_srcs:
+		casperbind_xcsp_objs += env.Object(env['PREFIX']+"/"+i,
+										CPPPATH=['#src','/usr/include/libxml++-2.6',
+													 '/usr/include/glibmm-2.4',
+													 '/usr/include/glib-2.0',
+													 '/usr/lib/glib-2.0/include',
+													 '/usr/lib/glibmm-2.4/include/',
+													 '/usr/lib/libxml++-2.6/include/'])
+	
+	# TODO: find correct include and link paths automatically  
+	casperbind_xcsp_target = env.Program(env['PREFIX']+"/bindings/xcsp/casper-xcsp",
+											source=casperbind_xcsp_objs,
+											LIBS=libcasperbind_cpp+['xml++-2.6'])
+	
+	Alias('casperbind_xcsp',casperbind_xcsp_target)
+	
+	
+	### support for building fzn-casper ###
+	
+	casperbind_fzn_target_libpath = confCommonEnv['LIBPATH']
+	casperbind_fzn_target_libs = confCommonEnv['LIBS']+[libcasperbind_cpp]+[libcasper]
+								     
+	casperbind_fzn_target = env.Program(env['PREFIX']+'/bindings/fzn/fzn-casper',
+										[env['PREFIX']+'/bindings/fzn/parser.yy',
+										  env['PREFIX']+'/bindings/fzn/lexer.ll',
+										  env['PREFIX']+'/bindings/fzn/driver.cpp',
+										  env['PREFIX']+'/bindings/fzn/main.cpp'],
+										  CPPPATH=['#src','#src/bindings/fzn','#src/bindings/cpp',
+										  '#build/'+MODE+'/bindings/fzn'],
+										  LIBS=casperbind_fzn_target_libs,
+										  LIBPATH=casperbind_fzn_target_libpath)
+	
+	Alias('casperbind_fzn',casperbind_fzn_target)
+	
+	### support for building py-casper ###
+	
+	pycasper_ifaces=['main.i']
+	
+	pycasper_objs=[]
+	for i in pycasper_ifaces:
+		pycasper_objs += env.SharedObject(env['PREFIX']+"/bindings/py/"+i,
+										 CCFLAGS=' -fPIC -Wall -std=c++0x',
+										 CPPPATH=['#src','/usr/include/python2.6'],
+										 SWIGFLAGS = '-c++ -python -Isrc -Wall');
+	
+	pycasper_target_libpath = confCommonEnv['LIBPATH']
+	pycasper_target_libs = confCommonEnv['LIBS']+[libcasperbind_cpp]+[libcasper]
+	
+	pycasper_lib=env.SharedLibrary(target=env['PREFIX']+'/bindings/py/casper',
+								   source=pycasper_objs,SHLIBPREFIX='_',
+								   LIBPATH=pycasper_target_libpath,
+								   LIBS=pycasper_target_libs)
+	
+	Alias('casperbind_py',pycasper_lib)
 							   
-### support for building minicasper-cspxml ***
-
-# if we are cross-compiling
-if compiler=='crossmingw':
-	libxml2_incpath = '#libxml2/include'
-	libxml2_libpath = '#libxml2/lib'
-	libiconv_incpath = '#iconv/include'
-	libiconv_libpath = '#iconv/lib'
-	minicasper_cspxml_libs=['minicasper','libxml2']
-else:
-	libxml2_incpath = '/usr/include/libxml2'
-	libxml2_libpath = '/usr/lib'
-	libiconv_incpath = '/usr/include'
-	libiconv_libpath = '/usr/lib'
-	minicasper_cspxml_libs=['minicasper','xml2']
-
-
-minicasper_cspxml_libs+=confCommonEnv['LIBS']
-
-minicasper_cspxml_libpath = [env['PREFIX']+'/minicasper',\
-							libxml2_libpath,libiconv_libpath]+\
-							confCommonEnv['LIBPATH'] 
-minicasper_cspxml_objs=[]
-
-# saucy src
-minicasper_cspxml_objs += env.Object(env['PREFIX']+"casper/thirdparty/saucy-1.1/saucy.cpp",
-										 CPPPATH=['#src'])
-	
-for i in minicasper_cspxml:
-	minicasper_cspxml_objs += env.Object(env['PREFIX']+"minicasper/bindings/xml/"+i,
-										 CPPPATH=['#src',libxml2_incpath,libiconv_incpath])
-										 
-minicasper_cspxml_exe=env.Program(target=env['PREFIX']+'minicasper/bindings/xml/minicasper-cspxml',
-							   source=minicasper_cspxml_objs,
-							   LIBPATH=minicasper_cspxml_libpath,
-							   LIBS=minicasper_cspxml_libs)
-
-Alias('minicasper-cspxml',minicasper_cspxml_exe)
 
 ############ general environment information ############
 
@@ -815,29 +717,39 @@ def getVersionInfo(arg):
 benchExec = "/home/marco/projects/benchmark/benchmark"
 
 def runTests(env,target,source):
-	benchArgs = ["--product-name=CaSPER",\
+	productArgs = ["--product-name=CaSPER",\
 				"--product-version="+getVersionInfo("--version"),\
-				"--product-revision="+getVersionInfo("--revision"),\
-				"--buildenv-compiler="+getVersionInfo("--compiler"),\
+				"--product-revision="+getVersionInfo("--revision")]
+	buildenvArgs = ["--buildenv-compiler="+getVersionInfo("--compiler"),\
 				"--buildenv-stdlib="+getVersionInfo("--stdlib"),\
-				"--buildenv-flags="+getVersionInfo("--flags"),\
-				"--timeout=30",\
+				"--buildenv-flags="+getVersionInfo("--flags")]
+	runenvArgs = ["--timeout=30",\
 				"--memout=900000000",\
 				"--sample-count=3"]
-	if GetOption('notes')!=None:
-		benchArgs += ["--product-note="+GetOption('notes')]
+	benchArgs = productArgs+buildenvArgs+runenvArgs			
 	cmd = [source[0].abspath]+benchArgs
+	if GetOption('notes')!=None:
+		cmd += ["--product-note="+GetOption('notes')]
 	if not subprocess.call(cmd):
 		import testcmp
-		(couteq,cerreq,tgavg,mgavg,favg) = testcmp.compare("test/BenchmarkResults.xml.correct","test/BenchmarkResults.xml")
-		if not couteq:
-			print "FAILED: different stdout!"
-		if not cerreq:
-			print "FAILED: different stderr!"
-		print "avg time ratio of newfile/oldfile:",tgavg
-		print "avg mem ratio of newfile/oldfile:",mgavg
-		print "ratio of problems solved faster in newfile:",favg
-		
+		import zlib
+		import platform
+		envStr = buildenvArgs+runenvArgs+list(platform.uname())
+		id = str(zlib.crc32(str(benchArgs)) & 0xffffffff)
+		benchmarkResultsFileName = "test/BenchmarkResults@"+id+".xml"
+		try:
+			f = open(benchmarkResultsFileName,"r")
+			f.close()			
+			(couteq,cerreq,tgavg,mgavg,favg) = testcmp.compare(benchmarkResultsFileName,"test/BenchmarkResults.xml")
+			if not couteq:
+				print "FAILED: different stdout!"
+			if not cerreq:
+				print "FAILED: different stderr!"
+			print "avg time ratio of newfile/oldfile:",tgavg
+			print "avg mem ratio of newfile/oldfile:",mgavg
+			print "ratio of problems solved faster in newfile:",favg
+		except IOError:
+			print "no previous benchmark results found for this environment. Please copy test/BenchmarkResults.xml to "+benchmarkResultsFileName 
 testCmd = Command("tests.passed",benchExec,runTests)
 Depends(testCmd,example_targets+[File(benchExec)])
 
@@ -908,20 +820,8 @@ for i in Flatten(example_targets):
 	lib_install_target.append(env.InstallAs(target=env['install_prefix']+'/bin/casper-'+eval+"-"+filename,source = i))
 	lib_install_target.append(env.InstallAs(target=env['install_prefix']+'/share/casper/examples/'+eval+"-"+filename,source = i))
 
-cspxml_install_target = []
-cspxml_install_target += common_install_target
-cspxml_install_target.append(env.InstallAs(target=env['install_prefix']+'/bin/casper-cspxml',source = minicasper_cspxml_exe))
-
-if compiler=='crossmingw':	# windows requires libxml dlls
-	cspxml_install_target.append(env.Install(target=env['install_prefix']+'/bin/',source = '#libxml2/bin/libxml2.dll'))
-	cspxml_install_target.append(env.Install(target=env['install_prefix']+'/bin/',source = '#iconv/bin/iconv.dll'))
-	cspxml_install_target.append(env.Install(target=env['install_prefix']+'/bin/',source = '#zlib/bin/zlib1.dll'))
-else:
-	cspxml_install_target.append(env.Install(target=env['install_prefix']+'/bin/',source = '/usr/lib/libxml2.so'))
-	cspxml_install_target.append(env.Install(target=env['install_prefix']+'/bin/',source = '/usr/lib/libz.so'))
 	
 Alias('library-install',lib_install_target)	
-Alias('cspxml-install',cspxml_install_target)
               
 
 
@@ -958,17 +858,4 @@ package_libbin_dist = env.Package(
              X_RPM_GROUP    = 'Application/fu',
              SOURCE_URL     = casper_src_url)
 
-package_cspxmlbin_dist = env.Package( 
-			 source			= cspxml_install_target,
-			 NAME           = 'casper-cspxml',
-             SUMMARY		= casper_summary,
-             DESCRIPTION    = casper_description,
-             VERSION		= casper_cspxml_version,
-             LICENSE		= casper_license,
-             VENDOR			= casper_vendor,
-			 X_MSI_LANGUAGE = x_msi_language,
-             X_MSI_LICENSE_TEXT = x_msi_license_text,
-             PACKAGEVERSION =  0,
-             X_RPM_GROUP    = 'Application/fu',
-             SOURCE_URL     = casper_src_url)
 

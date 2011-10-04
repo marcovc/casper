@@ -244,7 +244,7 @@ class IntervalA
 	void insert(InputIterator first, InputIterator last);
 	void insert(scit first, scit last);
 
-#ifndef _MVC_VER 
+#ifndef _MSC_VER
 	friend std::ostream& ::operator<< <>(std::ostream& os, const IntervalA& f);
 #else
 	template<class T1,class Container1,class Compare1>
