@@ -262,10 +262,26 @@ struct StdArray
 			mustFree(!heap.doesGC())
 	{}
 
+	/** Creates a new 2D array with \p p1 X \p p2 elements and initializes
+	 *  each element with the parameter \p p3.	*/
+	template<class T2,class T3>
+	StdArray(IHeap& heap,uint p1,const T2& p2,T3& p3)  :
+			pData(Detail::ArrayDataTraits<Self,dims>::initData(heap,p1,p2,p3)),
+			mustFree(!heap.doesGC())
+	{}
+
 	/** Creates a new 3D array with \p p1 X \p p2 X \p p3 elements and
 	 *  initializes each element with the parameter \p p4.	*/
 	template<class T2,class T3,class T4>
 	StdArray(IHeap& heap,uint p1,const T2& p2,const T3& p3,const T4& p4) :
+		 	pData(Detail::ArrayDataTraits<Self,dims>::initData(heap,p1,p2,p3,p4)),
+		 	mustFree(!heap.doesGC())
+	{}
+
+	/** Creates a new 3D array with \p p1 X \p p2 X \p p3 elements and
+	 *  initializes each element with the parameter \p p4.	*/
+	template<class T2,class T3,class T4>
+	StdArray(IHeap& heap,uint p1,const T2& p2,const T3& p3,T4& p4) :
 		 	pData(Detail::ArrayDataTraits<Self,dims>::initData(heap,p1,p2,p3,p4)),
 		 	mustFree(!heap.doesGC())
 	{}

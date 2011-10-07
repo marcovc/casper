@@ -60,6 +60,7 @@ lp_examples=[]
 lp_examples+=['debug.cpp']
 lp_examples+=['tritype.cpp']
 lp_examples+=['binsearch.cpp']
+lp_examples+=['bubble.cpp']
 
 for i in lp_examples:
 	extra_example_libs['examples/lp/'+i]=['glpk']

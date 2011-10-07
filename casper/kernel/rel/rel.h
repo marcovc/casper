@@ -413,6 +413,7 @@ NEW_REL_3(forSome,ForSome)
 
 NEW_REL_2(assign,Assign)
 NEW_REL_2(selectFirst,SelectFirst)
+NEW_REL_3(selectFirst,SelectFirst)
 
 NEW_REL_3(countEqual,CountEqual)
 
@@ -637,6 +638,10 @@ struct GetEval<Rel2<Assign,Expr1,Expr2> >
 
 template<class Expr1, class Expr2>
 struct GetEval<Rel2<SelectFirst,Expr1,Expr2> >
+{	typedef bool	Type;	};
+
+template<class Expr1, class Expr2,class Expr3>
+struct GetEval<Rel3<SelectFirst,Expr1,Expr2,Expr3> >
 {	typedef bool	Type;	};
 
 } // Traits

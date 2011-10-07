@@ -183,7 +183,7 @@ struct LinearExprValView<Store,Rel2<Div,T1,T2> >
 	LinearExprValView<Store,T2>	v2;
 };
 
-struct VarArray;
+//struct VarArray;
 
 template<class Store,class VarArray,class T2>
 struct LinearExprValView<Store,Rel2<Element,VarArray,T2> >

@@ -25,11 +25,19 @@
 namespace Casper {
 namespace LP {
 
-struct VarArray : Util::StdArray<Var>
+namespace Detail {
+template<int dims>
+struct VarArray : Util::StdArray<Var,dims>
 {
-	VarArray(Solver& solver, uint n) : Util::StdArray<Var>(solver,n,solver) {}
+	VarArray(Solver& solver, uint n) : Util::StdArray<Var,dims>(solver,n,solver) {}
+	VarArray(Solver& solver, uint n1, uint n2) : Util::StdArray<Var,dims>(solver,n1,n2,solver) {}
+	VarArray(Solver& solver, uint n1, uint n2, uint n3) : Util::StdArray<Var,dims>(solver,n1,n2,n3,solver) {}
 };
+} // Detail
 
+typedef Casper::LP::Detail::VarArray<1>	VarArray;
+typedef Casper::LP::Detail::VarArray<2>	VarArray2;
+typedef Casper::LP::Detail::VarArray<3>	VarArray3;
 }
 }
 

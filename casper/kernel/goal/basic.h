@@ -208,7 +208,7 @@ struct GoalView2<Assign,Eval,Expr1,Eval,Expr2> : IGoal
 
   	Goal execute()
 	{
-		Par<int>(s,v1).setValue(Par<int>(s,v2).value());
+		Par<Eval>(s,v1).setValue(Par<Eval>(s,v2).value());
 		return succeed();
 	}
 
@@ -231,7 +231,7 @@ struct GoalView2<SelectFirst,Eval,Par<Eval>,Seq<Eval>,Set> : IGoal
 
   	Goal execute()
 	{
-		Casper::Detail::PIteration<Par<int>,Set,bool> it(p,s,true);
+		Casper::Detail::PIteration<Par<Eval>,Set,bool> it(p,s,true);
 		if (it.valid())
 			return succeed();
 		return fail();
@@ -240,6 +240,31 @@ struct GoalView2<SelectFirst,Eval,Par<Eval>,Seq<Eval>,Set> : IGoal
   	State&					state;
 	Par<Eval>				p;
 	Set						s;
+};
+
+/**
+	Assigns the first value in the set \a s to \a p for which \a cond is \p true. Fails
+	if no value is found, succeeds otherwise.
+	\ingroup Search
+*/
+template<class Set,class Eval,class Cond>
+struct GoalView3<SelectFirst,Eval,Par<Eval>,Seq<Eval>,Set,bool,Cond> : IGoal
+{
+	GoalView3(State& state,const Par<Eval>& p, const Set& s, const Cond& cond) :
+		state(state),p(p),s(s),cond(cond) {}
+
+  	Goal execute()
+	{
+		Casper::Detail::PIteration<Par<Eval>,Set,bool> it(p,s,cond);
+		if (it.valid())
+			return succeed();
+		return fail();
+	}
+
+  	State&					state;
+	Par<Eval>				p;
+	Set						s;
+	Cond					cond;
 };
 
 };
