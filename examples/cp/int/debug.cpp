@@ -746,7 +746,8 @@ void assignRealSolution(Solver& solver,
 }
 
 void solve(int nbSubjects, int nbClasses,
-			const Util::StdStringArray& names, const Util::StdIntArray& nbTheoretical, const Util::StdIntArray& nbPractical,
+			const Util::StdStringArray& names, const Util::StdIntArray& nbTheoretical,
+			const Util::StdIntArray& nbPractical,
 			Util::StdIntArray2& collisions)
 {
 	const int hour = 2;
@@ -903,12 +904,12 @@ void solve(int nbSubjects, int nbClasses,
 
 #elif LABELING==2
 
-	solver.setExplorer(lds(solver,8));
+	//solver.setExplorer(lds(solver,8));
 
 	IntPar idx(solver),val(solver),i(solver),j(solver);
 
 	const int maxHours = (20-8)*hour;
-	IntVarArray timeCoord(solver,nbClasses,0,4*maxHours-1);
+	IntVarArray timeCoord(solver,nbClasses,0,5*maxHours-1);
 	for (int d = 2; d <= 6; ++d)
 		for (int t = 8*hour; t < 20*hour; ++t)
 		{

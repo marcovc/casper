@@ -43,8 +43,8 @@ bool bubbleFD(int size)
 	using namespace Casper;
 	using namespace Casper::CP;
 
-	const int maxInt = 1000;
-	const int minInt = -1000;
+	const int maxInt = 11;
+	const int minInt = 1;
 
 	Solver solver;
 	IntVarArray 	tabInit(solver,size,minInt,maxInt);
@@ -144,12 +144,6 @@ bool bubbleMIP(int size)
 				mip.post( ifThenElse(labelVars[cc],
 								tab[i][j][1] >= tab[i][j+1][0]+1.0,
 								tab[i][j][1] <= tab[i][j+1][0]) );
-//				mip.post(
-//						ifThenElse(labelVars[cc],
-//							tab[i+1][j][0] == tab[i][j+1][0] and
-//							tab[i][j+1][1] == tab[i][j][1],
-//							tab[i+1][j][0] == tab[i][j][1] and
-//							tab[i][j+1][1] == tab[i][j+1][0]) );
 
 				mip.post(
 						ifThenElse(labelVars[cc],
