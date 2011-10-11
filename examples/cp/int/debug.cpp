@@ -978,7 +978,7 @@ int main(int argc, char** argv)
 		solve(nbSubjects,nbClasses,names,nbTheoretical,nbPractical,collisions);
 	}
 	else
-		cerr << "usage: " << argv[0] << " path-to-collisions-file\n";
+		cerr << "usage: " << argv[0] << " collisions.data subjects.data\n";
 }
 
 #endif
