@@ -16,7 +16,7 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-#define EX 14
+#define EX 15
 
 #if EX==1
 
@@ -552,6 +552,433 @@ int main()
 		found = solver.next();
 	}
 	cout << solver.getStats() << endl;
+}
+#elif EX==15
+
+#include <casper/kernel.h>
+#include <casper/cp.h>
+#include <iostream>
+#include <list>
+#include <fstream>
+
+using namespace Casper;
+using namespace Casper::CP;
+using namespace std;
+
+int readNbSubjects(const char* fname)
+{
+	int nbSubjects;
+	ifstream f(fname);
+	f >> nbSubjects;
+	f.close();
+	return nbSubjects;
+}
+
+int readScheduleData(const char* fname, Util::StdStringArray& names, Util::StdIntArray2& data)
+{
+	int nbSubjects;
+	ifstream f(fname);
+	f >> nbSubjects >> ws;
+	for (int i = 0; i < nbSubjects; ++i)
+	{
+		assert(f.good());
+		std::string s;
+		f >> s >> ws;
+		names[i] = s;
+		for (int j = 0; j < nbSubjects; ++j)
+			f >> data[i][j] >> ws;
+	}
+	f.close();
+	return nbSubjects;
+}
+
+int readClassData(const char* fname, int nbSubjects, Util::StdIntArray& nbTheoretical,Util::StdIntArray& nbPractical)
+{
+	ifstream f(fname);
+	int nbClasses = 0;
+	for (int i = 0; i < nbSubjects; ++i)
+	{
+		assert(f.good());
+		f >> nbTheoretical[i] >> ws >> nbPractical[i] >> ws;
+		nbClasses += nbTheoretical[i] + nbPractical[i];
+	}
+	f.close();
+	return nbClasses;
+}
+
+void printSchedule(int nbSubjects, int hour, const Util::StdStringArray& names,
+					const Util::StdIntArray& nbTheoretical, const Util::StdIntArray& nbPractical,
+					const IntVarArray& 	startTimesT, const IntVarArray2& startTimesP,
+					const IntVarArray& 	daysT, const IntVarArray2& 	daysP)
+{
+	int w[5] = {0};
+
+	// find width of columns
+	for (int d = 2; d <= 6; ++d)
+		for (int t = 8*hour; t < 20*hour; ++t)
+		{
+			int ww = 0;
+			for (int s = 0; s < nbSubjects; ++s)
+			{
+				if (daysT[s].domain().value() == d and
+					t>=startTimesT[s].domain().value() and
+					t<startTimesT[s].domain().value()+ 2*hour)
+					ww += names[s].size()+2+3;
+				for (int p = 0; p < nbPractical[s]; ++p)
+					if (daysP[s][p].domain().value() == d and
+						t>=startTimesP[s][p].domain().value() and
+						t<startTimesP[s][p].domain().value()+ 2*hour)
+						ww += names[s].size()+2+3;
+			}
+			w[d-2] = std::max(w[d-2],ww);
+		}
+
+	// print header
+	for (int d = 2; d <= 6; ++d)
+	{
+		cout << "+";
+		for (int i = 0; i < w[d-2]; ++i)
+			cout << "-";
+	}
+	cout << "+" << endl;
+
+	// print rows
+	for (int t = 8*hour; t < 20*hour; ++t)
+	{
+		cout << "|";
+		for (int d = 2; d <= 6; ++d)
+		{
+			int sused = 0;
+			for (int s = 0; s < nbSubjects; ++s)
+			{
+				if (daysT[s].domain().value() == d and
+					t>=startTimesT[s].domain().value() and
+					t<startTimesT[s].domain().value()+ 2*hour)
+				{
+					cout << " " << names[s] << "(T) ";
+					sused += names[s].size()+2+3;
+				}
+				for (int p = 0; p < nbPractical[s]; ++p)
+					if (daysP[s][p].domain().value() == d and
+						t>=startTimesP[s][p].domain().value() and
+						t<startTimesP[s][p].domain().value()+ 2*hour)
+					{
+						cout << " " << names[s] << "(P) ";
+						sused += names[s].size()+2+3;
+					}
+			}
+			for (int i = 0; i < w[d-2]-sused; ++i)
+				cout << " ";
+			cout << "|";
+		}
+		cout << endl;
+	}
+
+	// print footer
+	for (int d = 2; d <= 6; ++d)
+	{
+		cout << "+";
+		for (int i = 0; i < w[d-2]; ++i)
+			cout << "-";
+	}
+	cout << "+" << endl;
+}
+
+void calcCollisions(const Util::StdIntArray& nbPractical,
+					Util::StdIntArray2& collisions,
+					int s1,int s2,
+					int& costTT, Util::StdIntArray& costTP,Util::StdIntArray& costPT, Util::StdIntArray2& costPP)
+{
+	costTT = collisions[s1][s2];
+	int aux = collisions[s1][s2];
+	for ( int c = 0; c < nbPractical[s2]; ++c)
+	{
+		costTP[c] = std::ceil(aux/(double)(nbPractical[s2]-c));
+		assert(costTP[c]>=0);
+		aux -= costTP[c];
+	}
+	assert(nbPractical[s2] == 0 or aux==0);
+	aux = collisions[s1][s2];
+	for ( int c = 0; c < nbPractical[s1]; ++c)
+	{
+		costPT[c] = std::ceil(aux/(double)(nbPractical[s1]-c));
+		assert(costPT[c]>=0);
+		aux -= costPT[c];
+	}
+	assert(nbPractical[s1] == 0 or aux==0);
+	aux = collisions[s1][s2];
+	for ( int c1 = 0; c1 < nbPractical[s1]; ++c1)
+	{
+		int aux2 = std::ceil(aux/(double)(nbPractical[s1]-c1));
+		for ( int c2 = 0; c2 < nbPractical[s2]; ++c2)
+		{
+			costPP[c1][c2] = std::ceil(aux2/(double)(nbPractical[s2]-c2));
+			assert(costPP[c1][c2]>=0);
+			aux2 -= costPP[c1][c2];
+		}
+		assert(nbPractical[s2] == 0 or aux2==0);
+		aux -= std::ceil(aux/(double)(nbPractical[s1]-c1));
+	}
+	assert(nbPractical[s1] == 0 or nbPractical[s2] == 0 or aux==0);
+}
+
+void assignRealSolution(Solver& solver,
+							const IntVarArray& 	startTimesT, const IntVarArray2& startTimesP,
+							const IntVarArray& 	daysT, const IntVarArray2& 	daysP)
+{
+	solver.post(daysT[0]==3); solver.post(startTimesT[0]==9*2);
+	solver.post(daysT[1]==2); solver.post(startTimesT[1]==14*2);
+	solver.post(daysT[2]==5); solver.post(startTimesT[2]==8*2);
+	solver.post(daysT[3]==4); solver.post(startTimesT[3]==10*2);
+	solver.post(daysT[4]==6); solver.post(startTimesT[4]==9*2);
+	solver.post(daysT[5]==2); solver.post(startTimesT[5]==12*2);
+	solver.post(daysT[6]==6); solver.post(startTimesT[6]==27);
+	solver.post(daysT[7]==3); solver.post(startTimesT[7]==14*2);
+	solver.post(daysT[8]==2); solver.post(startTimesT[8]==19);
+	solver.post(daysT[9]==6); solver.post(startTimesT[9]==9*2);
+	solver.post(daysT[10]==3); solver.post(startTimesT[10]==9*2);
+	solver.post(daysT[11]==3); solver.post(startTimesT[11]==9*2);
+	solver.post(daysT[12]==5); solver.post(startTimesT[12]==12*2);
+	solver.post(daysT[13]==6); solver.post(startTimesT[13]==9*2);
+	solver.post(daysT[14]==2); solver.post(startTimesT[14]==14*2);
+	solver.post(daysT[15]==5); solver.post(startTimesT[15]==16*2);
+	solver.post(daysT[16]==5); solver.post(startTimesT[16]==12*2);
+}
+
+void solve(int nbSubjects, int nbClasses,
+			const Util::StdStringArray& names, const Util::StdIntArray& nbTheoretical, const Util::StdIntArray& nbPractical,
+			Util::StdIntArray2& collisions)
+{
+	const int hour = 2;
+
+	Solver solver;
+
+	// find max number of practical classes (max number of theoretical is assumed to be 1)
+	int maxNbPractical = 0;
+	for (int i = 0; i < nbSubjects; ++i)
+		maxNbPractical = std::max(maxNbPractical,nbPractical[i]);
+
+	// start times of classes indexed by subject
+	IntVarArray 	startTimesT(solver,nbSubjects,8*hour,18*hour);
+	IntVarArray2 	startTimesP(solver,nbSubjects,maxNbPractical,8*hour,18*hour);
+
+	// days of classes indexed by subject
+	IntVarArray 	daysT(solver,nbSubjects,2,6);
+	IntVarArray2 	daysP(solver,nbSubjects,maxNbPractical,2,6);
+
+	// for each subject, practical classes must form contiguous blocks of <= 6 hours,
+	// and remaining must be contiguous to theoretical
+	for (int s = 0; s < nbSubjects; ++s)
+	{
+		assert(nbTheoretical[s]==1);
+
+		// constrain practical classes in each block of 3 classes
+		for ( int b = 0; b < nbPractical[s]/3; ++b)
+			for (int i = 1; i < 3; ++i)
+			{
+				// practical classes in the same block are on the same day
+				solver.post(daysP[s][b*3] == daysP[s][b*3+i]);
+				// and are contiguous
+				solver.post(startTimesP[s][b*3]+2*hour*i == startTimesP[s][b*3+i]);
+			}
+
+		int remNbPractical = nbPractical[s] % 3;
+
+		// if practical class do not fit in complete blocks of 3 classes
+		if (remNbPractical > 0)
+		{
+			// constrain the remaining practical classes
+			for (int i = 0; i < remNbPractical; ++i)
+			{
+				// must be on the same day as the theoretical class
+				solver.post(daysT[s] == daysP[s][nbPractical[s]-remNbPractical+i]);
+				// and are contiguous
+				solver.post(startTimesT[s] + (2 + i*2)*hour ==
+									startTimesP[s][nbPractical[s]-remNbPractical+i]);
+			}
+		}
+		else
+		// otherwise constrain isolated theoretical class to be earlier than all practical classes
+		for ( int c = 0; c < nbPractical[s]; ++c)
+			solver.post(daysT[s] < daysP[s][c]);
+	}
+
+	// there are no classes on wednesdays after 14
+	for (int s = 0; s < nbSubjects; ++s)
+	{
+		// constrain theoretical class
+		solver.post( (startTimesT[s] <= 12*hour) >= (daysT[s] == 4) );
+		// constraint practical classes
+		for ( int c = 0; c < nbPractical[s]; ++c)
+			solver.post( (startTimesP[s][c] <= 12*hour) >= (daysP[s][c] == 4));
+	}
+
+	// cost function
+	Util::StdList<IntVar> costTerms;
+
+	int cc = 0;
+	for (int s1 = 0; s1 < nbSubjects; ++s1)
+		for (int s2 = s1+1; s2 < nbSubjects; ++s2)
+			{
+				int costTT;
+				Util::StdArray<int> costTP(nbPractical[s2]);
+				Util::StdArray<int> costPT(nbPractical[s1]);
+				Util::StdArray<int,2> costPP(nbPractical[s1],nbPractical[s2]);
+				calcCollisions(nbPractical,collisions,s1,s2,costTT,costTP,costPT,costPP);
+				if (costTT>0)
+				{
+					IntVar costTerm(solver,0,costTT);
+					solver.post(costTerm == costTT *
+							cast<int>(daysT[s1]==daysT[s2] and
+										abs(startTimesT[s1]-startTimesT[s2])< 2*hour));
+					costTerms.pushBack(costTerm);
+				}
+				for (int i = 0; i < nbPractical[s2]; ++i)
+					if (costTP[i]>0)
+					{
+						IntVar costTerm(solver,0,costTP[i]);
+						solver.post(costTerm ==
+								costTP[i]*cast<int>(daysT[s1]==daysP[s2][i] and
+										abs(startTimesT[s1]-startTimesP[s2][i])< 2*hour));
+						costTerms.pushBack(costTerm);
+					}
+				for (int i = 0; i < nbPractical[s1]; ++i)
+					if (costPT[i]>0)
+					{
+						IntVar costTerm(solver,0,costPT[i]);
+						solver.post(costTerm ==
+								costPT[i]*cast<int>(daysP[s1][i]==daysT[s2] and
+										abs(startTimesP[s1][i]-startTimesT[s2])< 2*hour));
+						costTerms.pushBack(costTerm);
+					}
+				for (int i = 0; i < nbPractical[s1]; ++i)
+					for (int j = 0; j < nbPractical[s2]; ++j)
+						if (costPP[i][j]>0)
+						{
+							IntVar costTerm(solver,0,costPP[i][j]);
+							solver.post(costTerm ==
+									costPP[i][j]*cast<int>(daysP[s1][i]==daysP[s2][j] and
+											abs(startTimesP[s1][i]-startTimesP[s2][j])< 2*hour));
+							costTerms.pushBack(costTerm);
+						}
+			}
+	IntVar negCost(solver,-100000,0);
+	costTerms.pushBack(negCost);
+	solver.post(sumEqual(costTerms,0));
+
+	IntVar cost(solver,0,100000);
+	solver.post(cost == -negCost);
+
+	//assignRealSolution(solver,startTimesT,startTimesP,daysT,daysP);
+
+	cout << solver.valid() << " " << cost << endl;
+
+	// collect all variables
+	IntVarArray labelVars(solver,nbClasses*2);
+	cc = 0;
+	for (int s = 0; s < nbSubjects; ++s)
+	{
+		assert(nbTheoretical[s]==1);
+		labelVars[cc++] = daysT[s];
+		labelVars[cc++] = startTimesT[s];
+		for (int i = 0; i < nbPractical[s]; ++i)
+		{
+			labelVars[cc++] = daysP[s][i];
+			labelVars[cc++] = startTimesP[s][i];
+		}
+	}
+
+	Objective<int> obj(solver);
+	obj.set(cost);
+
+#define LABELING 1
+
+#if LABELING==1
+
+	solver.setExplorer(lds(solver,6));
+
+	bool found = solver.solve(
+			label(solver,daysT,selectVarMinDom(solver,daysT),selectValsRand(solver,daysT)) and
+			label(solver,labelVars));
+
+#elif LABELING==2
+
+	solver.setExplorer(lds(solver,8));
+
+	IntPar idx(solver),val(solver),i(solver),j(solver);
+
+	const int maxHours = (20-8)*hour;
+	IntVarArray timeCoord(solver,nbClasses,0,4*maxHours-1);
+	for (int d = 2; d <= 6; ++d)
+		for (int t = 8*hour; t < 20*hour; ++t)
+		{
+			cc = 0;
+			for (int s = 0; s < nbSubjects; ++s)
+			{
+				solver.post( (daysT[s]==d and startTimesT[s]==t) == (timeCoord[cc++] == (d-2)*maxHours+t-8*hour));
+				for (int p = 0; p < nbPractical[s]; ++p)
+					solver.post( (daysP[s][p]==d and startTimesP[s][p]==t) ==
+									(timeCoord[cc++] == (d-2)*maxHours+t-8*hour));
+			}
+		}
+
+	IntVarArray classesPerTimeCoord(solver,5*(20-8)*hour,0,nbClasses);
+	for (int d = 2; d <= 6; ++d)
+		for (int t = 8*hour; t < 20*hour; ++t)
+			solver.post(classesPerTimeCoord[(d-2)*maxHours+t-8*hour] ==
+						sum(all(i,range(0,nbClasses-1),true,
+								cast<int>(t >= timeCoord[i] and
+										  t < timeCoord[i]+2*hour))));
+
+	Goal varSelect(solver,
+			assign(idx,
+				argMin(i,nonGroundIdxs(solver,timeCoord),domainSize(solver,timeCoord[idx]))));
+	Goal valSelect(solver,
+			assign(val,
+				argMin(i,domain(solver,timeCoord[idx]),
+					sum(j,range(0,2*hour-1),minInDomain(solver,classesPerTimeCoord[i+j])))));
+
+	bool found = solver.solve(
+			label(solver,daysT,selectVarMinDom(solver,daysT),selectValsRand(solver,daysT)) and
+			whileNotGround(timeCoord)
+			(
+					varSelect and
+					valSelect and
+					(post(solver,timeCoord[idx]==val) or post(solver,timeCoord[idx]!=val))
+			) and label(solver,labelVars));
+#endif
+
+
+	if (!found)
+		cout << "no solution\n";
+	else
+	while (found)
+	{
+		//cout << found << endl << startTimesT << endl << daysT << endl << startTimesP << endl << daysP << endl << cost << endl;
+		printSchedule(nbSubjects,hour,names,nbTheoretical,nbPractical,
+						startTimesT,startTimesP,daysT,daysP);
+		cout << "cost = " << cost << endl;
+		found = obj.decrease(1) and solver.next();
+	}
+}
+
+int main(int argc, char** argv)
+{
+	if (argc==3)
+	{
+		int nbSubjects = readNbSubjects(argv[1]);
+
+		Util::StdIntArray2		collisions(nbSubjects,nbSubjects,0);
+		Util::StdIntArray  		nbTheoretical(nbSubjects,0);
+		Util::StdIntArray		nbPractical(nbSubjects,0);
+		Util::StdStringArray	names(nbSubjects,"");
+
+		readScheduleData(argv[1],names,collisions);
+		int nbClasses = readClassData(argv[2],nbSubjects,nbTheoretical,nbPractical);
+		solve(nbSubjects,nbClasses,names,nbTheoretical,nbPractical,collisions);
+	}
+	else
+		cerr << "usage: " << argv[0] << " path-to-collisions-file\n";
 }
 
 #endif

@@ -70,15 +70,14 @@
 			<target name="example-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
 				<buildArguments>-j 3 optimize_level=3</buildArguments>
-				<buildTarget>build/release/examples/lp/bubble</buildTarget>
+				<buildTarget>build/release/examples/cp/int/debug</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="example-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
-				<buildArguments>-j 1 debug_level=3 build/debug/examples/lp/bubble</buildArguments>
-				<buildTarget/>
+				<buildArguments>-j 1 debug_level=3 build/debug/examples/cp/int/debug</buildArguments>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>

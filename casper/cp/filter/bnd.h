@@ -633,14 +633,15 @@ struct BndFilterView3<Linear,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3> : IFilt
 	BndExpr<Eval>			 f;
 };
 
+
 #define GECODE_SUM
-#ifdef GECODE_SUM
 /**
  *	Enforces the constraint \f$\sum_{i=1}^{n}x_{i}=b\f$.
  *	\tparam Expr1 The sequence of variables \f$x_1\ldots x_n\f$
  *	\tparam Expr2 \f$b\f$.
  *  \ingroup Filtering
  **/
+#ifdef GECODE_SUM
 template<class Eval,class Expr1,class Expr2>
 struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 {

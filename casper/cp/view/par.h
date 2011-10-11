@@ -26,9 +26,12 @@
 namespace Casper {
 
 struct Domain;
+struct InDomain;
 struct Ground;
 struct NonGroundIdxs;
 struct DomainSize;
+struct MaxInDomain;
+struct MinInDomain;
 
 namespace CP {
 struct Store;
@@ -38,6 +41,10 @@ template<class T>
 Rel2<Domain,CP::Store*,T> domain(CP::Store& store,const T& t)
 {	return Rel2<Domain,CP::Store*,T>(&store,t);	}
 
+template<class E,class T>
+Rel3<InDomain,CP::Store*,E,T> inDomain(CP::Store& store,const E& e, const T& t)
+{	return Rel3<InDomain,CP::Store*,E,T>(&store,e,t);	}
+
 template<class T>
 Rel2<DomainSize,CP::Store*,T> domainSize(CP::Store& store,const T& t)
 {	return Rel2<DomainSize,CP::Store*,T>(&store,t);	}
@@ -45,6 +52,14 @@ Rel2<DomainSize,CP::Store*,T> domainSize(CP::Store& store,const T& t)
 template<class T>
 Rel2<Ground,CP::Store*,T> ground(CP::Store& store,const T& t)
 {	return Rel2<Ground,CP::Store*,T>(&store,t);	}
+
+template<class T>
+Rel2<MaxInDomain,CP::Store*,T> maxInDomain(CP::Store& store,const T& t)
+{	return Rel2<MaxInDomain,CP::Store*,T>(&store,t);	}
+
+template<class T>
+Rel2<MinInDomain,CP::Store*,T> minInDomain(CP::Store& store,const T& t)
+{	return Rel2<MinInDomain,CP::Store*,T>(&store,t);	}
 
 template<class T>
 Rel2<NonGroundIdxs,CP::Store*,T> nonGroundIdxs(CP::Store& store,const T& t)
@@ -59,9 +74,22 @@ template<class T>
 struct GetElem<Rel2<Domain,CP::Store*,T> >
 {	typedef	typename GetEval<T>::Type	Type;	};
 
+template<class E,class T>
+struct GetEval<Rel3<InDomain,CP::Store*,E,T> >
+{	typedef	bool	Type;	};
+
+
 template<class T>
 struct GetEval<Rel2<Ground,CP::Store*,T> >
 {	typedef	bool	Type;	};
+
+template<class T>
+struct GetEval<Rel2<MaxInDomain,CP::Store*,T> >
+{	typedef	typename GetEval<T>::Type	Type;	};
+
+template<class T>
+struct GetEval<Rel2<MinInDomain,CP::Store*,T> >
+{	typedef	typename GetEval<T>::Type	Type;	};
 
 template<class T>
 struct GetEval<Rel2<DomainSize,CP::Store*,T> >
@@ -158,6 +186,30 @@ struct ParView2<Ground,CP::Store*,View,bool> : IPar<bool>
 	View p1;
 };
 
+/**
+ * 	ParView over groundness testing.
+ * 	\ingroup Views
+ **/
+template<class Elem,class View>
+struct ParView3<InDomain,CP::Store*,Elem,View,bool> : IPar<bool>
+{
+	typedef typename Traits::GetEval<Elem>::Type	ElemEval;
+	typedef typename Traits::GetEval<View>::Type	ViewEval;
+	ParView3(State& state,const CP::Store* store, const Elem& elem,const View& p1) :
+		store(const_cast<CP::Store&>(*store)),elem(elem),p1(p1) {}
+	bool value() const
+	{
+		CP::DomView<ViewEval,View> v(store,p1);
+		return v->find(ParView<ElemEval,Elem>(store,elem).value())!=v->end();
+	}
+
+	Rel3<InDomain,CP::Store*,Elem,View> getObj()  const { return inDomain(store,elem,p1); }
+
+
+	CP::Store& store;
+	Elem	elem;
+	View p1;
+};
 
 /**
  * 	ParView for obtaining domain size.
@@ -177,6 +229,41 @@ struct ParView2<DomainSize,CP::Store*,View,Size> : IPar<Size>
 	View p1;
 };
 
+/**
+ * 	ParView for obtaining maximum element in domain.
+ * 	\ingroup Views
+ **/
+template<class View,class Size>
+struct ParView2<MaxInDomain,CP::Store*,View,Size> : IPar<Size>
+{
+	typedef typename Traits::GetEval<View>::Type	ViewEval;
+	ParView2(State& state,const CP::Store* store, const View& p1) :
+		store(const_cast<CP::Store&>(*store)),p1(p1) {}
+	Size value() const
+	{	return 	CP::BndView<ViewEval,View>(store,p1).max();	}
+	Rel2<MaxInDomain,CP::Store*,View> getObj()  const { return maxInDomain(store,p1); }
+
+	CP::Store& store;
+	View p1;
+};
+
+/**
+ * 	ParView for obtaining minimum element in domain.
+ * 	\ingroup Views
+ **/
+template<class View,class Size>
+struct ParView2<MinInDomain,CP::Store*,View,Size> : IPar<Size>
+{
+	typedef typename Traits::GetEval<View>::Type	ViewEval;
+	ParView2(State& state,const CP::Store* store, const View& p1) :
+		store(const_cast<CP::Store&>(*store)),p1(p1) {}
+	Size value() const
+	{	return 	CP::BndView<ViewEval,View>(store,p1).min();	}
+	Rel2<MinInDomain,CP::Store*,View> getObj()  const { return minInDomain(store,p1); }
+
+	CP::Store& store;
+	View p1;
+};
 
 } // Casper
 

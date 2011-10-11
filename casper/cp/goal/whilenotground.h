@@ -56,6 +56,25 @@ struct GoalView2<WhileNotGround,Seq<T>,Vars,bool,Statm> : IGoal
 	Statm 		statm;
 };
 
+namespace Detail {
+
+template<class Store,class T1,class T2>
+struct Post<Store,Rel2<Distinct,T1,T2> >: IGoal
+{
+	Post(Store& store,const Rel2<Distinct,T1,T2>& p, bool validate) :
+		store(store),p(p),validate(validate) {}
+	Goal execute()
+	{
+		if (store.post(p,CP::postDomFilter))
+			return Goal(!validate or store.valid());
+		else
+			return fail();
+	}
+	Store&	store;
+	const Rel2<Distinct,T1,T2>	p;
+	const bool	validate;
+};
+}
 }
 
 #endif /* CASPER_KERNEL_GOAL_WHILENOTGROUND_H_ */

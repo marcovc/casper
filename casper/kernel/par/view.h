@@ -29,11 +29,40 @@ namespace Casper {
  * Views over parameterized expressions
  *********************/
 
+// Extracts a given element of any array type
+template<class T>
+struct ParArrayView
+{
+	typedef typename Traits::GetElem<T>::Type	Elem;
+	ParArrayView(State& s,const T& p) : p(p) {}
+	Elem& operator[](int idx)
+	{	return p[idx];	}
+	const Elem& operator[](int idx) const
+	{	return p[idx];	}
+	T p;
+};
+
+// Extracts a given element of any array type
+template<class Array,class Index>
+struct ParArrayView<Rel2<Element,Array,Index> >
+{
+	typedef typename Traits::GetElem<Array>::Type	Elem;
+	typedef typename Traits::GetElem<Elem>::Type	EElem;
+	ParArrayView(State& s,const Rel2<Element,Array,Index>& p) : a(s,p.p1),i(s,p.p2) {}
+	EElem& operator[](int idx)
+	{	return a[i.value()][idx];	}
+	const EElem& operator[](int idx) const
+	{	return a[i.value()][idx];	}
+	ParArrayView<Array> a;
+	Par<int> i;
+};
+
 
 template<class>	struct Par;
 template<class,class,class>			struct ParView1;
 template<class,class,class,class>	struct ParView2;
 template<class,class,class,class,class>	struct ParView3;
+template<class,class,class,class,class,class>	struct ParView4;
 
 /**
  * 	ParView over generic object. View must be convertible to Eval.
@@ -124,6 +153,20 @@ struct ParView<Eval,Rel3<F,Expr1,Expr2,Expr3> > :
 		ParView3<F,Expr1,Expr2,Expr3,Eval>(state,r.p1,r.p2,r.p3) {}
 };
 
+/**
+ * 	ParView over a Rel4 relation -> defer to ParView4.
+ * 	\ingroup Views
+ **/
+template<class Eval,class F,class Expr1,class Expr2,class Expr3,class Expr4>
+struct ParView<Eval,Rel4<F,Expr1,Expr2,Expr3,Expr4> > :
+	ParView4<F,Expr1,Expr2,Expr3,Expr4,Eval>
+{
+//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::attach;
+//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::detach;
+
+	ParView(State& state, const Rel4<F,Expr1,Expr2,Expr3,Expr4>& r) :
+		ParView4<F,Expr1,Expr2,Expr3,Expr4,Eval>(state,r.p1,r.p2,r.p3,r.p4) {}
+};
 
 /**
  * 	ParView over symmetric.
@@ -497,23 +540,28 @@ struct ParView1<Cast<Eval>,View,Eval> : IPar<Eval>
 	ParView<ViewEval,View>	p1;
 };
 
-// FIXME: Attach is not correct, must fix when ParArray is ready
+template<class Eval,class T>
+ParView<Eval,T> newParView(State& state,const T& t)
+{	return ParView<Eval,T>(state,t);	}
+
 template<class Array,class Index,class Eval>
 struct ParView2<Element,Array,Index,Eval> : IPar<Eval>
 {
 	typedef typename Traits::GetEval<Index>::Type	IndexEval;
 	typedef typename Traits::GetElem<Array>::Type	ArrayElem;
 	ParView2(State& state, const Array& s, const Index& idx) :
-		state(state),s(s),idx(state,idx) {}
-	Eval value() const { return ParView<Eval,ArrayElem>(state,s[idx.value()]).value();	}
+		state(state),s(state,s),idx(state,idx) {}
+	//Eval value() const { return ParView<Eval,ArrayElem>(state,s[idx.value()]).value();	}
+	Eval value() const { return  newParView<Eval>(state,s[idx.value()]).value();	}
 	void setValue(const Eval& v)
-	{	ParView<Eval,ArrayElem>(state,s[idx.value()]).setValue(v); }
+	{
+		//ParView<Eval,ArrayElem>(state,s[idx.value()]).setValue(v);
+		newParView<Eval>(state,s[idx.value()]).setValue(v);
+	}
 
-//	void attach(INotifiable* f) { 	idx.attach(f); }
-//	void detach(INotifiable* f) {	idx.detach(f); }
 
 	State& state;
-	Array	s;
+	ParArrayView<Array>	s;
 	ParView<IndexEval,Index> idx;
 };
 
@@ -695,6 +743,51 @@ struct ParView2<RandInRange,Eval,Eval,Eval> : IPar<Eval>
 
 	const Eval lb;
 	const Eval ub;
+};
+
+template<class Set, class Cond,class Expr,class Eval>
+struct ParView4<Sum,Par<int>,Set,Cond,Expr,Eval> : IPar<Eval>
+{
+	ParView4(State& state, const Par<int>& v, const Set& s, const Cond& c, const Expr& e) :
+		v(v),s(s),cond(c),e(state,e) {}
+	Eval value() const
+	{
+		Eval sum = 0;
+		for (Casper::Detail::PIteration<Par<int>,Set,Cond> it(v,s,cond);
+				it.valid(); it.iterate())
+			sum += e.value();
+		return sum;
+	}
+	Par<int> v;
+	Set	s;
+	Cond cond;
+	ParView<Eval,Expr> e;
+};
+
+template<class Set, class Expr,class Eval>
+struct ParView3<Sum,Par<int>,Set,Expr,Eval> :
+	ParView4<Sum,Par<int>,Set,bool,Expr,Eval>
+{
+	ParView3(State& state, const Par<int>& v, const Set& s, const Expr& e) :
+		ParView4<Sum,Par<int>,Set,bool,Expr,Eval>(state,v,s,true,e) {}
+};
+
+template<class Cond,class IfTrue, class IfFalse,class Eval>
+struct ParView3<IfThenElse,Cond,IfTrue,IfFalse,Eval> : IPar<Eval>
+{
+	ParView3(State& state, const Cond& c, const IfTrue& t, const IfFalse& f) :
+		c(state,c),t(state,t),f(state,f) {}
+	Eval value() const
+	{
+		if (c.value())
+			return t.value();
+		else
+			return f.value();
+	}
+
+	ParView<bool,Cond> c;
+	ParView<Eval,IfTrue>  t;
+	ParView<Eval,IfFalse> f;
 };
 
 };

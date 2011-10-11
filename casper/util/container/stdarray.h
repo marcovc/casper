@@ -506,6 +506,15 @@ public:
 
 
 } // Detail
+
+typedef StdArray<int>		StdIntArray;
+typedef StdArray<int,2>		StdIntArray2;
+typedef StdArray<int,3>		StdIntArray3;
+typedef StdArray<bool>		StdBoolArray;
+typedef StdArray<bool,2>	StdBoolArray2;
+typedef StdArray<bool,3>	StdBoolArray3;
+typedef StdArray<string>	StdStringArray;
+
 } // Util
 
 

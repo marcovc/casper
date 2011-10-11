@@ -61,8 +61,10 @@ struct Objective
 	{
 	}
 
-	void set(BndExpr<T> b)
+	template<class T1>
+	void set(const T1& t)
 	{
+		BndExpr<T> b(store,t);
 		curMin = b.min();
 		curMax = b.max();
 		this->b = b;

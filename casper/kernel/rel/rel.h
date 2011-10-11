@@ -385,6 +385,9 @@ NEW_REL_3(linear,Linear)
 NEW_REL_2(sumProduct,SumProduct)
 
 NEW_REL_1(sum,Sum)
+NEW_REL_3(sum,Sum)
+NEW_REL_4(sum,Sum)
+
 NEW_REL_2(sumEquals,SumEqual)
 
 NEW_REL_2(ifThen,IfThen)
@@ -546,6 +549,14 @@ struct GetEval<Rel2<SumEqual,T1,T2> >
 template<class T1>
 struct GetEval<Rel1<Sum,T1> >
 {	typedef	typename Traits::GetEval<typename Traits::GetTermElem<T1>::Type>::Type	Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<Sum,T1,T2,T3> >
+{	typedef	typename Traits::GetEval<T3>::Type	Type;	};
+
+template<class T1,class T2,class T3,class T4>
+struct GetEval<Rel4<Sum,T1,T2,T3,T4> >
+{	typedef	typename Traits::GetEval<T4>::Type	Type;	};
 
 template<class T1,class T2>
 struct GetEval<Rel2<InTable,T1,T2> >

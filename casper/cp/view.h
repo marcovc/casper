@@ -25,7 +25,7 @@
 //#include <casper/cp/view/mutview.h>
 #include <casper/cp/view/dom.h>
 #include <casper/cp/view/array.h>
-
+#include <casper/cp/view/par.h>
 
 
 #endif // _H_CASPER_KERNEL_VIEW

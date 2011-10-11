@@ -42,6 +42,7 @@ struct Post: IGoal
 	const bool	validate;
 };
 
+
 template<class Store>
 struct Validate : IGoal
 {
