@@ -16,7 +16,7 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-#define EX 15
+#define EX 12
 
 #if EX==1
 
@@ -417,15 +417,15 @@ using namespace Casper;
 using namespace Casper::CP;
 using namespace std;
 
-int main()
+int main(int argc, char** argv)
 {
-	const int n = 100;
+	const int n = atoi(argv[1]);
 
 	Env env;
 
 	Store store(env);
 
-	IntVarArray v(store,n,1,n);
+	IntVarArray v(store,n,0,n-1);
 
 	cout << v << endl;
 
@@ -442,13 +442,16 @@ int main()
 	Goal varSelect(store,
 			assign(idx,
 				argMin(i,nonGroundIdxs(store,v),
-						domainSize(store,v[i]))));
+						(cast<int>(domainSize(store,v[i]))*n+abs(i-n/2))*n+i)));
+
+//	Goal valSelect(store,
+//			assign(val,
+//				argMax(i,domain(store,v[idx]),
+//						randInRange(0,n-1))));
 
 	Goal valSelect(store,
 			assign(val,
-				argMax(i,domain(store,v[idx]),
-						randInRange(0,n-1))));
-
+				min(i,domain(store,v[idx]),i)));
 
 	Goal searchTree(env,
 			whileNotGround(v)
@@ -463,11 +466,15 @@ int main()
 	DFSExplorer dfs(env);
 
 	bool found = dfs.explore(searchTree);
-	while (found)
+/*	while (found)
 	{
 		cout << v << endl;
 		found = dfs.resume();
-	}
+	}*/
+	if (found)
+		cout << v << endl;
+	else
+		cout << "no solution!" << endl;
 	cout << store.getStats() << endl;
 	cout << dfs.getStats() << endl;
 }
