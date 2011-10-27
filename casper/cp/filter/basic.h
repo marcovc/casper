@@ -33,10 +33,10 @@ namespace Casper {
 namespace CP {
 
 // TODO: make this a global static object (similar to fail() goal)
-struct NoFilter : IFilter
+struct UndefinedFilter : IFilter
 {
 	template<class T>
-	NoFilter(Store& s,const T& t) : IFilter(s)
+	UndefinedFilter(Store& s,const T& t) : IFilter(s)
 	{
 		assert(0);
 		/*int     status;

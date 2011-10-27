@@ -77,14 +77,14 @@
 			</target>
 			<target name="example-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
-				<buildArguments>-j 1 debug_level=3 build/debug/examples/lp/bubble</buildArguments>
+				<buildArguments>-j 1 debug_level=3 casperbind_python</buildArguments>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="examples-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
-				<buildArguments>-j 9 debug_level=3 safe_rounding=false lp=false</buildArguments>
+				<buildArguments>-j 2 debug_level=3 safe_rounding=false lp=false</buildArguments>
 				<buildTarget>examples</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -148,7 +148,7 @@
 			</target>
 			<target name="library-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
-				<buildArguments>debug_level=3</buildArguments>
+				<buildArguments>debug_level=3 subpoly_rels=1</buildArguments>
 				<buildTarget>library</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -156,6 +156,7 @@
 			</target>
 			<target name="gcc-version" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>gcc</buildCommand>
+				<buildArguments/>
 				<buildTarget>--version</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>

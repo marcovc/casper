@@ -131,7 +131,7 @@ struct ChkViewRel2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2>
 	bool setToFalse()
 	{
 		detach(pOwner);
-		throw Exception::NoFilter("not contained(set,set)");
+		throw Exception::UndefinedFilter("not contained(set,set)");
 	}
 
 	void attach(INotifiable* f)
@@ -281,7 +281,7 @@ struct ChkViewRel3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,
 		return store.post(intersect(x.getObj(),y.getObj(),z.getObj()));
 	}
 	bool setToFalse()		// FIXME: using views instead of auxvar
-	{	throw Exception::NoFilter("not intersect(set,set,set)");	}
+	{	throw Exception::UndefinedFilter("not intersect(set,set,set)");	}
 
 	void attach(INotifiable* f)
 	{ 	pOwner=f; x->attachOnDomain(f); y->attachOnDomain(f); z->attachOnDomain(f);}
@@ -336,7 +336,7 @@ struct ChkViewRel3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3>
 		return store.post(union_(x.getObj(),y.getObj(),z.getObj()));
 	}
 	bool setToFalse()
-	{	throw Exception::NoFilter("not unionEqual(set,set,set)");	}
+	{	throw Exception::UndefinedFilter("not unionEqual(set,set,set)");	}
 
 	void attach(INotifiable* f)
 	{ 	pOwner=f; x->attachOnDomain(f); y->attachOnDomain(f); z->attachOnDomain(f);}
@@ -395,7 +395,7 @@ struct ChkViewRel1<Partition,Seq<Set<Elem> >,Expr1>
 	bool setToFalse()
 	{
 		detach(pOwner);
-		throw Exception::NoFilter("not Partition(sets)");
+		throw Exception::UndefinedFilter("not Partition(sets)");
 	}
 
 	void attach(INotifiable* f) { 	pOwner=f; x->attachOnDomain(f); }

@@ -16,7 +16,7 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-#define EX 15
+#define EX 16
 
 #if EX==1
 
@@ -979,6 +979,80 @@ int main(int argc, char** argv)
 	}
 	else
 		cerr << "usage: " << argv[0] << " collisions.data subjects.data\n";
+}
+#else
+
+#include <casper/kernel.h>
+#include <casper/cp.h>
+#include <iostream>
+#include <list>
+#include <fstream>
+
+using namespace Casper;
+using namespace Casper::CP;
+using namespace std;
+
+template<class Vars>
+struct MyVarSelector : IVarSelector
+{
+	MyVarSelector(Store& store,const Vars& vars, bool rr) :
+		doms(store,vars),
+		rr(rr),
+		selected(store,doms.size(),false)
+	{
+	}
+	int select()
+	{
+		uint first = 0;
+
+		if( rr ) {
+			for(first = 0; first < doms.size(); first++ )
+				if( !selected[first] )
+					break;
+			if( first == doms.size() ) {
+				selected = false;
+				first = 0;
+			}
+
+			for(uint k = 0; k < doms.size(); k++ )
+				if( selected[k] && !doms[k]->ground() )
+					printf("%d was pruned\n", k);
+
+		}
+		int bestIdx = -1;
+		uint bestDom = limits<uint>::max();
+
+		for (uint varidx = 0; varidx < doms.size(); varidx++) {
+			if( (!rr || !selected[varidx])
+			    && !doms[varidx]->ground()
+				&& doms[varidx]->size() < bestDom )
+			{
+				bestIdx = varidx;
+				bestDom = doms[varidx]->size();
+			}
+		}
+
+		if( rr && bestIdx >= 0 )
+			selected[bestIdx] = true;
+
+		return bestIdx;
+	}
+	DomArrayView<int,Vars> doms;
+	bool rr;
+	Array<bool> 	selected;
+};
+
+int main()
+{
+	Solver solver;
+	IntVarArray v(solver,2,1,4);
+	VarSelector vs = new (solver) MyVarSelector<IntVarArray>(solver,v,true);
+	bool found = solver.solve(label(solver,v,vs,selectHalfMin(solver,v)));
+	while (found)
+	{
+		cout << v << endl;
+		found = solver.next();
+	}
 }
 
 #endif

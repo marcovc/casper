@@ -70,6 +70,9 @@ kernel_examples+=['debug.cpp']
 #kernel_examples+=['goal_sched.cpp']
 kernel_examples+=['getversion.cpp']
 
+bindings_examples=[]
+bindings_examples+=['bindings.cpp']
+
 example_srcs=[]
 for i in kernel_examples:
 	example_srcs += ["examples/kernel/"+i]
@@ -77,6 +80,8 @@ for i in cp_examples:
 	example_srcs += ["examples/cp/"+i]
 for i in lp_examples:
 	example_srcs += ["examples/lp/"+i]
+for i in bindings_examples:
+	example_srcs += ["examples/bindings/"+i]
 
 examples_for_extra_lib={}
 for k,v in extra_example_libs.iteritems():
@@ -97,6 +102,7 @@ casper_kernel+=['goal/terminal.cpp']
 casper_kernel+=['notify/susplist.cpp']
 casper_kernel+=['state/state.cpp']
 casper_kernel+=['state/env.cpp']
+#casper_kernel+=['obj/obj.cpp']
 
 casper_cp=[]
 casper_cp+=['filter/common.cpp']
@@ -240,12 +246,12 @@ vars.Add(BoolVariable('asserts', 'extra run-time checks', False))
 vars.Add(BoolVariable('log', 'enable builtin debugger', False))
 vars.Add(BoolVariable('static_link', 'static link', False))
 vars.Add(BoolVariable('cpp0x', 'enable c++0x extensions', True))
+vars.Add(BoolVariable('subpoly_rels', 'enable subtype polymorphic relations', True))
 vars.Add(BoolVariable('lp', 'builds interface to glpk (requires preinstalled glpk library)', True))
 vars.Add(PathVariable('install_prefix', 'installation prefix', '.'))
 vars.Add(PathVariable('boost_path','path where boost libraries are installed',None))
 vars.Add(PathVariable('gmp_path','path where gmp library is installed',None))
 vars.Add(PathVariable('mpfr_path','path where mpfr library is installed',None))
-vars.Add(BoolVariable('build_bindings','compile casper bindings',False))
 
 
 compiler = ARGUMENTS.get('tool', 'default')   #allows user defined compiler
@@ -367,7 +373,9 @@ if env['log']:
 if env['cpp0x']:
 	defined_macros += ['CASPER_CPP0X']
 	
-
+if env['subpoly_rels']:
+	defined_macros += ['CASPER_SUBPOLY_RELS']
+	
 env.Append(CPPDEFINES = defined_macros)
 
 
@@ -596,101 +604,106 @@ Alias('examples',example_targets)
 dexample_targets = defineExamples(denv)
 rexample_targets = defineExamples(renv)
 
-# bindings_cpp library
 
-if env['build_bindings']:
-	gen_casper_preds = env.Command('bindings/cpp/casperpreds.h',None,'python bindings/cpp/genpreds.py > $TARGET')
+gen_casper_preds = env.Command('bindings/cpp/casperpreds.h',None,'python bindings/cpp/genpreds.py > $TARGET')
 	
-	casperbind_cpp_srcs = []
-	for i in casperbind_cpp:
-		casperbind_cpp_srcs+=["bindings/cpp/"+i]
+casperbind_cpp_srcs = []
+for i in casperbind_cpp:
+	casperbind_cpp_srcs+=["bindings/cpp/"+i]
+
+casperbind_cpp_objs=[]
+for i in casperbind_cpp_srcs:
+	casperbind_cpp_objs += env.Object(env['PREFIX']+"/"+i,
+									CPPPATH=['#'])
 	
-	casperbind_cpp_objs=[]
-	for i in casperbind_cpp_srcs:
-		casperbind_cpp_objs += env.Object(env['PREFIX']+"/"+i,
-										CPPPATH=['#'])
-		
-	libcasperbind_cpp=env.Library(target=env['PREFIX']+"/bindings/casperbind_cpp",source=casperbind_cpp_objs)
-	
-	Alias('casperbind_cpp',[gen_casper_preds,libcasperbind_cpp])
-	
-	# bindings_cpp tests
-	
-	casperbind_cpp_tests_srcs = []
-	for i in casperbind_cpp_tests:
-		casperbind_cpp_tests_srcs+=["bindings/cpp/"+i]
-	
-	casperbind_cpp_tests_targets=[]
-	for i in casperbind_cpp_tests_srcs:
-		casperbind_cpp_tests_targets += env.Program(env['PREFIX']+"/"+i,
-											CPPPATH=['#'],
-											LIBPATH=[env['PREFIX']+'bindings/cpp/'],
-							   				LIBS=libcasperbind_cpp)
-	
-	Alias('casperbind_cpp_tests',casperbind_cpp_tests_targets)
-	
-	# bindings_xcsp exec
-	
-	casperbind_xcsp_srcs = []
-	for i in casperbind_xcsp:
-		casperbind_xcsp_srcs+=["bindings/xcsp/"+i]
-	
-	
-	casperbind_xcsp_objs=[]
-	for i in casperbind_xcsp_srcs:
-		casperbind_xcsp_objs += env.Object(env['PREFIX']+"/"+i,
-										CPPPATH=['#src','/usr/include/libxml++-2.6',
-													 '/usr/include/glibmm-2.4',
-													 '/usr/include/glib-2.0',
-													 '/usr/lib/glib-2.0/include',
-													 '/usr/lib/glibmm-2.4/include/',
-													 '/usr/lib/libxml++-2.6/include/'])
-	
-	# TODO: find correct include and link paths automatically  
-	casperbind_xcsp_target = env.Program(env['PREFIX']+"/bindings/xcsp/casper-xcsp",
-											source=casperbind_xcsp_objs,
-											LIBS=libcasperbind_cpp+['xml++-2.6'])
-	
-	Alias('casperbind_xcsp',casperbind_xcsp_target)
-	
-	
-	### support for building fzn-casper ###
-	
-	casperbind_fzn_target_libpath = confCommonEnv['LIBPATH']
-	casperbind_fzn_target_libs = confCommonEnv['LIBS']+[libcasperbind_cpp]+[libcasper]
-								     
-	casperbind_fzn_target = env.Program(env['PREFIX']+'/bindings/fzn/fzn-casper',
-										[env['PREFIX']+'/bindings/fzn/parser.yy',
-										  env['PREFIX']+'/bindings/fzn/lexer.ll',
-										  env['PREFIX']+'/bindings/fzn/driver.cpp',
-										  env['PREFIX']+'/bindings/fzn/main.cpp'],
-										  CPPPATH=['#src','#src/bindings/fzn','#src/bindings/cpp',
-										  '#build/'+MODE+'/bindings/fzn'],
-										  LIBS=casperbind_fzn_target_libs,
-										  LIBPATH=casperbind_fzn_target_libpath)
-	
-	Alias('casperbind_fzn',casperbind_fzn_target)
-	
-	### support for building py-casper ###
-	
-	pycasper_ifaces=['main.i']
-	
-	pycasper_objs=[]
-	for i in pycasper_ifaces:
-		pycasper_objs += env.SharedObject(env['PREFIX']+"/bindings/py/"+i,
-										 CCFLAGS=' -fPIC -Wall -std=c++0x',
-										 CPPPATH=['#src','/usr/include/python2.6'],
-										 SWIGFLAGS = '-c++ -python -Isrc -Wall');
-	
-	pycasper_target_libpath = confCommonEnv['LIBPATH']
-	pycasper_target_libs = confCommonEnv['LIBS']+[libcasperbind_cpp]+[libcasper]
-	
-	pycasper_lib=env.SharedLibrary(target=env['PREFIX']+'/bindings/py/casper',
-								   source=pycasper_objs,SHLIBPREFIX='_',
+libcasperbind_cpp=env.Library(target=env['PREFIX']+"/bindings/casperbind_cpp",source=casperbind_cpp_objs)
+
+Alias('casperbind_cpp',[gen_casper_preds,libcasperbind_cpp])
+
+# bindings_cpp tests
+
+casperbind_cpp_tests_srcs = []
+for i in casperbind_cpp_tests:
+	casperbind_cpp_tests_srcs+=["bindings/cpp/"+i]
+
+casperbind_cpp_tests_targets=[]
+for i in casperbind_cpp_tests_srcs:
+	casperbind_cpp_tests_targets += env.Program(env['PREFIX']+"/"+i,
+										CPPPATH=['#'],
+										LIBPATH=[env['PREFIX']+'bindings/cpp/'],
+						   				LIBS=libcasperbind_cpp)
+
+Alias('casperbind_cpp_tests',casperbind_cpp_tests_targets)
+
+# bindings_xcsp exec
+
+casperbind_xcsp_srcs = []
+for i in casperbind_xcsp:
+	casperbind_xcsp_srcs+=["bindings/xcsp/"+i]
+
+
+casperbind_xcsp_objs=[]
+for i in casperbind_xcsp_srcs:
+	casperbind_xcsp_objs += env.Object(env['PREFIX']+"/"+i,
+									CPPPATH=['#src','/usr/include/libxml++-2.6',
+												 '/usr/include/glibmm-2.4',
+												 '/usr/include/glib-2.0',
+												 '/usr/lib/glib-2.0/include',
+												 '/usr/lib/glibmm-2.4/include/',
+												 '/usr/lib/libxml++-2.6/include/'])
+
+# TODO: find correct include and link paths automatically  
+casperbind_xcsp_target = env.Program(env['PREFIX']+"/bindings/xcsp/casper-xcsp",
+										source=casperbind_xcsp_objs,
+										LIBS=libcasperbind_cpp+['xml++-2.6'])
+
+Alias('casperbind_xcsp',casperbind_xcsp_target)
+
+
+### support for building fzn-casper ###
+
+casperbind_fzn_target_libpath = confCommonEnv['LIBPATH']
+casperbind_fzn_target_libs = confCommonEnv['LIBS']+[libcasperbind_cpp]+[libcasper]
+							     
+casperbind_fzn_target = env.Program(env['PREFIX']+'/bindings/fzn/fzn-casper',
+									[env['PREFIX']+'/bindings/fzn/parser.yy',
+									  env['PREFIX']+'/bindings/fzn/lexer.ll',
+									  env['PREFIX']+'/bindings/fzn/driver.cpp',
+									  env['PREFIX']+'/bindings/fzn/main.cpp'],
+									  CPPPATH=['#src','#src/bindings/fzn','#src/bindings/cpp',
+									  '#build/'+MODE+'/bindings/fzn'],
+									  LIBS=casperbind_fzn_target_libs,
+									  LIBPATH=casperbind_fzn_target_libpath)
+
+Alias('casperbind_fzn',casperbind_fzn_target)
+
+### support for building py-casper ###
+
+pycasper_target_libpath = confCommonEnv['LIBPATH']
+pycasper_target_libs = confCommonEnv['LIBS']+[libcasper]
+
+pycasper_ifaces=['kernel','cp','util']
+
+#pycasper_objs=[]
+pycasper_libs=[]
+for i in pycasper_ifaces:
+	pycasper_obj = env.SharedObject(env['PREFIX']+"/bindings/python/"+i+".i",
+									 CCFLAGS=' -fPIC -Wall -std=c++0x -DSWIG_BUILD -Wfatal-errors',
+									 CPPPATH=['#.','/usr/include/python2.6'],
+									 SWIGFLAGS = '-c++ -python -I. -Ibindings/python -Wall')
+	pycasper_libs += env.SharedLibrary(target=env['PREFIX']+'/bindings/python/'+i,
+								   source=pycasper_obj,SHLIBPREFIX='_',
 								   LIBPATH=pycasper_target_libpath,
 								   LIBS=pycasper_target_libs)
 	
-	Alias('casperbind_py',pycasper_lib)
+gen_op_intvar = env.Command('bindings/python/cp/int/intvar_operators.i',['bindings/python/pyutils/objdb.py','bindings/python/cp/int/gen_operators_intvar.py'],'python bindings/python/cp/int/gen_operators_intvar.py > $TARGET')
+gen_op_boolvar = env.Command('bindings/python/cp/int/boolvar_operators.i',['bindings/python/pyutils/objdb.py','bindings/python/cp/int/gen_operators_boolvar.py'],'python bindings/python/cp/int/gen_operators_boolvar.py > $TARGET')
+gen_op_intexpr = env.Command('bindings/python/kernel/intexpr_operators.i',['bindings/python/pyutils/objdb.py','bindings/python/kernel/gen_operators_intexpr.py'],'python bindings/python/kernel/gen_operators_intexpr.py > $TARGET')
+gen_op_boolexpr = env.Command('bindings/python/kernel/boolexpr_operators.i',['bindings/python/pyutils/objdb.py','bindings/python/kernel/gen_operators_boolexpr.py'],'python bindings/python/kernel/gen_operators_boolexpr.py > $TARGET')
+gen_pred_expr = env.Command('bindings/python/kernel/expr_predicates.i',['bindings/python/pyutils/objdb.py','bindings/python/kernel/gen_predicates_expr.py'],'python bindings/python/kernel/gen_predicates_expr.py > $TARGET')
+
+gen_scripts = [gen_op_intvar,gen_op_boolvar,gen_op_intexpr,gen_op_boolexpr,gen_pred_expr]
+Alias('casperbind_python',gen_scripts+pycasper_libs)
 							   
 
 ############ general environment information ############

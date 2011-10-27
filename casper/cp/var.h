@@ -93,13 +93,6 @@ class Var
 	/// Creates a new variable pointing to the domain of \a s.
 	Var(const Var<T,DomT>& s) : pDom(s.pDom)	{ }
 
-#ifndef SWIG
-	/// Creates a new variable pointing to the domain of \a s.
-	/// \pre Dom1 is convertible to DomT
-	template<class T1,class Dom1>
-	Var(const Var<T1,Dom1>& s) : pDom(s.getEnv(),static_cast<Dom*>(s.pDomain()))	{ }
-#endif
-
 	/// Creates a new variable with the domain pointing to \a s.
 	Var(Store& store,PDom s) : pDom(store,s)	{ }
 
@@ -144,9 +137,6 @@ class Var
 													  p4,p5,p6,p7,p8)) {}
 
 	~Var() {}
-
-	///	Returns the Store object associated with this variable.
-	Store&		getStore()	const	{	return domain().getStore();	}
 
 	/// Returns \a true if the variable is ground, \a false otherwise.
 	bool	ground() const { return domain().ground(); }

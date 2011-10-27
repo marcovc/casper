@@ -105,13 +105,32 @@ struct IDomExpr : INotifier
 	void	detach(INotifiable*	n)	{	(*this)->detachOnDomain(n);	}
 
 	bool notify() { assert(0); return true; }
+
 	/// Return Store object associated with the expression.
 	Store&		getStore() const {	return store; }
 
 	Store&				store;
 };
 
+struct IChkExpr : INotifier
+{
+	IChkExpr(Store& store) : store(store) {}
+	virtual ~IChkExpr()	{}
 
+	virtual bool isTrue() const	= 0;
+
+	virtual bool canBeTrue() const = 0;
+
+	virtual bool setToTrue() = 0;
+
+	virtual bool setToFalse() = 0;
+
+	bool notify() { assert(0); return true; }
+
+	Store& getStore() const {	return store;	}
+
+	Store&				store;
+};
 
 
 // wrappers
@@ -176,6 +195,29 @@ struct DomExprWrapper : IDomExpr<Dom>
 	void detach(INotifiable* f)
 	{	v.detach(f);	}
 	DomView<Eval,View,Dom>	v;
+};
+
+template<class View>
+struct ChkExprWrapper : IChkExpr
+{
+	ChkExprWrapper(Store& store, const View& v) :
+		IChkExpr(store),v(store,v) {}
+
+	bool isTrue() const
+	{	return v.isTrue();	}
+	bool canBeTrue() const
+	{	return v.canBeTrue();	}
+	bool setToTrue()
+	{	return v.setToTrue();	}
+	bool setToFalse()
+	{	return v.setToFalse();	}
+
+	void attach(INotifiable* f)
+	{	v.attach(f);	}
+	void detach(INotifiable* f)
+	{	v.detach(f);	}
+
+	ChkView<View>	v;
 };
 
 } // Detail
@@ -376,6 +418,56 @@ struct GetDom<DomExpr<Eval,DomT> >
 {	typedef DomT	Type; };
 
 
+/********************
+ * Check Expression
+ *********************/
+
+
+/**
+ *	A wrapper around a ChkView.
+ *
+ *  \ingroup CPViews
+ */
+struct ChkExpr : Util::PImplIdiom<Detail::IChkExpr>
+{
+	/// Expression type.
+	typedef ChkExpr	Self;
+
+	/// Parent type.
+	typedef Util::PImplIdiom<Detail::IChkExpr> Super;
+
+	/// Creates a value expression which references an existing implementation.
+	ChkExpr(Detail::IChkExpr* pImpl) : Super(pImpl) {}
+
+	/// Creates a new value expression from a generic object.
+	template<class T1>
+	ChkExpr(Store& store, const T1& t) :
+		Super(new (store) Detail::ChkExprWrapper<T1>(store,t)) {}
+
+	ChkExpr(Store& store, const ChkExpr& t) : Super(t) {}
+
+	/// Returns if expression is true
+	bool isTrue() const	{	return Super::getImpl().isTrue();	}
+
+	/// Returns if expression can still be true
+	bool canBeTrue() const {	return Super::getImpl().canBeTrue();	}
+
+	/// Sets expression to true
+	bool setToTrue() {	return Super::getImpl().setToTrue();	}
+
+	/// Sets expression to false
+	bool setToFalse() {	return Super::getImpl().setToFalse();	}
+
+	/// Schedules \p f to be notified as soon as the expression truth value might changed.
+	void attach(INotifiable* f) { Super::pImpl->attach(f); }
+
+	/// Stops \p f to be notified as soon as the expression truth value might changed.
+	void detach(INotifiable* f) { Super::pImpl->detach(f); }
+
+	/// Returns the Store object associated with the expression.
+	Store&	getStore() const { return Super::pImpl->getStore(); }
+};
+
 typedef BndExpr<int>	IntBndExpr;
 typedef BndExpr<bool>	BoolBndExpr;
 typedef BndExpr<double>	DoubleBndExpr;
@@ -420,6 +512,10 @@ template<class T,class D>
 struct GetEval<CP::DomExpr<T,D> >
 {	typedef T	Type;	};
 
+template<>
+struct GetEval<CP::ChkExpr>
+{	typedef bool	Type;	};
+
 }
 
 } // Casper
@@ -434,7 +530,6 @@ std::ostream& operator<<(std::ostream& os, const Casper::CP::ValExpr<T>& f)
 	os << f.value();
 	return os;
 };
-
 
 template<class Eval,class Dom>
 std::ostream& operator<<(std::ostream& os, const Casper::CP::DomExpr<Eval,Dom>& f)

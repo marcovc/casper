@@ -25,7 +25,7 @@
 namespace Casper {
 
 NEW_REL_2(forAll,ForAll)
-NEW_REL_3(forAll,ForAll)
+NEW_FN_3(forAll,ForAll)
 
 namespace Traits {
 template<class T1,class T2,class T3>

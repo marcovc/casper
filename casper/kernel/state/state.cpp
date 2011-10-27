@@ -106,7 +106,7 @@ ostream& operator<<(ostream& os, const Casper::StateStats& s)
 	   << left << setw (30) << "Maximum depth" << ":" <<  std::setw (10) << std::right
 							  << s.getMaxDepth() << std::endl
 	   << left << setw (30) << "Peak of reversible heap (KiB)" << ":" <<  std::setw (10) << std::right
-							  << (s.state.getHeap().maxAllocated()/1024);
+							  << (s.getState().getHeap().maxAllocated()/1024);
 
 	return os;
 }

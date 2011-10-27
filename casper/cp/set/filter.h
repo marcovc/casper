@@ -513,7 +513,7 @@ struct PostBndFilter1<Disjoint,Seq<Set<Elem> >,View>
 		for (uint i = 0; i < s.size(); i++)
 			for (uint j = i+1; j < s.size(); j++)
 				e = e and disjoint(s[i].getObj(),s[j].getObj());
-		return store.post(Filter(e));
+		return store.post(e);
 	}
 };
 

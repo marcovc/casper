@@ -27,7 +27,7 @@ namespace Casper {
 
 
 NEW_REL_1(whileNotGround,WhileNotGround)
-NEW_REL_2(whileNotGround,WhileNotGround)
+NEW_FN_2(whileNotGround,WhileNotGround)
 
 namespace Traits {
 template<class T1,class T2>

@@ -212,6 +212,15 @@ bool ValFilterView1<Distinct,IntSeq,View>::execute()
 }
 #endif
 
+template<class View>
+struct PostValFilter1<Distinct,Seq<int>,View>
+{
+	static bool post(Store& s,const View& v)
+	{
+		return s.post(new (s) DomFilterView1<Distinct,Seq<int>,View>(s,v));
+	}
+};
+
 } // CP
 } // Casper
 

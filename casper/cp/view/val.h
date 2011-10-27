@@ -25,7 +25,7 @@
 namespace Casper {
 namespace CP {
 
-
+#if 0
 // converts a view to a checkview
 template<class Eval,class View>
 struct ValChkViewWrapper;
@@ -47,6 +47,7 @@ struct ValChkViewWrapper<bool,View>
 
 	CChkView<View>	v;
 };
+
 
 /********************
  * Value View
@@ -96,6 +97,83 @@ struct ValViewRel3 : ValChkViewWrapper<Eval,Rel3<F,Expr1,Expr2,Expr3> >
 	ValViewRel3(Store& store, const Expr1& v1, const Expr2& v2,const Expr3& v3) :
 		ValChkViewWrapper<Eval,Rel3<F,Expr1,Expr2,Expr3> >(store,rel<F>(v1,v2,v3)) {}
 };
+#else
+
+/********************
+ * Value View
+ *********************/
+
+template<class Eval,class R>
+struct NoValView
+{
+	NoValView(Store& s,const R& r)
+	{
+		std::ostringstream os;
+		::operator<<(os,r);
+		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::ValView");
+	}
+	Eval value() const { assert(0); }
+	bool setValue(const Eval& val) { assert(0); }
+	bool ground() const { assert(0); }
+	void attach(INotifiable*) { assert(0); }
+	void detach(INotifiable*) { assert(0); }
+	Eval getObj()  const { assert(0); }
+};
+
+template<class> struct CChkView;
+template<class> struct ChkView;
+
+// converts a view to a checkview
+template<class View>
+struct NoValView<bool,View>
+{
+	NoValView(Store& store,const View& v) :
+		v(store,v) {}
+	bool value() const { assert(ground()); return v.isTrue(); }
+	bool setValue(const bool& val) { return val?v.setToTrue():v.setToFalse();	}
+	bool ground() const { return v.isTrue() or !v.canBeTrue(); }
+	void attach(INotifiable* f) { v.attach(f); }
+	void detach(INotifiable* f) { v.detach(f); }
+	View getObj()  const { return v.getObj(); }
+
+	CChkView<View>	v;
+};
+
+/**
+ * 	ValView over a generic view. View must be convertible to Eval.
+ * 	\ingroup ValViews
+ **/
+
+template<class Eval,class View>
+struct ValView : NoValView<Eval,View>
+{
+	ValView(Store& s,const View& v) :
+		NoValView<Eval,View>(s,v) {}
+};
+
+
+template<class F,class Expr1,class Eval>
+struct ValViewRel1 : NoValView<Eval,Rel1<F,Expr1> >
+{
+	ValViewRel1(Store& s,const Expr1& v) :
+		NoValView<Eval,Rel1<F,Expr1> >(s,rel<F>(v)) {}
+};
+
+template<class F,class Expr1,class Expr2,class Eval>
+struct ValViewRel2 :  NoValView<Eval,Rel2<F,Expr1,Expr2> >
+{
+	ValViewRel2(Store& s,const Expr1& v1,const Expr2& v2) :
+		NoValView<Eval,Rel2<F,Expr1,Expr2> >(s,rel<F>(v1,v2)) {}
+};
+
+template<class F,class Expr1,class Expr2,class Expr3,class Eval>
+struct ValViewRel3 :  NoValView<Eval,Rel3<F,Expr1,Expr2,Expr3> >
+{
+	ValViewRel3(Store& s,const Expr1& v1,const Expr2& v2,const Expr3& v3) :
+		NoValView<Eval,Rel3<F,Expr1,Expr2,Expr3> >(s,rel<F>(v1,v2,v3)) {}
+};
+
+#endif
 
 /**
  * 	ValView over a literal.
@@ -663,6 +741,35 @@ struct ValViewRel3<IfThenElse,Expr1,Expr2,Expr3,Eval>
 	CChkView<Expr1> 	c1;
 	ValView<Eval,Expr2>	p2;
 	ValView<Eval,Expr3>	p3;
+};
+
+/**
+ * 	ValView over the modulo operation.
+ * 	\ingroup ValViews
+ **/
+template<class Expr1,class Expr2,class Eval>
+struct ValViewRel2<Mod,Expr1,Expr2,Eval>
+{
+	typedef typename Casper::Traits::GetEval<Expr1>::Type	View1Eval;
+	typedef typename Casper::Traits::GetEval<Expr2>::Type	View2Eval;
+
+	ValViewRel2(Store& store,const Expr1& p1, const Expr2& p2) :
+		p1(store,p1),p2(store,p2) {}
+	Eval value() const { return p1.value() % p2.value(); }
+	bool setValue(const Eval& val)
+	{
+		if (p1.ground() and p2.ground())
+			return val == value();
+		return true;
+	}
+	bool ground() const { return p1.ground() && p2.ground(); }
+	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
+	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
+	Rel2<Mod,Expr1,Expr2>	getObj() const
+	{	return Rel2<Mod,Expr1,Expr2>(p1.getObj(),p2.getObj());}
+
+	ValView<View1Eval,Expr1>	p1;
+	ValView<View2Eval,Expr2>	p2;
 };
 
 template<class Eval,class View>

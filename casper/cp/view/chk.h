@@ -25,39 +25,51 @@
 namespace Casper {
 namespace CP {
 
+template<class R>
+struct NoChkView
+{
+	NoChkView(const R& r)
+	{
+		std::ostringstream os;
+		::operator<<(os,r);
+		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::ChkView");
+	}
+	bool isTrue() const
+	{	return true;	}
+	bool canBeTrue() const
+	{	return true;	}
+	bool setToTrue()
+	{	return true;	}
+	bool setToFalse()
+	{	return true;	}
+};
 
 template<class View>
-struct ChkView
-#ifdef CASPER_CPP0X
-{	static_assert(sizeof(View)==0,"Undefined specialization of ChkView");	};
-#else
-;
-#endif
+struct ChkView : NoChkView<View>
+{	ChkView(Store&,const View& r) : NoChkView<View>(r) {} };
 
 template<class F,class Eval1,class Expr1>
-struct ChkViewRel1
-#ifdef CASPER_CPP0X
-{	static_assert(sizeof(Expr1)==0,"Undefined specialization of ChkViewRel1");	};
-#else
-;
-#endif
+struct ChkViewRel1 : NoChkView<Rel1<F,Expr1> >
+{
+	ChkViewRel1(Store&,const Expr1& v1) :
+		NoChkView<Rel1<F,Expr1> >(rel<F>(v1)) {}
+};
 
 template<class F, class Eval1,class Expr1,class Eval2,class Expr2>
-struct ChkViewRel2
-#ifdef CASPER_CPP0X
-{	static_assert(sizeof(Expr1)==0,"Undefined specialization of ChkViewRel2");	};
-#else
-;
-#endif
+struct ChkViewRel2 : NoChkView<Rel2<F,Expr1,Expr2> >
+{
+	ChkViewRel2(Store&,const Expr1& v1,const Expr2& v2) :
+		NoChkView<Rel2<F,Expr1,Expr2> >(rel<F>(v1,v2)) {}
+};
 
 template<class F, class Eval1,class Expr1,class Eval2,class Expr2,
 				class Eval3,class Expr3>
-struct ChkViewRel3
-#ifdef CASPER_CPP0X
-{	static_assert(sizeof(Expr1)==0,"Undefined specialization of ChkViewRel3");	};
-#else
-;
-#endif
+struct ChkViewRel3 : NoChkView<Rel3<F,Expr1,Expr2,Expr3> >
+{
+	ChkViewRel3(Store&,const Expr1& v1,const Expr2& v2,const Expr3& v3) :
+		NoChkView<Rel3<F,Expr1,Expr2,Expr3> >(rel<F>(v1,v2,v3)) {}
+};
+
 
 /*
  *	ChkView over a Rel1 relation -> defers to ChkViewRel1
@@ -289,7 +301,7 @@ struct ChkViewRel2<And,bool,Expr1,bool,Expr2>
 	bool setToFalse()
 	{
 		detach(pOwner);
-		return store.post(rel<Or>(!p1.getObj(),!p2.getObj()));
+		return store.post(rel<Or>(rel<Not>(p1.getObj()),rel<Not>(p2.getObj())));
 	}
 
 	void attach(INotifiable* f) { 	pOwner=f; p1.attach(f); p2.attach(f);}
@@ -639,6 +651,39 @@ struct ChkViewRel2<Element,Seq<bool>,T1,int,T2> :
 {
 	ChkViewRel2(Store& s, const T1& t1,const T2& t2) :
 		BndView2ChkView<Rel2<Element,T1,T2> >(s,rel<Element>(t1,t2)) {}
+};
+
+/**
+ * 	ChkView over a cast expression.
+ * 	\ingroup ChkViews
+ */
+template<class Expr1>
+struct ChkViewRel1<Cast<bool>,int,Expr1>
+{
+	ChkViewRel1(Store& store, const Expr1& p1) :
+			v(store,p1) {}
+	bool isTrue() const	// is it true?
+	{	return v.max()==v.min() and v.max()==1;	}
+	bool canBeTrue() const 	// can it still be true?
+	{	return v.max()>=1 and v.min()<=1;	}
+	bool setToTrue()
+	{	return v.updateRange(1,1);	}
+	bool setToFalse()
+	{
+		if (v.min()==1)
+			return v.updateMin(2);
+		if (v.max()==1)
+			return v.updateMax(0);
+		return true;
+	}
+
+	void attach(INotifiable* f) { 	v.attach(f);}
+	void detach(INotifiable* f) {	v.detach(f);}
+
+	Rel1<Cast<bool>,Expr1> getObj()  const
+	{ 	return rel<cast<bool>>(v.getObj());	}
+
+	BndView<int,Expr1>	v;
 };
 
 } // CP

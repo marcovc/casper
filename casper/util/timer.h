@@ -33,9 +33,7 @@ namespace Util {
 
 struct ITimer
 {
-	string name;
-	double secs;
-	ITimer(string name, double secs) : name(name),secs(secs) {}
+	ITimer(std::string name, double secs) : name(name),secs(secs) {}
 	ITimer(const ITimer& s) : name(s.name),secs(s.secs) {}
 	virtual void reset() = 0;
 	virtual void pause() = 0;
@@ -44,6 +42,9 @@ struct ITimer
 	double getSecs() const { return secs;	}
 	virtual void print(std::ostream& os) const = 0;
 	virtual ~ITimer() {}
+protected:
+	std::string name;
+	double secs;
 };
 
 #if 0 // FIXME: this was measuring CPU time
@@ -52,7 +53,7 @@ struct WallTimer : ITimer
 {
 	clock_t tic,tac;	// could be local to 'pause()' ...
 	bool isRunning;
-	WallTimer(string name,bool running = true) :
+	WallTimer(std::string name,bool running = true) :
 		ITimer(name,0),isRunning(false)
 	{ reset(); if (running) resume(); }
 	WallTimer(const WallTimer& s) : ITimer(s),tic(s.tic),tac(s.tac),
@@ -132,9 +133,7 @@ namespace Util {
 
 struct CPUTimer : ITimer
 {
-	LARGE_INTEGER tic,tac,freq;
-	bool isRunning;
-	CPUTimer(string name,bool running = true) : ITimer(name,0),isRunning(false)
+	CPUTimer(std::string name,bool running = true) : ITimer(name,0),isRunning(false)
 	{ reset(); if (running) resume();	}
 	CPUTimer(const CPUTimer& s) : ITimer(s),tic(s.tic),tac(s.tac),
 								freq(s.freq),isRunning(s.isRunning) {}
@@ -155,14 +154,16 @@ struct CPUTimer : ITimer
 	}
 	bool running() const {	return isRunning;	}
 	void print(std::ostream& os) const;
+protected:
+	LARGE_INTEGER tic,tac,freq;
+	bool isRunning;
+
 };
 
 // FIXME: currently this is a copy of CPUTimer
 struct WallTimer : ITimer
 {
-	LARGE_INTEGER tic,tac,freq;
-	bool isRunning;
-	WallTimer(string name,bool running = true) : ITimer(name,0),isRunning(false)
+	WallTimer(std::string name,bool running = true) : ITimer(name,0),isRunning(false)
 	{ reset(); if (running) resume();	}
 	WallTimer(const CPUTimer& s) : ITimer(s),tic(s.tic),tac(s.tac),
 								freq(s.freq),isRunning(s.isRunning) {}
@@ -183,6 +184,9 @@ struct WallTimer : ITimer
 	}
 	bool running() const {	return isRunning;	}
 	void print(std::ostream& os) const;
+protected:
+	LARGE_INTEGER tic,tac,freq;
+	bool isRunning;
 };
 
 } // Util
@@ -195,9 +199,7 @@ namespace Util {
 
 struct CPUTimer : ITimer
 {
-	struct timespec tic,tac;	// could be local to 'pause()' ...
-	bool isRunning;
-	CPUTimer(string name,bool running = true) : ITimer(name,0),isRunning(false)
+	CPUTimer(std::string name,bool running = true) : ITimer(name,0),isRunning(false)
 	{ reset(); if (running) resume(); }
 	CPUTimer(const CPUTimer& s) : ITimer(s),tic(s.tic),tac(s.tac),
 								isRunning(s.isRunning) {}
@@ -218,13 +220,15 @@ struct CPUTimer : ITimer
 	}
 	bool running() const {	return isRunning;	}
 	void print(std::ostream& os) const;
+
+protected:
+	struct timespec tic,tac;	// could be local to 'pause()' ...
+	bool isRunning;
 };
 
 struct WallTimer : ITimer
 {
-	struct timespec tic,tac;	// could be local to 'pause()' ...
-	bool isRunning;
-	WallTimer(string name,bool running = true) : ITimer(name,0),isRunning(false)
+	WallTimer(std::string name,bool running = true) : ITimer(name,0),isRunning(false)
 	{ reset(); if (running) resume(); }
 	WallTimer(const WallTimer& s) : ITimer(s),tic(s.tic),tac(s.tac),
 								isRunning(s.isRunning) {}
@@ -245,6 +249,9 @@ struct WallTimer : ITimer
 	}
 	bool running() const {	return isRunning;	}
 	void print(std::ostream& os) const;
+protected:
+	struct timespec tic,tac;	// could be local to 'pause()' ...
+	bool isRunning;
 };
 } // Util
 } // Casper

@@ -38,11 +38,6 @@ struct State;
  */
 struct StateStats
 {
-	State&	state;			// for other stats
-	counter countCPRestores;
-	counter countCPs;
-	counter maxLevel;
-	counter curLevel;
 	StateStats(State& state) :
 					state(state),
 					countCPRestores(0),
@@ -75,6 +70,16 @@ struct StateStats
 	counter	getMaxDepth()	const
 	{	return maxLevel;	}
 
+	/// Returns the state to which these statistics refer to
+	const State& getState() const
+	{	return state;	}
+
+protected:
+	State&	state;			// for other stats
+	counter countCPRestores;
+	counter countCPs;
+	counter maxLevel;
+	counter curLevel;
 };
 
 /**
@@ -107,6 +112,13 @@ struct State
 	 *	point is restored.
 	 */
 	Util::IHeap& getHeap() {	return *glbHeap;	}
+
+	/**
+	 * 	Returns a reference to the reversible heap.
+	 *	Memory obtained from this heap is available until the current check
+	 *	point is restored.
+	 */
+	const Util::IHeap& getHeap() const {	return *glbHeap;	}
 
 	/**
 	 * 	Automatically casts a state to its reversible heap. \sa getHeap()
