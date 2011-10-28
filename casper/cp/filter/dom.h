@@ -28,24 +28,29 @@
 namespace Casper {
 namespace CP {
 
-
-template<class,class,class> // TODO: default is to use FilterExpr1
+template<class,class,class>
 struct DomFilterView1;
 
 template<class,class,class,class,class>
-struct DomFilterView2; // TODO: default is to use FilterExpr2
+struct DomFilterView2;
 
 template<class,class,class,class,class,class,class>
-struct DomFilterView3; // TODO: default is to use FilterExpr3
+struct DomFilterView3;
+
+template<class,class,class,class,class,class,class,class,class>
+struct DomFilterView4;
+
+template<class,class,class,class,class,class,class,class,class,class,class>
+struct DomFilterView5;
 
 template<class Rel>
-struct DomFilterView; // default is to complain at compile time
+struct DomFilterView;
 
 // happens for example when the negation for a relation is not defined
 template<>
-struct DomFilterView<Rel0<UnknownRel> > : NoFilter
+struct DomFilterView<Rel0<UnknownRel> > : UndefinedFilter
 {
-	DomFilterView(Store& s,const Rel0<UnknownRel>&) : NoFilter(s,*this) {}
+	DomFilterView(Store& s,const Rel0<UnknownRel>&) : UndefinedFilter(s,*this) {}
 };
 
 template<class F,class T1>
@@ -78,46 +83,95 @@ struct DomFilterView<Rel3<F,T1,T2,T3> > :
 					  typename Casper::Traits::GetEval<T3>::Type,T3>(s,r.p1,r.p2,r.p3) {}
 };
 
-// FIXME: this disables all GAC filters (must specialize to fix)
-#if 1
-template<class Func,class Eval1,class Expr1>
-struct PostDomFilter1;
+template<class F,class T1,class T2,class T3,class T4>
+struct DomFilterView<Rel4<F,T1,T2,T3,T4> > :
+	public DomFilterView4<F,typename Casper::Traits::GetEval<T1>::Type,T1,
+						 typename Casper::Traits::GetEval<T2>::Type,T2,
+						 typename Casper::Traits::GetEval<T3>::Type,T3,
+						 typename Casper::Traits::GetEval<T4>::Type,T4>
+{
+	DomFilterView(Store& s,const Rel4<F,T1,T2,T3,T4>& r) :
+		DomFilterView4<F,typename Casper::Traits::GetEval<T1>::Type,T1,
+					  typename Casper::Traits::GetEval<T2>::Type,T2,
+					  typename Casper::Traits::GetEval<T3>::Type,T3,
+					  typename Casper::Traits::GetEval<T4>::Type,T4>(s,r.p1,r.p2,r.p3,r.p4) {}
+};
 
-template<class Func,class Eval1,class Expr1,class Eval2,class Expr2>
-struct PostDomFilter2;
-
-template<class Func,class Eval1,class Expr1,class Eval2,class Expr2,
-		class Eval3,class Expr3>
-struct PostDomFilter3;
-
-#else
+template<class F,class T1,class T2,class T3,class T4,class T5>
+struct DomFilterView<Rel5<F,T1,T2,T3,T4,T5> > :
+	public DomFilterView5<F,typename Casper::Traits::GetEval<T1>::Type,T1,
+						 typename Casper::Traits::GetEval<T2>::Type,T2,
+						 typename Casper::Traits::GetEval<T3>::Type,T3,
+						 typename Casper::Traits::GetEval<T4>::Type,T4,
+						 typename Casper::Traits::GetEval<T5>::Type,T5>
+{
+	DomFilterView(Store& s,const Rel5<F,T1,T2,T3,T4,T5>& r) :
+		DomFilterView5<F,typename Casper::Traits::GetEval<T1>::Type,T1,
+					  typename Casper::Traits::GetEval<T2>::Type,T2,
+					  typename Casper::Traits::GetEval<T3>::Type,T3,
+					  typename Casper::Traits::GetEval<T4>::Type,T4,
+					  typename Casper::Traits::GetEval<T5>::Type,T5>(s,r.p1,r.p2,r.p3,r.p4,r.p5) {}
+};
 
 template<class Func,class Eval1,class Expr1>
 struct PostDomFilter1
 {
 	static bool post(Store& s,const Expr1& v1)
-	{	return s.post(new (s) DomFilterView1<Func,Eval1,Expr1>(s,v1));	}
+	{
+		std::ostringstream os;
+		::operator<<(os,rel<Func>(v1));
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+	}
 };
 
 template<class Func,class Eval1,class Expr1,class Eval2,class Expr2>
 struct PostDomFilter2
 {
 	static bool post(Store& s,const Expr1& v1,const Expr2& v2)
-	{	return s.post (new (s) DomFilterView2<Func,Eval1,Expr1,Eval2,Expr2>(s,v1,v2);}
+	{
+		std::ostringstream os;
+		::operator<<(os,rel<Func>(v1,v2));
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+	}
 };
 
 template<class Func,class Eval1,class Expr1,class Eval2,class Expr2,
 		class Eval3,class Expr3>
 struct PostDomFilter3
 {
-	static bool post(Store& s,const Expr1& v1,const Expr2& v2,
-								const Expr3& v3)
-	{	return s.post(new (s)
-			DomFilterView3<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3>(s,v1,v2,v3);}
+	static bool post(Store& s,const Expr1& v1,const Expr2& v2,const Expr3& v3)
+	{
+		std::ostringstream os;
+		::operator<<(os,rel<Func>(v1,v2,v3));
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+	}
 };
-#endif
 
-// FIXME: same problem as for And for Bnd filters
+template<class Func,class Eval1,class Expr1,class Eval2,class Expr2,
+		class Eval3,class Expr3,class Eval4,class Expr4>
+struct PostDomFilter4
+{
+	static bool post(Store& s,const Expr1& v1,const Expr2& v2,const Expr3& v3,const Expr4& v4)
+	{
+		std::ostringstream os;
+		::operator<<(os,rel<Func>(v1,v2,v3,v4));
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+	}
+};
+
+template<class Func,class Eval1,class Expr1,class Eval2,class Expr2,
+		class Eval3,class Expr3,class Eval4,class Expr4,
+		class Eval5,class Expr5>
+struct PostDomFilter5
+{
+	static bool post(Store& s,const Expr1& v1,const Expr2& v2,const Expr3& v3,const Expr4& v4,const Expr5& v5)
+	{
+		std::ostringstream os;
+		::operator<<(os,rel<Func>(v1,v2,v3,v4,v5));
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+	}
+};
+
 /**
  * Enforces the conjunction of two constraints by creating a Dom filter
  * for each constraint.
@@ -303,6 +357,27 @@ struct PostDomFilter
 		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
 		typedef PostDomFilter3<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3> Post;
 		return Post::post(s,v.p1,v.p2,v.p3);
+	}
+	template<class Func,class Expr1,class Expr2,class Expr3,class Expr4>
+	bool operator()(Store& s,const Rel4<Func,Expr1,Expr2,Expr3,Expr4>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
+		typedef typename Casper::Traits::GetEval<Expr4>::Type	Eval4;
+		typedef PostDomFilter4<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4> Post;
+		return Post::post(s,v.p1,v.p2,v.p3,v.p4);
+	}
+	template<class Func,class Expr1,class Expr2,class Expr3,class Expr4,class Expr5>
+	bool operator()(Store& s,const Rel5<Func,Expr1,Expr2,Expr3,Expr4,Expr5>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
+		typedef typename Casper::Traits::GetEval<Expr4>::Type	Eval4;
+		typedef typename Casper::Traits::GetEval<Expr5>::Type	Eval5;
+		typedef PostDomFilter5<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4,Eval5,Expr5> Post;
+		return Post::post(s,v.p1,v.p2,v.p3,v.p4,v.p5);
 	}
 };
 

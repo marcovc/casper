@@ -28,7 +28,7 @@
 #include <casper/cp/var.h>
 //#include <casper/kernel/relation.h>
 //#include <casper/kernel/expression.h>
-#include <casper/util/iteration.h>
+#include <casper/kernel/view/iteration.h>
 
 //using namespace std;
 

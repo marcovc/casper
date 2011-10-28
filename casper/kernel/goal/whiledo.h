@@ -20,7 +20,7 @@
 #ifndef CASPER_KERNEL_GOAL_WHILEDO_H_
 #define CASPER_KERNEL_GOAL_WHILEDO_H_
 
-#include <casper/util/iteration.h>
+#include <casper/kernel/view/iteration.h>
 
 namespace Casper {
 

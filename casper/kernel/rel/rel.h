@@ -22,6 +22,7 @@
 #include <casper/kernel/common.h>
 #include <casper/kernel/traits.h>
 #include <iostream> // temp
+#include <sstream> // temp
 //#include <casper/kernel/memory.h>
 //#include <cxxabi.h>	// not sure if this is portable
 #include <casper/util/assertions.h>
@@ -239,6 +240,16 @@ Rel5<Functor,T1,T2,T3,T4,T5> rel(const T1& t1,const T2& t2,const T3& t3,
 #define ALIAS(OldName,NewName) \
 typedef OldName NewName;
 
+#ifdef CASPER_NO_OPERATORS
+
+#define NEW_FN_0(FunName,ObjName)
+#define NEW_FN_1(FunName,ObjName)
+#define NEW_FN_2(FunName,ObjName)
+#define NEW_FN_3(FunName,ObjName)
+#define NEW_FN_4(FunName,ObjName)
+#define NEW_FN_5(FunName,ObjName)
+
+#else
 #define NEW_FN_0(FunName,ObjName) \
 Rel0<ObjName > \
 FunName() \
@@ -273,73 +284,53 @@ template<class T1,class T2,class T3,class T4,class T5> \
 Rel5<ObjName,T1,T2,T3,T4,T5> \
 FunName(const T1& p1,const T2& p2,const T3& p3,const T4& p4,const T5& p5) \
 { return Rel5<ObjName,T1,T2,T3,T4,T5>(p1,p2,p3,p4,p5); }
+#endif
+
+template<class>
+struct FuncToStr;
+
+#define FUNC2STR(FunName,ObjName) \
+template<> \
+struct FuncToStr<ObjName> \
+{	const char* operator()() const { return # FunName; } };
 
 #define NEW_REL_0(FunName,ObjName) \
 struct ObjName; \
-NEW_FN_0(FunName,ObjName)
+NEW_FN_0(FunName,ObjName) \
+FUNC2STR(FunName,ObjName)
 
 #define NEW_REL_1(FunName,ObjName) \
 struct ObjName; \
-NEW_FN_1(FunName,ObjName)
+NEW_FN_1(FunName,ObjName) \
+FUNC2STR(FunName,ObjName)
 
 #define NEW_REL_2(FunName,ObjName) \
 struct ObjName; \
-NEW_FN_2(FunName,ObjName)
+NEW_FN_2(FunName,ObjName) \
+FUNC2STR(FunName,ObjName)
 
 #define NEW_REL_3(FunName,ObjName) \
 struct ObjName; \
-NEW_FN_3(FunName,ObjName)
+NEW_FN_3(FunName,ObjName) \
+FUNC2STR(FunName,ObjName)
 
 #define NEW_REL_4(FunName,ObjName) \
 struct ObjName; \
-NEW_FN_4(FunName,ObjName)
+NEW_FN_4(FunName,ObjName) \
+FUNC2STR(FunName,ObjName)
 
 #define NEW_REL_5(FunName,ObjName) \
 struct ObjName; \
-NEW_FN_5(FunName,ObjName)
+NEW_FN_5(FunName,ObjName) \
+FUNC2STR(FunName,ObjName)
 
 // ---
 
-#ifdef CASPER_NO_OPERATORS
-struct Equal;
-struct Distinct;
-struct Less;
-struct LessEqual;
-struct Greater;
-struct GreaterEqual;
-struct Not;
-struct Add;
-struct Sub;
-struct Mul;
-struct Div;
-struct Sym;
-struct Element;
-struct And;
-struct Or;
-struct XOr;
-struct Ground;
-struct Abs;
-struct Exp;
-struct Log;
-struct Min;
-struct Max;
-struct Mod;
-struct Linear;
-struct Sum;
-struct IfThenElse;
-struct Sqr;
-struct All;
-struct Pow;
-struct InRange;
-struct Cache;
-struct InTable;
-struct NotInTable;
-struct SumProduct;
 
-#else
 
 NEW_REL_2(equal,Equal)
 NEW_REL_2(distinct,Distinct)       	// !=
+NEW_FN_1(distinct,Distinct)
 NEW_REL_2(less,Less)       			// <
 NEW_REL_2(lessEqual,LessEqual)     	// <=
 NEW_REL_2(greater,Greater)       		// <
@@ -374,27 +365,26 @@ NEW_REL_1(log,Log)
 NEW_REL_1(min,Min)
 NEW_REL_1(max,Max)
 
-NEW_REL_2(min,Min)
-NEW_REL_2(max,Max)
+NEW_FN_2(min,Min)
+NEW_FN_2(max,Max)
 
 NEW_REL_2(mod,Mod)
 
-NEW_REL_2(linear,Linear)
-NEW_REL_3(linear,Linear)
+NEW_REL_3(sumProductEqual,SumProductEqual)
 
 NEW_REL_2(sumProduct,SumProduct)
 
 NEW_REL_1(sum,Sum)
-NEW_REL_3(sum,Sum)
-NEW_REL_4(sum,Sum)
+NEW_FN_3(sum,Sum)
+NEW_FN_4(sum,Sum)
 
-NEW_REL_2(sumEquals,SumEqual)
+NEW_REL_2(sumEqual,SumEqual)
 
 NEW_REL_2(ifThen,IfThen)
 NEW_REL_3(ifThenElse,IfThenElse)
 
 NEW_REL_1(cache,Cache)
-NEW_REL_3(cache,Cache)
+NEW_FN_3(cache,Cache)
 NEW_REL_1(fastCache,FastCache)
 NEW_REL_1(virtualView,VirtualView)
 NEW_REL_3(inRange,InRange)
@@ -406,8 +396,8 @@ NEW_REL_2(notInTable,NotInTable)
 
 NEW_REL_5(cumulative,Cumulative)
 
-NEW_REL_3(min,Min)
-NEW_REL_3(max,Max)
+NEW_FN_3(min,Min)
+NEW_FN_3(max,Max)
 NEW_REL_3(maxDiff,MaxDiff)
 NEW_REL_3(argMin,ArgMin)
 NEW_REL_3(argMax,ArgMax)
@@ -416,12 +406,12 @@ NEW_REL_3(forSome,ForSome)
 
 NEW_REL_2(assign,Assign)
 NEW_REL_2(selectFirst,SelectFirst)
-NEW_REL_3(selectFirst,SelectFirst)
+NEW_FN_3(selectFirst,SelectFirst)
 
 NEW_REL_3(countEqual,CountEqual)
 
 NEW_REL_2(randInRange,RandInRange)
-#endif
+
 
 // operators
 
@@ -440,13 +430,39 @@ Rel2<Func,T1,T2>::operator[](const Arg& arg) const
 {	return Rel2<Element,Self,Arg>(*this,arg);	}
 */
 
-// cast constraints
-// TODO: add more (round,floor,ceil)
 template<class AsT> struct Cast {	typedef AsT	As;	};
 
 template<class As,class T>
 Rel1<Cast<As>,T> cast(const T& t)
 {	return Rel1<Cast<As>,T>(t);	}
+
+template<>
+struct FuncToStr<Cast<int> >
+{
+	const char* operator()() const
+	{	return "int" ;}
+};
+
+template<>
+struct FuncToStr<Cast<bool> >
+{
+	const char* operator()() const
+	{	return "bool" ;}
+};
+
+template<>
+struct FuncToStr<Cast<double> >
+{
+	const char* operator()() const
+	{	return "double" ;}
+};
+
+template<>
+struct FuncToStr<Cast<float> >
+{
+	const char* operator()() const
+	{	return "float" ;}
+};
 
 struct UnknownRel;
 
@@ -479,6 +495,10 @@ template<class T1,class T2>
 struct GetEval<Rel2<Distinct,T1,T2> >
 {	typedef	bool	Type;	};
 
+template<class View>
+struct GetEval<Rel1<Distinct,View> >
+{	typedef	bool	Type;	};
+
 template<class T1,class T2>
 struct GetEval<Rel2<Less,T1,T2> >
 {	typedef	bool	Type;	};
@@ -508,7 +528,7 @@ struct GetEval<Rel2<XOr,T1,T2> >
 {	typedef	bool	Type;	};
 
 template<class T1,class T2,class T3>
-struct GetEval<Rel3<Linear,T1,T2,T3> >
+struct GetEval<Rel3<SumProductEqual,T1,T2,T3> >
 {	typedef typename Traits::GetEval<T2>::Type Type;	};
 
 template<class T1,class T2>
@@ -658,111 +678,6 @@ struct GetEval<Rel3<SelectFirst,Expr1,Expr2,Expr3> >
 } // Traits
 
 
-// ----
-
-
-/*
-		if (isDomExpr(indexView.getCRef()))
-		{
-			DomView<int,IdxView> v(solver(),indexView.getCRef());
-			if (v->ground())
-				pDom = &array[v->value()];
-			else
-				assert(0);	// TODO: use elementDom
-		}
-		else
-		if (isBndExpr(indexView.getCRef()))
-		{
-			BndView<int,IdxView> v(solver(),indexView.getCRef());
-			if (v.min()==v.max())
-				pDom = &array[v.min()];
-			else
-			{
-				pDom = new Dom(solver());
-				solver().post(elementBnd(array,index,Var<Eval,Dom>(solver(),pDom)));
-			}
-		}
-		else
-
-		if (index.min()==index.max())
-			Super::v = array[index.min()];
-		else
-			this->solver().post(elementBnd(array,index,Super::v));
-  */
-
-
-/*
-template<class T>
-struct RelSig;
-
-template<class Func, class T>
-struct RelSig<Rel1<Func,T> >
-{	typedef Rel1<Func,typename Traits::GetEval<T>::TypeType>	Type;	};
-
-template<class Func, class T1,class T2>
-struct RelSig<Rel2<Func,T1,T2> >
-{	typedef Rel2<Func,typename Traits::GetEval<T1>::TypeType,
-					  typename Traits::GetEval<T2>::TypeType>	Type;	};
-
-template<class Func, class T1,class T2,class T3>
-struct RelSig<Rel3<Func,T1,T2,T3> >
-{	typedef Rel3<Func,typename Traits::GetEval<T1>::TypeType,
-					  typename Traits::GetEval<T2>::TypeType,
-					  typename Traits::GetEval<T3>::TypeType>	Type;	};
-*/
-
-/*
-template<class F>
-std::ostream& operator<<(std::ostream& os, const Casper::Rel0<F>& r)
-{
-	int     status;
-	char   *realname;
-	realname = abi::__cxa_demangle(typeid(r).name(), 0, 0, &status);
-	os << realname;
-	return os;
-}
-
-template<class F,class T1>
-std::ostream& operator<<(std::ostream& os, const Casper::Rel1<F,T1>& r)
-{
-	int     status;
-	char   *realname;
-	realname = abi::__cxa_demangle(typeid(r).name(), 0, 0, &status);
-	os << realname;
-	return os;
-}
-
-template<class F,class T1,class T2>
-std::ostream& operator<<(std::ostream& os, const Casper::Rel2<F,T1,T2>& r)
-{
-	int     status;
-	char   *realname;
-	realname = abi::__cxa_demangle(typeid(r).name(), 0, 0, &status);
-	os << realname;
-	return os;
-}
-
-template<class F,class T1,class T2,class T3>
-std::ostream& operator<<(std::ostream& os, const Casper::Rel3<F,T1,T2,T3>& r)
-{
-	int     status;
-	char   *realname;
-	realname = abi::__cxa_demangle(typeid(r).name(), 0, 0, &status);
-	os << realname;
-	return os;
-}
-
-template<class F,class T1,class T2,class T3,class T4>
-std::ostream& operator<<(std::ostream& os, const Casper::Rel4<F,T1,T2,T3,T4>& r)
-{
-	int     status;
-	char   *realname;
-	realname = abi::__cxa_demangle(typeid(r).name(), 0, 0, &status);
-	os << realname;
-	return os;
-}
-*/
-
 template<class> struct GetPEnv;
 struct Env;
 
@@ -801,8 +716,6 @@ struct GetPEnv<Rel5<Func,T1,T2,T3,T4,T5> >
 	{	return getPEnv(r.p1,r.p2,r.p3,r.p4,r.p5);}
 };
 
-namespace Util {
-
 template<class ArrayT,class IndexT>
 struct IterationView<Rel2<Element,ArrayT,IndexT> > :
 	IterationView<typename ArrayT::Elem>
@@ -812,10 +725,51 @@ struct IterationView<Rel2<Element,ArrayT,IndexT> > :
 	IterationView(const RelT& v) : Super(v.p1[v.p2.value()]) {}
 };
 
-}
-
 };
 
+template<class F>
+std::ostream& operator<<(std::ostream& os, const Casper::Rel0<F>& r)
+{
+	os << Casper::FuncToStr<F>()();
+	return os;
+}
+
+template<class F,class T1>
+std::ostream& operator<<(std::ostream& os, const Casper::Rel1<F,T1>& r)
+{
+	os << Casper::FuncToStr<F>()() << "(" << r.p1 << ")";
+	return os;
+}
+
+template<class F,class T1,class T2>
+std::ostream& operator<<(std::ostream& os, const Casper::Rel2<F,T1,T2>& r)
+{
+	os << Casper::FuncToStr<F>()() << "(" << r.p1 << "," << r.p2 << ")";
+	return os;
+}
+
+template<class F,class T1,class T2,class T3>
+std::ostream& operator<<(std::ostream& os, const Casper::Rel3<F,T1,T2,T3>& r)
+{
+	os << Casper::FuncToStr<F>()() << "(" << r.p1 << "," << r.p2 << "," << r.p3 << ")";
+	return os;
+}
+
+template<class F,class T1,class T2,class T3,class T4>
+std::ostream& operator<<(std::ostream& os, const Casper::Rel4<F,T1,T2,T3,T4>& r)
+{
+	os << Casper::FuncToStr<F>()() << "(" << r.p1 << "," << r.p2
+	   << "," << r.p3 << "," << r.p4 << ")";
+	return os;
+}
+
+template<class F,class T1,class T2,class T3,class T4,class T5>
+std::ostream& operator<<(std::ostream& os, const Casper::Rel5<F,T1,T2,T3,T4,T5>& r)
+{
+	os << Casper::FuncToStr<F>()() << "(" << r.p1 << "," << r.p2
+	   << "," << r.p3 << "," << r.p4 << "," << r.p5 << ")";
+	return os;
+}
 
 #endif
 

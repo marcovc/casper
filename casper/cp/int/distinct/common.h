@@ -23,14 +23,6 @@
 
 namespace Casper {
 
-NEW_REL_1(distinct,Distinct)
-
-namespace Traits {
-template<class View>
-struct GetEval<Rel1<Distinct,View> >
-{	typedef	bool	Type;	};
-}; // Traits
-
 namespace CP {
 
 // FIXME: should be elsewhere

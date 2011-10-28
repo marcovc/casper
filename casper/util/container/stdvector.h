@@ -26,7 +26,7 @@
 
 #include <casper/util/memory.h>
 #include <string.h>
-#include <casper/util/iteration.h>
+#include <casper/kernel/view/iteration.h>
 
 //using namespace std;
 

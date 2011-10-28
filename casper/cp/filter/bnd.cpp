@@ -17,6 +17,7 @@
  \*************************************************************************/
 
 #include <casper/cp/filter/bnd.h>
+#include <casper/kernel/obj/expr.h>
 
 namespace Casper {
 namespace CP {
@@ -30,6 +31,9 @@ bool PostBndFilter::operator()(Store& s,BndExpr<bool> v) const
 {
 	return new (s) BndFilterView<BndExpr<bool> >(s,v);
 }
+
+bool PostBndFilter::operator()(Store& store, const Casper::Expr<bool>& expr) const
+{	return expr.postBndFilter(store);	}
 
 /*
 Filter::Filter(CPSolver& s,BndExpr<bool> b) :

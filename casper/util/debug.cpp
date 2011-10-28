@@ -57,13 +57,13 @@ void LogEventStats::operator()(const Logger::Event& ev)
 			if (toIt->toEvent == ev)
 			{
 				++toIt->nbTriggers;
-				toIt->accSecs += fromIt->timer.secs;
-				toIt->maxSecs = std::max(toIt->maxSecs,fromIt->timer.secs);
-				toIt->minSecs = std::min(toIt->minSecs,fromIt->timer.secs);
+				toIt->accSecs += fromIt->timer.getSecs();
+				toIt->maxSecs = std::max(toIt->maxSecs,fromIt->timer.getSecs());
+				toIt->minSecs = std::min(toIt->minSecs,fromIt->timer.getSecs());
 				break;
 			}
 		if (toIt == fromIt->toEvents.end())
-			fromIt->toEvents.pushBack(ToEvent(ev,1,fromIt->timer.secs));
+			fromIt->toEvents.pushBack(ToEvent(ev,1,fromIt->timer.getSecs()));
 		if (fromIt->fromEvent == ev)
 		{
 			found = true;

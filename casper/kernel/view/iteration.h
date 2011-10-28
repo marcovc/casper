@@ -19,14 +19,10 @@
 #ifndef CASPER_KERNEL_VIEW_ITERATION_H_
 #define CASPER_KERNEL_VIEW_ITERATION_H_
 
-// FIXME: either this goes into kernel or traits comes to util
 #include <casper/kernel/traits.h>
-
-// FIXME: either this goes into container or common comes here
 #include <casper/util/container/common.h>
 
 namespace Casper {
-namespace Util {
 
 /// \warning Make sure the view used for initializing this class is not
 /// destroyed before b reaches e.
@@ -552,7 +548,6 @@ void print(InputIterator b,InputIterator e)
 
 } // Detail
 
-} // Util
 } // Casper
 
 #endif /*CASPER_KERNEL_VIEW_ITERATION_H_*/

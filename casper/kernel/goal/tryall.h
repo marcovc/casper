@@ -23,7 +23,7 @@
 namespace Casper {
 
 NEW_REL_2(tryAll,TryAll)
-NEW_REL_3(tryAll,TryAll)
+NEW_FN_3(tryAll,TryAll)
 
 namespace Traits {
 template<class T1,class T2,class T3>
@@ -62,12 +62,12 @@ struct GoalView3<TryAll,T,Par<T>,Seq<T>,Iter,bool,Obj> : IGoal
 	Par<T> 				it;
 	Iter					r;
 	//IterationView<T,Iter>	iter;
-	Util::IterationView<Iter>	iter;
+	IterationView<Iter>	iter;
 	Obj					v;
 };
 
 
-NEW_REL_4(tryAll,TryAll)
+NEW_FN_4(tryAll,TryAll)
 
 namespace Traits {
 template<class T1,class T2,class T3,class T4>
@@ -100,7 +100,7 @@ struct GoalView4<TryAll,T,Par<T>,Seq<T>,Iter,
 	Par<T> it;
 	Iter					r;
 	//IterationView<T,Iter>	iter;
-	Util::IterationView<Iter>	iter;
+	IterationView<Iter>	iter;
 	Expr1	v1;
 	Expr2	v2;
 };

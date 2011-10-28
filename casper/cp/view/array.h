@@ -23,7 +23,7 @@
 #include <casper/util/container/stdarray.h>
 #include <casper/util/container/stdrange.h>
 #include <casper/cp/vararray.h>
-#include <casper/util/iteration.h>
+#include <casper/kernel/view/iteration.h>
 #include <casper/cp/view/dom.h>
 #include <casper/kernel/par/piteration.h>
 #include <casper/kernel/reversible/array.h> // tmp
@@ -122,7 +122,7 @@ struct BndArrayView :
 	static uint getSize(const View& p1)
 	{
 		uint r = 0;
-		for (Util::IterationView<View>	it(p1); it.valid(); it.iterate())
+		for (IterationView<View>	it(p1); it.valid(); it.iterate())
 			r++;
 		return r;
 	}
@@ -130,7 +130,7 @@ struct BndArrayView :
 		Super(store,getSize(p1)),store(store)
 	{
 		uint i = 0;
-		for (Util::IterationView<View>	it(p1); it.valid(); it.iterate())
+		for (IterationView<View>	it(p1); it.valid(); it.iterate())
 			::new(&Super::operator[](i++)) Elem(store,it.value());
 	}
 	View getObj() const
@@ -277,7 +277,7 @@ struct ValArrayView :
 	static uint getSize(const View& p1)
 	{
 		uint r = 0;
-		for (Util::IterationView<View>	it(p1); it.valid(); it.iterate())
+		for (IterationView<View>	it(p1); it.valid(); it.iterate())
 			r++;
 		return r;
 	}
@@ -285,7 +285,7 @@ struct ValArrayView :
 		Super(store,getSize(p1))
 	{
 		uint i = 0;
-		for (Util::IterationView<View>	it(p1); it.valid(); it.iterate())
+		for (IterationView<View>	it(p1); it.valid(); it.iterate())
 			::new(&Super::operator[](i++)) Elem(store,it.value());
 	}
 };
@@ -308,7 +308,7 @@ struct DomArrayView :
 	static uint getSize(const View& p1)
 	{
 		uint r = 0;
-		for (Util::IterationView<View>	it(p1); it.valid(); it.iterate())
+		for (IterationView<View>	it(p1); it.valid(); it.iterate())
 			r++;
 		return r;
 	}
@@ -316,7 +316,7 @@ struct DomArrayView :
 		Super(store,getSize(p1))
 	{
 		uint i = 0;
-		for (Util::IterationView<View>	it(p1); it.valid(); it.iterate())
+		for (IterationView<View>	it(p1); it.valid(); it.iterate())
 			::new(&Super::operator[](i++)) Elem(store,it.value());
 	}
 };

@@ -250,6 +250,7 @@ class IntervalA
 	template<class T1,class Container1,class Compare1>
 	friend std::ostream& ::operator<< <>(std::ostream& os, const IntervalA<T1,Container1,Compare1>& f);
 #endif
+
   	//friend istream& operator>>(istream& is, IntervalA& ia);
 	bool testInternRep() const;
 

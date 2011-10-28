@@ -112,6 +112,14 @@ struct Filter;
 struct IFilterSched;
 template<class> struct BndExpr;
 
+#ifdef SWIG
+enum Consistency { Domain, Bounds, Value };
+#endif
+#ifdef SWIG_BUILD
+enum Consistency { Domain, Bounds, Value };
+#endif
+
+
 /**
  * 	Stores and propagates constraints.
  * 	\ingroup Filtering
@@ -162,6 +170,12 @@ struct Store : INotifiable
 	template<class Op,class T1,class T2,class T3,class T4,class PostFilter = PostBndFilter>
 	bool post(const Rel4<Op,T1,T2,T3,T4>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
+
+	/// Adds a new constraint to the constraint store, enforced by the filter created by f
+	template<class Op,class T1,class T2,class T3,class T4,class T5,class PostFilter = PostBndFilter>
+	bool post(const Rel5<Op,T1,T2,T3,T4,T5>& r, const PostFilter& f = PostFilter())
+	{	return f(*this,r);	}
+
 #else
 	/// Adds a new constraint to the constraint store.
 	template<class Op,class T1>
@@ -202,6 +216,12 @@ struct Store : INotifiable
 	template<class Op,class T1,class T2,class T3,class T4,class PostFilter>
 	bool post(const Rel4<Op,T1,T2,T3,T4>& r, const PostFilter& f = PostFilter())
 	{	return f(*this,r);	}
+
+	/// Adds a new constraint to the constraint store, enforced by the filter created by f
+	template<class Op,class T1,class T2,class T3,class T4,class T5,class PostFilter>
+	bool post(const Rel5<Op,T1,T2,T3,T4,T5>& r, const PostFilter& f = PostFilter())
+	{	return f(*this,r);	}
+
 #endif
 	template<class Cond,class Func>
 	bool when(const Cond& cond, const Func& func);
@@ -242,6 +262,7 @@ struct Store : INotifiable
 		return bValid;
 	}
 
+protected:
 	Env&				env;
 //	IHeap*				globalSHeap;
 

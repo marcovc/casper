@@ -23,7 +23,7 @@ NEW_REL_2(disjoint,Disjoint)
 
 NEW_REL_2(contained,Contained)
 
-NEW_REL_1(disjoint,Disjoint)
+NEW_FN_1(disjoint,Disjoint)
 
 ALIAS(Mul,Intersect)
 NEW_FN_2(intersect,Intersect)
@@ -37,10 +37,9 @@ NEW_FN_2(unionEqual,UnionEqual)
 
 NEW_REL_1(partition,Partition)
 
-NEW_REL_2(sumEqual,SumEqual)
 NEW_FN_3(sumEqual,SumEqual)
 
-NEW_REL_2(symDiff,SymDiff)
+//NEW_REL_2(symDiff,SymDiff)
 
 namespace CP {
 namespace Traits {
@@ -72,9 +71,9 @@ template<class Expr1,class Expr2>
 struct GetEval<Rel2<Disjoint,Expr1,Expr2> >
 {	typedef bool	Type;	};
 
-template<class Expr1,class Expr2>
-struct GetEval<Rel2<SymDiff,Expr1,Expr2> >
-{	typedef typename Casper::Traits::GetEval<Expr1>::Type	Type;	};
+//template<class Expr1,class Expr2>
+//struct GetEval<Rel2<SymDiff,Expr1,Expr2> >
+//{	typedef typename Casper::Traits::GetEval<Expr1>::Type	Type;	};
 
 template<class T1,class T2,class T3>
 struct GetEval<Rel3<UnionEqual,T1,T2,T3> >

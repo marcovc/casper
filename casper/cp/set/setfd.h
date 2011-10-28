@@ -1087,17 +1087,17 @@ struct SetSafeEraser<SetFD<T> >
 }
 
 template<class T>
-Util::IterationView<typename SetFD<T>::In> makeInIt(SetFD<T>& s)
-{	return Util::makeIt(s.in()); }
+IterationView<typename SetFD<T>::In> makeInIt(SetFD<T>& s)
+{	return makeIt(s.in()); }
 
 template<class T>
-Util::IterationView<typename SetFD<T>::Poss> makePossIt(SetFD<T>& s)
-{	return Util::makeIt(s.poss()); }
+IterationView<typename SetFD<T>::Poss> makePossIt(SetFD<T>& s)
+{	return makeIt(s.poss()); }
 
 template<class T>
-Util::UnionItView<Util::IterationView<typename SetFD<T>::In>,
-				  Util::IterationView<typename SetFD<T>::Poss> > makeLUBIt(SetFD<T>& s)
-{	return Util::makeUnionIt(Util::makeIt(s.in()),Util::makeIt(s.poss())); }
+Util::UnionItView<IterationView<typename SetFD<T>::In>,
+				  IterationView<typename SetFD<T>::Poss> > makeLUBIt(SetFD<T>& s)
+{	return makeUnionIt(makeIt(s.in()),makeIt(s.poss())); }
 
 #ifdef CASPER_UNUSED
 template<class T>

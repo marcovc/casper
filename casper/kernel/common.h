@@ -66,6 +66,10 @@
 #define force_inline inline __attribute__ ((always_inline))
 #endif
 
+#ifdef SWIG
+typedef unsigned int uint;
+#endif
+
 /// Global namespace for the CaSPER library
 namespace Casper {
 
@@ -143,22 +147,31 @@ struct limits<ulonglong>
 
 
 template<class T>
-struct Seq
-{	typedef T Type;	};
-
-typedef Seq<int>	IntSeq;
-typedef Seq<bool>	BoolSeq;
-
-template<class T>
 struct Set
 {	typedef T	Elem;	};
 
-///	Set of integers. \ingroup Set
+///	Set of integers. \ingroup Kernel
 typedef Set<int>	IntSet;
 
-///	Set of booleans. \ingroup Set
+///	Set of booleans. \ingroup Kernel
 typedef Set<bool>	BoolSet;
 
+
+template<class T>
+struct Seq
+{	typedef T Type;	};
+
+///	Sequence of integers. \ingroup Kernel
+typedef Seq<int>	IntSeq;
+
+///	Sequence of booleans. \ingroup Kernel
+typedef Seq<bool>	BoolSeq;
+
+///	Sequence of sets of integers. \ingroup Kernel
+typedef Seq<IntSet>	IntSetSeq;
+
+///	Sequence of sets of booleans. \ingroup Kernel
+typedef Seq<BoolSet>	BoolSetSeq;
 
 //msvc defines these as macros
 #undef min

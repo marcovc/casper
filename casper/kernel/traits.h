@@ -34,13 +34,14 @@ template<class> struct StdVector;
 template<class> struct StdList;
 template<class> struct StdSList;
 template<class> struct StdRange;
-template<class> struct IterationView;
 template<class,class> struct PredItView;
 template<class,class> struct UnionItView;
 template<class,class> struct InterItView;
 template<class,class> struct DiffItView;
 template<class,class> struct SymDiffItView;
 }
+
+template<class> struct IterationView;
 
 namespace Traits {
 
@@ -119,7 +120,7 @@ struct GetEval<Util::StdRange<T> >
 { 	typedef Seq<typename Traits::GetEval<T>::Type>	Type;	};
 
 template<class View>
-struct GetEval<Util::IterationView<View> >
+struct GetEval<IterationView<View> >
 {	typedef Seq<typename Traits::GetElem<View>::Type>	Type;	};
 
 template<>
@@ -158,7 +159,7 @@ struct GetElem<Util::StdRange<T> >
 {	typedef T	Type;	};
 
 template<class T>
-struct GetElem<Util::IterationView<T> >
+struct GetElem<IterationView<T> >
 {	typedef typename Traits::GetElem<T>::Type	Type; };
 
 template<class T1,class T2>
@@ -214,7 +215,7 @@ struct GetTermElem<Util::StdRange<T> >
 {	typedef typename GetTermElem<T>::Type	Type;	};
 
 template<class T>
-struct GetTermElem<Util::IterationView<T> >
+struct GetTermElem<IterationView<T> >
 {	typedef typename Traits::GetTermElem<T>::Type	Type; };
 
 template<class T1,class T2>

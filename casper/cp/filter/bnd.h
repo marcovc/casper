@@ -32,6 +32,9 @@
 #include <casper/cp/store.h>
 
 namespace Casper {
+
+template<class> struct Expr;
+
 namespace CP {
 
 #if 0
@@ -66,12 +69,12 @@ struct BndFilterView3
 };
 
 template<class R,class E1,class V1,class E2,class V2,class E3,class V3,class E4,class V4>
-struct BndFilterView4 : NoFilter
-{	BndFilterView4(Store& s,const V1&,const V2&,const V3&,const V4&) : NoFilter(s,*this) {}	};
+struct BndFilterView4 : UndefinedFilter
+{	BndFilterView4(Store& s,const V1&,const V2&,const V3&,const V4&) : UndefinedFilter(s,*this) {}	};
 
 template<class R,class E1,class V1,class E2,class V2,class E3,class V3,class E4,class V4,class E5,class V5>
-struct BndFilterView5 : NoFilter
-{	BndFilterView5(Store& s,const V1&,const V2&,const V3&,const V4&,const V5&) : NoFilter(s,*this) {}	};
+struct BndFilterView5 : UndefinedFilter
+{	BndFilterView5(Store& s,const V1&,const V2&,const V3&,const V4&,const V5&) : UndefinedFilter(s,*this) {}	};
 #else
 
 template<class Rel>
@@ -209,9 +212,9 @@ struct BndD1FilterView; // default is to complain at compile time
 
 // happens for example when the negation for a relation is not defined
 template<>
-struct BndFilterView<Rel0<UnknownRel> > : NoFilter
+struct BndFilterView<Rel0<UnknownRel> > : UndefinedFilter
 {
-	BndFilterView(Store& s,const Rel0<UnknownRel>&) : NoFilter(s,*this) {}
+	BndFilterView(Store& s,const Rel0<UnknownRel>&) : UndefinedFilter(s,*this) {}
 };
 
 template<class F,class T1>
@@ -277,7 +280,6 @@ struct BndFilterView<Rel5<F,T1,T2,T3,T4,T5> > :
 template<class,class> class Var;
 template<class,class> struct DomExpr;
 
-
 struct PostBndFilter
 {
 	bool operator()(Store& s,const bool& v) const
@@ -292,6 +294,8 @@ struct PostBndFilter
 	{	return PostBndFilter()(s,BndExpr<bool>(s,v));	}
 
 	bool operator()(Store& s,BndExpr<bool> v) const;
+
+	bool operator()(Store& s,const Casper::Expr<bool>& v) const;
 
 //	bool operator()(Filter f) const;
 
@@ -580,7 +584,7 @@ struct BndFilterView2<Less,Eval,Expr1,Eval,Expr2> :
  *  \ingroup Filtering
  */
 template<class Eval,class Expr1,class Expr2,class Expr3>
-struct BndFilterView3<Linear,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3> : IFilter
+struct BndFilterView3<SumProductEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3> : IFilter
 {
 	BndFilterView3(Store& store,const Expr1& v1, const Expr2& v2,
 					const Expr3& v3) :
@@ -909,7 +913,7 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
  *  TODO: make sure it also works for reals
  */ /*
 template<class Eval,class Expr2,class Expr3>
-struct BndFilterView2<Linear,Seq<Eval>,Expr2,Eval,Expr3> : IFilter
+struct BndFilterView2<SumProductEqual,Seq<Eval>,Expr2,Eval,Expr3> : IFilter
 {
 	BndFilterView2(CPSolver& solver,const Expr2& v2,const Expr3& v3) : IFilter(solver),
 					x(solver,v2),v(solver,v3),
@@ -1210,43 +1214,6 @@ struct PostBndFilter3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,EvalView
 
 };
 
-#if 0
-template<bool Cond,class IfTrue,class IfFalse>
-struct ITE
-{	typedef IfTrue Eval;	};
-
-template<class IfTrue,class IfFalse>
-struct ITE<false,IfTrue,IfFalse>
-{	typedef IfFalse Eval;	};
-
-template<class Expr1,class Expr2,class Eval>
-struct ElementOverGroundIdx : BndView<Eval,typename Casper::Traits::GetElem<Expr1>::Type>
-{
-	typedef	BndView<Eval,typename Casper::Traits::GetElem<Expr1>::Type>	Super;
-
-	static Super getSuper(CPSolver& s,const Expr1& p1,const Expr2& p2)
-	{
-		if (ValExpr<int>(s,p2).ground())
-		{
-			uint val = ValExpr<int>(s,p2).value();
-			typedef typename Casper::Traits::GetElem<Expr1>::Type	SElem;
-			IterationView<SElem,Expr1>	it(p1);
-			for (;  it.valid() and val > 0; it.iterate())
-				--val;
-			return Super(s,it.value());
-		}
-	}
-	typedef Rel2<Element,Expr1,Expr2>	Viewed;
-	Viewed getObj()  const {	return viewed;	}
-
-	ElementOverGroundIdx(CPSolver& solver,const Expr1& p1, const Expr2& p2) :
-		Super(getSuper(solver,p1,p2)),
-		viewed(p1,p2){}
-
-	Viewed viewed;
-};
-#endif
-
 // if defined means that no auxiliary variable will be used for element
 //#define CASPER_CP_ELEMENT_BNDVIEW
 
@@ -1276,7 +1243,7 @@ struct BndViewRel2<Element,Expr1,Expr2,Eval> :
 			int val = ValView<int,Expr2>(s,p2).value();
 
 			typedef typename Casper::Traits::GetElem<Expr1>::Type EElem;
-			Util::IterationView<Expr1>	it(p1);
+			IterationView<Expr1>	it(p1);
 			for (;  it.valid() and val > 0; it.iterate())
 				--val;
 

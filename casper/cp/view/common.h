@@ -35,7 +35,7 @@ template<class,class> class Var;
 template<class T>	struct ValExpr;
 template<class T>	struct BndExpr;
 template<class E,class D>	struct DomExpr;
-//template<class T>	struct MutExpr;
+struct ChkExpr;
 
 template<class,class>				struct ValView;
 template<class,class,class>			struct ValViewRel1;
@@ -48,6 +48,8 @@ template<class,class,class,class>	struct BndViewRel2;
 template<class,class,class>			struct DomView;
 //template<class,class,class>			struct DomViewRel1;
 //template<class,class,class,class>	struct DomViewRel2;
+
+template<class>			struct ChkView;
 
 template<class,class,class>
 struct ChkViewRel1;

@@ -31,37 +31,15 @@ namespace Casper {
 namespace CP {
 
 
-/*
-cp::Var<int> v();
-
-CP::IntVar v;
-CP::IntSetVar v;
-
-Gecode::Store v;
-Model::IntVar v;
-
-LS::IntVar v;
-LP::IntVar v;
-
-SAT::Var v;
-SAT::MiniSat::Store store;
-store.post(v);
-
-Int v2(env);	// not just a typedef for a reversible...
-
-Goal g =	forAll(v2,range(2,4))
-			(
-				tryAll(v3,range(3,4))
-				( post(v[v2] == v3) )
-			);
-*/
-
-
 struct Solver;
 
 struct SolverStats
 {
 	SolverStats(Solver& solver) : solver(solver) {}
+	const StateStats& getStateStats() const;
+	const StoreStats& getStoreStats() const;
+	const ExplorerStats& getExplorerStats() const;
+protected:
 	Solver& solver;
 };
 
@@ -81,8 +59,10 @@ struct Solver : Env,Store
 	IExplorer* getExplorer() {	return pExplorer;	}
 
 	bool solve(Goal g) {	return valid() and pExplorer->explore(g);	}
+#ifndef SWIG_BUILD
 	template<class T>
 	bool solve(const T& t) {	return valid() and pExplorer->explore(Goal(*this,t));	}
+#endif
 	bool next()	{	return	pExplorer->resume();	}
 
 	const SolverStats& getStats() const
@@ -93,6 +73,7 @@ struct Solver : Env,Store
 	const Util::CPUTimer& getCPUTimer() const
 	{	return static_cast<const Env&>(*this).getStats().getCPUTimer(); }
 
+private:
 	Reversible<IExplorer*>			pExplorer;
 	SolverStats						stats;
 };

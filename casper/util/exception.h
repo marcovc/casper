@@ -57,10 +57,33 @@ struct DivisionByZero : std::runtime_error
 	{}
 };
 
-struct NoFilter: std::runtime_error
+struct UndefinedFilter: std::runtime_error
 {
-	NoFilter(std::string c) : std::runtime_error(
-			std::string("no CP::Filter object found for constraint: ")+c)
+	UndefinedFilter(std::string c) : std::runtime_error(
+			std::string("no CP::Filter object defined for constraint: ")+c)
+	{}
+	UndefinedFilter(std::string c,std::string obj) : std::runtime_error(
+			std::string("no ")+obj+
+			std::string(" object defined for constraint: ")+c)
+	{}
+};
+
+struct UndefinedView: std::runtime_error
+{
+	UndefinedView(std::string c) : std::runtime_error(
+			std::string("no CP::View object defined for expression: ")+c)
+	{}
+	UndefinedView(std::string c,std::string obj) : std::runtime_error(
+			std::string("no ")+obj+
+			std::string(" object defined for expression: ")+c)
+	{}
+};
+
+struct TypeCoercion: std::runtime_error
+{
+	TypeCoercion(std::string from,std::string to) : std::runtime_error(
+			std::string("cannot coerce type ")+from+
+			std::string(" to type ")+to)
 	{}
 };
 

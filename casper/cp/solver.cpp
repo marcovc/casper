@@ -23,6 +23,15 @@ using namespace std;
 namespace Casper {
 namespace CP {
 
+const StateStats& SolverStats::getStateStats() const
+{	return static_cast<const Casper::State&>(solver).getStats();	}
+
+const StoreStats& SolverStats::getStoreStats() const
+{	return static_cast<const Casper::CP::Store&>(solver).getStats();	}
+
+const ExplorerStats& SolverStats::getExplorerStats() const
+{	return solver.getExplorer()->getStats();	}
+
 Solver::Solver() :
 		Env(),
 		Store(static_cast<Env&>(*this)),
@@ -35,8 +44,8 @@ Solver::Solver() :
 
 ostream& operator<<(ostream& os, const Casper::CP::SolverStats& s)
 {
-	os << static_cast<const Casper::State&>(s.solver).getStats() << std::endl;
-	os << static_cast<const Casper::CP::Store&>(s.solver).getStats() << std::endl;
-	os << s.solver.pExplorer->getStats();
+	os << s.getStateStats() << std::endl;
+	os << s.getStoreStats() << std::endl;
+	os << s.getExplorerStats();
 	return os;
 }

@@ -215,7 +215,7 @@ struct BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 			if (!Detail::setSafeInsertRange(*y,makeInIt(*x)))
 				return false;
 
-			if (!Detail::setEraseRange(*x,Util::makeDiffIt(makePossIt(*x),makeLUBIt(*y))))
+			if (!Detail::setEraseRange(*x,makeDiffIt(makePossIt(*x),makeLUBIt(*y))))
 				return false;
 
 			xGLBDeltasIt = x->glbDeltas().end();
@@ -228,7 +228,7 @@ struct BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 				xGLBDeltasIt != x->glbDeltas().end(); ++xGLBDeltasIt)
 		{
 		//	++sumDelta[curFilter];
-			if (!Detail::setSafeInsertRange(*y,Util::makeIt(*xGLBDeltasIt)))
+			if (!Detail::setSafeInsertRange(*y,makeIt(*xGLBDeltasIt)))
 				return false;
 		}
 		//countDelta[curFilter]+= y->lubDeltas().beginFrom(yLUBDeltasIt) != y->lubDeltas().end();
@@ -236,7 +236,7 @@ struct BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 				yLUBDeltasIt != y->lubDeltas().end(); ++yLUBDeltasIt)
 		{
 		//	++sumDelta[curFilter];
-			if (!Detail::setEraseRange(*x,Util::makeIt(*yLUBDeltasIt)))
+			if (!Detail::setEraseRange(*x,makeIt(*yLUBDeltasIt)))
 				return false;
 		}
 
@@ -376,7 +376,7 @@ struct BACDisjointCard : IFilter
 
 	bool execute()
 	{
-		uint aux = Casper::Util::Detail::distance(Util::makeInterIt(makePossIt(*x),makePossIt(*y)));
+		uint aux = Casper::Detail::distance(makeInterIt(makePossIt(*x),makePossIt(*y)));
 
 		int n3 = x->inSize()+y->inSize()+
 				 x->possSize()+y->possSize()-
@@ -460,12 +460,12 @@ struct BndFilterView2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 
 		for (xGLBDeltasIt = x->glbDeltas().beginFrom(xGLBDeltasIt);
 				xGLBDeltasIt != x->glbDeltas().end(); ++xGLBDeltasIt)
-			if (!Detail::setSafeEraseRange(*y,Util::makeIt(*xGLBDeltasIt)))
+			if (!Detail::setSafeEraseRange(*y,makeIt(*xGLBDeltasIt)))
 				return false;
 
 		for (yGLBDeltasIt = y->glbDeltas().beginFrom(yGLBDeltasIt);
 				yGLBDeltasIt != y->glbDeltas().end(); ++yGLBDeltasIt)
-			if (!Detail::setEraseRange(*x,Util::makeIt(*yGLBDeltasIt)))
+			if (!Detail::setEraseRange(*x,makeIt(*yGLBDeltasIt)))
 				return false;
 
 		if (chk.isTrue())
@@ -513,7 +513,7 @@ struct PostBndFilter1<Disjoint,Seq<Set<Elem> >,View>
 		for (uint i = 0; i < s.size(); i++)
 			for (uint j = i+1; j < s.size(); j++)
 				e = e and disjoint(s[i].getObj(),s[j].getObj());
-		return store.post(Filter(e));
+		return store.post(e);
 	}
 };
 
@@ -538,7 +538,7 @@ struct BACIntersectCard1 : IFilter
 
 	bool execute()
 	{
-		int n3 = Casper::Util::Detail::distance(makeUnionIt(makeLUBIt(*x),makeLUBIt(*y)));
+		int n3 = Casper::Detail::distance(makeUnionIt(makeLUBIt(*x),makeLUBIt(*y)));
 
 		return z->card().updateMin(x->minCard()+y->minCard()-n3) and
 			   x->card().updateMax(z->maxCard()-y->minCard()+n3) and
@@ -598,7 +598,7 @@ struct BACIntersectCard2 : IFilter
 
 	bool execute()
 	{
-		int n3 = Casper::Util::Detail::distance(Util::makeDiffIt(makeInIt(*x),makeLUBIt(*y)));
+		int n3 = Casper::Detail::distance(makeDiffIt(makeInIt(*x),makeLUBIt(*y)));
 
 		return z->card().updateMax(x->card().max()-
 								   n3) and
@@ -680,13 +680,13 @@ struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,E
 			if (!store.post( contained(z.getObj(),y.getObj()) ))
 				return false;
 
-			uint n1 = Casper::Util::Detail::distance(Util::makeDiffIt(makeInIt(*x),makeLUBIt(*y)));
+			uint n1 = Casper::Detail::distance(makeDiffIt(makeInIt(*x),makeLUBIt(*y)));
 
 			// 31
 			if (!store.post( cardinal(z.getObj()) <= cardinal(x.getObj()) - (int)n1 ))
 				return false;
 
-			uint n2 = Casper::Util::Detail::distance(Util::makeDiffIt(makeInIt(*y),makeLUBIt(*x)));
+			uint n2 = Casper::Detail::distance(makeDiffIt(makeInIt(*y),makeLUBIt(*x)));
 
 			// 32
 			if (!store.post( cardinal(z.getObj()) <= cardinal(y.getObj()) - (int)n2 ))
@@ -699,33 +699,33 @@ struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,E
 		for (xGLBDeltasIt = x->glbDeltas().beginFrom(xGLBDeltasIt);
 				xGLBDeltasIt != x->glbDeltas().end(); ++xGLBDeltasIt)
 		{
-			if (!Detail::setSafeInsertRange(*z,Util::makeInterIt(makeInIt(*y),
-														   Util::makeIt(*xGLBDeltasIt))))
+			if (!Detail::setSafeInsertRange(*z,makeInterIt(makeInIt(*y),
+														   makeIt(*xGLBDeltasIt))))
 				return false;
-			if (!Detail::setSafeEraseRange(*y,Util::makeDiffIt(Util::makeIt(*xGLBDeltasIt),
+			if (!Detail::setSafeEraseRange(*y,makeDiffIt(makeIt(*xGLBDeltasIt),
 														 makeLUBIt(*z))))
 				return false;
 		}
 		for (yGLBDeltasIt = y->glbDeltas().beginFrom(yGLBDeltasIt);
 				yGLBDeltasIt != y->glbDeltas().end(); ++yGLBDeltasIt)
 		{
-			if (!Detail::setSafeInsertRange(*z,Util::makeInterIt(makeInIt(*x),
-														   Util::makeIt(*yGLBDeltasIt))))
+			if (!Detail::setSafeInsertRange(*z,makeInterIt(makeInIt(*x),
+														   makeIt(*yGLBDeltasIt))))
 				return false;
 
-			if (!Detail::setSafeEraseRange(*x,Util::makeDiffIt(Util::makeIt(*yGLBDeltasIt),
+			if (!Detail::setSafeEraseRange(*x,makeDiffIt(makeIt(*yGLBDeltasIt),
 														 makeLUBIt(*z))))
 				return false;
 		}
 		for (zLUBDeltasIt = z->lubDeltas().beginFrom(zLUBDeltasIt);
 				zLUBDeltasIt != z->lubDeltas().end(); ++zLUBDeltasIt)
 		{
-			if (!Detail::setSafeEraseRange(*y,Util::makeInterIt(makeInIt(*x),
-														  Util::makeIt(*zLUBDeltasIt))))
+			if (!Detail::setSafeEraseRange(*y,makeInterIt(makeInIt(*x),
+														  makeIt(*zLUBDeltasIt))))
 				return false;
 
-			if (!Detail::setSafeEraseRange(*x,Util::makeInterIt(makeInIt(*y),
-														  Util::makeIt(*zLUBDeltasIt))))
+			if (!Detail::setSafeEraseRange(*x,makeInterIt(makeInIt(*y),
+														  makeIt(*zLUBDeltasIt))))
 				return false;
 		}
 
@@ -854,27 +854,27 @@ struct BndFilterView3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3
 				return false;
 
 			// 42
-			uint n1 = Casper::Util::Detail::distance(Util::makeDiffIt(makeInIt(*x),makeLUBIt(*y)));
+			uint n1 = Casper::Detail::distance(makeDiffIt(makeInIt(*x),makeLUBIt(*y)));
 
 			if (!store.post( cardinal(z.getObj()) >=
 								cardinal(y.getObj()) + (int)n1 ))
 				return false;
 
 			// 43
-			uint n2 = Casper::Util::Detail::distance(Util::makeDiffIt(makeInIt(*y),makeLUBIt(*x)));
+			uint n2 = Casper::Detail::distance(makeDiffIt(makeInIt(*y),makeLUBIt(*x)));
 
 			if (!store.post( cardinal(z.getObj()) >=
 								cardinal(x.getObj()) + (int)n2 ))
 				return false;
 
-			if (!Detail::setSafeEraseRange(*z,Util::makeDiffIt(makeLUBIt(*z),
+			if (!Detail::setSafeEraseRange(*z,makeDiffIt(makeLUBIt(*z),
 										makeUnionIt(makeLUBIt(*x),makeLUBIt(*y)))))
 				return false;
 
-			if (!Detail::setSafeInsertRange(*y,Util::makeDiffIt(makeInIt(*z),makeLUBIt(*x))))
+			if (!Detail::setSafeInsertRange(*y,makeDiffIt(makeInIt(*z),makeLUBIt(*x))))
 				return false;
 
-			if (!Detail::setSafeInsertRange(*x,Util::makeDiffIt(makeInIt(*z),makeLUBIt(*y))))
+			if (!Detail::setSafeInsertRange(*x,makeDiffIt(makeInIt(*z),makeLUBIt(*y))))
 				return false;
 
 			xLUBDeltasIt = x->lubDeltas().end();
@@ -887,35 +887,35 @@ struct BndFilterView3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3
 		for (xLUBDeltasIt = x->lubDeltas().beginFrom(xLUBDeltasIt);
 				xLUBDeltasIt != x->lubDeltas().end(); ++xLUBDeltasIt)
 		{
-			if (!Detail::setSafeEraseRange(*z,Util::makeDiffIt(Util::makeIt(*xLUBDeltasIt),
+			if (!Detail::setSafeEraseRange(*z,makeDiffIt(makeIt(*xLUBDeltasIt),
 														 makeLUBIt(*y))))
 				return false;
 
-			if (!Detail::setSafeInsertRange(*y,Util::makeInterIt(makeInIt(*z),
-														   Util::makeIt(*xLUBDeltasIt))))
+			if (!Detail::setSafeInsertRange(*y,makeInterIt(makeInIt(*z),
+														   makeIt(*xLUBDeltasIt))))
 				return false;
 		}
 
 		for (yLUBDeltasIt = y->lubDeltas().beginFrom(yLUBDeltasIt);
 				yLUBDeltasIt != y->lubDeltas().end(); ++yLUBDeltasIt)
 		{
-			if (!Detail::setSafeEraseRange(*z,Util::makeDiffIt(Util::makeIt(*yLUBDeltasIt),
+			if (!Detail::setSafeEraseRange(*z,makeDiffIt(makeIt(*yLUBDeltasIt),
 														 makeLUBIt(*x))))
 				return false;
 
-			if (!Detail::setSafeInsertRange(*x,Util::makeInterIt(makeInIt(*z),
-														   Util::makeIt(*yLUBDeltasIt))))
+			if (!Detail::setSafeInsertRange(*x,makeInterIt(makeInIt(*z),
+														   makeIt(*yLUBDeltasIt))))
 				return false;
 		}
 
 		for (zGLBDeltasIt = z->glbDeltas().beginFrom(zGLBDeltasIt);
 				zGLBDeltasIt != z->glbDeltas().end(); ++zGLBDeltasIt)
 		{
-			if (!Detail::setSafeInsertRange(*x,Util::makeDiffIt(Util::makeIt(*zGLBDeltasIt),
+			if (!Detail::setSafeInsertRange(*x,makeDiffIt(makeIt(*zGLBDeltasIt),
 														  makeLUBIt(*y))))
 				return false;
 
-			if (!Detail::setSafeInsertRange(*y,Util::makeDiffIt(Util::makeIt(*zGLBDeltasIt),
+			if (!Detail::setSafeInsertRange(*y,makeDiffIt(makeIt(*zGLBDeltasIt),
 														  makeLUBIt(*x))))
 				return false;
 		}
@@ -1208,7 +1208,7 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2> : IFilte
 
 			// remove from x all values not in z
 			for (uint i = 0; i < x.size(); ++i)
-				if (!Detail::setSafeEraseRange(*x[i],Util::makeDiffIt(makeLUBIt(*x[i]),makeLUBIt(*z))))
+				if (!Detail::setSafeEraseRange(*x[i],makeDiffIt(makeLUBIt(*x[i]),makeLUBIt(*z))))
 					return false;
 
 			// insert in z all values in x
@@ -1230,7 +1230,7 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2> : IFilte
 			}
 
 			// remove from z all values not in union(lub(x))
-			if (!Detail::setSafeEraseRange(*z,Util::makeDiffIt(makeLUBIt(*z),makeSTLIt(un))))
+			if (!Detail::setSafeEraseRange(*z,makeDiffIt(makeLUBIt(*z),makeSTLIt(un))))
 				return false;
 
 			// create element->inLUB map
@@ -1269,7 +1269,7 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2> : IFilte
 		for (zLUBDeltasIt = z->lubDeltas().beginFrom(zLUBDeltasIt);
 					zLUBDeltasIt != z->lubDeltas().end(); ++zLUBDeltasIt)
 			for (uint i = 0; i < x.size(); ++i)
-				if (!Detail::setSafeEraseRange(*x[i],Util::makeIt(*zLUBDeltasIt)))
+				if (!Detail::setSafeEraseRange(*x[i],makeIt(*zLUBDeltasIt)))
 					return false;
 
 		// update map for erased elements and erase from z if element is not in x
@@ -1304,7 +1304,7 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2> : IFilte
 		for (uint i = 0; i < x.size(); ++i)
 			for (xGLBDeltasIt[i] = x[i]->glbDeltas().beginFrom(xGLBDeltasIt[i]);
 				xGLBDeltasIt[i] != x[i]->glbDeltas().end(); ++xGLBDeltasIt[i])
-				if (!setSafeInsertRange(*z,Util::makeIt(*xGLBDeltasIt[i])))
+				if (!setSafeInsertRange(*z,makeIt(*xGLBDeltasIt[i])))
 					return false;
 
 		// for any insert in z insert in xi if there is only one xi

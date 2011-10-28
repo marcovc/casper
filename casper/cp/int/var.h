@@ -30,6 +30,8 @@
 namespace Casper {
 namespace CP {
 
+#ifndef SWIG
+
 namespace Detail {
 
 template<FD_TP_SPEC(1)>
@@ -169,7 +171,7 @@ BD* VarDomCreator<BD>::unionOf(Store& store, const View& v)
 	return operator()(store);
 }
 
-};
+}; // CP::Detail
 
 
 template<FD_TP_SPEC(1)>
@@ -183,6 +185,8 @@ std::ostream& operator<<(std::ostream& os,
 	   ;
 	return os;
 }
+
+#endif
 
 
 /// Integer variable \ingroup CPIntegerDataStructures

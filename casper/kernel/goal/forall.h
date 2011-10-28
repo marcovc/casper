@@ -20,12 +20,12 @@
 #ifndef CASPER_KERNEL_GOAL_FORALL_H_
 #define CASPER_KERNEL_GOAL_FORALL_H_
 
-#include <casper/util/iteration.h>
+#include <casper/kernel/view/iteration.h>
 
 namespace Casper {
 
 NEW_REL_2(forAll,ForAll)
-NEW_REL_3(forAll,ForAll)
+NEW_FN_3(forAll,ForAll)
 
 namespace Traits {
 template<class T1,class T2,class T3>
@@ -55,7 +55,7 @@ struct GoalView3<ForAll,T,Par<T>,Seq<T>,Iter,bool,Obj> : IGoal
 	Par<T> it;
 	Iter r;
 	//IterationView<T,Iter>	iter;
-	Util::IterationView<Iter>	iter;
+	IterationView<Iter>	iter;
 	Obj v;
 };
 

@@ -180,7 +180,7 @@ template<class V1,class V2>
 struct PostDomFilter2<Distinct,bool,V1,bool,V2>
 {
 	static bool post(Store& s, const V1& p1,const V2& p2)
-	{	return s.post(Dom(s,cast<int>(p1) != cast<int>(p2)));	}
+	{	return postDomFilter(s,cast<int>(p1) != cast<int>(p2));	}
 };
 
 /**
@@ -214,28 +214,28 @@ template<class V1,class V2>
 struct PostDomFilter2<Greater,int,V1,int,V2>
 {
 	static bool post(Store& s, const V1& p1,const V2& p2)
-	{	return s.post(Bnd(s,p1>p2)); }
+	{	return postBndFilter(s,rel<Greater>(p1,p2)); }
 };
 
 template<class V1,class V2>
 struct PostDomFilter2<GreaterEqual,int,V1,int,V2>
 {
 	static bool post(Store& s, const V1& p1,const V2& p2)
-	{	return s.post(Bnd(s,p1>=p2)); }
+	{	return postBndFilter(s,rel<GreaterEqual>(p1,p2)); }
 };
 
 template<class V1,class V2>
 struct PostDomFilter2<Less,int,V1,int,V2>
 {
 	static bool post(Store& s, const V1& p1,const V2& p2)
-	{	return s.post(Bnd(s,p1<p2)); }
+	{	return postBndFilter(s,rel<Less>(p1,p2)); }
 };
 
 template<class V1,class V2>
 struct PostDomFilter2<LessEqual,int,V1,int,V2>
 {
 	static bool post(Store& s, const V1& p1,const V2& p2)
-	{	return s.post(Bnd(s,p1<=p2)); }
+	{	return postBndFilter(s,rel<LessEqual>(p1,p2)); }
 };
 
 

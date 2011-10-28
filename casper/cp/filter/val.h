@@ -24,28 +24,35 @@
 #include <casper/cp/filter/bnd.h>	//tmp
 #include <casper/cp/view/val.h>
 #include <casper/cp/view/bnd.h>
+#include <casper/cp/int/fd.h>
 
 namespace Casper {
 namespace CP {
 
-
-template<class,class,class> // TODO: default is to use FilterExpr1
+template<class,class,class>
 struct ValFilterView1;
 
 template<class,class,class,class,class>
-struct ValFilterView2; // TODO: default is to use FilterExpr2
+struct ValFilterView2;
 
 template<class,class,class,class,class,class,class>
-struct ValFilterView3; // TODO: default is to use FilterExpr3
+struct ValFilterView3;
+
+template<class,class,class,class,class,class,class,class,class>
+struct ValFilterView4;
+
+template<class,class,class,class,class,class,class,class,class,class,class>
+struct ValFilterView5;
 
 template<class Rel>
-struct ValFilterView; // default is to complain at compile time
+struct ValFilterView;
+
 
 // happens for example when the negation for a relation is not defined
 template<>
-struct ValFilterView<Rel0<UnknownRel> > : NoFilter
+struct ValFilterView<Rel0<UnknownRel> > : UndefinedFilter
 {
-	ValFilterView(Store& s,const Rel0<UnknownRel>&) : NoFilter(s,*this) {}
+	ValFilterView(Store& s,const Rel0<UnknownRel>&) : UndefinedFilter(s,*this) {}
 };
 
 template<class F,class T1>
@@ -78,6 +85,95 @@ struct ValFilterView<Rel3<F,T1,T2,T3> > :
 					  typename Casper::Traits::GetEval<T3>::Type,T3>(s,r.p1,r.p2,r.p3) {}
 };
 
+template<class F,class T1,class T2,class T3,class T4>
+struct ValFilterView<Rel4<F,T1,T2,T3,T4> > :
+	public ValFilterView4<F,typename Casper::Traits::GetEval<T1>::Type,T1,
+						 typename Casper::Traits::GetEval<T2>::Type,T2,
+						 typename Casper::Traits::GetEval<T3>::Type,T3,
+						 typename Casper::Traits::GetEval<T4>::Type,T4>
+{
+	ValFilterView(Store& s,const Rel4<F,T1,T2,T3,T4>& r) :
+		ValFilterView4<F,typename Casper::Traits::GetEval<T1>::Type,T1,
+					  typename Casper::Traits::GetEval<T2>::Type,T2,
+					  typename Casper::Traits::GetEval<T3>::Type,T3,
+					  typename Casper::Traits::GetEval<T4>::Type,T4>(s,r.p1,r.p2,r.p3,r.p4) {}
+};
+
+template<class F,class T1,class T2,class T3,class T4,class T5>
+struct ValFilterView<Rel5<F,T1,T2,T3,T4,T5> > :
+	public ValFilterView5<F,typename Casper::Traits::GetEval<T1>::Type,T1,
+						 typename Casper::Traits::GetEval<T2>::Type,T2,
+						 typename Casper::Traits::GetEval<T3>::Type,T3,
+						 typename Casper::Traits::GetEval<T4>::Type,T4,
+						 typename Casper::Traits::GetEval<T5>::Type,T5>
+{
+	ValFilterView(Store& s,const Rel5<F,T1,T2,T3,T4,T5>& r) :
+		ValFilterView5<F,typename Casper::Traits::GetEval<T1>::Type,T1,
+					  typename Casper::Traits::GetEval<T2>::Type,T2,
+					  typename Casper::Traits::GetEval<T3>::Type,T3,
+					  typename Casper::Traits::GetEval<T4>::Type,T4,
+					  typename Casper::Traits::GetEval<T5>::Type,T5>(s,r.p1,r.p2,r.p3,r.p4,r.p5) {}
+};
+
+template<class Func,class Eval1,class Expr1>
+struct PostValFilter1
+{
+	static bool post(Store& s,const Expr1& v1)
+	{
+		std::ostringstream os;
+		::operator<<(os,rel<Func>(v1));
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Value>");
+	}
+};
+
+template<class Func,class Eval1,class Expr1,class Eval2,class Expr2>
+struct PostValFilter2
+{
+	static bool post(Store& s,const Expr1& v1,const Expr2& v2)
+	{
+		std::ostringstream os;
+		::operator<<(os,rel<Func>(v1,v2));
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Value>");
+	}
+};
+
+template<class Func,class Eval1,class Expr1,class Eval2,class Expr2,
+		class Eval3,class Expr3>
+struct PostValFilter3
+{
+	static bool post(Store& s,const Expr1& v1,const Expr2& v2,const Expr3& v3)
+	{
+		std::ostringstream os;
+		::operator<<(os,rel<Func>(v1,v2,v3));
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Value>");
+	}
+};
+
+template<class Func,class Eval1,class Expr1,class Eval2,class Expr2,
+		class Eval3,class Expr3,class Eval4,class Expr4>
+struct PostValFilter4
+{
+	static bool post(Store& s,const Expr1& v1,const Expr2& v2,const Expr3& v3,const Expr4& v4)
+	{
+		std::ostringstream os;
+		::operator<<(os,rel<Func>(v1,v2,v3,v4));
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Value>");
+	}
+};
+
+template<class Func,class Eval1,class Expr1,class Eval2,class Expr2,
+		class Eval3,class Expr3,class Eval4,class Expr4,
+		class Eval5,class Expr5>
+struct PostValFilter5
+{
+	static bool post(Store& s,const Expr1& v1,const Expr2& v2,const Expr3& v3,const Expr4& v4,const Expr5& v5)
+	{
+		std::ostringstream os;
+		::operator<<(os,rel<Func>(v1,v2,v3,v4,v5));
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Value>");
+	}
+};
+
 /**
  * FIXME: see same relation for bnd and dom
  * Enforces the conjunction of two constraints. It succeeds if both
@@ -105,124 +201,63 @@ struct ValFilterView2<And,Eval1,Expr1,Eval2,Expr2> : IFilter
 	Expr2	v2;
 };
 
-#if 0
-/**
-	Value expression from filter (reification)
-	TODO: this should be like BndReify
-*/
-template<class View>
-struct ValReify
-{
-	ValReify(CPSolver& solver, const View& p1) :
-						pos(p1),
-						neg(!pos) {}
-	bool value() const { assert(ground()); return pos.entailed(); }
-	bool ground() const { return pos.entailed() || neg.entailed(); }
-	void attach(INotifiable* f) { pos.attach(f); neg.attach(f); 	}
-	void detach(INotifiable* f) { pos.detach(f); neg.detach(f); 	}
-	Filter	pos;
-	Filter	neg;
-};
-
-template<class F,class Expr1,class Eval>
-struct ValViewRel1 : ValReify<Rel1<F,Expr1> >
-{
-	typedef Rel1<F,Expr1> Rel;
-	typedef ValReify<Rel> Super;
-	ValViewRel1(CPSolver& solver, const Expr1& p1) :
-		Super(solver,Rel(p1)) {}
-};
-
-template<class F, class Expr1,class Expr2,class Eval>
-struct ValViewRel2 : ValReify<Rel2<F,Expr1,Expr2> >
-{
-	typedef Rel2<F,Expr1,Expr2> Rel;
-	typedef ValReify<Rel> Super;
-	ValViewRel2(CPSolver& solver, const Expr1& p1, const Expr2& p2) :
-		Super(solver,Rel(p1,p2)) {}
-};
-#endif
-
-///	Enforces equality
-// FIXME: must use setVal when ready
-template<class Eval,class Expr1,class Expr2>
-struct ValFilterView2<Equal,Eval,Expr1,Eval,Expr2> : IFilter
-{
-	ValFilterView2(Store& store,const Expr1& p1,const Expr2& p2)
-			: IFilter(store),p1(store,p1), p2(store,p2) {}
-
-	bool execute()
-	{
-		if (p1.ground())
-			return p2.setValue(p1.value());
-		else
-		if (p2.ground())
-			return p1.setValue(p2.value());
-		return true;
-	}
-//	bool entailed() const
-//	{	return p1.ground() and p2.ground() and p1.value() == p2.value();	}
-//	Filter	operator!() const
-//	{	return Val(v1 != v2);	}
-	void attach(INotifiable* s)
-	{	p1.attach(s); p2.attach(s);	}
-	void detach(INotifiable* s)
-	{	p1.detach(s); p2.detach(s);	}
-
-	ValView<Eval,Expr1>	p1;
-	ValView<Eval,Expr2>	p2;
-};
-
-///	Enforces disequality
-// FIXME: must use setVal when ready
-template<class Eval,class Expr1,class Expr2>
-struct ValFilterView2<Distinct,Eval,Expr1,Eval,Expr2> : IFilter
-{
-	ValFilterView2(Store& store,const Expr1& p1,const Expr2& p2)
-		: IFilter(store),p1(store,p1), p2(store,p2) {}
-
-	bool execute()
-	{
-		return !p1.ground() or !p2.ground() or p1.value()!=p2.value();
-	}
-//	bool entailed() const
-//	{	return p1.ground() and p2.ground() and p1.value() != p2.value();	}
-//	Filter	operator!() const
-//	{	return Val(v1 == v2);	}
-	void attach(INotifiable* s)
-	{	p1.attach(s); p2.attach(s);	}
-	void detach(INotifiable* s)
-	{	p1.detach(s); p2.detach(s);	}
-
-	ValView<Eval,Expr1>	p1;
-	ValView<Eval,Expr2>	p2;
-};
-
-// TODO: Dom expression from filter (reification)
-
-/**
-	Value expression from filter (reification)
-*/
-/*
-template<>
-struct ValView<bool,Filter> : ValReify<Filter>
-{
-	typedef ValReify<Filter> Super;
-
-	ValView(CPSolver& solver, const Filter& v) :
-						Super(solver,v) {}
-};
-*/
 struct PostValFilter
 {
-	template<class View>
-	bool operator()(Store& s,const View& v) const
-	{	return s.post(new (s) ValFilterView<View>(s,v));	}
+	template<class Func,class Expr1>
+	bool operator()(Store& s,const Rel1<Func,Expr1>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef PostValFilter1<Func,Eval1,Expr1>		Post;
+		return Post::post(s,v.p1);
+	}
+	template<class Func,class Expr1,class Expr2>
+	bool operator()(Store& s,const Rel2<Func,Expr1,Expr2>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef PostValFilter2<Func,Eval1,Expr1,Eval2,Expr2>	Post;
+		return Post::post(s,v.p1,v.p2);
+	}
+	template<class Func,class Expr1,class Expr2,class Expr3>
+	bool operator()(Store& s,const Rel3<Func,Expr1,Expr2,Expr3>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
+		typedef PostValFilter3<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3> Post;
+		return Post::post(s,v.p1,v.p2,v.p3);
+	}
+	template<class Func,class Expr1,class Expr2,class Expr3,class Expr4>
+	bool operator()(Store& s,const Rel4<Func,Expr1,Expr2,Expr3,Expr4>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
+		typedef typename Casper::Traits::GetEval<Expr4>::Type	Eval4;
+		typedef PostValFilter4<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4> Post;
+		return Post::post(s,v.p1,v.p2,v.p3,v.p4);
+	}
+	template<class Func,class Expr1,class Expr2,class Expr3,class Expr4,class Expr5>
+	bool operator()(Store& s,const Rel5<Func,Expr1,Expr2,Expr3,Expr4,Expr5>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
+		typedef typename Casper::Traits::GetEval<Expr4>::Type	Eval4;
+		typedef typename Casper::Traits::GetEval<Expr5>::Type	Eval5;
+		typedef PostValFilter5<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4,Eval5,Expr5> Post;
+		return Post::post(s,v.p1,v.p2,v.p3,v.p4,v.p5);
+	}
+
+	bool operator()(Store& s,const bool& b) const;
+	bool operator()(Store& s,const Var<bool>& v) const;
+	bool operator()(Store& s,const Casper::Expr<bool>& v) const;
 };
 
 extern PostValFilter postValFilter;
 
-
+// must update below to use Rels
+#if 0
 // AtMost constraint
 template<class T,int Dim,class Dom>
 struct AtMost : IFilter
@@ -400,6 +435,7 @@ struct ValFilterView<ValExpr<bool> > : IFilter
 
 	ValExpr<bool>	p;
 };
+#endif
 
 } // CP
 } // Casper

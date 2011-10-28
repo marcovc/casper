@@ -21,6 +21,7 @@
 #define CASPER_UTIL_PIMPL_H_
 
 #include <memory>
+#include <assert.h>
 
 namespace Casper {
 namespace Util {
@@ -33,8 +34,8 @@ struct PImplIdiom
 	typedef Iface* PImpl;
 	PImplIdiom(Iface* pImpl) : pImpl(pImpl) { }
 	PImplIdiom(const PImplIdiom& s) : pImpl(s.getPImpl()) { }
-	Iface&				getImpl() 			{ return *pImpl;}
-	const Iface&		getImpl() const 	{ return *pImpl;}
+	Iface&				getImpl() 			{ assert(pImpl); return *pImpl;}
+	const Iface&		getImpl() const 	{ assert(pImpl); return *pImpl;}
 	PImpl&				getPImpl() 			{ return pImpl;}
 	const PImpl&		getPImpl() const 	{ return pImpl;}
 
@@ -55,8 +56,8 @@ struct SPImplIdiom
 	SPImplIdiom(Iface* pImpl) : pImpl(pImpl) { }
 	SPImplIdiom(PImpl pImpl) : pImpl(pImpl) { }
 	SPImplIdiom(const SPImplIdiom& s) : pImpl(s.getPImpl()) { }
-	Iface&				getImpl() 			{ return *pImpl;}
-	const Iface&		getImpl() const 	{ return *pImpl;}
+	Iface&				getImpl() 			{ assert(pImpl); return *pImpl;}
+	const Iface&		getImpl() const 	{ assert(pImpl); return *pImpl;}
 	PImpl&				getPImpl() 			{ return pImpl;}
 	const PImpl&		getPImpl() const 	{ return pImpl;}
 

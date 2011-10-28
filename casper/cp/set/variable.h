@@ -99,6 +99,15 @@ typedef Casper::CP::VarArray<Casper::IntSet,2>	IntSetVarArray2;
 /// Integer set variable tridimensional matrix \ingroup CPSetDataStructures
 typedef Casper::CP::VarArray<Casper::IntSet,3>	IntSetVarArray3;
 
+///	Boolean set variable \ingroup CPSetDataStructures
+typedef Casper::CP::Var<Casper::BoolSet> 		BoolSetVar;
+/// Boolean set variable array \ingroup CPSetDataStructures
+typedef Casper::CP::VarArray<Casper::BoolSet>	BoolSetVarArray;
+/// Boolean set variable bidimensional matrix \ingroup CPSetDataStructures
+typedef Casper::CP::VarArray<Casper::BoolSet,2>	BoolSetVarArray2;
+/// Boolean set variable tridimensional matrix \ingroup CPSetDataStructures
+typedef Casper::CP::VarArray<Casper::BoolSet,3>	BoolSetVarArray3;
+
 } // CP
 
 namespace Traits {

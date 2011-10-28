@@ -19,7 +19,7 @@
 #ifndef CASPER_KERNEL_PITERATION_H_
 #define CASPER_KERNEL_PITERATION_H_
 
-#include <casper/util/iteration.h>
+#include <casper/kernel/view/iteration.h>
 #include <casper/util/container/stdpair.h>
 #include <casper/kernel/par/par.h>
 
@@ -55,7 +55,7 @@ struct PIteration<Par<T>,SetT,CondT>
 	}
 
 	Par<T> v;
-	Util::IterationView<SetT>	it;
+	IterationView<SetT>	it;
 	ParView<bool,CondT>	cond;
 };
 
@@ -63,7 +63,7 @@ template<class T,class SetT,class CondT>
 struct PIteration<Util::StdPair<Par<T>,Par<T> >,SetT,CondT>
 {
 	PIteration(const Util::StdPair<Par<T>,Par<T> >& p, const SetT& s,const CondT& c) :
-		v1(p.first),v2(p.second),it1(s),s(s),it2(new Util::IterationView<SetT>(s)),
+		v1(p.first),v2(p.second),it1(s),s(s),it2(new IterationView<SetT>(s)),
 		cond(p.first.getState(),c)
 	{
 		sync();
@@ -84,7 +84,7 @@ struct PIteration<Util::StdPair<Par<T>,Par<T> >,SetT,CondT>
 			{
 				it1.iterate();
 				delete it2;
-				it2 = new Util::IterationView<SetT>(s);
+				it2 = new IterationView<SetT>(s);
 				v2 = it2->value();
 				sync();
 			}
@@ -100,9 +100,9 @@ struct PIteration<Util::StdPair<Par<T>,Par<T> >,SetT,CondT>
 
 	Par<T> v1;
 	Par<T> v2;
-	Util::IterationView<SetT>	it1;
+	IterationView<SetT>	it1;
 	SetT					s;
-	Util::IterationView<SetT>*	it2;
+	IterationView<SetT>*	it2;
 	ParView<bool,CondT>	cond;
 };
 

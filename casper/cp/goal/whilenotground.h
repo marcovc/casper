@@ -20,14 +20,14 @@
 #ifndef CASPER_KERNEL_GOAL_WHILENOTGROUND_H_
 #define CASPER_KERNEL_GOAL_WHILENOTGROUND_H_
 
-#include <casper/util/iteration.h>
+#include <casper/kernel/view/iteration.h>
 #include <casper/cp/view/array.h>
 
 namespace Casper {
 
 
 NEW_REL_1(whileNotGround,WhileNotGround)
-NEW_REL_2(whileNotGround,WhileNotGround)
+NEW_FN_2(whileNotGround,WhileNotGround)
 
 namespace Traits {
 template<class T1,class T2>
