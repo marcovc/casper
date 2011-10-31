@@ -100,9 +100,8 @@ struct IDomExpr : INotifier
 	///	Returns a reference to the domain of the expression.
 	virtual Dom&		operator*() const	=	0;
 
-	// temporary -> the ArrayView mess depends on this.
-	void	attach(INotifiable*	n)	{	(*this)->attachOnDomain(n);	}
-	void	detach(INotifiable*	n)	{	(*this)->detachOnDomain(n);	}
+	virtual void	attach(INotifiable*	n)	= 0;
+	virtual void 	detach(INotifiable*	n) = 0;
 
 	bool notify() { assert(0); return true; }
 
@@ -194,6 +193,7 @@ struct DomExprWrapper : IDomExpr<Dom>
 	{	v.attach(f);	}
 	void detach(INotifiable* f)
 	{	v.detach(f);	}
+
 	DomView<Eval,View,Dom>	v;
 };
 
@@ -409,6 +409,12 @@ struct DomExpr : Util::PImplIdiom<Detail::IDomExpr<DomT> >
 
 	/// Returns the Store object associated with this expression.
 	Store&	getStore() const { return Super::pImpl->getStore(); }
+
+	void attach(INotifiable* f)
+	{ return Super::getImpl().attach(f);	}
+	void detach(INotifiable* f)
+	{ return Super::getImpl().detach(f);	}
+
 };
 
 template<class Eval>

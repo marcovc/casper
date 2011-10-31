@@ -17,55 +17,38 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_OBJ_ARRAY_H_
-#define CASPER_KERNEL_OBJ_ARRAY_H_
+#ifndef CASPER_KERNEL_OBJ_LIST_H_
+#define CASPER_KERNEL_OBJ_LIST_H_
 
 #include <casper/kernel/obj/expr.h>
+#include <casper/util/container/stdlist.h>
 
 #include <typeinfo>
 
 namespace Casper {
 namespace Detail {
 
-template<class T,class Eval,int dims>
-struct Create<T,Util::StdArray<Eval,dims> >
+template<class T,class Elem>
+struct Create<T,Util::StdList<Elem> >
 {
-	const Util::StdArray<Eval,dims>& operator()(const T& t)
-	{	throw Casper::Exception::TypeCoercion(typeid(T).name(),typeid(Util::StdArray<Eval,dims>).name());	}
+	Util::StdList<Elem> operator()(const T& t)
+	{	throw Casper::Exception::TypeCoercion(typeid(T).name(),typeid(Util::StdList<Elem>).name());	}
 };
 
-template<class Eval,int dims>
-struct Create<Util::StdArray<Eval,dims>,Util::StdArray<Eval,dims> >
+template<class Elem>
+struct Create<Util::StdList<Elem>,Util::StdList<Elem> >
 {
-	const Util::StdArray<Eval,dims>& operator()(const Util::StdArray<Eval,dims>& t)
+	const Util::StdList<Elem>& operator()(const Util::StdList<Elem>& t)
 	{	return t;	}
 };
 
-template<class Eval>
-struct Create<Util::StdList<Expr<Eval> >,Util::StdArray<Eval,1> >
-{
-	Util::StdArray<Eval,1> operator()(const Util::StdList<Expr<Eval> >& t)
-	{
-		Util::StdArray<Eval,1> r(std::distance(t.begin(),t.end()));
-		int i = 0;
-		for (auto it = t.begin(); it != t.end(); ++it)
-			r[i++] = it->toLiteral();
-		return r;
-	}
-};
 
 } // Detail
 
 namespace CP {
 
-// TMP: don't know why automatic conversion fails on this. Workaround:
-template<class Eval,class View>
-Filter gacSchema(Store& store,const View& v,const Expr<Seq<Eval> >& expr)
-{	return gacSchema(store,v,expr.toStdArray());	}
-
-
 } // CP
 
 }
 
-#endif /* CASPER_KERNEL_OBJ_BNDEXPR_H_ */
+#endif /* CASPER_KERNEL_OBJ_LIST_H_ */

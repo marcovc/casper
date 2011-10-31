@@ -548,6 +548,25 @@ void print(InputIterator b,InputIterator e)
 
 } // Detail
 
+
+// specialization for multidimensional arrays
+template<class> struct IterationView;
+template<class T,int dims>
+struct IterationView<Util::StdArray<T,dims> >
+{
+	typedef IterationView<Util::StdArray<T,dims> >	Self;
+	IterationView(const Util::StdArray<T,dims>& v) : idx(0),v(v),max(v.count()) {}
+	IterationView(const Util::StdArray<T,dims>& v,uint idx) : idx(idx),v(v),max(v.count()) {}
+	IterationView(const IterationView& s) : idx(s.idx),v(s.v),max(s.max) {}
+	void		iterate()	{	assert(valid()); ++idx;	}
+	const T& 	value() const 	{	assert(valid()); return v(idx);	}
+	bool		valid() const 	{	return idx < max;	}
+	Self		next() const {	return Self(v,idx+1); }
+	uint						idx;
+	const Util::StdArray<T,dims>&		v;
+	const uint					max;
+};
+
 } // Casper
 
 #endif /*CASPER_KERNEL_VIEW_ITERATION_H_*/

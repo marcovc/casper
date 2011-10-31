@@ -37,8 +37,8 @@ struct SelectValsMin : IValSelector
 		if (doms[idx]->ground())
 			return succeed();
 		return Goal(store,
-				post(store,doms[idx].getObj()==doms[idx]->min()) or
-				(post(store,doms[idx].getObj()>doms[idx]->min()) and callValSelector(store,this,idx))
+				post(store,rel<Equal>(doms[idx].getObj(),doms[idx]->min())) or
+				(post(store,rel<Greater>(doms[idx].getObj(),doms[idx]->min())) and callValSelector(store,this,idx))
 				);
 	}
 	Store&	store;
@@ -56,8 +56,9 @@ struct SelectValsMax : IValSelector
 		if (doms[idx]->ground())
 			return succeed();
 		return Goal(store,
-				post(store,doms[idx].getObj()==doms[idx]->max()) or
-				(post(store,doms[idx].getObj()<doms[idx]->max()) and callValSelector(store,this,idx))
+				post(store,rel<Equal>(doms[idx].getObj(),doms[idx]->max())) or
+				(post(store,rel<Less>(doms[idx].getObj(),doms[idx]->max())) and
+						callValSelector(store,this,idx))
 				);
 	}
 	Store&	store;
@@ -81,8 +82,8 @@ struct SelectValsRand : IValSelector
 		while (r-- > 0)
 			++it;
 		return Goal(store,
-				post(store,doms[idx].getObj() == *it) or
-				(post(store,doms[idx].getObj() != *it) and callValSelector(store,this,idx))
+				post(store,rel<Equal>(doms[idx].getObj(),*it)) or
+				(post(store,rel<Distinct>(doms[idx].getObj(),*it)) and callValSelector(store,this,idx))
 				);
 	}
 	Store&	store;
@@ -100,8 +101,8 @@ struct SelectValMin : IValSelector
 		if (doms[idx]->ground())
 			return succeed();
 		return Goal(store,
-				post(store,doms[idx].getObj()==doms[idx]->min()) or
-				post(store,doms[idx].getObj()>doms[idx]->min())
+				post(store,rel<Equal>(doms[idx].getObj(),doms[idx]->min())) or
+				post(store,rel<Greater>(doms[idx].getObj(),doms[idx]->min()))
 			);
 	}
 	Store& store;
@@ -119,8 +120,8 @@ struct SelectValMax : IValSelector
 		if (doms[idx]->ground())
 			return succeed();
 		return Goal(store,
-				post(store,doms[idx].getObj()==doms[idx]->max()) or
-				post(store,doms[idx].getObj()<doms[idx]->max())
+				post(store,rel<Equal>(doms[idx].getObj(),doms[idx]->max())) or
+				post(store,rel<Less>(doms[idx].getObj(),doms[idx]->max()))
 			);
 	}
 	Store& store;

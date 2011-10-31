@@ -111,6 +111,7 @@ struct IFilter;
 struct Filter;
 struct IFilterSched;
 template<class> struct BndExpr;
+template<class,class> struct Var;
 
 #ifdef SWIG
 enum Consistency { Domain, Bounds, Value };
@@ -151,6 +152,14 @@ struct Store : INotifiable
 	bool post(const BndExpr<bool>& b);
 
 #ifndef _MSC_VER
+
+	template<class PostFilter = PostBndFilter>
+	bool post(bool b,const PostFilter& f = PostFilter()) { return b; }
+
+	template<class Dom,class PostFilter = PostBndFilter>
+	bool post(const Var<bool,Dom>& v,const PostFilter& f = PostFilter())
+	{	return f(*this,v==true);	}
+
 	/// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class PostFilter = PostBndFilter>
 	bool post(const Rel1<Op,T1>& r, const PostFilter& f = PostFilter())

@@ -14,6 +14,8 @@ print "%module kernel"
 print "%import <kernel/expr.i>" 
 print "%inline %{"
 
+print "namespace PythonPreds {"
 objdb.printExprPredicates()
+print "}"
 
 print "%}"

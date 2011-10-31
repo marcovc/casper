@@ -589,10 +589,10 @@ struct BndFilterView3<SumProductEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3
 	BndFilterView3(Store& store,const Expr1& v1, const Expr2& v2,
 					const Expr3& v3) :
 						IFilter(store),c(store,v1),x(store,v2),v(store,v3),
-					f(store,c[0].value()*x[0].getObj())
+					f(store,rel<Mul>(c[0].value(),x[0].getObj()))
 	{
 		for (uint i = 1; i < c.size(); i++)
-			f = f + c[i].value()*x[i].getObj();
+			f = f + rel<Mul>(c[i].value(),x[i].getObj());
 	}
 	bool execute()
 	{
@@ -658,8 +658,9 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 			return true;
 
 		setInQueue(1);
-		// try to rewrite:
-		uint nground = 0;
+
+		// try to rewrite: 		FIXME: this only works if Expr1 is a var array. Doesn't look like there is a workaround...
+/*		uint nground = 0;
 		for (uint i = 0; i < x.size(); ++i)
 			if (x[i].min()==x[i].max())
 				++nground;
@@ -710,7 +711,7 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 			detach(pOwner);
 			return newx[0].domain().updateRange(v.value()-s,v.value()-s);
 		}
-
+*/
 		Eval sl = 0;
 		Eval su = 0;
 		for (uint i = 0; i < x.size(); ++i)

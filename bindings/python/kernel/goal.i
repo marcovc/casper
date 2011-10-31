@@ -7,4 +7,4 @@
 %}
 
 // Goal [TODO]
-%import <casper/kernel/goal/goal.h>
+%include <casper/kernel/goal/goal.h>

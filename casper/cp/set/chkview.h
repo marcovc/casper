@@ -226,8 +226,8 @@ struct ChkViewRel2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2>
 		Util::setUnion(lub1.begin(),lub1.end(),
 						 lub2.begin(),lub2.end(),
 						 Util::ListInserter<Elem>(lub3));
-		Var<IntSet> aux(store(),lub3);
-		return store.post(intersect(x.getObj(),y.getObj(),aux) and
+		Var<Set<Elem> > aux(store,lub3);
+		return store.post(intersectEqual(x.getObj(),y.getObj(),aux) and
 							 cardinal(aux)>0);
 	}
 
@@ -278,7 +278,7 @@ struct ChkViewRel3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,
 	bool setToTrue()
 	{
 		detach(pOwner);
-		return store.post(intersect(x.getObj(),y.getObj(),z.getObj()));
+		return store.post(intersectEqual(x.getObj(),y.getObj(),z.getObj()));
 	}
 	bool setToFalse()		// FIXME: using views instead of auxvar
 	{	throw Exception::UndefinedFilter("not intersect(set,set,set)");	}
@@ -333,7 +333,7 @@ struct ChkViewRel3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3>
 	bool setToTrue()
 	{
 		detach(pOwner);
-		return store.post(union_(x.getObj(),y.getObj(),z.getObj()));
+		return store.post(unionEqual(x.getObj(),y.getObj(),z.getObj()));
 	}
 	bool setToFalse()
 	{	throw Exception::UndefinedFilter("not unionEqual(set,set,set)");	}
@@ -398,8 +398,8 @@ struct ChkViewRel1<Partition,Seq<Set<Elem> >,Expr1>
 		throw Exception::UndefinedFilter("not Partition(sets)");
 	}
 
-	void attach(INotifiable* f) { 	pOwner=f; x->attachOnDomain(f); }
-	void detach(INotifiable* f) {	x->detachOnDomain(f); }
+	void attach(INotifiable* f) { 	pOwner=f; x.attach(f); }
+	void detach(INotifiable* f) {	x.detach(f); }
 
 	Rel1<Disjoint,Expr1> getObj()  const
 	{ 	return Rel1<Disjoint,Expr1>(x.getObj());	}

@@ -160,15 +160,14 @@ struct VarArray : Util::StdArray<Var<T,Dom1>,dims>
 template<class T, int dims, class Dom>
 bool VarArray<T,dims,Dom>::ground() const
 {
-	for (uint i = 0; i < this->size(); i++)
-		if (!this->operator[](i).ground())
+	for (uint i = 0; i < this->count(); i++)
+		if (!this->operator()(i).ground())
 			return false;
 	return true;
 }
 
 } // CP
 
-namespace Util {
 // specialization for multidimesional (domvar)arrays
 template<class Eval,int dims,class Dom>
 struct IterationView<CP::VarArray<Eval,dims,Dom> >
@@ -185,7 +184,6 @@ struct IterationView<CP::VarArray<Eval,dims,Dom> >
 	CP::VarArray<Eval,dims,Dom>	v;
 	const uint					max;
 };
-}
 
 template<class T,int Dims,class Dom>
 struct GetPEnv<CP::VarArray<T,Dims,Dom> >

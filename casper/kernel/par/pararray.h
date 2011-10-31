@@ -130,7 +130,6 @@ struct ParArray : Util::StdArray<Par<T>,dims>
 
 
 
-namespace Util {
 // specialization for multidimensional (par)arrays
 template<class Eval,int dims>
 struct IterationView<ParArray<Eval,dims> >
@@ -147,7 +146,6 @@ struct IterationView<ParArray<Eval,dims> >
 	ParArray<Eval,dims>	v;
 	const uint					max;
 };
-}
 
 //template<class T,int Dims,class Dom>
 //struct GetPEnv<CP::ParArray<T,Dims,Dom> >

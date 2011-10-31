@@ -3,6 +3,7 @@
 %{
 #include <casper/kernel.h>
 #include <casper/cp.h>
+#include <bindings/python/kernel/expr.h>
 %}
 
 %import <swigutil.i>

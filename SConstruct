@@ -410,6 +410,7 @@ def getBuildFlags(env,debug_level,optimize_level):
 		if env['cpp0x']:
 			build_flags += ['-std=gnu++0x']
 		build_flags += ['-Wfatal-errors']
+		build_flags += ['-fPIC']
 		#build_flags += ['-ffast-math']
 		#link_flags += ['-ffast-math']	
 		#factor = 64
@@ -682,28 +683,29 @@ Alias('casperbind_fzn',casperbind_fzn_target)
 pycasper_target_libpath = confCommonEnv['LIBPATH']
 pycasper_target_libs = confCommonEnv['LIBS']+[libcasper]
 
-pycasper_ifaces=['kernel','cp','util']
-
-#pycasper_objs=[]
-pycasper_libs=[]
-for i in pycasper_ifaces:
-	pycasper_obj = env.SharedObject(env['PREFIX']+"/bindings/python/"+i+".i",
-									 CCFLAGS=' -fPIC -Wall -std=c++0x -DSWIG_BUILD -Wfatal-errors',
-									 CPPPATH=['#.','/usr/include/python2.6'],
-									 SWIGFLAGS = '-c++ -python -I. -Ibindings/python -Wall')
-	pycasper_libs += env.SharedLibrary(target=env['PREFIX']+'/bindings/python/'+i,
+def compile_pycasper_module(iface):
+	pycasper_obj = env.SharedObject(env['PREFIX']+"/bindings/python/"+iface+".i",
+									 CCFLAGS=' -fPIC -Wall -std=c++0x -DSWIG_BUILD -g3',
+									 CPPPATH=['#.','/usr/include/python2.7'],
+									 SWIGFLAGS = '-c++ -python -I. -Ibindings/python -Wall -outdir '+env['PREFIX']+"/bindings/python/casper")
+	return env.SharedLibrary(target=env['PREFIX']+'/bindings/python/casper/'+iface,
 								   source=pycasper_obj,SHLIBPREFIX='_',
 								   LIBPATH=pycasper_target_libpath,
 								   LIBS=pycasper_target_libs)
-	
-gen_op_intvar = env.Command('bindings/python/cp/int/intvar_operators.i',['bindings/python/pyutils/objdb.py','bindings/python/cp/int/gen_operators_intvar.py'],'python bindings/python/cp/int/gen_operators_intvar.py > $TARGET')
-gen_op_boolvar = env.Command('bindings/python/cp/int/boolvar_operators.i',['bindings/python/pyutils/objdb.py','bindings/python/cp/int/gen_operators_boolvar.py'],'python bindings/python/cp/int/gen_operators_boolvar.py > $TARGET')
-gen_op_intexpr = env.Command('bindings/python/kernel/intexpr_operators.i',['bindings/python/pyutils/objdb.py','bindings/python/kernel/gen_operators_intexpr.py'],'python bindings/python/kernel/gen_operators_intexpr.py > $TARGET')
-gen_op_boolexpr = env.Command('bindings/python/kernel/boolexpr_operators.i',['bindings/python/pyutils/objdb.py','bindings/python/kernel/gen_operators_boolexpr.py'],'python bindings/python/kernel/gen_operators_boolexpr.py > $TARGET')
-gen_pred_expr = env.Command('bindings/python/kernel/expr_predicates.i',['bindings/python/pyutils/objdb.py','bindings/python/kernel/gen_predicates_expr.py'],'python bindings/python/kernel/gen_predicates_expr.py > $TARGET')
 
-gen_scripts = [gen_op_intvar,gen_op_boolvar,gen_op_intexpr,gen_op_boolexpr,gen_pred_expr]
-Alias('casperbind_python',gen_scripts+pycasper_libs)
+	
+pycasper_modules=['kernel','cp','util']
+pycasper_libs=[Execute(Mkdir(env['PREFIX']+"/bindings/python/casper"))] 
+for i in pycasper_modules:
+	pycasper_libs.append(compile_pycasper_module(i))
+
+py_gen_scripts = []
+pref = "bindings/python/"
+for src in ['cp/int/intvar_operators.i','cp/int/boolvar_operators.i','kernel/intexpr_operators.i','kernel/boolexpr_operators.i','kernel/expr_predicates.i']:
+	py_gen_scripts.append(env.Command(pref+src,['bindings/python/pyutils/objdb.py',pref+src+'.py'],'python '+pref+src+'.py'+' > $TARGET'))
+
+copy_init = [Command(env['PREFIX']+"/bindings/python/casper/__init__.py", pycasper_libs[0], Copy("$TARGET", env['PREFIX']+"/bindings/python/casper/kernel.py"))]
+Alias('casperbind_python',py_gen_scripts+pycasper_libs+copy_init)
 							   
 
 ############ general environment information ############

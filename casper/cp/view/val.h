@@ -109,7 +109,7 @@ struct NoValView
 	NoValView(Store& s,const R& r)
 	{
 		std::ostringstream os;
-		::operator<<(os,r);
+		os << r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::ValView");
 	}
 	Eval value() const { assert(0); }

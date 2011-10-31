@@ -39,7 +39,7 @@ namespace Casper {
  */
 
 NEW_REL_1(whileDo,WhileDo)
-NEW_REL_2(whileDo,WhileDo)
+NEW_FN_2(whileDo,WhileDo)
 
 namespace Traits {
 template<class T1,class T2,class T3>

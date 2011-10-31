@@ -28,11 +28,7 @@ using namespace std;
 int main()
 {
 	CP::Solver solver;
-	CP::IntVarArray vars(solver,2,0,3);
-	Util::StdArray<int,1>	v(solver,2,2);
-
-	Expr<Seq<int> > expr(v);
-
-	IterationExpr<Expr<int> > e(expr.toIterationExpr());
+	CP::IntVarArray v(solver,2,1,10);
+	solver.solve(label(solver,I))
 //	cout << expr << endl;
 }

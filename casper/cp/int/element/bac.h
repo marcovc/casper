@@ -172,7 +172,7 @@ BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::execu
 	if (ivMin == ivMax)	// post equality
 	{
 		detach(pParent);
-		return store.post(array[ivMin].getObj() == res.getObj());
+		return store.post(rel<Equal>(array[ivMin].getObj(),res.getObj()));
   	}
 
 	// update res bounds from possible domains

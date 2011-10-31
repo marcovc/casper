@@ -26,10 +26,6 @@
 	%template(BoolVar) Var<bool,bool>;
 }
 
-%inline %{
-Casper::Expr<int> myMethod(const Casper::Expr<int>& s)
-{	return s;	}
-%}
 
 %include <cp/int/intvar_operators.i>
 %include <cp/int/boolvar_operators.i>

@@ -414,7 +414,12 @@ struct StdArray
 
 	///	Copies all elements from \s replacing existing elements.
 	const Self& operator=(const Self& s)
-	{	*pData = *s.pData;	return *this;	}
+	{
+		if (mustFree)
+			delete pData;
+		pData = new (s.getHeap()) Data(s.getHeap(),s.begin(),s.end());
+		return *this;
+	}
 
 	/// Returns element at position \p i in the last level, using row major
 	/// index ordering.
@@ -445,24 +450,6 @@ struct StdArray
 	const bool 	mustFree;
 };
 
-
-// specialization for multidimensional arrays
-template<class> struct IterationView;
-template<class T,int dims>
-struct IterationView<StdArray<T,dims> >
-{
-	typedef IterationView<StdArray<T,dims> >	Self;
-	IterationView(const StdArray<T,dims>& v) : idx(0),v(v),max(v.count()) {}
-	IterationView(const StdArray<T,dims>& v,uint idx) : idx(idx),v(v),max(v.count()) {}
-	IterationView(const IterationView& s) : idx(s.idx),v(s.v),max(s.max) {}
-	void		iterate()	{	assert(valid()); ++idx;	}
-	const T& 	value() const 	{	assert(valid()); return v(idx);	}
-	bool		valid() const 	{	return idx < max;	}
-	Self		next() const {	return Self(v,idx+1); }
-	uint						idx;
-	const StdArray<T,dims>&		v;
-	const uint					max;
-};
 
 namespace Detail {
 
@@ -516,7 +503,6 @@ typedef StdArray<bool,3>	StdBoolArray3;
 typedef StdArray<string>	StdStringArray;
 
 } // Util
-
 
 
 } // Casper

@@ -1,5 +1,6 @@
 
 %module cp 
+%feature("autodoc", "1");
 
 %{
 #include <casper/kernel.h>
@@ -16,4 +17,5 @@
 %include <cp/int/var.i>
 %include <cp/vararray.i>
 %include <cp/int/vararray.i>
+%include <cp/label.i>
 

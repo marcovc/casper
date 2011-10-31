@@ -19,11 +19,12 @@ namespace Casper {
 NEW_REL_1(cardinal,Cardinal)
 NEW_REL_2(member,Member)
 NEW_REL_2(notMember,NotMember)
+
 NEW_REL_2(disjoint,Disjoint)
+NEW_FN_1(disjoint,Disjoint)
 
 NEW_REL_2(contained,Contained)
 
-NEW_FN_1(disjoint,Disjoint)
 
 ALIAS(Mul,Intersect)
 NEW_FN_2(intersect,Intersect)
@@ -69,6 +70,10 @@ struct GetEval<Rel2<Contained,Expr1,Expr2> >
 
 template<class Expr1,class Expr2>
 struct GetEval<Rel2<Disjoint,Expr1,Expr2> >
+{	typedef bool	Type;	};
+
+template<class Expr1>
+struct GetEval<Rel1<Disjoint,Expr1> >
 {	typedef bool	Type;	};
 
 //template<class Expr1,class Expr2>

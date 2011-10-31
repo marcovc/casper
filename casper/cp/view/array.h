@@ -313,12 +313,17 @@ struct DomArrayView :
 		return r;
 	}
 	DomArrayView(Store& store, const View& p1) :
-		Super(store,getSize(p1))
+		Super(store,getSize(p1)),v(p1)
 	{
 		uint i = 0;
 		for (IterationView<View>	it(p1); it.valid(); it.iterate())
 			::new(&Super::operator[](i++)) Elem(store,it.value());
 	}
+	View getObj() const
+	{
+		return v;
+	}
+	View	v;
 };
 
 

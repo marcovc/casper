@@ -499,18 +499,19 @@ namespace Detail {
 template<class Obj>
 struct SelectHalfMin : IValSelector
 {
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetElem<Obj>::Type>::Type ElemEval;
+	typedef typename Casper::Traits::GetEval<
+			typename Casper::Traits::GetElem<Obj>::Type>::Type ElemEval;
 	SelectHalfMin(Store& s,const Obj& obj) :
 		store(s),obj(s,obj) {}
 	Goal select(uint idx)
 	{
 		ElemEval midpoint = Util::median(obj[idx].min(),obj[idx].max());
 		if (Casper::Traits::IsIntegral<ElemEval>::value)
-			return Goal(store,post(store,obj[idx].getObj() <= midpoint) or
-							  post(store,obj[idx].getObj() > midpoint));
+			return Goal(store,post(store,rel<LessEqual>(obj[idx].getObj(),midpoint)) or
+							  post(store,rel<Greater>(obj[idx].getObj(),midpoint)));
 		else
-			return Goal(store,post(store,obj[idx].getObj() <= midpoint) or
-							  post(store,obj[idx].getObj() >= midpoint));
+			return Goal(store,post(store,rel<LessEqual>(obj[idx].getObj(),midpoint)) or
+							  post(store,rel<GreaterEqual>(obj[idx].getObj(),midpoint)));
 	}
 	Store&						store;
 	BndArrayView<ElemEval,Obj> obj;
@@ -519,18 +520,19 @@ struct SelectHalfMin : IValSelector
 template<class Obj>
 struct SelectHalfMax : IValSelector
 {
-	typedef typename Casper::Traits::GetEval<Obj>::Type::Elem	ElemEval;
+	typedef typename Casper::Traits::GetEval<
+			typename Casper::Traits::GetElem<Obj>::Type>::Type	ElemEval;
 	SelectHalfMax(Store& s,const Obj& obj) :
 		store(s),obj(s,obj) {}
 	Goal select(uint idx)
 	{
 		ElemEval midpoint = Util::median(obj[idx].min(),obj[idx].max());
 		if (Casper::Traits::IsIntegral<ElemEval>::value)
-			return Goal(store,post(store,obj[idx].getObj() > midpoint) or
-							  post(store,obj[idx].getObj() <= midpoint));
+			return Goal(store,post(store,rel<Greater>(obj[idx].getObj(),midpoint)) or
+							  post(store,rel<LessEqual>(obj[idx].getObj(),midpoint)));
 		else
-			return Goal(store,post(store,obj[idx].getObj() >= midpoint) or
-							  post(store,obj[idx].getObj() <= midpoint));
+			return Goal(store,post(store,rel<GreaterEqual>(obj[idx].getObj(),midpoint)) or
+							  post(store,rel<LessEqual>(obj[idx].getObj(),midpoint)));
 	}
 	Store&						store;
 	BndArrayView<ElemEval,Obj> obj;

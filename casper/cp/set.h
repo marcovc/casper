@@ -20,6 +20,7 @@
 #include <casper/cp/set/filter.h>
 #include <casper/cp/set/goal.h>
 #include <casper/cp/set/weight.h>
+#include <casper/cp/set/relation.h>
 
 #include <casper/cp/store.h>
 #include <casper/cp/solver.h>

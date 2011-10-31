@@ -87,6 +87,8 @@ struct Goal : Util::PImplIdiom<IGoal>
 
 	Goal(IGoal* g) : Super(g) {}
 
+	~Goal() {} // SWIG needs this
+
 	// 'explicit' below is needed to avoid creating ambiguity with an
 	// overload of && defined in the STL (at least with gcc)
 	explicit Goal(bool cond) : Super(cond?succeed():fail()) {}
@@ -124,8 +126,10 @@ struct Goal : Util::PImplIdiom<IGoal>
 			typename Traits::GetEval<T3>::Type,T3,
 			typename Traits::GetEval<T4>::Type,T4>(s,r.p1,r.p2,r.p3,r.p4)) {}
 
+#ifndef SWIG
 	Goal(State& s, const std::function<Goal()>& fn);
 	Goal(State& s, const std::function<void()>& fn);
+#endif
 
 	inline Goal execute(IExplorer& expl);
 	//inline Goal create();

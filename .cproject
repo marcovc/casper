@@ -70,22 +70,22 @@
 			<target name="example-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
 				<buildArguments>-j 3 optimize_level=3</buildArguments>
-				<buildTarget>build/release/examples/cp/int/debug</buildTarget>
+				<buildTarget>build/release/examples/cp/real/inverse</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="example-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
-				<buildArguments>-j 1 debug_level=3 build/debug/examples/cp/int/debug</buildArguments>
-				<buildTarget/>
+				<buildArguments>-j 8 debug_level=3</buildArguments>
+				<buildTarget>build/debug/examples/bindings/bindings</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="examples-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
-				<buildArguments>-j 9 debug_level=3 safe_rounding=false lp=false</buildArguments>
+				<buildArguments>-j 1 debug_level=3</buildArguments>
 				<buildTarget>examples</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -157,7 +157,6 @@
 			</target>
 			<target name="gcc-version" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>gcc</buildCommand>
-				<buildArguments/>
 				<buildTarget>--version</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -167,6 +166,14 @@
 				<buildCommand>scons</buildCommand>
 				<buildArguments>-j 8 debug_level=3</buildArguments>
 				<buildTarget>casperbind_cpp</buildTarget>
+				<stopOnError>false</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="bindings-python" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+				<buildCommand>scons</buildCommand>
+				<buildArguments>-j 8 debug_level=3</buildArguments>
+				<buildTarget>casperbind_python</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>

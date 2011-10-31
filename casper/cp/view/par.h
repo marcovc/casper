@@ -104,8 +104,6 @@ struct GetEval<Rel2<NonGroundIdxs,CP::Store*,T> >
 } // Traits
 
 
-namespace Util {
-
 // specialization for finite domain variables
 template<class ParExpr>
 struct IterationView<Rel2<Domain,CP::Store*,ParExpr> >
@@ -159,9 +157,6 @@ struct IterationView<Rel2<NonGroundIdxs,CP::Store*,View> >
 	CP::ValArrayView<Eval,View>	v;
 	uint idx;
 };
-
-
-}
 
 /**
  * 	ParView over groundness testing.

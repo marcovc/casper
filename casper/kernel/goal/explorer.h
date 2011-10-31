@@ -206,7 +206,6 @@ struct LIFOSearchPath : ISearchPath
 	double				eval;
 };
 
-std::ostream& operator<<(std::ostream& os, const LIFOSearchPath& l);
 
 /**
  * Maintains a single path from the root to the current node. This means that
@@ -597,6 +596,7 @@ Goal explore(State& state,IExplorer& gs, Goal g);
 
 };
 
+std::ostream& operator<<(std::ostream& os, const Casper::LIFOSearchPath& l);
 std::ostream& operator<<(std::ostream& os, const Casper::MonoSearchPath& s);
 std::ostream& operator<<(std::ostream& os, const Casper::ExplorerStats& s);
 

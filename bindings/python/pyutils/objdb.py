@@ -52,6 +52,7 @@ class ActionMap:
 		return cover
 
 objs = set()
+seqTypes = ["Casper::BoolSeq", "Casper::IntSeq", "Casper::BoolSetSeq", "Casper::IntSetSeq"]
 
 # literal types
 for e in ["bool", "int"]:
@@ -62,13 +63,16 @@ for e in ["Casper::BoolSeq", "Casper::IntSeq"]:
 # CP types
 for e in ["bool", "int"]:
 	objs.add(Rule(type="tExt",cl="CP",ev=e,extType="Var"))
-for e in ["Casper::BoolSeq", "Casper::IntSeq", "Casper::BoolSetSeq", "Casper::IntSetSeq"]:
+for e in seqTypes:
 	objs.add(Rule(type="tExt",cl="CP",ev=e,extType="VarArray"))
 
 
 # boolean unary operations between boolean types
 objs.add(Rule(type="tRel",func="Not",ev="bool",nArgs=1,arg1Eval="bool"))
 objs.add(Rule(type="tRel",func="Cast<bool>",ev="bool",nArgs=1,arg1Eval="int"))
+
+# boolean unary operations between integer sequence types
+objs.add(Rule(type="tRel",func="Distinct",ev="bool",nArgs=1,arg1Eval="Casper::IntSeq"))
 
 # boolean unary operations between set types
 for f in ["Disjoint","Partition"]:
@@ -202,28 +206,23 @@ for i in range(1,6):
 
 #python unary and binary operators
 casperOp2PythonOp = {
-		"Equal" : "eq",
-		"Distinct" : "ne",
-		"And" : "and",
-		"XOr" : "xor",
-		"Or" : "or",
-		"Not" : "invert",
-		"Floor" : "floor",
-		"Ceil" : "ceil",
-		"Round" : "round",
-		"Mod" : "mod",
-		"Less" : "lt",
-		"LessEqual" : "le",
-		"Greater" : "gt",
-		"GreaterEqual" : "ge",
-		"Add" : "add",
-		"Sym" : "neg",
-		"Sub" : "sub",
-		"Mul" : "mul", 
-		"Div" : "div",
-		"Pow" : "pow",
-		"Abs" : "abs",
-		"Div" : "div",
+		("Equal",2) : "eq",
+		("Distinct",2) : "ne",
+		("And",2) : "and",
+		("XOr",2) : "xor",
+		("Or",2) : "or",
+		("Not",1) : "invert",
+		("Mod",2) : "mod",
+		("Less",2) : "lt",
+		("LessEqual",2) : "le",
+		("Greater",2) : "gt",
+		("GreaterEqual",2) : "ge",
+		("Add",2) : "add",
+		("Sym",1) : "neg",
+		("Sub",2) : "sub",
+		("Mul",2) : "mul", 
+		("Div",2) : "div",
+		("Pow",2) : "pow",
 }
 
 customCasperFn2PythonFn = {
@@ -240,7 +239,7 @@ def casperFn2PythonFn(casperFn):
 
 def printUnaryOperator(func,ev,arg1):
 	print "Casper::Expr<"+ev+">"
-	print  "__"+casperOp2PythonOp[func]+"__()"
+	print  "__"+casperOp2PythonOp[(func,1)]+"__()"
 	print "{"
 	print "\tCasper::Rel1<Casper::"+func+","+arg1+"> r(*$self);"
 	print "\treturn r;"
@@ -249,9 +248,9 @@ def printUnaryOperator(func,ev,arg1):
 def printBinaryOperator(func,ev,arg1,arg2,reverse=False):
 	print "Casper::Expr<"+ev+">"
 	if not reverse:
-		print  "__"+casperOp2PythonOp[func]+"__(const "+arg2+"& v)"
+		print  "__"+casperOp2PythonOp[(func,2)]+"__(const "+arg2+"& v)"
 	else:
-		print  "__r"+casperOp2PythonOp[func]+"__(const "+arg2+"& v)"
+		print  "__r"+casperOp2PythonOp[(func,2)]+"__(const "+arg2+"& v)"
 	print "{"
 	if not reverse:	
 		print "\tCasper::Rel2<Casper::"+func+","+arg1+","+arg2+"> r(*$self,v);"
@@ -263,12 +262,13 @@ def printBinaryOperator(func,ev,arg1,arg2,reverse=False):
 def printVarOperators(arg1,ev1):
 	for r in objs:
 		if r.properties["type"]=="tRel" and \
-			r.properties["func"] in casperOp2PythonOp.keys() and \
+			(r.properties["func"], r.properties["nArgs"]) in casperOp2PythonOp.keys() and \
 			r.properties["arg1Eval"]==ev1:
 			if r.properties["nArgs"]==1:
 				printUnaryOperator(r.properties["func"],r.properties["ev"],arg1)
 			if r.properties["nArgs"]==2:
 				ev2 = r.properties["arg2Eval"]
+				'''
 				# self with literal
 				if ev2=="int" or ev2=="bool":
 					arg2 = ev2
@@ -278,6 +278,7 @@ def printVarOperators(arg1,ev1):
 				# self with var
 				arg2 = "Casper::CP::Var<"+ev2+",Casper::CP::Traits::GetDefaultDom<"+ev2+">::Type>"
 				printBinaryOperator(r.properties["func"],r.properties["ev"],arg1,arg2)
+				'''
 				# self with expression
 				arg2 = "Casper::Expr<"+ev2+">"
 				printBinaryOperator(r.properties["func"],r.properties["ev"],arg1,arg2)
@@ -287,21 +288,24 @@ def printVarOperators(arg1,ev1):
 def printExprOperators(arg1,ev1):
 	for r in objs:
 		if r.properties["type"]=="tRel" and \
-			r.properties["func"] in casperOp2PythonOp.keys() and \
+			(r.properties["func"], r.properties["nArgs"]) in casperOp2PythonOp.keys() and \
 			r.properties["arg1Eval"]==ev1:
 			if r.properties["nArgs"]==1:
 				printUnaryOperator(r.properties["func"],r.properties["ev"],arg1)
 			if r.properties["nArgs"]==2:
 				ev2 = r.properties["arg2Eval"]
+				'''
 				# expr with literal
 				if ev2=="int" or ev2=="bool":
 					arg2 = ev2
 					printBinaryOperator(r.properties["func"],r.properties["ev"],arg1,arg2)
 				# literal with expr		
 					printBinaryOperator(r.properties["func"],r.properties["ev"],arg1,arg2,True)
+				'''
 				# expr with expr	
 				arg2 = "Casper::Expr<"+ev2+">"
 				printBinaryOperator(r.properties["func"],r.properties["ev"],arg1,arg2)
+
 
 def printPredicate(func,ev,argevs):
 	print "Casper::Expr<"+ev+">"
@@ -319,7 +323,7 @@ def printPredicate(func,ev,argevs):
 def printExprPredicates():
 	for r in objs:
 		if r.properties["type"]=="tRel" and \
-			r.properties["func"] not in casperOp2PythonOp.keys():
+			(r.properties["func"], r.properties["nArgs"]) not in casperOp2PythonOp.keys():			
 			argevs = [r.properties["arg"+str(i)+"Eval"] for i in range(1,r.properties["nArgs"]+1)]
 			printPredicate(r.properties["func"],r.properties["ev"],argevs)
 			

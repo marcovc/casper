@@ -27,12 +27,15 @@
 #define AT_Rel3(M1,M2,M3,M4)	Rel3< AT_ ## M1,AT_ ## M2,AT_ ## M3,AT_ ## M4 >
 #define AT_Rel4(M1,M2,M3,M4,M5)	Rel4< AT_ ## M1,AT_ ## M2,AT_ ## M3,AT_ ## M4, \
 									 AT_ ## M5 >
+#define AT_Rel5(M1,M2,M3,M4,M5,M6)	Rel5< AT_ ## M1,AT_ ## M2,AT_ ## M3,AT_ ## M4, \
+									 AT_ ## M5,AT_ ## M6 >
 									 
 #define AD_Rel0(M)				AD_ ## M
 #define AD_Rel1(M1,M2)			AD_ ## M1 AD_ ## M2
 #define AD_Rel2(M1,M2,M3)		AD_ ## M1 AD_ ## M2 AD_ ## M3
 #define AD_Rel3(M1,M2,M3,M4)	AD_ ## M1 AD_ ## M2 AD_ ## M3 AD_ ## M4
 #define AD_Rel4(M1,M2,M3,M4,M5)	AD_ ## M1 AD_ ## M2 AD_ ## M3 AD_ ## M4 AD_ ## M5
+#define AD_Rel5(M1,M2,M3,M4,M5,M6)	AD_ ## M1 AD_ ## M2 AD_ ## M3 AD_ ## M4 AD_ ## M5 AD_ ## M6
 
 namespace Casper {
 
@@ -90,6 +93,17 @@ REL_FROM_ARITH_OPERATORS(double,Rel4(Op,T1,T2,T3,T4))
 REL_FROM_COMPARISON_OPERATORS(float,Rel4(Op,T1,T2,T3,T4))
 REL_FROM_ARITH_OPERATORS(float,Rel4(Op,T1,T2,T3,T4))
 REL_FROM_BINARY_OPERATORS(bool,Rel4(Op,T1,T2,T3,T4))
+
+// Rel5
+REL_FROM_UNARY_OPERATORS(Rel5(Op,T1,T2,T3,T4,T5))
+REL_FROM_BINARY_OPERATORS(Rel5(Op,T1,T2,T3,T4,T5),T)
+REL_FROM_COMPARISON_OPERATORS(int,Rel5(Op,T1,T2,T3,T4,T5))
+REL_FROM_ARITH_OPERATORS(int,Rel5(Op,T1,T2,T3,T4,T5))
+REL_FROM_COMPARISON_OPERATORS(double,Rel5(Op,T1,T2,T3,T4,T5))
+REL_FROM_ARITH_OPERATORS(double,Rel5(Op,T1,T2,T3,T4,T5))
+REL_FROM_COMPARISON_OPERATORS(float,Rel5(Op,T1,T2,T3,T4,T5))
+REL_FROM_ARITH_OPERATORS(float,Rel5(Op,T1,T2,T3,T4,T5))
+REL_FROM_BINARY_OPERATORS(bool,Rel5(Op,T1,T2,T3,T4,T5))
 
 } // Casper
   

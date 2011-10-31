@@ -41,13 +41,18 @@
 // tmp
 #include <casper/cp/scheduler.h>
 
+// required forward declarations
+namespace Casper {
+namespace CP {
+template<FD_TP_SPEC(1)> class FD;
+}
+}
+
+template<FD_TP_SPEC(1)> std::ostream& operator<<(std::ostream& os, const Casper::CP::FD<FD_TP_LIST(1)>& f);
 
 namespace Casper {
 namespace CP {
 
-// required forward declarations
-template<FD_TP_SPEC(1)> class FD;
-template<FD_TP_SPEC(1)> std::ostream& operator<<(std::ostream& os, const FD<FD_TP_LIST(1)>& f);
 template<class Container1,class Element,class T1, class Container2,class T2>
 bool isEqual(const FD<Container1,Element,T1>&,const FD<Container2,Element,T2>&);
 
@@ -661,114 +666,6 @@ struct EraseInterval<FD<FD_TP_LIST(1)> >
 };
 
 
-template<FD_TP_SPEC(1)>
-std::ostream& operator<<(std::ostream& os, const FD<FD_TP_LIST(1)>& f)
-{
-	typedef typename FD<FD_TP_LIST(1)>::ConstIterator ConstIterator;
-	if (f.empty() == 1)	// no elements
-		os << "{}";
-	else
-	if (f.size() == 1)	// one element
-		os << *f.begin();
-	else
-	{
-		ConstIterator itprev = f.begin();
-		ConstIterator it1 = f.begin();
-		++it1;
-		while (it1 != f.end())
-		{
-			if (*it1 != *itprev+1)
-				break;
-			++it1; ++itprev;
-		}
-		if 	(it1 == f.end())	// one range
-			os << "[" << *f.begin() << ".." << *itprev << "]";
-		else
-		{
-			ConstIterator rangeStart = f.begin();
-			itprev = f.begin();
-			it1 = f.begin();
-			++it1;
-			os << "{" << *itprev;
-			while (it1 != f.end())
-			{
-				if (*it1 != *itprev+1)
-				{
-					if (rangeStart != itprev)
-						os << ".." << *itprev;
-					os << "," << *it1;
-					rangeStart = it1;
-				}
-				++it1; ++itprev;
-			}
-			if (rangeStart != itprev)
-				os << ".." << *itprev;
-			os << "}";
-		}
-	}
-	//os << (typename FD<FD_TP_LIST(1)>::Super&)f;
-	return os;
-}
-
-template<FD_TP_SPEC(1)>
-std::istream& operator>>(std::istream& is, FD<FD_TP_LIST(1)>& f)
-{
-	using namespace std;
-	typedef FD<FD_TP_LIST(1)> Dom;
-	typedef typename Dom::Value	Value;
-	is >> ws;
-	char c = is.peek();
-
-	if (c == '[')	// read range
-	{
-		is.get(c);
-		Value start,end;
-		char dot1,dot2;
-		is >> ws >> start >> ws >> dot1 >> dot2 >> ws >> end;
-		f.updateMin(start);
-		f.updateMax(end);
-		is >> ws;
-		is.get(c);
-		assert(c == ']');
-	}
-	else
-	if (c == '{')	// read value list
-	{
-		is.get(c);
-		typename Dom::Iterator it = f.begin();
-		Value value;
-		char sep = 0;
-		while (sep != '}' && it != f.end())
-		{
-			is >> ws >> value >> ws >> sep >> ws;
-			typename Dom::Iterator it2 = f.lowerBound(value);
-			if (it2 != it)
-				f.erase(it,it2);
-			if (sep == '.')	// if reading a range
-			{
-				is >> sep >> ws >> value;
-				assert(sep == '.');
-				it = f.upperBound(value);
-				is >> ws >> sep;
-			}
-			else
-			{
-				it = it2;
-				++it;
-			}
-		}
-		if (f.max() > value)
-			f.updateMax(value);
-	}
-	else	// c must be a number
-	{
-		Value value;
-		is >> value;
-		f.updateMax(value);
-		f.updateMin(value);
-	}
-	return is;
-}
 
 /**
 	FD specialization for BitsetA
@@ -896,6 +793,116 @@ struct GetEval<Casper::CP::FD<C,E,T> >
 }
 
 } // Casper
+
+
+template<FD_TP_SPEC(1)>
+std::ostream& operator<<(std::ostream& os, const Casper::CP::FD<FD_TP_LIST(1)>& f)
+{
+	typedef typename Casper::CP::FD<FD_TP_LIST(1)>::ConstIterator ConstIterator;
+	if (f.empty() == 1)	// no elements
+		os << "{}";
+	else
+	if (f.size() == 1)	// one element
+		os << *f.begin();
+	else
+	{
+		ConstIterator itprev = f.begin();
+		ConstIterator it1 = f.begin();
+		++it1;
+		while (it1 != f.end())
+		{
+			if (*it1 != *itprev+1)
+				break;
+			++it1; ++itprev;
+		}
+		if 	(it1 == f.end())	// one range
+			os << "[" << *f.begin() << ".." << *itprev << "]";
+		else
+		{
+			ConstIterator rangeStart = f.begin();
+			itprev = f.begin();
+			it1 = f.begin();
+			++it1;
+			os << "{" << *itprev;
+			while (it1 != f.end())
+			{
+				if (*it1 != *itprev+1)
+				{
+					if (rangeStart != itprev)
+						os << ".." << *itprev;
+					os << "," << *it1;
+					rangeStart = it1;
+				}
+				++it1; ++itprev;
+			}
+			if (rangeStart != itprev)
+				os << ".." << *itprev;
+			os << "}";
+		}
+	}
+	//os << (typename FD<FD_TP_LIST(1)>::Super&)f;
+	return os;
+}
+
+template<FD_TP_SPEC(1)>
+std::istream& operator>>(std::istream& is, Casper::CP::FD<FD_TP_LIST(1)>& f)
+{
+	using namespace std;
+	typedef Casper::CP::FD<FD_TP_LIST(1)> Dom;
+	typedef typename Dom::Value	Value;
+	is >> ws;
+	char c = is.peek();
+
+	if (c == '[')	// read range
+	{
+		is.get(c);
+		Value start,end;
+		char dot1,dot2;
+		is >> ws >> start >> ws >> dot1 >> dot2 >> ws >> end;
+		f.updateMin(start);
+		f.updateMax(end);
+		is >> ws;
+		is.get(c);
+		assert(c == ']');
+	}
+	else
+	if (c == '{')	// read value list
+	{
+		is.get(c);
+		typename Dom::Iterator it = f.begin();
+		Value value;
+		char sep = 0;
+		while (sep != '}' && it != f.end())
+		{
+			is >> ws >> value >> ws >> sep >> ws;
+			typename Dom::Iterator it2 = f.lowerBound(value);
+			if (it2 != it)
+				f.erase(it,it2);
+			if (sep == '.')	// if reading a range
+			{
+				is >> sep >> ws >> value;
+				assert(sep == '.');
+				it = f.upperBound(value);
+				is >> ws >> sep;
+			}
+			else
+			{
+				it = it2;
+				++it;
+			}
+		}
+		if (f.max() > value)
+			f.updateMax(value);
+	}
+	else	// c must be a number
+	{
+		Value value;
+		is >> value;
+		f.updateMax(value);
+		f.updateMin(value);
+	}
+	return is;
+}
 
 #endif
 

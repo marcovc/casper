@@ -1095,7 +1095,7 @@ IterationView<typename SetFD<T>::Poss> makePossIt(SetFD<T>& s)
 {	return makeIt(s.poss()); }
 
 template<class T>
-Util::UnionItView<IterationView<typename SetFD<T>::In>,
+UnionItView<IterationView<typename SetFD<T>::In>,
 				  IterationView<typename SetFD<T>::Poss> > makeLUBIt(SetFD<T>& s)
 {	return makeUnionIt(makeIt(s.in()),makeIt(s.poss())); }
 

@@ -976,45 +976,6 @@ void IntervalA<T,Container,Compare>::
 	}
 }
 
-/**
-	Writes the contents of the IntervalA to an ostream.
-*/
-template<class T, class Container, class Compare>
-std::ostream& operator<<(std::ostream& o,
-					const IntervalA<T,Container,Compare>& a)
-{
-	o << "{";
-	if (a.size()==1)
-		o << *a.begin();
-	else
-	for (typename IntervalA<T,Container,Compare>::
-		 DataT::Iterator it = a.data.begin();
-		 it != a.data.end();
-		 ++it)
-	{
-		o << "[";
-		if (it->min() == limits<T>::min())
-			o << "inf";
-		else
-		if (it->min() == limits<T>::max())
-			o << "sup";
-		else
-			o << it->min();
-		o << "..";
-		if (it->max() == limits<T>::min())
-			o << "inf";
-		else
-		if (it->max() == limits<T>::max())
-			o << "sup";
-		else
-			o << it->max();
-		o << "]";
-	}
-	//o << "},#" << (long long)a.size();
-	o << "}";
-	return o;
-}
-
 
 /**
 	Tests if the IntervalA internal representation is correct.
@@ -1045,6 +1006,46 @@ bool IntervalA<T,Container,Compare>::
 
 } // Detail
 } // Casper
+
+
+/**
+	Writes the contents of the IntervalA to an ostream.
+*/
+template<class T, class Container, class Compare>
+std::ostream& operator<<(std::ostream& o,
+					const Casper::Detail::IntervalA<T,Container,Compare>& a)
+{
+	o << "{";
+	if (a.size()==1)
+		o << *a.begin();
+	else
+	for (typename Casper::Detail::IntervalA<T,Container,Compare>::
+		 DataT::Iterator it = a.data.begin();
+		 it != a.data.end();
+		 ++it)
+	{
+		o << "[";
+		if (it->min() == Casper::limits<T>::min())
+			o << "inf";
+		else
+		if (it->min() == Casper::limits<T>::max())
+			o << "sup";
+		else
+			o << it->min();
+		o << "..";
+		if (it->max() == Casper::limits<T>::min())
+			o << "inf";
+		else
+		if (it->max() == Casper::limits<T>::max())
+			o << "sup";
+		else
+			o << it->max();
+		o << "]";
+	}
+	//o << "},#" << (long long)a.size();
+	o << "}";
+	return o;
+}
 
 #endif // _H_CASPER_KERNEL_CONTAINER_INTERVALA
 

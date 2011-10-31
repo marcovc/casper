@@ -113,7 +113,7 @@ struct NoBndView
 	NoBndView(Store& s,const R& r)
 	{
 		std::ostringstream os;
-		::operator<<(os,r);
+		os << r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::BndView");
 	}
 	Eval min() const { assert(0); }

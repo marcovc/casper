@@ -9,7 +9,6 @@
 %import <kernel.i>
 %import <util.i>
 
-
 // Var
 %ignore Casper::CP::Var::domain;
 %ignore Casper::CP::Var::pDomain;

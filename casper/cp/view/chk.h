@@ -42,6 +42,8 @@ struct NoChkView
 	{	return true;	}
 	bool setToFalse()
 	{	return true;	}
+	void attach(INotifiable*)	{}
+	void detach(INotifiable*)	{}
 };
 
 template<class View>

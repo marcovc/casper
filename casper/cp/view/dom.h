@@ -92,32 +92,6 @@ struct DomView<Eval,Var<Eval,DomT>,DomT>
 	Dom&	d;
 };
 
-#if 0
-/**
- * 	Identity: DomView over a DomView.
- *  \ingroup Views
- **/
-template<class Eval,class View, class DomT>
-struct DomView<Eval,DomView<Eval,View,DomT>,DomT> : IDomExpr<DomT>
-{
-	typedef	DomT		Dom;
-	typedef IDomExpr<Dom>	Super;
-	DomView(CPSolver& solver, const DomView<Eval,View,DomT>& v) :
-		Super(solver),d(*v) {}
-	DomView(CPSolver& solver, Dom& d) : Super(solver),d(d) {}
-
-	Dom*	operator->()			{	return &d;	}
-	Dom*	operator->() const	{	return const_cast<Dom*>(&d);	}
-	Dom&	operator*()				{	return d;	}
-	Dom&	operator*() const	{	return const_cast<Dom&>(d);	}
-
-	DomView<Eval,View,DomT> getObj() const
-	{	return DomView<Eval,View,DomT>(this->solver(),d);	}
-
-	Dom&	d;
-};
-#endif
-
 /*
  * 	DomView over a DomExpr.
  *  \ingroup Views
@@ -144,7 +118,6 @@ struct DomView<Eval,DomExpr<Eval,DomT>,DomT>
 	Store&	store;
 	Dom&	d;
 };
-
 
 namespace Traits {
 template<class Eval,class View,class DomT>

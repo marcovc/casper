@@ -2,6 +2,7 @@
 %import "swigutil.i"
 
 %module kernel 
+%feature("autodoc", "1");
 %{
 #include <casper/kernel.h>
 %}
@@ -10,12 +11,12 @@
 %import <casper/kernel/common.h>
 %import <casper/kernel/traits.h>
 
-%include <kernel/goal.i>
-%include <kernel/explorer.i>
-
 // State [hidden?]
 %ignore Casper::State::operator Util::IHeap&;
 %ignore Casper::State::operator const Util::IHeap&;
 %import <casper/kernel/state/state.h>
 
 %include <kernel/expr.i>
+
+%include <kernel/goal.i>
+%include <kernel/explorer.i>

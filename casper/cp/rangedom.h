@@ -226,11 +226,6 @@ bool RangeDom<T>::triggerAfterUpdate()
 	return (boundsSL.notifyAll() && !empty());
 }
 
-// printing RangeDom
-template<class T>
-std::ostream& operator<<(std::ostream& os,
-						 const Casper::CP::RangeDom<T>& i)
-{	return Casper::Util::RangePrinter<T,Casper::CP::RangeDom<T> >()(os,i);	}
 
 namespace Traits {
 template<class T>
@@ -370,5 +365,12 @@ struct BndView<Eval1,Var<Eval2,RangeDom<Eval2> > >
 
 } // CP
 } // Casper
+
+// printing RangeDom
+template<class T>
+std::ostream& operator<<(std::ostream& os,
+						 const Casper::CP::RangeDom<T>& i)
+{	return Casper::Util::RangePrinter<T,Casper::CP::RangeDom<T> >()(os,i);	}
+
 
 #endif /*_H_CASPER_REAL_INTERVAL */

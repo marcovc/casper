@@ -529,7 +529,7 @@ struct GetEval<Rel2<XOr,T1,T2> >
 
 template<class T1,class T2,class T3>
 struct GetEval<Rel3<SumProductEqual,T1,T2,T3> >
-{	typedef typename Traits::GetEval<T2>::Type Type;	};
+{	typedef bool Type;	};
 
 template<class T1,class T2>
 struct GetEval<Rel2<IfThen,T1,T2> >
@@ -590,6 +590,9 @@ template<class T1,class T2>
 struct GetEval<Rel2<SumProduct,T1,T2> >
 {	typedef	typename Traits::GetEval<typename Traits::GetTermElem<T2>::Type>::Type	Type;	};
 
+template<class T1,class T2,class T3,class T4,class T5>
+struct GetEval<Rel5<Cumulative,T1,T2,T3,T4,T5> >
+{	typedef	bool Type;	};
 
 template<class Expr1,class Expr2,class Expr3,class Expr4>
 struct GetElem<Rel4<All,Expr1,Expr2,Expr3,Expr4> >

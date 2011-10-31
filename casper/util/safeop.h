@@ -179,6 +179,11 @@ struct rounded_arith_integer : Rounding
   T int_up  (const T& x) { return x; }
   T pow_up  (const T& x, const T& y) { return std::pow(x,y); }
   T pow_down  (const T& x, const T& y) { return std::pow(x,y); }
+  T exp_up  (const T& x) { return std::exp(x); }
+  T exp_down  (const T& x) { return std::exp(x); }
+  T log_up  (const T& x) { return std::log(x); }
+  T log_down  (const T& x) { return std::log(x); }
+
 # undef BOOST_DN
 # undef BOOST_NR
 # undef BOOST_UP

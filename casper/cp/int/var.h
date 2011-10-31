@@ -28,6 +28,9 @@
 #include <iostream>
 
 namespace Casper {
+
+template<class> struct Expr;
+
 namespace CP {
 
 #ifndef SWIG
@@ -51,6 +54,8 @@ struct VarDomCreator<FD<FD_TP_LIST(1)> >
 	// returned domain is the union of all domains in the array
 	template<class View>
 	FD<FD_TP_LIST(1)>* unionOf(Store& store, const View& v);
+
+	FD<FD_TP_LIST(1)>* operator()(Store& store,const Expr<T1>& l);
 };
 
 template<FD_TP_SPEC(1)>
@@ -145,6 +150,8 @@ struct VarDomCreator<BD>
 		return ret;
 	}
 
+	BD* operator()(Store& store,const Expr<bool>& l);
+
 	// returned domain is the union of all domains in the array
 	template<class View>
 	BD* unionOf(Store& store, const View& v);
@@ -174,17 +181,6 @@ BD* VarDomCreator<BD>::unionOf(Store& store, const View& v)
 }; // CP::Detail
 
 
-template<FD_TP_SPEC(1)>
-std::ostream& operator<<(std::ostream& os,
-					const Casper::CP::Var<T1,Casper::CP::FD<FD_TP_LIST(1)> >& v)
-{
-	os << v.domain()
-	#if FD_SHOW_CARD
-	   << ",#" << (long long)v.domain().size()
-	#endif
-	   ;
-	return os;
-}
 
 #endif
 
@@ -212,6 +208,19 @@ typedef Casper::CP::VarArray<bool,4> BoolVarArray4;
 
 } // CP
 } // Casper
+
+template<FD_TP_SPEC(1)>
+std::ostream& operator<<(std::ostream& os,
+					const Casper::CP::Var<T1,Casper::CP::FD<FD_TP_LIST(1)> >& v)
+{
+	os << v.domain()
+	#if FD_SHOW_CARD
+	   << ",#" << (long long)v.domain().size()
+	#endif
+	   ;
+	return os;
+}
+
 
 #endif // _H_CASPER_CP_INT_VAR
 

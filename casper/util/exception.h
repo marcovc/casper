@@ -81,7 +81,7 @@ struct UndefinedView: std::runtime_error
 
 struct TypeCoercion: std::runtime_error
 {
-	TypeCoercion(std::string from,std::string to) : std::runtime_error(
+	TypeCoercion(std::string from, std::string to) : std::runtime_error(
 			std::string("cannot coerce type ")+from+
 			std::string(" to type ")+to)
 	{}

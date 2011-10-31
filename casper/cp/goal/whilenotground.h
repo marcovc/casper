@@ -39,21 +39,20 @@ struct GetEval<Rel2<WhileNotGround,T1,T2> >
  * 	While \a vars are not ground, executes \a statm.
  * 	\ingroup CPSearch
  */
-template<class T,class Vars,class Statm>
-struct GoalView2<WhileNotGround,Seq<T>,Vars,bool,Statm> : IGoal
+template<class T,class Eval,int dims,class Statm>
+struct GoalView2<WhileNotGround,Seq<T>,CP::VarArray<Eval,dims>,bool,Statm> : IGoal
 {
-	GoalView2(State& state, const Vars& vars,const Statm& statm) :
-		store(vars.getStore()),vars(store,vars), statm(statm){}
+	GoalView2(State& state, const CP::VarArray<Eval,dims>& vars,const Statm& statm) :
+		state(state),vars(vars), statm(statm){}
     Goal execute()
 	{
-    	for (uint i = 0; i < vars.size(); ++i)
-    		if (!vars[i].ground())
-    			return Goal(store, Goal(store,statm) and Goal(this));
+    	if (!vars.ground())
+    		return Goal(state, Goal(state,statm) and Goal(this));
 		return succeed();
 	}
-    CP::Store& 		store;
-	CP::ValArrayView<T,Vars> 	vars;
-	Statm 		statm;
+    State& 						state;
+    CP::VarArray<Eval,dims> 	vars;
+	Statm 						statm;
 };
 
 namespace Detail {

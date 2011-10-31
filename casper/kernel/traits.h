@@ -34,14 +34,14 @@ template<class> struct StdVector;
 template<class> struct StdList;
 template<class> struct StdSList;
 template<class> struct StdRange;
+}
+
+template<class> struct IterationView;
 template<class,class> struct PredItView;
 template<class,class> struct UnionItView;
 template<class,class> struct InterItView;
 template<class,class> struct DiffItView;
 template<class,class> struct SymDiffItView;
-}
-
-template<class> struct IterationView;
 
 namespace Traits {
 
@@ -163,23 +163,23 @@ struct GetElem<IterationView<T> >
 {	typedef typename Traits::GetElem<T>::Type	Type; };
 
 template<class T1,class T2>
-struct GetElem<Util::PredItView<T1,T2> >
+struct GetElem<PredItView<T1,T2> >
 { typedef typename Traits::GetElem<T1>::Type	Type; };
 
 template<class T1,class T2>
-struct GetElem<Util::UnionItView<T1,T2> >
+struct GetElem<UnionItView<T1,T2> >
 {	typedef typename Traits::GetElem<T1>::Type	Type; };
 
 template<class T1,class T2>
-struct GetElem<Util::InterItView<T1,T2> >
+struct GetElem<InterItView<T1,T2> >
 {	typedef typename Traits::GetElem<T1>::Type	Type; };
 
 template<class T1,class T2>
-struct GetElem<Util::DiffItView<T1,T2> >
+struct GetElem<DiffItView<T1,T2> >
 {	typedef typename Traits::GetElem<T1>::Type	Type; };
 
 template<class T1,class T2>
-struct GetElem<Util::SymDiffItView<T1,T2> >
+struct GetElem<SymDiffItView<T1,T2> >
 {	typedef typename Traits::GetElem<T1>::Type	Type; };
 
 #ifndef _MSC_VER
@@ -219,23 +219,23 @@ struct GetTermElem<IterationView<T> >
 {	typedef typename Traits::GetTermElem<T>::Type	Type; };
 
 template<class T1,class T2>
-struct GetTermElem<Util::PredItView<T1,T2> >
+struct GetTermElem<PredItView<T1,T2> >
 { typedef typename Traits::GetTermElem<T1>::Type	Type; };
 
 template<class T1,class T2>
-struct GetTermElem<Util::UnionItView<T1,T2> >
+struct GetTermElem<UnionItView<T1,T2> >
 {	typedef typename Traits::GetTermElem<T1>::Type	Type; };
 
 template<class T1,class T2>
-struct GetTermElem<Util::InterItView<T1,T2> >
+struct GetTermElem<InterItView<T1,T2> >
 {	typedef typename Traits::GetTermElem<T1>::Type	Type; };
 
 template<class T1,class T2>
-struct GetTermElem<Util::DiffItView<T1,T2> >
+struct GetTermElem<DiffItView<T1,T2> >
 {	typedef typename Traits::GetTermElem<T1>::Type	Type; };
 
 template<class T1,class T2>
-struct GetTermElem<Util::SymDiffItView<T1,T2> >
+struct GetTermElem<SymDiffItView<T1,T2> >
 {	typedef typename Traits::GetTermElem<T1>::Type	Type; };
 
 #ifndef _MSC_VER
