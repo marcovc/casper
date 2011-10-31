@@ -685,7 +685,7 @@ pycasper_target_libs = confCommonEnv['LIBS']+[libcasper]
 
 def compile_pycasper_module(iface):
 	pycasper_obj = env.SharedObject(env['PREFIX']+"/bindings/python/"+iface+".i",
-									 CCFLAGS=' -fPIC -Wall -std=c++0x -DSWIG_BUILD -g3',
+									 CCFLAGS=env['CCFLAGS']+['-fPIC','-DSWIG_BUILD'],
 									 CPPPATH=['#.','/usr/include/python2.7'],
 									 SWIGFLAGS = '-c++ -python -I. -Ibindings/python -Wall -outdir '+env['PREFIX']+"/bindings/python/casper")
 	return env.SharedLibrary(target=env['PREFIX']+'/bindings/python/casper/'+iface,
