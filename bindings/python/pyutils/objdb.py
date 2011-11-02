@@ -248,9 +248,9 @@ def printUnaryOperator(func,ev,arg1):
 def printBinaryOperator(func,ev,arg1,arg2,reverse=False):
 	print "Casper::Expr<"+ev+">"
 	if not reverse:
-		print  "__"+casperOp2PythonOp[(func,2)]+"__(const "+arg2+"& v)"
+		print  "__"+casperOp2PythonOp[(func,2)]+"__("+arg2+" const& v)"
 	else:
-		print  "__r"+casperOp2PythonOp[(func,2)]+"__(const "+arg2+"& v)"
+		print  "__r"+casperOp2PythonOp[(func,2)]+"__("+arg2+" const& v)"
 	print "{"
 	if not reverse:	
 		print "\tCasper::Rel2<Casper::"+func+","+arg1+","+arg2+"> r(*$self,v);"
@@ -308,10 +308,17 @@ def printExprOperators(arg1,ev1):
 
 
 def printPredicate(func,ev,argevs):
+
+#	print "%template("+casperFn2PythonFn(func)+") Casper::"+func[0].lower()+func[1:]+"<",
+#	print "Casper::Expr<"+argevs[0]+">",
+#	for i in range(1,len(argevs)):
+#		print  ",Casper::Expr<"+argevs[i]+">",
+#	print ">;"
+	
 	print "Casper::Expr<"+ev+">"
-	print casperFn2PythonFn(func)+"(const Casper::Expr<"+argevs[0]+">& a0",
+	print casperFn2PythonFn(func)+"(Casper::Expr<"+argevs[0]+"> const& a0",
 	for i in range(1,len(argevs)):
-		print  ",const Casper::Expr<"+argevs[i]+">& a"+str(i),
+		print  ",Casper::Expr<"+argevs[i]+"> const& a"+str(i),
 	print ")"
 	print "{"
 	print "\treturn Casper::rel<Casper::"+func+">(a0",

@@ -7,15 +7,10 @@ sys.path.append(libPath)
 
 import objdb
 
-obj = "Casper::Expr<bool>"
-ev = "bool"
-
 print "%module kernel"
 print "%import <kernel/expr.i>" 
 print "%inline %{"
-
-print "namespace PythonPreds {"
+print "namespace CasperPreds {"
 objdb.printExprPredicates()
 print "}"
-
 print "%}"

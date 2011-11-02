@@ -146,10 +146,12 @@ struct Store : INotifiable
 	/// Returns whether filter weighting is enabled.
 	bool getFilterWeighting() const;
 
+#ifndef SWIG
 	/// Add a new filter to the store.
 	bool post(const Filter&);
 	bool post(IFilter*);
 	bool post(const BndExpr<bool>& b);
+#endif
 
 #ifndef _MSC_VER
 

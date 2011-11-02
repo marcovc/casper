@@ -144,6 +144,9 @@ struct Expr : Casper::Util::SPImplIdiom<Detail::IExpr<Eval> >
 	template<class T>
 	Expr(const T& t) : Super(new Detail::ExprWrapper<Eval,T>(t)) {}
 
+	Expr(Expr* t) : Super(*t)
+	{	assert(0); }
+
 	Expr(const Expr& expr) : Super(expr) {}
 
 #ifndef SWIG
@@ -199,14 +202,13 @@ struct Expr<bool> : Casper::Util::SPImplIdiom<Detail::IExpr<bool> >
 	~Expr() {}
 };
 
-
 template<class Eval>
-struct Expr<Seq<Eval> > : Casper::Util::SPImplIdiom<Detail::IExpr<Seq<Eval> > >
+struct Expr<Casper::Seq<Eval> > : Casper::Util::SPImplIdiom<Detail::IExpr<Casper::Seq<Eval> > >
 {
-	typedef Casper::Util::SPImplIdiom<Detail::IExpr<Seq<Eval> > > Super;
+	typedef Casper::Util::SPImplIdiom<Detail::IExpr<Casper::Seq<Eval> > > Super;
 
 	template<class T>
-	Expr(const T& t) : Super(new Detail::ExprWrapper<Seq<Eval>,T>(t)) {}
+	Expr(const T& t) : Super(new Detail::ExprWrapper<Casper::Seq<Eval>,T>(t)) {}
 
 	Expr(const Expr& expr) : Super(expr) {}
 
@@ -231,6 +233,7 @@ struct Expr<Seq<Eval> > : Casper::Util::SPImplIdiom<Detail::IExpr<Seq<Eval> > >
 	// SWIG needs this
 	~Expr() {}
 };
+
 
 namespace Traits {
 template<class Eval>

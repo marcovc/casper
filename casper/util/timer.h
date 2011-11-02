@@ -81,7 +81,7 @@ struct WallTimer : ITimer
 } // Casper
 
 
-#if defined(CASPER_NO_RT) and defined(__MACH__) 	// FIXME: not all compilers support this
+#if defined(CASPER_NO_RT) && defined(__MACH__)  	// FIXME: not all compilers support this
 
 #include <mach/mach_time.h>
 #include <sys/time.h>
@@ -122,7 +122,7 @@ static inline int clock_gettime(int, struct timespec *tp)
 
 #endif
 
-#if defined(CASPER_NO_RT) and defined(_WIN32)	// FIXME: not all compilers support this
+#if defined(CASPER_NO_RT) && defined(_WIN32)	// FIXME: not all compilers support this
 
 
 #include <tchar.h>

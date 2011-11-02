@@ -8,3 +8,5 @@
 
 // Env [TODO]
 %import <casper/kernel/state/env.h>
+
+%include <casper/kernel/state/state.h>

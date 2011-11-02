@@ -20,3 +20,4 @@
 
 %include <kernel/goal.i>
 %include <kernel/explorer.i>
+%include <kernel/env.i>
