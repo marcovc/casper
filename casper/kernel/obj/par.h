@@ -17,20 +17,48 @@
  \*************************************************************************/
  
 
+#ifndef CASPER_KERNEL_OBJ_PAR_H_
+#define CASPER_KERNEL_OBJ_PAR_H_
 
-#include <casper/kernel.h>
-#include <casper/cp.h>
 #include <casper/kernel/obj/expr.h>
 
-using namespace Casper;
-using namespace std;
+namespace Casper {
+namespace Detail {
 
-int main()
+template<class T,class Eval>
+struct Create<T,Par<Eval> >
 {
-	CP::Solver solver;
-	IntPar i (solver);
-	Expr<int> ei(i);
-	Expr<bool> g = assign(ei,3);
-	cout << solver.solve(g) << endl;
-	cout << i << endl;
+	Par<Eval> operator()(State& state, const T& t)
+	{	return Par<Eval>(state,t);	}
+};
+
+} // Detail
+
+template<class Eval>
+struct ParView<Eval,Expr<Eval> > : IPar<Eval>
+{
+	ParView(State& state, const Expr<Eval>& e) :
+		par(e.toPar(state)),expr(e) {}
+	const Expr<Eval>& getObj() const {	return expr; }
+	Eval value() const { return par.value(); }
+	void setValue(const Eval& v)	{	par.setValue(v);	}
+	Par<Eval> par;
+	Expr<Eval> expr;
+};
+
+// Extracts a given element of any array type
+template<class Eval>
+struct ParArrayView<Expr<Seq<Eval> > >
+{
+	typedef Expr<Eval>	Elem;
+	ParArrayView(State& s,const Expr<Seq<Eval> >& e) : a(e.toStdArray()) {}
+	Elem& operator[](int idx)
+	{	return a[idx];	}
+	const Elem& operator[](int idx) const
+	{	return a[idx];	}
+	Util::StdArray<Expr<Eval> > a;
+};
+
 }
+
+#endif /* CASPER_KERNEL_OBJ_PAR_H_ */

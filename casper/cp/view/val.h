@@ -25,79 +25,6 @@
 namespace Casper {
 namespace CP {
 
-#if 0
-// converts a view to a checkview
-template<class Eval,class View>
-struct ValChkViewWrapper;
-
-template<class> struct CChkView;
-template<class> struct ChkView;
-
-template<class View>
-struct ValChkViewWrapper<bool,View>
-{
-	ValChkViewWrapper(Store& store,const View& v) :
-		v(store,v) {}
-	bool value() const { assert(ground()); return v.isTrue(); }
-	bool setValue(const bool& val) { return val?v.setToTrue():v.setToFalse();	}
-	bool ground() const { return v.isTrue() or !v.canBeTrue(); }
-	void attach(INotifiable* f) { v.attach(f); }
-	void detach(INotifiable* f) { v.detach(f); }
-	View getObj()  const { return v.getObj(); }
-
-	CChkView<View>	v;
-};
-
-
-/********************
- * Value View
- *********************/
-
-template<class Eval,class View>
-struct ValView;
-
-/**
- * 	ValView over a generic view. View must be convertible to Eval.
- * 	\ingroup ValViews
- **/
-
-template<class Eval,class View>
-struct ValView : ValChkViewWrapper<Eval,View>
-{
-	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
-
-	ValView(Store& store, const View& v) :
-		ValChkViewWrapper<Eval,View>(store,v) {}
-};
-
-
-template<class F,class Expr1,class Eval>
-struct ValViewRel1 : ValChkViewWrapper<Eval,Rel1<F,Expr1> >
-{
-	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
-
-	ValViewRel1(Store& store, const Expr1& v) :
-		ValChkViewWrapper<Eval,Rel1<F,Expr1> >(store,rel<F>(v)) {}
-};
-
-template<class F,class Expr1,class Expr2,class Eval>
-struct ValViewRel2 : ValChkViewWrapper<Eval,Rel2<F,Expr1,Expr2> >
-{
-	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
-
-	ValViewRel2(Store& store, const Expr1& v1, const Expr2& v2) :
-		ValChkViewWrapper<Eval,Rel2<F,Expr1,Expr2> >(store,rel<F>(v1,v2)) {}
-};
-
-template<class F,class Expr1,class Expr2,class Expr3,class Eval>
-struct ValViewRel3 : ValChkViewWrapper<Eval,Rel3<F,Expr1,Expr2,Expr3> >
-{
-	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
-
-	ValViewRel3(Store& store, const Expr1& v1, const Expr2& v2,const Expr3& v3) :
-		ValChkViewWrapper<Eval,Rel3<F,Expr1,Expr2,Expr3> >(store,rel<F>(v1,v2,v3)) {}
-};
-#else
 
 /********************
  * Value View
@@ -173,7 +100,6 @@ struct ValViewRel3 :  NoValView<Eval,Rel3<F,Expr1,Expr2,Expr3> >
 		NoValView<Eval,Rel3<F,Expr1,Expr2,Expr3> >(s,rel<F>(v1,v2,v3)) {}
 };
 
-#endif
 
 /**
  * 	ValView over a literal.

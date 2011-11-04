@@ -139,6 +139,10 @@ objs.add(Rule(type="tRel",func="SumProduct",ev="int",nArgs=2,arg1Eval="Casper::I
 objs.add(Rule(type="tRel",func="Element",ev="int",nArgs=2,arg1Eval="Casper::IntSeq",arg2Eval="int"))
 
 
+## Goals ##
+for t in ["bool","int"]:
+	objs.add(Rule(type="tRel",func="Assign",ev="bool",nArgs=2,arg1Eval=t,arg2Eval=t))
+
 # TODO later
 #				"fWhileNotGround",
 #				"fIfThen","fIfThenElse","fInRange",

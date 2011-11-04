@@ -136,16 +136,20 @@ struct State
 	 */
 	Util::IHeap& getCPHeap() {	return *cpHeap;	}
 
+#ifndef SWIG
 	/**
 	 * 	Records a new function object \a u in the trail. This function will be
 	 *	called when restoring the last inserted check point.
 	 */
 	void record(PTrailAgent u) { trail.record(u); }
+#endif
 
 	/// Returns state statistics
 	StateStats&	getStats() {	return stats; }
 	/// Returns state statistics
 	const StateStats&	getStats() const {	return stats; }
+
+	protected:
 
 	Util::IHeap*					glbHeap; 	// global heap
 	Util::IHeap*					cpHeap;		// checkpoint heap

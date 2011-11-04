@@ -7,61 +7,40 @@ n = 4
 
 solver = Solver()
 
-vars = IntVarArray(solver,n,1,n)
-
-solver.post(distinct(vars))
-solver.post(distinct([vars[i]+i for i in range(0,n)]))
-solver.post(distinct([vars[i]-i for i in range(0,n)]))
-
-found = solver.solve(label(solver,vars,SelectVarMinDom,SelectValsRand));
-
-while found:
-    print vars
-    found = solver.next()
-    
-print solver.getStats()
-print solver.getCPUTimer()
-
-solver.post(distinct(aggregate(i,range(1,10)) (vars[i]+i)))
-
-#class Fail(Exception):
-#    def __str__(self):
-#        return "Fail"
+#vars = IntVarArray(solver,n,1,n)
+#
+#solver.post(distinct(vars))
+#solver.post(distinct([vars[i]+i for i in range(0,n)]))
+#solver.post(distinct([vars[i]-i for i in range(0,n)]))
+#
+#found = solver.solve(label(solver,vars,selectVarMinDom(solver,vars),selectValsRand(solver,vars)));
+#
+#while found:
+#    print vars
+#    found = solver.next()
 #    
-#def succeed():
-#    return True
-#def fail():
-#    return False
-#
-#class display:
-#    def __init__(self,stri):
-#        self.stri = str(stri)
-#    def __call__(self):
-#        print self.stri
-#        return True
-#
-#def forall(iterable):
-#    print "here"
-#    try:
-#        b = iterable.next()
-#    except StopIteration:
-#        return True
-#    for g in b:
-#        g()
-#        print iterable
-#        forall(iterable)
-    
+#print solver.getStats()
+#print solver.getCPUTimer()
 
-#def branch(iterable):
-#    for g in iterable:
-#        print g
-#        yield g
-# 
-#        
-#            
-#for i in forall(branch(display((v,x)) for v in range(1,3)) for x in [-1,1]):
-#    print i
+p = IntPar(solver.getState(),lambda:8)
+e = IntExpr(lambda:8)
+print e
+print "bla"
+#d = IntPar(lambda:8)
 
-#for i in tryall(display(v) for v in range(1,3))():
-#    print i
+#print f
+#print gg
+#found = solver.solve(assign(p,2) | assign(p,lambda:8))
 
+#while found:
+#    print p
+#    found = solver.next()
+
+#i << lambda:min(j for j in range(1,3)))
+#j << 
+#solver.post(distinct(aggregate(i,range(1,10)) (vars[i]+i)))
+
+
+
+        
+             

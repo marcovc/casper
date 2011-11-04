@@ -104,7 +104,7 @@ void Driver::updateObjectiveCoeff(uint idx, double coef)
 	const double oldCoef = glp_get_obj_coef(static_cast<glp_prob*>(glpProb),idx);
 	if (coef == oldCoef)
 		return;
-	state.trail.record(new (state) UndoUpdateObjectiveCoef(*this,idx,oldCoef));
+	state.record(new (state) UndoUpdateObjectiveCoef(*this,idx,oldCoef));
 
 	// change current value
 	setObjectiveCoeff(idx,coef);
@@ -129,14 +129,14 @@ void Driver::updateObjectiveDir(bool upDir)
 		if (oldDir == GLP_MAX)
 			return;
 		// store undo information
-		state.trail.record(new (state) UndoSetObjectiveDir(*this,GLP_MIN));
+		state.record(new (state) UndoSetObjectiveDir(*this,GLP_MIN));
 	}
 	else
 	{
 		if (oldDir == GLP_MIN)
 			return;
 		// store undo information
-		state.trail.record(new (state) UndoSetObjectiveDir(*this,GLP_MAX));
+		state.record(new (state) UndoSetObjectiveDir(*this,GLP_MAX));
 	}
 
 	// perform the update
@@ -184,7 +184,7 @@ uint Driver::addConstraint(const Idxs& idxs,
 	uint rowId = glp_add_rows(static_cast<glp_prob*>(glpProb),1);
 
 	// store undo information
-	state.trail.record(new (state) UndoAllocateRow(*this,rowId));
+	state.record(new (state) UndoAllocateRow(*this,rowId));
 
 	setConstraintCoeffs(rowId,idxs,vals);
 	setConstraintBounds(rowId,type,lb,ub);
@@ -244,7 +244,7 @@ void Driver::updateConstraintBounds(uint rowId,ConstraintType type, double lb, d
 	double oldLb = glp_get_row_lb(static_cast<glp_prob*>(glpProb),rowId);
 	double oldUb = glp_get_row_ub(static_cast<glp_prob*>(glpProb),rowId);
 
-	state.trail.record(new (state) UndoUpdateConstraintBounds(*this,rowId,oldType,oldLb,oldUb));
+	state.record(new (state) UndoUpdateConstraintBounds(*this,rowId,oldType,oldLb,oldUb));
 
 	// perform the update
 	setConstraintBounds(rowId,type,lb,ub);
@@ -286,7 +286,7 @@ uint Driver::addVariable(ConstraintType type, double lb, double ub)
 	int colId = glp_add_cols(static_cast<glp_prob*>(glpProb),1);
 
 	// store undo information
-	state.trail.record(new (state) UndoAllocateCol(*this,colId));
+	state.record(new (state) UndoAllocateCol(*this,colId));
 
 	setVariableBounds(colId,type,lb,ub);
 
@@ -303,7 +303,7 @@ uint Driver::addVariable(const Idxs& idxs,
 	int colId = glp_add_cols(static_cast<glp_prob*>(glpProb),1);
 
 	// store undo information
-	state.trail.record(new (state) UndoAllocateCol(*this,colId));
+	state.record(new (state) UndoAllocateCol(*this,colId));
 
 	setVariableCoeffs(colId,idxs,vals);
 	setVariableBounds(colId,type,lb,ub);
@@ -419,7 +419,7 @@ bool Driver::updateVariableBounds(uint colId,ConstraintType type, double lb, dou
 	}
 
 	// record undo action
-	state.trail.record(new (state) UndoUpdateVariableBounds(*this,colId,oldType,oldLb,oldUb));
+	state.record(new (state) UndoUpdateVariableBounds(*this,colId,oldType,oldLb,oldUb));
 
 	// perform the update
 	setVariableBounds(colId,type,lb,ub);
@@ -443,7 +443,7 @@ struct UndoSolve : ITrailAgent
 
 bool Driver::solve()
 {
-	state.trail.record(new (state) UndoSolve(*this));
+	state.record(new (state) UndoSolve(*this));
 	if (first)
 	{
 		first = false;

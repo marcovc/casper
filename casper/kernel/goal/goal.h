@@ -30,11 +30,12 @@
 //#include <casper/kernel/par/parexpr.h>
 #include <casper/kernel/common.h>
 #include <casper/util/pimpl.h>
+#include <casper/util/exception.h>
 #include <assert.h>
 
 #include <functional>
 
-//#include <casper/kernel/goal/explorer.h>
+#include <casper/fwddecl.h>
 
 namespace Casper {
 
@@ -95,6 +96,10 @@ struct Goal : Util::PImplIdiom<IGoal>
 	Goal(const Goal& g) : Super(g.getPImpl())	{}
 
 	Goal(State&,const Goal& g) : Super(g.getPImpl())	{}
+
+	template<class T>
+	Goal(State& s,const T& obj) :
+		Super(new (s) GoalView<T>(s,obj)) {}
 
 	template<class Func,class T1>
 	Goal(State& s,const Rel1<Func,T1>& r) :
@@ -184,6 +189,61 @@ Goal Goal::execute(IExplorer& sched)
 Goal succeeds(Goal g);
 Goal fails(Goal g);
 #endif
+
+template<class T>
+struct NoGoalView :IGoal
+{
+	NoGoalView(State& s,const T& r)
+	{
+		std::ostringstream os;
+		os << r;
+		throw Casper::Exception::UndefinedView(os.str().c_str(),"GoalView");
+	}
+	Goal execute() { assert(0); }
+};
+
+
+template<class T>
+struct GoalView : NoGoalView<T>
+{
+	GoalView(State& s,const T& r) :
+		NoGoalView<T>(s,r) {}
+};
+
+template<class F,class E1,class T1>
+struct GoalView1 : NoGoalView<Rel1<F,T1> >
+{
+	GoalView1(State& s,const T1& p1) :
+		NoGoalView<Rel1<F,T1> >(s,rel<F>(p1)) {}
+};
+
+template<class F,class E1,class T1,class E2,class T2>
+struct GoalView2 : NoGoalView<Rel2<F,T1,T2> >
+{
+	GoalView2(State& s,const T1& p1,const T2& p2) :
+		NoGoalView<Rel2<F,T1,T2> >(s,rel<F>(p1,p2)) {}
+};
+
+template<class F,class E1,class T1,class E2,class T2,class E3,class T3>
+struct GoalView3 : NoGoalView<Rel3<F,T1,T2,T3> >
+{
+	GoalView3(State& s,const T1& p1,const T2& p2,const T3& p3) :
+		NoGoalView<Rel3<F,T1,T2,T3> >(s,rel<F>(p1,p2,p3)) {}
+};
+
+template<class F,class E1,class T1,class E2,class T2,class E3,class T3,class E4,class T4>
+struct GoalView4 : NoGoalView<Rel4<F,T1,T2,T3,T4> >
+{
+	GoalView4(State& s,const T1& p1,const T2& p2,const T3& p3,const T4& p4) :
+		NoGoalView<Rel4<F,T1,T2,T3,T4> >(s,rel<F>(p1,p2,p3,p4)) {}
+};
+
+template<class F,class E1,class T1,class E2,class T2,class E3,class T3,class E4,class T4,class E5,class T5>
+struct GoalView5 : NoGoalView<Rel5<F,T1,T2,T3,T4,T5> >
+{
+	GoalView5(State& s,const T1& p1,const T2& p2,const T3& p3,const T4& p4,const T5& p5) :
+		NoGoalView<Rel5<F,T1,T2,T3,T4,T5> >(s,rel<F>(p1,p2,p3,p4,p5)) {}
+};
 
 };
 

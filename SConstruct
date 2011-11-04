@@ -683,11 +683,13 @@ Alias('casperbind_fzn',casperbind_fzn_target)
 pycasper_target_libpath = confCommonEnv['LIBPATH']
 pycasper_target_libs = confCommonEnv['LIBS']+[libcasper]
 
-def compile_pycasper_module(iface):
-	pycasper_obj = env.SharedObject(env['PREFIX']+"/bindings/python/"+iface+".i",
+def generate_wrapper(iface):
+	return env.SharedObject(env['PREFIX']+"/bindings/python/"+iface+".i",
 									 CCFLAGS=env['CCFLAGS']+['-fPIC','-DSWIG_BUILD'],
 									 CPPPATH=['#.','/usr/include/python2.7'],
 									 SWIGFLAGS = ' -c++ -python -I. -Ibindings/python -Wall -outdir '+env['PREFIX']+"/bindings/python/casper")
+
+def compile_wrapper(iface,pycasper_obj):
 	return env.SharedLibrary(target=env['PREFIX']+'/bindings/python/casper/'+iface,
 								   source=pycasper_obj,SHLIBPREFIX='_',
 								   LIBPATH=pycasper_target_libpath,
@@ -695,16 +697,19 @@ def compile_pycasper_module(iface):
 
 	
 pycasper_modules=['kernel','cp','util']
+pycasper_wrappers=[]
 pycasper_libs=[Execute(Mkdir(env['PREFIX']+"/bindings/python/casper"))] 
 for i in pycasper_modules:
-	pycasper_libs.append(compile_pycasper_module(i))
+	wrapper = generate_wrapper(i)
+	pycasper_wrappers.append(wrapper)
+	pycasper_libs.append(compile_wrapper(i,wrapper))
 
 py_gen_scripts = []
 pref = "bindings/python/"
 for src in ['cp/int/intvar_operators.i','cp/int/boolvar_operators.i','kernel/intexpr_operators.i','kernel/boolexpr_operators.i','kernel/expr_predicates.i']:
 	py_gen_scripts.append(env.Command(pref+src,['bindings/python/pyutils/objdb.py',pref+src+'.py'],'python '+pref+src+'.py'+' > $TARGET'))
 
-copy_init = [Command(env['PREFIX']+"/bindings/python/casper/__init__.py", pycasper_libs[0], Copy("$TARGET", env['PREFIX']+"/bindings/python/casper/kernel.py"))]
+copy_init = [Command(env['PREFIX']+"/bindings/python/casper/__init__.py", pycasper_wrappers[0], Copy("$TARGET", env['PREFIX']+"/bindings/python/casper/kernel.py"))]
 Alias('casperbind_python',py_gen_scripts+pycasper_libs+copy_init)
 							   
 

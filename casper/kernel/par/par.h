@@ -48,7 +48,7 @@ struct IPar
 	virtual T 		value() const = 0;
 
 	virtual void setValue(const T& value)
-	{	throw Casper::Exception::InvalidOperation("cannot set value for current par variable"); }
+	{	throw Casper::Exception::InvalidOperation("cannot set value for current par expression"); }
 };
 
 template<class,class> struct ParView;

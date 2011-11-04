@@ -17,20 +17,34 @@
  \*************************************************************************/
  
 
+#ifndef CASPER_KERNEL_OBJ_GOAL_H_
+#define CASPER_KERNEL_OBJ_GOAL_H_
 
-#include <casper/kernel.h>
-#include <casper/cp.h>
 #include <casper/kernel/obj/expr.h>
 
-using namespace Casper;
-using namespace std;
+namespace Casper {
+namespace Detail {
 
-int main()
+template<class T>
+struct Create<T,Goal>
 {
-	CP::Solver solver;
-	IntPar i (solver);
-	Expr<int> ei(i);
-	Expr<bool> g = assign(ei,3);
-	cout << solver.solve(g) << endl;
-	cout << i << endl;
+	Goal operator()(State& state, const T& t)
+	{	return Goal(state,t);	}
+};
+
+} // Detail
+
+
+template<class Eval>
+struct GoalView<Expr<Eval> > : IGoal
+{
+	GoalView(State& state, const Expr<Eval>& e) :
+		g(e.toGoal(state).getImpl()) {}
+	Goal execute() {	return g.execute(); }
+	IGoal& g;
+};
+
+
 }
+
+#endif /* CASPER_KERNEL_OBJ_GOAL_H_ */

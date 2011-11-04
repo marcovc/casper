@@ -113,6 +113,17 @@ struct DomFilterView<Rel5<F,T1,T2,T3,T4,T5> > :
 					  typename Casper::Traits::GetEval<T5>::Type,T5>(s,r.p1,r.p2,r.p3,r.p4,r.p5) {}
 };
 
+template<class Expr1>
+struct PostDomFilterGen
+{
+	static bool post(Store& s,const Expr1& v1)
+	{
+		std::ostringstream os;
+		os << v1;
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+	}
+};
+
 template<class Func,class Eval1,class Expr1>
 struct PostDomFilter1
 {
@@ -310,29 +321,17 @@ struct DomView<Eval,Rel2<Element,Expr1,Expr2> > :
 };
 
 
-
-// TODO: DomFilterView2<Equal,Eval1,Expr1,Eval2,Expr2>
-
-/* TODO: DomFilterView2<Less,bool,Expr1,bool,Expr2>
- * should use DomFilterView for filters...
- *
- * example: DomFilter( (a==b) <= (distinct(vars)) ) uses Bnd distinct
- *
- * idea1: CPSolver::currentFilterFactory
- * 	.... but filterFactory is a compile time object..
- *
- * idea2: always uses Bnd, user must override specific cases:
- *  DomFilter( (a==b) <= (DomFilter(distinct(vars))) ) uses Bnd distinct
- * .... but this is ugly
- */
-
-// TODO: Dom expression from filter (reification)
-
 /**
  * TODO: see PostBndFilter for complete method list
  */
 struct PostDomFilter
 {
+	template<class T>
+	bool operator()(Store& s,const T& v) const
+	{
+		typedef PostDomFilterGen<T>		Post;
+		return Post::post(s,v);
+	}
 
 	template<class Func,class Expr1>
 	bool operator()(Store& s,const Rel1<Func,Expr1>& v) const

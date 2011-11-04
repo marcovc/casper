@@ -54,6 +54,13 @@ struct Create<Util::StdList<Expr<Eval> >,Util::StdArray<Eval,1> >
 	}
 };
 
+template<class Eval,int dims>
+struct Create<Util::StdArray<Expr<Eval>,dims>,Util::StdArray<Expr<Eval>,dims> >
+{
+	const Util::StdArray<Eval,dims>& operator()(const Util::StdArray<Expr<Eval>,dims>& t)
+	{	return t; }
+};
+
 } // Detail
 
 namespace CP {
@@ -61,7 +68,7 @@ namespace CP {
 // TMP: don't know why automatic conversion fails on this. Workaround:
 template<class Eval,class View>
 Filter gacSchema(Store& store,const View& v,const Expr<Seq<Eval> >& expr)
-{	return gacSchema(store,v,expr.toStdArray());	}
+{	return gacSchema(store,v,expr.toLitStdArray());	}
 
 
 } // CP

@@ -29,6 +29,71 @@ namespace Casper {
  * Views over parameterized expressions
  *********************/
 
+template<class>	struct Par;
+template<class,class,class>			struct ParView1;
+template<class,class,class,class>	struct ParView2;
+template<class,class,class,class,class>	struct ParView3;
+template<class,class,class,class,class,class>	struct ParView4;
+template<class,class,class,class,class,class,class>	struct ParView5;
+
+template<class Eval,class R>
+struct NoParView : IPar<Eval>
+{
+	NoParView(State& s,const R& r)
+	{
+		std::ostringstream os;
+		os << r;
+		throw Casper::Exception::UndefinedView(os.str().c_str(),"ParView");
+	}
+	Eval value() const { assert(0); }
+	void setValue(const Eval& val) { assert(0); }
+	bool ground() const { assert(0); }
+	R getObj()  const { assert(0); }
+};
+
+
+template<class Eval,class View>
+struct ParView  : NoParView<Eval,View>
+{
+	ParView(State& s, const View& p1) :
+		NoParView<Eval,View>(s,p1) {}
+};
+
+template<class F,class Expr1,class Eval>
+struct ParView1 : NoParView<Eval,Rel1<F,Expr1> >
+{
+	ParView1(State& s,const Expr1& v) :
+		NoParView<Eval,Rel1<F,Expr1> >(s,rel<F>(v)) {}
+};
+
+template<class F,class Expr1,class Expr2,class Eval>
+struct ParView2 :  NoParView<Eval,Rel2<F,Expr1,Expr2> >
+{
+	ParView2(State& s,const Expr1& v1,const Expr2& v2) :
+		NoParView<Eval,Rel2<F,Expr1,Expr2> >(s,rel<F>(v1,v2)) {}
+};
+
+template<class F,class Expr1,class Expr2,class Expr3,class Eval>
+struct ParView3 :  NoParView<Eval,Rel3<F,Expr1,Expr2,Expr3> >
+{
+	ParView3(State& s,const Expr1& v1,const Expr2& v2,const Expr3& v3) :
+		NoParView<Eval,Rel3<F,Expr1,Expr2,Expr3> >(s,rel<F>(v1,v2,v3)) {}
+};
+
+template<class F,class Expr1,class Expr2,class Expr3,class Expr4, class Eval>
+struct ParView4 :  NoParView<Eval,Rel4<F,Expr1,Expr2,Expr3,Expr4> >
+{
+	ParView4(State& s,const Expr1& v1,const Expr2& v2,const Expr3& v3,const Expr4& v4) :
+		NoParView<Eval,Rel4<F,Expr1,Expr2,Expr3,Expr4> >(s,rel<F>(v1,v2,v3,v4)) {}
+};
+
+template<class F,class Expr1,class Expr2,class Expr3,class Expr4, class Expr5,class Eval>
+struct ParView5 :  NoParView<Eval,Rel5<F,Expr1,Expr2,Expr3,Expr4,Expr5> >
+{
+	ParView5(State& s,const Expr1& v1,const Expr2& v2,const Expr3& v3,const Expr4& v4,const Expr5& v5) :
+		NoParView<Eval,Rel5<F,Expr1,Expr2,Expr3,Expr4,Expr5> >(s,rel<F>(v1,v2,v3,v4,v5)) {}
+};
+
 // Extracts a given element of any array type
 template<class T>
 struct ParArrayView
@@ -58,29 +123,20 @@ struct ParArrayView<Rel2<Element,Array,Index> >
 };
 
 
-template<class>	struct Par;
-template<class,class,class>			struct ParView1;
-template<class,class,class,class>	struct ParView2;
-template<class,class,class,class,class>	struct ParView3;
-template<class,class,class,class,class,class>	struct ParView4;
-
 /**
- * 	ParView over generic object. View must be convertible to Eval.
+ * 	ParView over literal.
  * 	\ingroup Views
  **/
-template<class Eval,class View>
-struct ParView : IPar<Eval>
+template<class Eval>
+struct ParView<Eval,Eval> : IPar<Eval>
 {
-	ParView(State& state, const View& p1) :
+	ParView(State& state, const Eval& p1) :
 		p1(p1) {}
 	Eval value() const { return p1; }
 
-//	void attach(INotifiable*) {}
-//	void detach(INotifiable*) {}
+	const Eval& getObj()  const { return p1; }
 
-	const View& getObj()  const { return p1; }
-
-	const View	p1;
+	const Eval	p1;
 };
 
 /**
@@ -166,6 +222,22 @@ struct ParView<Eval,Rel4<F,Expr1,Expr2,Expr3,Expr4> > :
 
 	ParView(State& state, const Rel4<F,Expr1,Expr2,Expr3,Expr4>& r) :
 		ParView4<F,Expr1,Expr2,Expr3,Expr4,Eval>(state,r.p1,r.p2,r.p3,r.p4) {}
+};
+
+
+/**
+ * 	ParView over a Rel5 relation -> defer to ParView5.
+ * 	\ingroup Views
+ **/
+template<class Eval,class F,class Expr1,class Expr2,class Expr3,class Expr4,class Expr5>
+struct ParView<Eval,Rel5<F,Expr1,Expr2,Expr3,Expr4,Expr5> > :
+	ParView5<F,Expr1,Expr2,Expr3,Expr4,Expr5,Eval>
+{
+//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::attach;
+//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::detach;
+
+	ParView(State& state, const Rel5<F,Expr1,Expr2,Expr3,Expr4,Expr5>& r) :
+		ParView5<F,Expr1,Expr2,Expr3,Expr4,Expr5,Eval>(state,r.p1,r.p2,r.p3,r.p4,r.p5) {}
 };
 
 /**

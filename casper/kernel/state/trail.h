@@ -74,6 +74,7 @@ struct Trail
 
 	void statePop()
 	{	s.pop();	}
+
 };
 
 };
