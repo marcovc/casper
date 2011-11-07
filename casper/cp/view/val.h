@@ -39,12 +39,12 @@ struct NoValView
 		os << r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::ValView");
 	}
-	Eval value() const { assert(0); }
-	bool setValue(const Eval& val) { assert(0); }
-	bool ground() const { assert(0); }
-	void attach(INotifiable*) { assert(0); }
-	void detach(INotifiable*) { assert(0); }
-	Eval getObj()  const { assert(0); }
+	__attribute__((noreturn)) Eval value() const { assert(0); }
+	__attribute__((noreturn)) bool setValue(const Eval& val) { assert(0); }
+	__attribute__((noreturn)) bool ground() const { assert(0); }
+	__attribute__((noreturn)) void attach(INotifiable*) { assert(0); }
+	__attribute__((noreturn)) void detach(INotifiable*) { assert(0); }
+	__attribute__((noreturn)) Eval getObj()  const { assert(0); }
 };
 
 template<class> struct CChkView;

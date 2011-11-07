@@ -45,10 +45,10 @@ struct NoParView : IPar<Eval>
 		os << r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"ParView");
 	}
-	Eval value() const { assert(0); }
-	void setValue(const Eval& val) { assert(0); }
-	bool ground() const { assert(0); }
-	R getObj()  const { assert(0); }
+	__attribute__((noreturn)) Eval value() const { assert(0); }
+	__attribute__((noreturn)) void setValue(const Eval& val) { assert(0); }
+	__attribute__((noreturn)) bool ground() const { assert(0); }
+	__attribute__((noreturn)) R getObj()  const { assert(0); }
 };
 
 

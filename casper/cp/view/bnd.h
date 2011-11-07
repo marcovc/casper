@@ -116,15 +116,15 @@ struct NoBndView
 		os << r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::BndView");
 	}
-	Eval min() const { assert(0); }
-	Eval max() const { assert(0); }
-	bool updateMin(const Eval& val) { assert(0); }
-	bool updateMax(const Eval& val) { assert(0); }
-	void range(Eval& v1,Eval& v2) const {	assert(0); }
-	bool updateRange(const Eval& v1, const Eval& v2) {	assert(0);	}
-	void attach(INotifiable*) { assert(0); }
-	void detach(INotifiable*) { assert(0); }
-	Eval getObj()  const { assert(0); }
+	__attribute__((noreturn)) Eval min() const { assert(0); }
+	__attribute__((noreturn)) Eval max() const { assert(0); }
+	__attribute__((noreturn)) bool updateMin(const Eval& val) { assert(0); }
+	__attribute__((noreturn)) bool updateMax(const Eval& val) { assert(0); }
+	__attribute__((noreturn)) void range(Eval& v1,Eval& v2) const {	assert(0); }
+	__attribute__((noreturn)) bool updateRange(const Eval& v1, const Eval& v2) {	assert(0);	}
+	__attribute__((noreturn)) void attach(INotifiable*) { assert(0); }
+	__attribute__((noreturn)) void detach(INotifiable*) { assert(0); }
+	__attribute__((noreturn)) Eval getObj()  const { assert(0); }
 };
 
 template<class> struct CChkView;
