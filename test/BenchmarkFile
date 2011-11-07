@@ -1,81 +1,81 @@
 #testsuite(Examples,Examples included in the CaSPER distribution)
 
 #test(golfers-1,Social Golfers Problem,int-example,pred-eq,pred-le,pred-lt,global-alldifferent,label-lex)
-../build/release/examples/cp/int/golfer 6 --heuristic 0 -t0
+./build/release/examples/cp/int/golfer 6 --heuristic 0 -t0
 #test(golfers-2,Social Golfers Problem,int-example,pred-eq,pred-le,pred-lt,global-alldifferent,label-lex)
-../build/release/examples/cp/int/golfer 4 6 5 --heuristic 0 -t0
+./build/release/examples/cp/int/golfer 4 6 5 --heuristic 0 -t0
 #test(golfers-3,Social Golfers Problem,int-example,pred-eq,pred-le,pred-lt,global-alldifferent,label-opl)
-../build/release/examples/cp/int/golfer 3 4 3 --heuristic 1 -t0
+./build/release/examples/cp/int/golfer 3 4 3 --heuristic 1 -t0
 #test(golfers-4,Social Golfers Problem,int-example,pred-eq,pred-le,pred-lt,global-alldifferent,label-opl)
-../build/release/examples/cp/int/golfer 9 8 4 --heuristic 1 -t0
+./build/release/examples/cp/int/golfer 9 8 4 --heuristic 1 -t0
 
 #test(golomb-1,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent-val,label-lex)
-../build/release/examples/cp/int/golomb 10 55 --distinct=0 -m0 -s2 -t0
+./build/release/examples/cp/int/golomb 10 55 --distinct=0 -m0 -s2 -t0
 #test(golomb-2,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent-bnd,label-lex)
-../build/release/examples/cp/int/golomb 10 55 --distinct=1 -m0 -s2 -t0
+./build/release/examples/cp/int/golomb 10 55 --distinct=1 -m0 -s2 -t0
 #test(golomb-3,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent,label-lex)
-../build/release/examples/cp/int/golomb 10 55 --distinct=2 -m0 -s2 -t0
+./build/release/examples/cp/int/golomb 10 55 --distinct=2 -m0 -s2 -t0
 #test(golomb-4,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent-val,label-lex)
-../build/release/examples/cp/int/golomb 11 72 --distinct=0 -m0 -t0
+./build/release/examples/cp/int/golomb 11 72 --distinct=0 -m0 -t0
 #test(golomb-5,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent-bnd,label-lex)
-../build/release/examples/cp/int/golomb 11 72 --distinct=1 -m0 -t0
+./build/release/examples/cp/int/golomb 11 72 --distinct=1 -m0 -t0
 #test(golomb-6,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent,label-lex)
-../build/release/examples/cp/int/golomb 11 72 --distinct=2 -m0 -t0
+./build/release/examples/cp/int/golomb 11 72 --distinct=2 -m0 -t0
 #test(golomb-7,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent,label-lex, search-bb)
-../build/release/examples/cp/int/golomb 10 -t0
+./build/release/examples/cp/int/golomb 10 -t0
 #test(golomb-8,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent,label-lex, search-bb)
-../build/release/examples/cp/int/golomb 11 -t0
+./build/release/examples/cp/int/golomb 11 -t0
 
 #test(langford-1,Langford Problem,pred-eq,int-example,pred-element,label-lex)
-../build/release/examples/cp/int/langford 3 12 -t0
+./build/release/examples/cp/int/langford 3 12 -t0
 #test(langford-2,Langford Problem,pred-eq,int-example,pred-element,label-lex)
-../build/release/examples/cp/int/langford 3 17 -t0
+./build/release/examples/cp/int/langford 3 17 -t0
 
 #test(latin-1,Partial Latin Squares Problem,int-example,global-alldifferent,label-impacts)
-../build/release/examples/cp/int/latin -f ../examples/int/data_latin/30-312-2.pls --heuristic 0 -t0
+./build/release/examples/cp/int/latin -f ./examples/int/data_latin/30-312-2.pls --heuristic 0 -t0
 #test(latin-2,Partial Latin Squares Problem,int-example,global-alldifferent,label-la)
-../build/release/examples/cp/int/latin -f ../examples/int/data_latin/30-312-4.pls --heuristic 1 -t0
+./build/release/examples/cp/int/latin -f ./examples/int/data_latin/30-312-4.pls --heuristic 1 -t0
 
 #test(nqueens-1,N-Queens Problem,int-example,pred-custom,label-ff)
-../build/release/examples/cp/int/nqueens 75 -s40 -t0
+./build/release/examples/cp/int/nqueens 75 -s40 -t0
 #test(nqueens-2,N-Queens Problem,int-example,pred-custom,label-ff)
-../build/release/examples/cp/int/nqueens 206 -t0
+./build/release/examples/cp/int/nqueens 206 -t0
 #test(nqueens-3,N-Queens Problem,int-example,pred-custom,label-ff)
-../build/release/examples/cp/int/nqueens 1000 -t0
+./build/release/examples/cp/int/nqueens 1000 -t0
 
 #test(allinterval,All Intervals Problem,int-example,label-lex)
-../build/release/examples/cp/int/allinterval 14 -s2 -t0
+./build/release/examples/cp/int/allinterval 14 -s2 -t0
 
 #test(ortholatin,Orthogonal Latin Squares Problem,int-example,global-element,global-distinct,pred-eq,label-ff)
-../build/release/examples/cp/int/ortholatin 5 -s40 -t0
+./build/release/examples/cp/int/ortholatin 5 -s40 -t0
 
 #test(labs-1,Low Autocorrelation Binary Sequences Problem,int-example,label-lex, search-bb)
-../build/release/examples/cp/int/labs 21 -t0
+./build/release/examples/cp/int/labs 21 -t0
 #test(labs-2,Low Autocorrelation Binary Sequences Problem,int-example,label-lex, search-bb)
-../build/release/examples/cp/int/labs 22 -t0
+./build/release/examples/cp/int/labs 22 -t0
 
 #test(codes-1,Fixed-Length Error Correcting Codes Problem,int-example,label-lex)
-../build/release/examples/cp/int/codes 3 15 35 --distance=11 -t0
+./build/release/examples/cp/int/codes 3 15 35 --distance=11 -t0
 #test(codes-2,Fixed-Length Error Correcting Codes Problem,int-example,label-lex)
-../build/release/examples/cp/int/codes 3 15 35 --lee=1 --distance=9 -t0
+./build/release/examples/cp/int/codes 3 15 35 --lee=1 --distance=9 -t0
 
 
 #test(golfers-5,Social Golfers Problem,set-example,pred-cardinal,global-partition,label-lex)
-../build/release/examples/cp/set/golfer 4 7 4 --heuristic 0 -t0
+./build/release/examples/cp/set/golfer 4 7 4 --heuristic 0 -t0
 #test(golfers-6,Social Golfers Problem,set-example,pred-cardinal,global-partition,label-lex)
-../build/release/examples/cp/set/golfer 5 7 4 --heuristic 0 -t0
+./build/release/examples/cp/set/golfer 5 7 4 --heuristic 0 -t0
 #test(golfers-7,Social Golfers Problem,set-example,pred-cardinal,global-partition,label-opl)
-../build/release/examples/cp/set/golfer 3 6 3 --heuristic 1 -t0
+./build/release/examples/cp/set/golfer 3 6 3 --heuristic 1 -t0
 #test(golfers-8,Social Golfers Problem,set-example,pred-cardinal,global-partition,label-opl)
-../build/release/examples/cp/set/golfer 3 6 3 --heuristic 2 -t0
+./build/release/examples/cp/set/golfer 3 6 3 --heuristic 2 -t0
 
 #test(steiner-1,Steiner triples,set-example,pred-cardinal,pred-intersect,label-lex)
-../build/release/examples/cp/set/steiner 7 -t0
+./build/release/examples/cp/set/steiner 7 -t0
 #test(steiner-2,Steiner triples,set-example,pred-cardinal,pred-intersect,label-lex)
-../build/release/examples/cp/set/steiner 9 -t0
+./build/release/examples/cp/set/steiner 9 -t0
 
 #test(hamming-1,Hamming codes,set-example,pred-disjoint,pred-cardinal,pred-le,label-lex)
-../build/release/examples/cp/set/hamming 10 20 --distance 9 -t0
+./build/release/examples/cp/set/hamming 10 20 --distance 9 -t0
 #test(hamming-2,Hamming codes,set-example,pred-disjoint,pred-cardinal,pred-le,label-lex,search-bb)
-../build/release/examples/cp/set/hamming 5 5 --maximize 1 -t0
+./build/release/examples/cp/set/hamming 5 5 --maximize 1 -t0
 

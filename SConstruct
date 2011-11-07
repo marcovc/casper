@@ -735,7 +735,7 @@ def getVersionInfo(arg):
 	(sout,serr) = p.communicate()
 	return sout.replace('\r','').replace('\n','')
 	
-benchExec = "/home/marco/projects/benchmark/benchmark"
+benchExec = "test/benchmark.py"
 
 def runTests(env,target,source):
 	productArgs = ["--product-name=CaSPER",\
@@ -748,16 +748,21 @@ def runTests(env,target,source):
 				"--memout=900000000",\
 				"--sample-count=3"]
 	benchArgs = productArgs+buildenvArgs+runenvArgs			
-	cmd = [source[0].abspath]+benchArgs
 	if GetOption('notes')!=None:
-		cmd += ["--product-note="+GetOption('notes')]
+		benchArgs += ["--product-note="+GetOption('notes')]
+	cmd = [source[0].abspath]+benchArgs+["test/BenchmarkFile","test/BenchmarkResults.xml"]
 	if not subprocess.call(cmd):
-		import testcmp
-		import zlib
 		import platform
-		envStr = buildenvArgs+runenvArgs+list(platform.uname())
-		id = str(zlib.crc32(str(benchArgs)) & 0xffffffff)
-		benchmarkResultsFileName = "test/BenchmarkResults@"+id+".xml"
+		dir1 = platform.machine().replace(" ","_")
+		dir2 = platform.processor().replace(" ","_")
+		system = platform.system_alias(platform.system(),platform.release(),platform.version())
+		dir3 = (system[0]+" "+system[1]).replace(" ","_")
+		fulldir = "test/"+dir1+"/"+dir2+"/"+dir3+"/"
+		try:
+			os.makedirs(fulldir)
+		except OSError:
+			pass		
+		benchmarkResultsFileName = fulldir+"BenchmarkResults.xml"
 		try:
 			f = open(benchmarkResultsFileName,"r")
 			f.close()			
@@ -770,7 +775,8 @@ def runTests(env,target,source):
 			print "avg mem ratio of newfile/oldfile:",mgavg
 			print "ratio of problems solved faster in newfile:",favg
 		except IOError:
-			print "no previous benchmark results found for this environment. Please copy test/BenchmarkResults.xml to "+benchmarkResultsFileName 
+			print "warning: no previous benchmark results found for this environment"
+		print "please copy test/BenchmarkResults.xml to "+benchmarkResultsFileName	 
 testCmd = Command("tests.passed",benchExec,runTests)
 Depends(testCmd,example_targets+[File(benchExec)])
 
