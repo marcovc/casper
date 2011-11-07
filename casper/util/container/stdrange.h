@@ -29,7 +29,7 @@
 
 namespace Casper {
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) | defined(__APPLE__)
 typedef unsigned int uint;
 #endif
 

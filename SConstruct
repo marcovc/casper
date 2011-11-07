@@ -409,7 +409,7 @@ def getBuildFlags(env,debug_level,optimize_level):
 			link_flags += ['-static']
 		if env['cpp0x']:
 			build_flags += ['-std=gnu++0x']
-		build_flags += ['-Wfatal-errors']
+		#build_flags += ['-Wfatal-errors']
 		build_flags += ['-fPIC']
 		#build_flags += ['-ffast-math']
 		#link_flags += ['-ffast-math']	

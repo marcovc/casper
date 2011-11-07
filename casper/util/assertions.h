@@ -24,23 +24,9 @@ namespace Casper {
 
 namespace Util {
 
+
+
 // check if two types are the same type
-
-/*
-template<class T1,class T2>
-struct IsSameType
-{	static const bool value;	};
-
-template<class T>
-struct IsSameType<T,T>
-{	static const bool value;	};
-
-template<class T1,class T2>
-const bool IsSameType<T1,T2>::value = false;
-
-template<class T>
-const bool IsSameType<T,T>::value = true;
-*/
 
 template<bool If,class Then,class Else>
 struct IfThenElse

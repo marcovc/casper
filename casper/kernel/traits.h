@@ -123,6 +123,7 @@ template<class View>
 struct GetEval<IterationView<View> >
 {	typedef Seq<typename Traits::GetElem<View>::Type>	Type;	};
 
+#ifdef CASPER_CPP0X
 template<>
 struct GetEval<std::function<Goal()> >
 {	typedef bool Type;	};
@@ -131,6 +132,8 @@ struct GetEval<std::function<Goal()> >
 template<class T>
 struct GetEval<std::initializer_list<T> >
 {	typedef Seq<typename Traits::GetEval<T>::Type> Type;	};
+#endif
+
 #endif
 
 // GetElem
@@ -182,10 +185,14 @@ template<class T1,class T2>
 struct GetElem<SymDiffItView<T1,T2> >
 {	typedef typename Traits::GetElem<T1>::Type	Type; };
 
+#ifdef CASPER_CPP0X
+
 #ifndef _MSC_VER
 template<class T>
 struct GetElem<std::initializer_list<T> >
 {	typedef T Type;	};
+#endif
+
 #endif
 
 // GetTermElem
@@ -238,11 +245,16 @@ template<class T1,class T2>
 struct GetTermElem<SymDiffItView<T1,T2> >
 {	typedef typename Traits::GetTermElem<T1>::Type	Type; };
 
+#ifdef CASPER_CPP0X
+
 #ifndef _MSC_VER
 template<class T>
 struct GetTermElem<std::initializer_list<T> >
 {	typedef typename GetTermElem<T>::Type	Type;	};
 #endif
+
+#endif
+
 }
 }
 

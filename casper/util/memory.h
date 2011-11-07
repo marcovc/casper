@@ -36,7 +36,7 @@
 
 namespace Casper {
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) or defined(__APPLE__)
 typedef unsigned int uint;
 #endif
 
@@ -117,7 +117,7 @@ struct StaticHeap : IHeap
 	char* 	ptr;
 	char*	mem;
 
-	StaticHeap(uint maxSize = static_cast<uint>(64E6)) : uMaxSize(maxSize)
+	StaticHeap(uint maxSize = static_cast<uint>(64e6)) : uMaxSize(maxSize)
 	{
 		try {
 			mem = new char[uMaxSize];

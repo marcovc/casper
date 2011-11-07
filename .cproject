@@ -85,11 +85,11 @@
 			</target>
 			<target name="examples-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
-				<buildArguments>-j 1 debug_level=3</buildArguments>
+				<buildArguments>-j 3 debug_level=3</buildArguments>
 				<buildTarget>examples</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
-				<runAllBuilders>true</runAllBuilders>
+				<runAllBuilders>false</runAllBuilders>
 			</target>
 			<target name="benchmark-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
@@ -157,7 +157,6 @@
 			</target>
 			<target name="gcc-version" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>gcc</buildCommand>
-				<buildArguments/>
 				<buildTarget>--version</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>

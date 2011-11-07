@@ -66,7 +66,7 @@
 #define force_inline inline __attribute__ ((always_inline))
 #endif
 
-#ifdef SWIG
+#if defined(SWIG) or defined(__APPLE__)
 typedef unsigned int uint;
 #endif
 
