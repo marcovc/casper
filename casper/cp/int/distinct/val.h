@@ -217,7 +217,7 @@ struct PostValFilter1<Distinct,Seq<int>,View>
 {
 	static bool post(Store& s,const View& v)
 	{
-		return s.post(new (s) DomFilterView1<Distinct,Seq<int>,View>(s,v));
+		return s.post(new (s) ValFilterView1<Distinct,Seq<int>,View>(s,v));
 	}
 };
 

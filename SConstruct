@@ -735,50 +735,54 @@ def getVersionInfo(arg):
 	(sout,serr) = p.communicate()
 	return sout.replace('\r','').replace('\n','')
 	
-benchExec = "test/benchmark.py"
-
 def runTests(env,target,source):
-	productArgs = ["--product-name=CaSPER",\
-				"--product-version="+getVersionInfo("--version"),\
-				"--product-revision="+getVersionInfo("--revision")]
-	buildenvArgs = ["--buildenv-compiler="+getVersionInfo("--compiler"),\
-				"--buildenv-stdlib="+getVersionInfo("--stdlib"),\
-				"--buildenv-flags="+getVersionInfo("--flags")]
-	runenvArgs = ["--timeout=30",\
-				"--memout=900000000",\
-				"--sample-count=3"]
-	benchArgs = productArgs+buildenvArgs+runenvArgs			
-	if GetOption('notes')!=None:
-		benchArgs += ["--product-note="+GetOption('notes')]
-	cmd = [source[0].abspath]+benchArgs+["test/BenchmarkFile","test/BenchmarkResults.xml"]
-	if not subprocess.call(cmd):
-		import platform
-		dir1 = platform.machine().replace(" ","_")
-		dir2 = platform.processor().replace(" ","_")
-		system = platform.system_alias(platform.system(),platform.release(),platform.version())
-		dir3 = (system[0]+" "+system[1]).replace(" ","_")
-		fulldir = "test/"+dir1+"/"+dir2+"/"+dir3+"/"
-		try:
-			os.makedirs(fulldir)
-		except OSError:
-			pass		
-		benchmarkResultsFileName = fulldir+"BenchmarkResults.xml"
-		try:
-			f = open(benchmarkResultsFileName,"r")
-			f.close()			
-			(couteq,cerreq,tgavg,mgavg,favg) = testcmp.compare(benchmarkResultsFileName,"test/BenchmarkResults.xml")
-			if not couteq:
-				print "FAILED: different stdout!"
-			if not cerreq:
-				print "FAILED: different stderr!"
-			print "avg time ratio of newfile/oldfile:",tgavg
-			print "avg mem ratio of newfile/oldfile:",mgavg
-			print "ratio of problems solved faster in newfile:",favg
-		except IOError:
-			print "warning: no previous benchmark results found for this environment"
-		print "please copy test/BenchmarkResults.xml to "+benchmarkResultsFileName	 
-testCmd = Command("tests.passed",benchExec,runTests)
-Depends(testCmd,example_targets+[File(benchExec)])
+	product = { "name" : "CaSPER",
+				"version" :  getVersionInfo("--version"),
+				"revision" : getVersionInfo("--revision"),
+				"note" : "" }
+	buildenv = {"compiler" : getVersionInfo("--compiler"),
+				"stdlib" : getVersionInfo("--stdlib"),
+				"flags" : getVersionInfo("--flags")}
+
+ 	import SCons.compat	# bypasses SCons bug #2781
+ 	SCons.compat.rename_module('cPickle','pickle') 
+	import benchmark 
+	
+	benchmark.runBenchmarks(infilename="test/BenchmarkFile",outfilename="test/BenchmarkResults.xml",
+				  sample_count=3,timeout=30,memout=900e6,product=product,buildenv=buildenv)
+	
+ 	SCons.compat.rename_module('pickle','cPickle') # bypasses SCons bug #2781 
+
+	import platform
+	import testcmp
+	
+	
+	dir1 = platform.machine().replace(" ","_")
+	dir2 = platform.processor().replace(" ","_")
+	system = platform.system_alias(platform.system(),platform.release(),platform.version())
+	dir3 = (system[0]+" "+system[1]).replace(" ","_")
+	fulldir = "test/"+dir1+"/"+dir2+"/"+dir3+"/"
+	try:
+		os.makedirs(fulldir)
+	except OSError:
+		pass		
+	benchmarkResultsFileName = fulldir+"BenchmarkResults.xml"
+	try:
+		f = open(benchmarkResultsFileName,"r")
+		f.close()			
+		(couteq,cerreq,tgavg,mgavg,favg) = testcmp.compare(benchmarkResultsFileName,"test/BenchmarkResults.xml")
+		if not couteq:
+			print "FAILED: different stdout!"
+		if not cerreq:
+			print "FAILED: different stderr!"
+		print "avg time ratio of newfile/oldfile:",tgavg
+		print "avg mem ratio of newfile/oldfile:",mgavg
+		print "ratio of problems solved faster in newfile:",favg
+	except IOError:
+		print "warning: no previous benchmark results found for this environment"
+	print "please copy test/BenchmarkResults.xml to "+benchmarkResultsFileName	 
+
+testCmd = Command("tests.passed",example_targets,runTests)
 
 testing_target = Alias("test",testCmd)
 

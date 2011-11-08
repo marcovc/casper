@@ -10,7 +10,7 @@ def getTestsField(filename,field):
   tests = testsuite.xpath('.//test')
   for test in tests:
     if test.xpath('string(result)')=="ok":
-      testName=test.xpath('string(name)')
+      testName=test.xpath('string(@id)')
       r[testName]=test.xpath(field)
   return r
   
@@ -20,7 +20,7 @@ def compare(file1,file2):
 
   secs1=getTestsField(file1,"number(secs)")
   secs2=getTestsField(file2,"number(secs)")
-
+  
   tgavg=1.0
   countPositive = 0
   countFaster = 0
@@ -29,7 +29,8 @@ def compare(file1,file2):
       countPositive+=1
       tgavg *= float(secs2[i])/float(secs1[i])
       if float(secs2[i])>float(secs1[i]):
-	countFaster += 1
+          countFaster += 1
+
   tgavg=pow(tgavg,1.0/countPositive)
 
   kbs1=getTestsField(file1,"number(kb)")

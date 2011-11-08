@@ -35,6 +35,73 @@ onlinux = os.name=="posix"
 if onlinux:
     import resource
 
+def leastsquares(X, Y):
+    """
+    Summary
+        Linear regression of y = ax + b
+    Usage
+        real, real, real = linreg(list, list)
+    Returns coefficients to the regression line "y=ax+b" from x[] and y[], and R^2 Value
+    (stolen from http://www.answermysearches.com/how-to-do-a-simple-linear-regression-in-python/124/)
+    """
+    if len(X) != len(Y):  raise ValueError, 'unequal length'
+    N = len(X)
+    Sx = Sy = Sxx = Syy = Sxy = 0.0
+    for x, y in map(None, X, Y):
+        Sx = Sx + x
+        Sy = Sy + y
+        Sxx = Sxx + x*x
+        Syy = Syy + y*y
+        Sxy = Sxy + x*y   
+    det = Sxx * N - Sx * Sx
+    a, b = (Sxy * N - Sy * Sx)/det, (Sxx * Sy - Sx * Sxy)/det
+    meanerror = residual = 0.0
+    for x, y in map(None, X, Y):
+        meanerror = meanerror + (y - Sy/N)**2
+        residual = residual + (y - a * x - b)**2
+    RR = 1 - residual/meanerror
+    ss = residual / (N-2)
+    #Var_a, Var_b = ss * N / det, ss * Sxx / det
+    return a, b, RR
+
+        
+import math
+
+class ProgressBar:
+    def __init__(self,width=40):
+        self.count = 0
+        self.completed = 0
+        self.width = width
+    def reset(self):
+        self.completed=0
+    def setTaskCount(self,c):
+        self.count = c
+    def signalTaskComplete(self):
+        self.completed += 1
+    def display(self):
+        nbars = int(self.completed/float(self.count)*self.width)
+        
+        percent = self.completed/float(self.count)*100        
+        percentStr = str("%(percent)d" % {"percent" : percent})+"%"  
+        percentWidth = len(percentStr)
+
+        startPercent = (self.width-percentWidth)/2 
+        endPercent = startPercent+percentWidth-1
+
+        r = "["
+        for i in range(0,self.width):
+            if i < startPercent and i < nbars:
+                r += "+"
+            elif i == startPercent:
+                r += percentStr
+            elif i > endPercent and i < nbars:
+                r += "+"
+            elif (i < startPercent or i > endPercent) and i >= nbars:
+                r += " "
+        r += "]"
+        return r
+    
+    
 class Stats:
     def start(self):
         if not onlinux:
@@ -174,8 +241,22 @@ class RunQueue:
         avg = average(self.exectimes)
         stddev = std(self.exectimes)
         
+        if self.nbCompleted>2:
+            x=[]; y=[]
+            s = 0; c= 0
+            for i in self.exectimes:
+                s += i
+                c += 1
+                y.append(s)
+                x.append(c)
+            a,b,r2 = leastsquares(x,y)
+            eta = a*(self.nbTasks-self.nbCompleted)+b
+            stddev = math.sqrt(r2)
+        else:
+            eta = avg * (self.nbTasks-self.nbCompleted)
+               
         r += " avgtime:" + formatTime(int(avg)) \
-                  + "|ETA:" + formatTime(int(avg*(self.nbTasks-self.nbCompleted))) \
+                  + "|ETA:" + formatTime(int(eta)) \
                   + chr(177) + formatTime(int(stddev*(self.nbTasks-self.nbCompleted))) \
                           + "|timeouts:" + str(self.timeoutCount) + "|errors:" + str(self.errorCount);
 
@@ -312,47 +393,32 @@ def getBenchmarksXML(benchmarkFile,product,buildenv,runenv):
                           XMLNode("categories",{},"",[XMLNode("category",{},i,[]) for i in b.categories])])]
 
     return getXML(testsuite)        
+
+## main function
+def runBenchmarks(infilename,outfilename,sample_count,timeout,memout,product,buildenv,number_workers = cpu_count()):
+    import platform    
+    runenv = { "os" : " ".join(platform.system_alias(platform.system(),platform.release(),platform.version())),
+               "arch" : platform.machine(),
+               "processor" : platform.processor() }
+
+    bf = BenchmarkFile(infilename)
+    
+    runqueue = RunQueue(number_workers)
+    for b in bf.benchmarks:
+        endTaskHandler = EndTaskHandler(b,runqueue,sample_count)
+        for i in range(0,sample_count):
+            runqueue.add(b,endTaskHandler,maxtime=timeout,maxmem=memout)
         
-import math
-
-class ProgressBar:
-    def __init__(self,width=40):
-        self.count = 0
-        self.completed = 0
-        self.width = width
-    def reset(self):
-        self.completed=0
-    def setTaskCount(self,c):
-        self.count = c
-    def signalTaskComplete(self):
-        self.completed += 1
-    def display(self):
-        nbars = int(self.completed/float(self.count)*self.width)
-        
-        percent = self.completed/float(self.count)*100        
-        percentStr = str("%(percent)d" % {"percent" : percent})+"%"  
-        percentWidth = len(percentStr)
-
-        startPercent = (self.width-percentWidth)/2 
-        endPercent = startPercent+percentWidth-1
-
-        r = "["
-        for i in range(0,self.width):
-            if i < startPercent and i < nbars:
-                r += "+"
-            elif i == startPercent:
-                r += percentStr
-            elif i > endPercent and i < nbars:
-                r += "+"
-            elif (i < startPercent or i > endPercent) and i >= nbars:
-                r += " "
-        r += "]"
-        return r
-           
+    runqueue.wait()    
+    
+    f = open(outfilename,"w")
+    f.write(getBenchmarksXML(bf,product,buildenv,runenv))
+    f.close()
+               
 if __name__ == '__main__':
 
     import argparse
-    import platform
+    
     
     parser = argparse.ArgumentParser(description='Run a set of commands and store benchmarks')
     parser.add_argument('input_file', metavar='INFILE',\
@@ -397,23 +463,10 @@ if __name__ == '__main__':
                 "stdlib": args.buildenv_stdlib,
                 "flags": args.buildenv_flags,
                 "note": args.product_notes }
-
-    runenv = { "os" : " ".join(platform.system_alias(platform.system(),platform.release(),platform.version())),
-               "arch" : platform.machine(),
-               "processor" : platform.processor() }
     
-   # print args
-    bf = BenchmarkFile(args.input_file)
-    
-    runqueue = RunQueue(args.number_workers)
-    for b in bf.benchmarks:
-        endTaskHandler = EndTaskHandler(b,runqueue,args.sample_count)
-        for i in range(0,args.sample_count):
-            runqueue.add(b,endTaskHandler,maxtime=args.timeout,maxmem=args.memout)
-        
-    runqueue.wait()    
-    
-    f = open(args.output_file,"w")
-    f.write(getBenchmarksXML(bf,product,buildenv,runenv))
-    f.close()
+    runBenchmarks(infilename=args.input_file,outfilename=args.output_file,
+                  number_workers=args.number_workers,sample_count=args.sample_count,
+                  timeout=args.timeout,memout=args.memout,product=product,
+                  buildenv=buildenv)
+ 
     
