@@ -167,7 +167,7 @@ import os
 
 casper_version_major = "1"
 casper_version_minor = "0"
-casper_version_release = "0pre1"
+casper_version_release = "0rc1"
 
 casper_version = casper_version_major+'.'+\
 				 casper_version_minor+'.'+\
