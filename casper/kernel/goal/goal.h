@@ -199,7 +199,10 @@ struct NoGoalView :IGoal
 		os << r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"GoalView");
 	}
-	__attribute__((noreturn)) Goal execute() { assert(0); }
+#ifndef SWIG
+	__attribute__((noreturn))
+#endif
+	Goal execute() { assert(0); }
 };
 
 

@@ -17,4 +17,4 @@
 
 %include <kernel/goal.i>
 %include <kernel/explorer.i>
-%include <kernel/par.i>
+//%include <kernel/par.i>

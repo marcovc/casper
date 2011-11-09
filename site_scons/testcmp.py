@@ -3,23 +3,22 @@
 
 
 def getTestsField(filename,field):
-  from Ft.Xml import Parse
+  from xml.etree.ElementTree import ElementTree
   r = dict()
-  doc = Parse(filename)
-  testsuite = doc.documentElement
-  tests = testsuite.xpath('.//test')
-  for test in tests:
-    if test.xpath('string(result)')=="ok":
-      testName=test.xpath('string(@id)')
-      r[testName]=test.xpath(field)
+  doc = ElementTree(file=filename)
+  for test in doc.iterfind('.//test'):
+    if test.find('result').text=="ok":
+      testName=test.attrib['id']
+      r[testName]=test.find(field).text
   return r
-  
-def compare(file1,file2):
-  couteq = getTestsField(file1,"string(cout)")==getTestsField(file2,"string(cout)")
-  cerreq = getTestsField(file1,"string(cerr)")==getTestsField(file2,"string(cerr)")
 
-  secs1=getTestsField(file1,"number(secs)")
-  secs2=getTestsField(file2,"number(secs)")
+ 
+def compare(file1,file2):
+  couteq = getTestsField(file1,"cout")==getTestsField(file2,"cout")
+  cerreq = getTestsField(file1,"cerr")==getTestsField(file2,"cerr")
+
+  secs1=getTestsField(file1,"secs")
+  secs2=getTestsField(file2,"secs")
   
   tgavg=1.0
   countPositive = 0
@@ -33,8 +32,8 @@ def compare(file1,file2):
 
   tgavg=pow(tgavg,1.0/countPositive)
 
-  kbs1=getTestsField(file1,"number(kb)")
-  kbs2=getTestsField(file2,"number(kb)")
+  kbs1=getTestsField(file1,"kb")
+  kbs2=getTestsField(file2,"kb")
 
   mgavg=1.0
   for i in kbs1.keys():
@@ -57,9 +56,9 @@ if __name__ == "__main__":
 
   (couteq,cerreq,tgavg,mgavg,favg) = compare(args.file1[0],args.file2[0])
   if not couteq:
-    print "different stdout!"
+    print "warning: different stdout!"
   if not cerreq:
-    print "different stderr!"
+    print "warning: different stderr!"
   print "average time ratio (file2/file1) =",tgavg
   print "average memory ratio (file2/file1) =",mgavg
   print "ratio of problems solved faster by file2 =",favg

@@ -25,7 +25,7 @@ namespace Casper {
 
 unsigned int getVersionMajor();
 unsigned int getVersionMinor();
-unsigned int getVersionRelease();
+std::string getVersionRelease();
 std::string getRevision();
 
 std::string getVersion();

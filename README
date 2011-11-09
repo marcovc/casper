@@ -1,1 +1,22 @@
-type 'scons --help' for available build targets and options
+======
+README
+======
+
+Source installations:
+=====================
+
+	Just type ``scons --help`` for available build targets and options
+
+Binary installations:
+=====================
+
+	* C++ headers, libraries, and examples were installed on default system locations. Writing the following on a terminal should provide version information about installed library:
+
+	``./casper-kernel-getversion``
+
+	* Python bindings should be accessible from the Python interpreter.
+
+	``import casper``
+	``help(casper)``
+
+	* Source files for C++ and Python examples are in /usr/share/casper.

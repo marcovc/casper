@@ -28,15 +28,12 @@ unsigned int getVersionMajor()
 unsigned int getVersionMinor()
 {	return CASPER_VERSION_MINOR;	}
 
-unsigned int getVersionRelease()
-{	return CASPER_VERSION_RELEASE;	}
-
 std::string getVersion()
 {
 	std::stringstream ss;
 	ss << CASPER_VERSION_MAJOR << "."
 	   << CASPER_VERSION_MINOR << "."
-	   << CASPER_VERSION_RELEASE;
+	   << getVersionRelease();
 	return ss.str();
 }
 
@@ -67,6 +64,9 @@ std::string getBuildDate()
 
 std::string getRevision()
 {	return XSTR(CASPER_REVISION);	}
+
+std::string getVersionRelease()
+{	return XSTR(CASPER_VERSION_RELEASE);	}
 
 
 }

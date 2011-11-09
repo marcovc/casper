@@ -165,13 +165,13 @@ import os
 
 ########### distribution info ###########
 
-casper_version_major = 0
-casper_version_minor = 4
-casper_version_release = 0
+casper_version_major = "1"
+casper_version_minor = "0"
+casper_version_release = "0pre1"
 
-casper_version = str(casper_version_major)+'.'+\
-				 str(casper_version_minor)+'.'+\
-				 str(casper_version_release)
+casper_version = casper_version_major+'.'+\
+				 casper_version_minor+'.'+\
+				 casper_version_release
 casper_license = 'Apache-2.0'
 casper_vendor = 'N/A'
 x_msi_language = 1033
@@ -227,7 +227,7 @@ for root,dir,files in os.walk("site_scons"):
 			extra_files.append(f)
 
 
-dist_sources = library_sources+example_sources+extra_files
+dist_sources = example_sources+extra_files
 
 ############ support for build flags ############
 
@@ -279,7 +279,8 @@ env = Environment(ENV=os.environ,
 				  CPPPATH=['#','#thirdparty/include'],
 				  LIBPATH=['#thirdparty/lib'],
 				  CPPDEFINES = defined_macros,				  
-				  CXXFILESUFFIX='.cpp'
+				  CXXFILESUFFIX='.cpp',
+				  tools=['default','PackageMaker']
 				 )
 
 env.EnsureSConsVersion(1, 2, 0)
@@ -306,6 +307,7 @@ if compiler!='default':
 	Tool(compiler)(env)
 
 Tool('packaging')(env)
+
 
 ############ generate the help message ############
 
@@ -470,8 +472,8 @@ for i in range(1,len(build_flags)):
 version_macros = defined_macros+\
 				[("CASPER_VERSION_MAJOR",str(casper_version_major))]+ \
 				[("CASPER_VERSION_MINOR",str(casper_version_minor))]+ \
-				[("CASPER_VERSION_RELEASE",str(casper_version_release))]+ \
-				[("CASPER_REVISION",str(casper_revision))]+ \
+				[("CASPER_VERSION_RELEASE",casper_version_release)]+ \
+				[("CASPER_REVISION",casper_revision)]+ \
 				[("CASPER_BUILDFLAGS",build_str)]
 				#+ \
 				#[("CASPER_BUILDDATE",time.asctime())]
@@ -683,26 +685,44 @@ Alias('casperbind_fzn',casperbind_fzn_target)
 pycasper_target_libpath = confCommonEnv['LIBPATH']
 pycasper_target_libs = confCommonEnv['LIBS']+[libcasper]
 
+import distutils.sysconfig
+
 def generate_wrapper(iface):
 	return env.SharedObject(env['PREFIX']+"/bindings/python/"+iface+".i",
 									 CCFLAGS=env['CCFLAGS']+['-fPIC','-DSWIG_BUILD'],
-									 CPPPATH=['#.','/usr/include/python2.7'],
+									 CPPPATH=['#.',distutils.sysconfig.get_python_inc()],
 									 SWIGFLAGS = ' -c++ -python -I. -Ibindings/python -Wall -outdir '+env['PREFIX']+"/bindings/python/casper")
 
 def compile_wrapper(iface,pycasper_obj):
-	return env.SharedLibrary(target=env['PREFIX']+'/bindings/python/casper/'+iface,
-								   source=pycasper_obj,SHLIBPREFIX='_',
-								   LIBPATH=pycasper_target_libpath,
-								   LIBS=pycasper_target_libs)
+#	vars = distutils.sysconfig.get_config_vars('CC', 'CXX', 'OPT', 'BASECFLAGS', 'CCSHARED', 'LDSHARED', 'SO')
+#	for i in range(len(vars)):
+#		if vars[i] is None:
+#			vars[i] = ""
+#	(cc, cxx, opt, basecflags, ccshared, ldshared, so_ext) = vars
+#	print vars
+	return env.LoadableModule(target=env['PREFIX']+'/bindings/python/casper/'+iface,
+								   source=pycasper_obj,
+								   LIBPATH=[pycasper_target_libpath],
+								   LINKFLAGS=env['LINKFLAGS'],
+								   LDMODULEPREFIX='_',
+								   LDMODULESUFFIX='.so',
+								   LIBS=pycasper_target_libs,
+								   FRAMEWORKSFLAGS='-flat_namespace -undefined dynamic_lookup')
 
 	
 pycasper_modules=['kernel','cp','util']
 pycasper_wrappers=[]
-pycasper_libs=[Execute(Mkdir(env['PREFIX']+"/bindings/python/casper"))] 
+pycasper_builddir = env.Command(env['PREFIX']+'bindings/python/casper/dummy', '', 
+							[Mkdir(env['PREFIX']+'bindings/python/casper')]),
+						
+pycasper_libs=[] 
+
 for i in pycasper_modules:
 	wrapper = generate_wrapper(i)
 	pycasper_wrappers.append(wrapper)
 	pycasper_libs.append(compile_wrapper(i,wrapper))
+
+Requires(pycasper_wrappers,pycasper_builddir)
 
 py_gen_scripts = []
 pref = "bindings/python/"
@@ -710,8 +730,14 @@ for src in ['cp/int/intvar_operators.i','cp/int/boolvar_operators.i','kernel/int
 	py_gen_scripts.append(env.Command(pref+src,['bindings/python/pyutils/objdb.py',pref+src+'.py'],'python '+pref+src+'.py'+' > $TARGET'))
 
 copy_init = [Command(env['PREFIX']+"/bindings/python/casper/__init__.py", pycasper_wrappers[0], Copy("$TARGET", env['PREFIX']+"/bindings/python/casper/kernel.py"))]
-Alias('casperbind_python',py_gen_scripts+pycasper_libs+copy_init)
-							   
+Alias('casper_python',py_gen_scripts+pycasper_libs+copy_init)
+	
+### support for packaging py-casper ###
+
+#import packagemaker
+#env.Append(BUILDERS = {'PackageMaker' : packagemaker.PackageMakerBuilder})
+	
+#def createPythonCasperDist(env):
 
 ############ general environment information ############
 
@@ -835,31 +861,49 @@ if env.has_key('MSVSPROJECTCOM'):
 
 ### installing ###
 
-common_install_target = []
-for i in extra_files_info:
-	common_install_target.append(env.InstallAs(target=env['install_prefix']+'/share/casper/'+i,source = i))
-
-lib_install_target = []
-lib_install_target += common_install_target
-for i in library_headers:
-	lib_install_target.append(env.InstallAs(target = env['install_prefix']+'/include/'+i[4:],source = i))
-lib_install_target.append(env.Install(target=env['install_prefix']+'/lib/',source = libcasper))
-
-for i in Flatten(example_targets):
-	(dir1,filename) = os.path.split(str(i))
-	(dir2,eval) = os.path.split(dir1)
-	lib_install_target.append(env.InstallAs(target=env['install_prefix']+'/bin/casper-'+eval+"-"+filename,source = i))
-	lib_install_target.append(env.InstallAs(target=env['install_prefix']+'/share/casper/examples/'+eval+"-"+filename,source = i))
-
+def createLibInstallTarget(env):
+	common_install_target = []
+	for i in dist_sources:
+		common_install_target.append(env.InstallAs(target=env['install_prefix']+'/share/casper/'+i,source = i))
 	
+	lib_install_target = []
+	lib_install_target += common_install_target
+	for i in library_headers:
+		lib_install_target.append(env.InstallAs(target = env['install_prefix']+'/include/'+i,source = i))
+	lib_install_target.append(env.Install(target=env['install_prefix']+'/lib/',source = libcasper))
+	
+	for i in Flatten(example_targets):
+		(dir1,filename) = os.path.split(str(i))
+		(dir2,eval) = os.path.split(dir1)
+		lib_install_target.append(env.InstallAs(target=env['install_prefix']+'/bin/casper-'+eval+"-"+filename,source = i))
+	return lib_install_target
+	
+lib_install_target = createLibInstallTarget(env)
 Alias('library-install',lib_install_target)	
               
 
 
 ### packaging ###
 
-dist_sources.append(File('REVISION'))
+newenv = env.Clone()
+newenv['install_prefix']="./dist/usr/"
+bindist_install_target = createLibInstallTarget(newenv)
 
+bindist = [env.Install("dist/Library/Python/2.7/site-packages/",Dir(env["PREFIX"]+"bindings/python/casper")),
+					 env.Command("dist/License.txt","LICENSE",[Copy("$TARGET","$SOURCE")]),
+					 env.Command("dist/Readme.txt","README",[Copy("$TARGET","$SOURCE")]),
+					 env.Command("dist/Changelog.txt",".git/HEAD",
+							["echo CHANGELOG > $TARGET; echo \"---------\" >> $TARGET; echo >> $TARGET; echo >> $TARGET; git log --pretty=format:\"Date: %cd%n  %s%n\" >> $TARGET"]),
+					 bindist_install_target]
+Alias('bindist',bindist)
+			
+Alias('package_macosx',
+					[env.PackageMaker(source=[bindist,"dist/CaSPER.pmdoc"],
+									target=File("dist/CaSPER-"+casper_version+".pkg"),
+					 VERSION="\""+casper_version+"\"")])
+
+dist_sources.append(File('REVISION'))
+'''
 package_libsrc_dist = env.Package( 
 			 source			= dist_sources,
 			 NAME           = 'casper-src',
@@ -886,7 +930,6 @@ package_libbin_dist = env.Package(
 			 X_MSI_LANGUAGE = x_msi_language,
              X_MSI_LICENSE_TEXT = x_msi_license_text,
              PACKAGEVERSION =  0,
-             X_RPM_GROUP    = 'Application/fu',
              SOURCE_URL     = casper_src_url)
-
+'''
 
