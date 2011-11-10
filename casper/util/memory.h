@@ -36,7 +36,7 @@
 
 namespace Casper {
 
-#if defined(_MSC_VER) or defined(__APPLE__)
+#if defined(_MSC_VER) || defined(__APPLE__)
 typedef unsigned int uint;
 #endif
 
