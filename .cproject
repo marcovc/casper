@@ -157,7 +157,6 @@
 			</target>
 			<target name="gcc-version" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>gcc</buildCommand>
-				<buildArguments/>
 				<buildTarget>--version</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -173,7 +172,7 @@
 			</target>
 			<target name="bindings-python" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
-				<buildArguments>-j 8 debug_level=3</buildArguments>
+				<buildArguments>-j 2 debug_level=3</buildArguments>
 				<buildTarget>casper_python</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>

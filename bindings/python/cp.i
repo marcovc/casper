@@ -18,4 +18,4 @@
 %include <cp/vararray.i>
 %include <cp/int/vararray.i>
 %include <cp/label.i>
-
+%include <cp/goal.i>

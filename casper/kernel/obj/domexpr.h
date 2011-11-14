@@ -32,6 +32,13 @@ struct Create<T,CP::DomExpr<Eval> >
 	{	return CP::DomExpr<Eval>(store,t);	}
 };
 
+template<class Eval>
+struct Create<Goal,CP::DomExpr<Eval> >
+{
+	CP::DomExpr<Eval> operator()(CP::Store& store, const Goal& t)
+	{	throw Casper::Exception::TypeCoercion("Goal",typeid(CP::DomExpr<Eval>).name()); }
+};
+
 } // Detail
 
 namespace CP {

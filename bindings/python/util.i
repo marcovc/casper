@@ -16,3 +16,4 @@
 COUTWRAPPER(Casper::Util::CPUTimer)
 
 %include <util/stdarray.i>
+%include <util/iterator.i>

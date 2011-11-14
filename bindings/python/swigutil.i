@@ -17,3 +17,12 @@
 	};
 %enddef
 
+
+%define ITERATOR_WRAPPER(ItName,Class,Container,It,Elem,Call)
+%template(ItName) Casper::Util::Iterator<Container,It,Elem>;
+%extend Class 
+{
+	Casper::Util::Iterator<Container,It,Elem> __iter__() 
+	{	return Casper::Util::Iterator<Container,It,Elem>(Call);	}
+}
+%enddef

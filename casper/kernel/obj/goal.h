@@ -32,6 +32,12 @@ struct Create<T,Goal>
 	{	return Goal(state,t);	}
 };
 
+template<>
+struct Create<bool,Goal>
+{
+	Goal operator()(State& state, const bool& t)
+	{	return Goal(t);	}
+};
 } // Detail
 
 
@@ -39,9 +45,9 @@ template<class Eval>
 struct GoalView<Expr<Eval> > : IGoal
 {
 	GoalView(State& state, const Expr<Eval>& e) :
-		g(e.toGoal(state).getImpl()) {}
-	Goal execute() {	return g.execute(); }
-	IGoal& g;
+		g(e.toGoal(state)) {}
+	Goal execute() {	return g; }
+	Goal g;
 };
 
 

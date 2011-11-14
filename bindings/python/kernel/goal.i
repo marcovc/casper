@@ -8,3 +8,5 @@
 
 // Goal [TODO]
 %include <casper/kernel/goal/goal.h>
+
+%include <kernel/goal_operators.i>

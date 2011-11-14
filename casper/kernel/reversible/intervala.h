@@ -526,7 +526,7 @@ IntervalA<T,Container,Compare>&
 	clear();
 	for (typename DataT::ConstIterator it = s.data.begin();
 		 it != s.data.end(); ++it)
-		 insertInterval(*(*it));
+		 insertInterval(*it);
 	return *this;
 }
 

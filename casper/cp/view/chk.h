@@ -42,6 +42,7 @@ struct NoChkView
 	{	return true;	}
 	bool setToFalse()
 	{	return true;	}
+	__attribute__((noreturn))  R getObj() const {}
 	void attach(INotifiable*)	{}
 	void detach(INotifiable*)	{}
 };

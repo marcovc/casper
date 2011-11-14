@@ -181,9 +181,10 @@ template<class T, int maxSize,class AllocT>
 typename BitsetA<T,maxSize,AllocT>::Iterator&
 BitsetA<T,maxSize,AllocT>::Iterator::operator++() // pre-increment
 {
-	//while (!(*pOwner)[++curVal] && curVal<maxSize)
-	while (++curVal<maxSize and !(*pOwner)[curVal])
-		;
+	if (curVal<maxSize)
+		++curVal;
+	while (curVal<maxSize and !(*pOwner)[curVal])
+		++curVal;
 	return *this;
 }
 
@@ -192,8 +193,7 @@ typename BitsetA<T,maxSize,AllocT>::Iterator
 BitsetA<T,maxSize,AllocT>::Iterator::operator++(int) //post-increment
 {
 	Iterator ret(*this);
-	while (!(*pOwner)[++curVal] && curVal<maxSize)
-	;
+	++*this;
 	return ret;
 }
 

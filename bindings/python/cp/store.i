@@ -22,7 +22,8 @@
 %ignore Casper::CP::Store::operator const State&;
 %include <casper/cp/store.h>
 COUTWRAPPER(Casper::CP::StoreStats)
-	
+
+/*	
 %extend Casper::CP::Store {
 	bool post(const Casper::Expr<bool>& expr, 
 			  Casper::CP::Consistency consistency = Casper::CP::Bounds)
@@ -39,3 +40,4 @@ COUTWRAPPER(Casper::CP::StoreStats)
 	}
 
 }
+*/

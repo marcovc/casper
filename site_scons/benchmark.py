@@ -241,7 +241,7 @@ class RunQueue:
         avg = average(self.exectimes)
         stddev = std(self.exectimes)
         
-        if self.nbCompleted>2:
+        if False: #self.nbCompleted>5:
             x=[]; y=[]
             s = 0; c= 0
             for i in self.exectimes:

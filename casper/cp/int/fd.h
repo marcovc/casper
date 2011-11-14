@@ -44,11 +44,12 @@
 // required forward declarations
 namespace Casper {
 namespace CP {
-template<FD_TP_SPEC(1)> class FD;
+template<class Container, class Element, class T> class FD;
 }
 }
 
-template<FD_TP_SPEC(1)> std::ostream& operator<<(std::ostream& os, const Casper::CP::FD<FD_TP_LIST(1)>& f);
+template<class Container, class Element, class T> std::ostream&
+operator<<(std::ostream& os, const Casper::CP::FD<Container,Element,T>& f);
 
 namespace Casper {
 namespace CP {
@@ -59,6 +60,8 @@ bool isEqual(const FD<Container1,Element,T1>&,const FD<Container2,Element,T2>&);
 template<class> struct EraseInterval {};
 
 namespace Detail {
+
+template<class> struct PrintFD;
 
 template<class T,class CompareT>
 SUList<T,CompareT> rangeStruct(SUList<T,CompareT>*,
@@ -183,8 +186,8 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		    \note Elements are always sorted according
 		    to the \p CompareT function.
 		*/
-		template<FD_TP_SPEC(1)>
-				FD(const FD<FD_TP_LIST(1)>& s)	:
+		template<class Container1,class Element1,class T1>
+				FD(const FD<Container1,Element1,T1>& s)	:
 				_min(s._min),_max(s._max),
 					groundSL(s.groundSL),boundsSL(s.boundsSL),
 					domainSL(s.domainSL)
@@ -200,8 +203,8 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		bool operator=(Iterator it);
 
 		/// Returns \p true if \p this has exactly the same elements as \a s.
-		template<FD_TP_SPEC(1)>
-		bool 	operator==(const FD<FD_TP_LIST(1)>& s) const
+		template<class Container1,class Element1,class T1>
+		bool 	operator==(const FD<Container1,Element1,T1>& s) const
 		{ return isEqual(*this,s);}
 
 		/// Returns the first element of the FD. \pre empty() is false.
@@ -280,7 +283,7 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		friend struct EraseInterval<Self> ;
 		friend bool isEqual<>(const FD&,const FD&);
 #ifndef SWIG
-		friend std::ostream& operator<< <>(std::ostream&, const FD&);
+		friend struct Detail::PrintFD<Self>;
 #endif
 		/// Registers notifiable \a f on groundness event
 		void attachOnGround(INotifiable*	f) { groundSL.attach(f); }
@@ -329,16 +332,16 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		EventSuspList			domainSL;
 };
 
-template<FD_TP_SPEC(1)>
-uint FD<FD_TP_LIST(1)>::getNbSuspFilters() const
+template<class Container,class Element,class T>
+uint FD<Container,Element,T>::getNbSuspFilters() const
 {	return groundSL.getNbFilters() + boundsSL.getNbFilters() + domainSL.getNbFilters(); }
 
-template<FD_TP_SPEC(1)>
-uint FD<FD_TP_LIST(1)>::getNbSuspWeightedFilters() const
+template<class Container,class Element,class T>
+uint FD<Container,Element,T>::getNbSuspWeightedFilters() const
 {	return groundSL.getNbWeightedFilters() + boundsSL.getNbWeightedFilters() + domainSL.getNbWeightedFilters(); }
 
-template<FD_TP_SPEC(1)>
-uint FD<FD_TP_LIST(1)>::getAFC() const
+template<class Container,class Element,class T>
+uint FD<Container,Element,T>::getAFC() const
 {
 	return groundSL.getTotalAFC() + boundsSL.getTotalAFC() + domainSL.getTotalAFC();
 }
@@ -360,8 +363,8 @@ uint FD<FD_TP_LIST(1)>::getAFC() const
 
 	If \a v is not in the domain it fails.
 */
-template<FD_TP_SPEC(1)>
-bool FD<FD_TP_LIST(1)>::operator=(const Value& v)
+template<class Container,class Element,class T>
+bool FD<Container,Element,T>::operator=(const Value& v)
 {
 	Iterator it = find(v);
 	if (it == end())
@@ -377,8 +380,8 @@ bool FD<FD_TP_LIST(1)>::operator=(const Value& v)
 	\brief Assigns the value pointed by \a it to the finite domain.
 	\pre it
 */
-template<FD_TP_SPEC(1)>
-bool FD<FD_TP_LIST(1)>::operator=(Iterator it)
+template<class Container,class Element,class T>
+bool FD<Container,Element,T>::operator=(Iterator it)
 {
 	if (it == end())
 		return false;
@@ -390,8 +393,8 @@ bool FD<FD_TP_LIST(1)>::operator=(Iterator it)
 }
 
 /// Erases all elements in the interval [\a min , \a max ].
-template<FD_TP_SPEC(1)>
-bool FD<FD_TP_LIST(1)>::erase(Value min, Value max)
+template<class Container,class Element,class T>
+bool FD<Container,Element,T>::erase(Value min, Value max)
 {
 	Iterator b = lowerBound(min);
 	Iterator e = upperBound(max);
@@ -406,8 +409,8 @@ bool FD<FD_TP_LIST(1)>::erase(Value min, Value max)
 }
 
 /// Erases element \a k if it exists.
-template<FD_TP_SPEC(1)>
-inline bool FD<FD_TP_LIST(1)>::erase(const Value& k)
+template<class Container,class Element,class T>
+inline bool FD<Container,Element,T>::erase(const Value& k)
 {
 	assert(!empty());
 	Iterator it = find(k);
@@ -417,8 +420,8 @@ inline bool FD<FD_TP_LIST(1)>::erase(const Value& k)
 }
 
 /// Erases element at position \a p. \pre \a p is a valid Iterator
-template<FD_TP_SPEC(1)>
-inline bool FD<FD_TP_LIST(1)>::erase(Iterator p)
+template<class Container,class Element,class T>
+inline bool FD<Container,Element,T>::erase(Iterator p)
 {
 	triggerBeforeErase(p);
 	Super::erase(p);
@@ -431,8 +434,8 @@ inline bool FD<FD_TP_LIST(1)>::erase(Iterator p)
 }
 
 /// Erases all elements in [\a p, \a q )
-template<FD_TP_SPEC(1)>
-bool FD<FD_TP_LIST(1)>::erase(Iterator p,Iterator q)
+template<class Container,class Element,class T>
+bool FD<Container,Element,T>::erase(Iterator p,Iterator q)
 {
 	triggerBeforeErase(p,q);
 	Super::erase(p,q);
@@ -445,8 +448,8 @@ bool FD<FD_TP_LIST(1)>::erase(Iterator p,Iterator q)
 }
 
 /// Removes the interval [min,ith) from the domain
-template<FD_TP_SPEC(1)>
-bool FD<FD_TP_LIST(1)>::updateMin(Iterator ith)
+template<class Container,class Element,class T>
+bool FD<Container,Element,T>::updateMin(Iterator ith)
 {
 	triggerBeforeErase(begin(),ith);
 	Super::updateMin(ith);
@@ -455,8 +458,8 @@ bool FD<FD_TP_LIST(1)>::updateMin(Iterator ith)
 }
 
 /// Removes the interval [min,v) from the domain
-template<FD_TP_SPEC(1)>
-inline bool FD<FD_TP_LIST(1)>::updateMin(const Value& v)
+template<class Container,class Element,class T>
+inline bool FD<Container,Element,T>::updateMin(const Value& v)
 {
 	if (v <= min())	return true;
 	Iterator ith = Super::lowerBound(v);
@@ -466,8 +469,8 @@ inline bool FD<FD_TP_LIST(1)>::updateMin(const Value& v)
 }
 
 /// Removes the interval [ith,max] from the domain
-template<FD_TP_SPEC(1)>
-bool FD<FD_TP_LIST(1)>::updateMax(Iterator ith)
+template<class Container,class Element,class T>
+bool FD<Container,Element,T>::updateMax(Iterator ith)
 {
 	triggerBeforeErase(ith,end());
 	Super::updateMax(--ith);
@@ -476,8 +479,8 @@ bool FD<FD_TP_LIST(1)>::updateMax(Iterator ith)
 }
 
 /// Removes the interval (v,max] from the domain
-template<FD_TP_SPEC(1)>
-inline bool FD<FD_TP_LIST(1)>::updateMax(const Value& v)
+template<class Container,class Element,class T>
+inline bool FD<Container,Element,T>::updateMax(const Value& v)
 {
  	if (v >= max())	return true;
  	Iterator ith = Super::upperBound(v);
@@ -487,8 +490,8 @@ inline bool FD<FD_TP_LIST(1)>::updateMax(const Value& v)
 }
 
 /// Removes everything not in [min,max] from the domain
-template<FD_TP_SPEC(1)>
-inline bool FD<FD_TP_LIST(1)>::updateRange(const Value& min,const Value& max)
+template<class Container,class Element,class T>
+inline bool FD<Container,Element,T>::updateRange(const Value& min,const Value& max)
 {
 	// FIXME: make more effient (call triggerAfterErase once)
 	return updateMin(min) && updateMax(max);
@@ -496,9 +499,9 @@ inline bool FD<FD_TP_LIST(1)>::updateRange(const Value& min,const Value& max)
 
 /// Intersects FD with all values in iteratable range defined by [b,e[
 /// \pre Values in the range are sorted.
-template<FD_TP_SPEC(1)>
+template<class Container,class Element,class T>
 template<class Iterator1>
-bool FD<FD_TP_LIST(1)>::intersect(Iterator1 b,Iterator1 e)
+bool FD<Container,Element,T>::intersect(Iterator1 b,Iterator1 e)
 {
 	assert(!empty());
 	assert(b!=e);
@@ -534,9 +537,9 @@ bool FD<FD_TP_LIST(1)>::intersect(Iterator1 b,Iterator1 e)
 
 /// Erases all values in iterateable range defined by [b,e[ from FD
 /// \pre Values in the range are sorted.
-template<FD_TP_SPEC(1)>
+template<class Container,class Element,class T>
 template<class Iterator1>
-bool FD<FD_TP_LIST(1)>::erase(Iterator1 b,Iterator1 e)
+bool FD<Container,Element,T>::erase(Iterator1 b,Iterator1 e)
 {
 	assert(!empty());
 
@@ -558,14 +561,14 @@ bool FD<FD_TP_LIST(1)>::erase(Iterator1 b,Iterator1 e)
 }
 //@}
 
-template<FD_TP_SPEC(1)>
-inline void FD<FD_TP_LIST(1)>::triggerBeforeErase(Iterator it)
+template<class Container,class Element,class T>
+inline void FD<Container,Element,T>::triggerBeforeErase(Iterator it)
 {
 	mDelta.f = mDelta.l = it;
 }
 
-template<FD_TP_SPEC(1)>
-inline void FD<FD_TP_LIST(1)>::triggerBeforeErase(Iterator it1,Iterator it2)
+template<class Container,class Element,class T>
+inline void FD<Container,Element,T>::triggerBeforeErase(Iterator it1,Iterator it2)
 {
 	mDelta.f = it1;
 	mDelta.l = --it2;
@@ -579,8 +582,8 @@ void FD<FD_TP_LIST(1)>::triggerBeforeErase(Value from, Value to)
 	lastErasedRangeMax = to;
 }*/
 
-template<FD_TP_SPEC(1)>
-inline bool FD<FD_TP_LIST(1)>::triggerAfterErase()
+template<class Container,class Element,class T>
+inline bool FD<Container,Element,T>::triggerAfterErase()
 {
 	assert(!empty());
 
@@ -597,16 +600,19 @@ inline bool FD<FD_TP_LIST(1)>::triggerAfterErase()
 /**
 	Generic copy constructor. Populates the FD inserting each element. O(N)
 */
-template<FD_TP_SPEC(1),FD_TP_SPEC(2)>
-inline void copyC(FD<FD_TP_LIST(1)>& me, const FD<FD_TP_LIST(2)>& s)
+template<class Container1,class Element1,class T1,
+		 class Container2,class Element2,class T2>
+inline void copyC(FD<Container1,Element1,T1>& me,
+			const FD<Container2,Element2,T2>& s)
 { C_DEBUG_COUT("copyC\n");me.insert(s.begin(),s.end());}
 
 /**
 	Generic comparison. Compares each element. O(N)
 */
-template<FD_TP_SPEC(1),FD_TP_SPEC(2)>
-inline bool isEqual(const FD<FD_TP_LIST(1)>& me,
-					const FD<FD_TP_LIST(2)>& s)
+template<class Container1,class Element1,class T1,
+		 class Container2,class Element2,class T2>
+inline bool isEqual(const FD<Container1,Element1,T1>& me,
+					const FD<Container2,Element2,T2>& s)
 {
 	return (!me.empty() && !s.empty() && equal(me.begin(),me.end(),s.begin()))
 			||	(me.empty() && s.empty());
@@ -617,11 +623,12 @@ inline bool isEqual(const FD<FD_TP_LIST(1)>& me,
 	element type. O(s(N))
 */
 
-template<FD_TP_SPEC(1),FD_TP_NE_SPEC(2)>
-inline void copyC(FD<FD_TP_LIST(1)>& me,
+template<class Container1,class Element1,class T1,
+		 class Container2, class T2>
+inline void copyC(FD<Container1,Element1,T1>& me,
 	  			  const FD<Container2,Element1,T2>& s)
 {
-	typedef typename FD<FD_TP_LIST(1)>::Super Super_me;
+	typedef typename FD<Container1,Element1,T1>::Super Super_me;
 	typedef typename FD<Container2,Element1,T2>::Super Super_s;
 	((Super_me&)me)(s);
 }
@@ -630,12 +637,13 @@ inline void copyC(FD<FD_TP_LIST(1)>& me,
 	Comparison between an FD and another FD with the same
 	element type. O(s(N))
 */
-template<FD_TP_SPEC(1),FD_TP_NE_SPEC(2)>
+template<class Container1,class Element1,class T1,
+		 class Container2, class T2>
 inline bool
-isEqual(const FD<FD_TP_LIST(1)>& me,
+isEqual(const FD<Container1,Element1,T1>& me,
 	    const FD<Container2,Element1,T2>& s)
 {
-	typedef typename FD<FD_TP_LIST(1)>::Super Super_me;
+	typedef typename FD<Container1,Element1,T1>::Super Super_me;
 	typedef typename FD<Container2,Element1,T2>::Super Super_s;
 	return ((const Super_me&)me) == s;
 }
@@ -646,10 +654,10 @@ isEqual(const FD<FD_TP_LIST(1)>& me,
 	@cost O(s(N))
 	@todo Can be optimized when the structure is a list or vector.
 */
-template<FD_TP_SPEC(1)>
-struct EraseInterval<FD<FD_TP_LIST(1)> >
+template<class Container,class Element,class T>
+struct EraseInterval<FD<Container,Element,T> >
 {
-	typedef FD<FD_TP_LIST(1)> Self;
+	typedef FD<Container,Element,T> Self;
 	typedef typename Self::Super	Super;
 	typedef typename Self::Iterator Iterator;
 	bool operator()(Self& t, Iterator b,Iterator e)
@@ -781,6 +789,75 @@ struct BatchRangeErase
 	int				minElem;
 	int				maxElem;
 };
+
+template<class Dom>
+struct PrintFD
+{
+	std::ostream& operator()(std::ostream& os,const Dom& f)
+	{
+		typedef typename Dom::ConstIterator ConstIterator;
+		if (f.empty() == 1)	// no elements
+			os << "{}";
+		else
+		if (f.size() == 1)	// one element
+			os << *f.begin();
+		else
+		{
+			ConstIterator itprev = f.begin();
+			ConstIterator it1 = f.begin();
+			++it1;
+			while (it1 != f.end())
+			{
+				if (*it1 != *itprev+1)
+					break;
+				++it1; ++itprev;
+			}
+			if 	(it1 == f.end())	// one range
+				os << "[" << *f.begin() << ".." << *itprev << "]";
+			else
+			{
+				ConstIterator rangeStart = f.begin();
+				itprev = f.begin();
+				it1 = f.begin();
+				++it1;
+				os << "{" << *itprev;
+				while (it1 != f.end())
+				{
+					if (*it1 != *itprev+1)
+					{
+						if (rangeStart != itprev)
+							os << ".." << *itprev;
+						os << "," << *it1;
+						rangeStart = it1;
+					}
+					++it1; ++itprev;
+				}
+				if (rangeStart != itprev)
+					os << ".." << *itprev;
+				os << "}";
+			}
+		}
+		//os << (typename FD<FD_TP_LIST(1)>::Super&)f;
+		return os;
+	}
+};
+
+template<>
+struct PrintFD<BD>
+{
+	std::ostream& operator()(std::ostream& os,const BD& f)
+	{
+		if (f.empty())
+			os << "{";
+		else
+		if (f.ground())
+			os << "{" << static_cast<bool>(*f.begin()) << "}";
+		else
+			os << "{0,1}";
+		return os;
+	}
+};
+
 } // Detail
 
 } // CP
@@ -795,60 +872,19 @@ struct GetEval<Casper::CP::FD<C,E,T> >
 } // Casper
 
 
-template<FD_TP_SPEC(1)>
-std::ostream& operator<<(std::ostream& os, const Casper::CP::FD<FD_TP_LIST(1)>& f)
+template<class Container,class Element,class T>
+std::ostream& operator<<(std::ostream& os,
+						 const Casper::CP::FD<Container,Element,T>& f)
 {
-	typedef typename Casper::CP::FD<FD_TP_LIST(1)>::ConstIterator ConstIterator;
-	if (f.empty() == 1)	// no elements
-		os << "{}";
-	else
-	if (f.size() == 1)	// one element
-		os << *f.begin();
-	else
-	{
-		ConstIterator itprev = f.begin();
-		ConstIterator it1 = f.begin();
-		++it1;
-		while (it1 != f.end())
-		{
-			if (*it1 != *itprev+1)
-				break;
-			++it1; ++itprev;
-		}
-		if 	(it1 == f.end())	// one range
-			os << "[" << *f.begin() << ".." << *itprev << "]";
-		else
-		{
-			ConstIterator rangeStart = f.begin();
-			itprev = f.begin();
-			it1 = f.begin();
-			++it1;
-			os << "{" << *itprev;
-			while (it1 != f.end())
-			{
-				if (*it1 != *itprev+1)
-				{
-					if (rangeStart != itprev)
-						os << ".." << *itprev;
-					os << "," << *it1;
-					rangeStart = it1;
-				}
-				++it1; ++itprev;
-			}
-			if (rangeStart != itprev)
-				os << ".." << *itprev;
-			os << "}";
-		}
-	}
-	//os << (typename FD<FD_TP_LIST(1)>::Super&)f;
-	return os;
+	return Casper::CP::Detail::PrintFD<Casper::CP::FD<Container,Element,T> >()(os,f);
 }
 
-template<FD_TP_SPEC(1)>
-std::istream& operator>>(std::istream& is, Casper::CP::FD<FD_TP_LIST(1)>& f)
+template<class Container,class Element,class T>
+std::istream& operator>>(std::istream& is,
+						 Casper::CP::FD<Container,Element,T>& f)
 {
 	using namespace std;
-	typedef Casper::CP::FD<FD_TP_LIST(1)> Dom;
+	typedef Casper::CP::FD<Container,Element,T> Dom;
 	typedef typename Dom::Value	Value;
 	is >> ws;
 	char c = is.peek();

@@ -28,9 +28,8 @@ using namespace std;
 int main()
 {
 	CP::Solver solver;
-	IntPar i (solver);
-	Expr<int> ei(i);
-	Expr<bool> g = assign(ei,3);
-	cout << solver.solve(g) << endl;
-	cout << i << endl;
+	CP::BoolVar v(solver,false,false);
+	cout << v << endl;
+	for (auto it = v.domain().begin(); it != v.domain().end(); it++)
+		cout << *it << endl;
 }

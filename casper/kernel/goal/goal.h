@@ -250,6 +250,9 @@ struct GoalView5 : NoGoalView<Rel5<F,T1,T2,T3,T4,T5> >
 
 };
 
+inline std::ostream& operator<<(std::ostream& os, const Casper::Goal& g)
+{	os << "Casper::Goal@" << g.getPImpl(); return os; }
+
 #endif
 
 #ifndef CASPER_NO_OPERATORS

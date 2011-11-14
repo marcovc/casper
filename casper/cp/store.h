@@ -26,6 +26,11 @@
 #include <casper/kernel/rel/rel.h>
 
 namespace Casper {
+
+#if defined(SWIG_BUILD)
+template<class> struct Expr;
+#endif
+
 namespace CP {
 
 /**
@@ -113,10 +118,7 @@ struct IFilterSched;
 template<class> struct BndExpr;
 template<class,class> struct Var;
 
-#ifdef SWIG
-enum Consistency { Domain, Bounds, Value };
-#endif
-#ifdef SWIG_BUILD
+#if defined(SWIG) | defined(SWIG_BUILD)
 enum Consistency { Domain, Bounds, Value };
 #endif
 
@@ -151,6 +153,11 @@ struct Store : INotifiable
 	bool post(const Filter&);
 	bool post(IFilter*);
 	bool post(const BndExpr<bool>& b);
+#endif
+
+#if defined(SWIG) | defined(SWIG_BUILD)
+	bool post(const Casper::Expr<bool>& expr,
+			  Casper::CP::Consistency consistency = Casper::CP::Bounds);
 #endif
 
 #ifndef _MSC_VER

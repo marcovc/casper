@@ -1,9 +1,10 @@
 
-
+import sys
 from casper import *
 from casper.cp import *
+import random
 
-n = 4
+n = 8
 
 solver = Solver()
 
@@ -13,17 +14,33 @@ solver.post(distinct(vars))
 solver.post(distinct([vars[i]+i for i in range(0,n)]))
 solver.post(distinct([vars[i]-i for i in range(0,n)]))
 
-x = IntVar(solver)
-v = IntPar(solver)
-
+#
+#x = IntVar(solver)
+#v = IntPar(solver.getState())
+#
+x = IntVarRef(solver)
+v = IntRef(solver)
 search = whiledo(lambda:not vars.ground()) (
-					assign(x,lambda:min(vars,key=domainSize)) &	
+					assign(x,min(vars,key=lambda x: len(x.domain()))) &
+					assignMin(x,vars,domainSize(x)*ground(x)))	
 					assign(v,lambda:min(x)) &
 					(post(solver,x==v) | post(solver,x!=v)) 
 				)
 
-found = solver.solve(search);
 
+def search():
+	if vars.ground():
+		return True
+
+	idx = __builtins__.min(range(n),
+						key=lambda idx: vars[idx].ground()*n*n+len(vars[idx].domain())*n+
+								__builtins__.abs(idx-n/2))
+	x = vars[idx]
+#	x = __builtins__.min(nonground,key=lambda v: len(v.domain()))
+	v = random.choice(list(x.domain()))
+	return  (post(solver,x==v) | post(solver,x!=v)) & search
+
+found = solver.solve(search)
 if found:
     print vars
 else:
@@ -32,16 +49,15 @@ else:
 print solver.getStats()
 print solver.getCPUTimer()
 
-#found = solver.solve(assign(p,2) | assign(p,lambda:8))
-#
-#while found:
-#    print p
-#    found = solver.next()
-#
+#search = whiledo(lambda:not vars.ground()) (
+#					assign(x,lambda:min(vars,key=domainSize)) &	
+#					assign(v,lambda:min(x)) &
+#					(post(solver,x==v) | post(solver,x!=v))) 
+
 #
 #p = IntPar(solver.getState(),lambda:8)
+#print p
 #e = IntExpr(lambda:8)
 #print e
-#print "bla"
         
              

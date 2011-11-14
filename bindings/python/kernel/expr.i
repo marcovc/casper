@@ -5,6 +5,7 @@
 #include <casper/kernel.h>
 #include <casper/cp.h>
 #include <casper/kernel/obj/expr.h>
+#include <casper/kernel/goal/whiledo.h>
 #include <bindings/python/kernel/expr.h>
 %}
 
@@ -18,7 +19,8 @@
 Casper::Detail::CreateFromPyObject<Eval>::isExpr = $descriptor(Casper::Expr<Eval>*);
 Casper::Detail::CreateFromPyObject<Eval>::isCPVar = 
 			$descriptor(Casper::CP::Var<Eval,Casper::CP::Traits::GetDefaultDom<Eval>::Type >*);
-Casper::Detail::CreateFromPyObject<Eval>::isPar = $descriptor(Casper::Par<Eval>*);			
+Casper::Detail::CreateFromPyObject<Eval>::isPar = $descriptor(Casper::Par<Eval>*);
+Casper::Detail::CreateFromPyObject<Eval>::isGoal = $descriptor(Casper::Goal*);				
 %enddef
 
 %define SET_SEQEXPR_SWIG_TYPE_DESCR(Eval)
@@ -36,7 +38,7 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 
 %typemap(in) Casper::Expr<int> const&
 {
-	std::cout << "in Expr<int> typemap\n";
+	//std::cout << "in Expr<int> typemap\n";
 	
 	SET_EXPR_SWIG_TYPE_DESCR(int)	
 		
@@ -45,7 +47,7 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 
 %typemap(typecheck,precedence=0) Casper::Expr<int> const&
 {
-	std::cout << "in Expr<int> typecheck\n";
+	//std::cout << "in Expr<int> typecheck\n";
 	
 	SET_EXPR_SWIG_TYPE_DESCR(int)
 		
@@ -56,7 +58,7 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 
 %typemap(in) Casper::Expr<bool> const&
 {
-	std::cout << "in Expr<bool> typemap\n";
+	//std::cout << "in Expr<bool> typemap\n";
 	
 	SET_EXPR_SWIG_TYPE_DESCR(bool)
 	
@@ -65,7 +67,7 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 
 %typemap(typecheck,precedence=0) Casper::Expr<bool> const&
 {
-	std::cout << "in Expr<bool> typecheck\n";
+	//std::cout << "in Expr<bool> typecheck\n";
 
 	SET_EXPR_SWIG_TYPE_DESCR(bool)
 
@@ -76,7 +78,7 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 
 %typemap(in) Casper::Expr<Casper::Seq<int> > const&
 {
-	std::cout << "in Expr<Seq<int> > typemap\n";
+	//std::cout << "in Expr<Seq<int> > typemap\n";
 	
 	SET_SEQEXPR_SWIG_TYPE_DESCR(int)
 	
@@ -85,7 +87,7 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 
 %typemap(typecheck,precedence=0) Casper::Expr<Casper::Seq<int> > const&
 {
-	std::cout << "in Expr<Seq<int> > typecheck\n";
+	//std::cout << "in Expr<Seq<int> > typecheck\n";
 
 	SET_SEQEXPR_SWIG_TYPE_DESCR(int)
 	
@@ -96,7 +98,7 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 
 %typemap(in) Casper::Expr<Casper::Seq<bool> > const&
 {
-	std::cout << "in Expr<Seq<bool> > typemap\n";
+	//std::cout << "in Expr<Seq<bool> > typemap\n";
 	
 	SET_SEQEXPR_SWIG_TYPE_DESCR(bool)
 	
@@ -105,7 +107,7 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 
 %typemap(typecheck,precedence=0) Casper::Expr<Casper::Seq<bool> > const&
 {
-	std::cout << "in Expr<Seq<bool> > typecheck\n";
+	//std::cout << "in Expr<Seq<bool> > typecheck\n";
 
 	SET_SEQEXPR_SWIG_TYPE_DESCR(bool)
 	

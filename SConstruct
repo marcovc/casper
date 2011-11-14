@@ -726,7 +726,9 @@ Requires(pycasper_wrappers,pycasper_builddir)
 
 py_gen_scripts = []
 pref = "bindings/python/"
-for src in ['cp/int/intvar_operators.i','cp/int/boolvar_operators.i','kernel/intexpr_operators.i','kernel/boolexpr_operators.i','kernel/expr_predicates.i']:
+for src in ['cp/int/intvar_operators.i','cp/int/boolvar_operators.i',
+			'kernel/intexpr_operators.i','kernel/boolexpr_operators.i',
+			'kernel/expr_predicates.i','kernel/goal_operators.i']:
 	py_gen_scripts.append(env.Command(pref+src,['bindings/python/pyutils/objdb.py',pref+src+'.py'],'python '+pref+src+'.py'+' > $TARGET'))
 
 copy_init = [Command(env['PREFIX']+"/bindings/python/casper/__init__.py", pycasper_wrappers[0], Copy("$TARGET", env['PREFIX']+"/bindings/python/casper/kernel.py"))]
@@ -775,7 +777,7 @@ def runTests(env,target,source):
 	import benchmark 
 	
 	benchmark.runBenchmarks(infilename="test/BenchmarkFile",outfilename="test/BenchmarkResults.xml",
-				  sample_count=3,timeout=30,memout=900e6,product=product,buildenv=buildenv)
+				  sample_count=3,timeout=30,memout=900e3,product=product,buildenv=buildenv)
 	
  	SCons.compat.rename_module('pickle','cPickle') # bypasses SCons bug #2781 
 

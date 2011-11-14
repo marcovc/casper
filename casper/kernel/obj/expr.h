@@ -304,4 +304,4 @@ std::ostream& operator<<(std::ostream& os,const Casper::Expr<T>& expr)
 #include <casper/kernel/obj/variable.h>
 #include <casper/kernel/obj/par.h>
 #include <casper/kernel/obj/goal.h>
-
+#include <casper/kernel/obj/extensions.h>

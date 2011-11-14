@@ -142,6 +142,7 @@ objs.add(Rule(type="tRel",func="Element",ev="int",nArgs=2,arg1Eval="Casper::IntS
 ## Goals ##
 for t in ["bool","int"]:
 	objs.add(Rule(type="tRel",func="Assign",ev="bool",nArgs=2,arg1Eval=t,arg2Eval=t))
+objs.add(Rule(type="tRel",func="WhileDo",ev="bool",nArgs=2,arg1Eval="bool",arg2Eval="bool"))
 
 # TODO later
 #				"fWhileNotGround",
