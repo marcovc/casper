@@ -51,6 +51,9 @@ struct VarDomCreator<FD<FD_TP_LIST(1)> >
 
 	FD<FD_TP_LIST(1)>* operator()(Store& store,const Util::StdList<Util::StdRange<T1> >& l);
 
+	FD<FD_TP_LIST(1)>* operator()(Store& store,std::initializer_list<T1>& l)
+	{	return operator()(store,l.begin(),l.end()); }
+
 	// returned domain is the union of all domains in the array
 	template<class View>
 	FD<FD_TP_LIST(1)>* unionOf(Store& store, const View& v);

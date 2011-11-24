@@ -3,7 +3,7 @@
     <product id='1'>
         <name>CaSPER</name>
         <version>1.0.0rc1</version>
-        <revision>v1.0.0rc1-2-g2f7b4f5</revision>
+        <revision>v1.0.0rc1-3-g2494cb1</revision>
         <note></note>
     </product>
     <buildenv id='1'>
@@ -12,7 +12,7 @@
         <buildflags>-g0 -O3 -Wall -std=gnu++0x -fPIC</buildflags>
     </buildenv>
     <runenv id='1'>
-        <os>Linux 2.6.37.6 #9 SMP PREEMPT Fri Nov 11 17:33:16 WET 2011</os>
+        <os>Linux 2.6.37.6 #10 SMP PREEMPT Wed Nov 16 16:39:29 WET 2011</os>
         <arch>i686</arch>
         <processor>Intel(R) Core(TM)2 Duo CPU T7500 @ 2.20GHz</processor>
     </runenv>
@@ -37,8 +37,8 @@ Maximum depth                 :       123
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>1.353794</secs>
-        <kb>19460</kb>
+        <secs>1.287803</secs>
+        <kb>19380</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -65,8 +65,8 @@ Maximum depth                 :        79
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>1.408785</secs>
-        <kb>19460</kb>
+        <secs>1.626752</secs>
+        <kb>19388</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -93,8 +93,8 @@ Maximum depth                 :        52
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>3.049535</secs>
-        <kb>19460</kb>
+        <secs>2.668593</secs>
+        <kb>19384</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -121,7 +121,7 @@ Maximum depth                 :       469
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>3.105527</secs>
+        <secs>3.2795</secs>
         <kb>27024</kb>
         <result>ok</result>
         <categories>
@@ -150,8 +150,8 @@ Maximum depth                 :         7
 Number of solutions           :         2
 </cout>
         <cerr></cerr>
-        <secs>8.323734</secs>
-        <kb>27024</kb>
+        <secs>7.895799</secs>
+        <kb>27028</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -179,7 +179,7 @@ Maximum depth                 :         6
 Number of solutions           :         2
 </cout>
         <cerr></cerr>
-        <secs>8.28274</secs>
+        <secs>8.381725</secs>
         <kb>27024</kb>
         <result>ok</result>
         <categories>
@@ -208,8 +208,8 @@ Maximum depth                 :         6
 Number of solutions           :         2
 </cout>
         <cerr></cerr>
-        <secs>14.163846</secs>
-        <kb>27024</kb>
+        <secs>13.731912</secs>
+        <kb>27028</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -236,8 +236,8 @@ Maximum depth                 :         7
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>15.52364</secs>
-        <kb>27024</kb>
+        <secs>15.093704</secs>
+        <kb>27028</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -264,8 +264,8 @@ Maximum depth                 :         7
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>15.71161</secs>
-        <kb>27024</kb>
+        <secs>15.959573</secs>
+        <kb>27028</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -292,7 +292,7 @@ Maximum depth                 :         7
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>21.300761</secs>
+        <secs>20.576871</secs>
         <kb>27024</kb>
         <result>ok</result>
         <categories>
@@ -329,8 +329,8 @@ Maximum depth                 :         9
 Number of solutions           :        10
 </cout>
         <cerr></cerr>
-        <secs>26.459976</secs>
-        <kb>27024</kb>
+        <secs>26.628951</secs>
+        <kb>27028</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -367,8 +367,8 @@ Maximum depth                 :         8
 Number of solutions           :         0
 </cout>
         <cerr></cerr>
-        <secs>36.413463</secs>
-        <kb>27024</kb>
+        <secs>36.393467</secs>
+        <kb>27028</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -395,8 +395,8 @@ Maximum depth                 :        11
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>38.832096</secs>
-        <kb>27024</kb>
+        <secs>49.719441</secs>
+        <kb>27028</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -423,7 +423,7 @@ Maximum depth                 :        11
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>43.196432</secs>
+        <secs>31.359231</secs>
         <kb>27024</kb>
         <result>ok</result>
         <categories>
@@ -451,7 +451,7 @@ Maximum depth                 :        11
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>43.214429</secs>
+        <secs>31.377229</secs>
         <kb>27024</kb>
         <result>ok</result>
         <categories>
@@ -518,7 +518,7 @@ Maximum depth                 :        67
 Number of solutions           :        40
 </cout>
         <cerr></cerr>
-        <secs>42.346562</secs>
+        <secs>38.270181</secs>
         <kb>27024</kb>
         <result>ok</result>
         <categories>
@@ -546,8 +546,8 @@ Maximum depth                 :       193
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>55.58155</secs>
-        <kb>27024</kb>
+        <secs>58.238145</secs>
+        <kb>27028</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -574,8 +574,8 @@ Maximum depth                 :       992
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>58.260142</secs>
-        <kb>166504</kb>
+        <secs>53.302895</secs>
+        <kb>166512</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -603,8 +603,8 @@ Maximum depth                 :        11
 Number of solutions           :         2
 </cout>
         <cerr></cerr>
-        <secs>63.115404</secs>
-        <kb>166504</kb>
+        <secs>74.514671</secs>
+        <kb>166508</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -670,8 +670,8 @@ Maximum depth                 :         9
 Number of solutions           :        40
 </cout>
         <cerr></cerr>
-        <secs>73.706794</secs>
-        <kb>166504</kb>
+        <secs>59.725919</secs>
+        <kb>166512</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -773,8 +773,8 @@ Maximum depth                 :        19
 Number of solutions           :        76
 </cout>
         <cerr></cerr>
-        <secs>73.059893</secs>
-        <kb>166504</kb>
+        <secs>84.377172</secs>
+        <kb>166508</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -782,22 +782,134 @@ Number of solutions           :        76
     </test>
     <test id='./build/release/examples/cp/int/labs'>
         <description>./build/release/examples/cp/int/labs 22 -t0</description>
-        <cout></cout>
+        <cout>
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } 3311
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1 } 2471
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1 } 2399
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1 } 1863
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1 } 1791
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1 } 1727
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1 } 1455
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1 } 1367
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1 } 1303
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1 } 1263
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1 } 1215
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1 } 1199
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1 } 1111
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, 1 } 1047
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, 1 } 991
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, -1 } 975
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1 } 943
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, -1 } 895
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, -1, 1 } 871
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1 } 855
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1 } 839
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, 1, -1 } 807
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, -1, 1, 1, -1 } 799
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, -1, 1 } 783
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, -1, -1 } 727
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1 } 719
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, -1 } 711
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, 1 } 703
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, 1, 1, -1 } 679
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, 1, -1, -1 } 671
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, 1, -1, 1 } 655
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, 1, 1, -1 } 631
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, -1, 1, -1 } 623
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, -1, 1, 1 } 615
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, 1, -1 } 607
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, -1, -1, 1 } 559
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, 1, -1, -1 } 551
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, -1, 1, 1, -1 } 543
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, 1, -1 } 519
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1, -1, 1 } 511
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, 1, -1, -1, 1 } 487
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, -1, -1, 1, -1 } 479
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, -1, 1, 1, 1, -1, -1 } 471
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, 1, -1, -1 } 447
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, -1, -1, -1, 1 } 439
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, -1, -1, 1, -1 } 431
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, -1, 1, 1, -1, -1 } 407
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1, -1, -1, 1 } 399
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1, -1, 1, -1 } 391
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, 1, -1, -1, 1, -1 } 375
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, -1 } 367
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, -1, 1, 1, 1, -1 } 359
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, 1, 1, -1, -1 } 343
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, -1, -1, 1, -1, 1 } 335
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, 1, -1, -1, -1, 1 } 327
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, -1, 1, 1 } 319
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1 } 311
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, 1, -1, 1, -1 } 295
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1, 1, -1, 1, -1 } 279
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, 1, -1, 1, -1, -1, 1 } 263
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, 1, 1 } 247
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, 1, -1, -1, -1, 1 } 231
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, -1, 1, 1, -1 } 223
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, -1, -1, 1, -1, 1 } 215
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1, -1, -1, 1, -1, 1 } 199
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, 1, 1, -1 } 183
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, 1, -1, -1, -1, 1, 1 } 167
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1, -1, -1, 1, 1 } 159
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, -1, 1, -1, 1, -1, 1 } 151
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, 1, -1, -1, -1, 1, 1 } 143
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, 1, 1, 1, -1, -1, -1, 1, -1, 1, 1 } 135
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, -1, 1, -1, -1, 1, 1, 1, -1 } 127
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, 1, 1, 1, -1 } 103
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, -1, 1, -1, 1, -1, 1, 1, -1 } 95
+{ -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1, -1, -1, 1, 1, -1, 1, -1 } 79
+{ -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, 1, 1, -1, -1, -1, 1, 1, 1, -1, 1, -1 } 63
+{ -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1, -1, -1, 1, 1, -1, 1, -1, 1 } 55
+{ -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1, -1, 1, -1, 1, 1, -1, -1, 1 } 47
+{ -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, 1, -1, 1, -1, 1, -1, -1, 1, 1, -1, 1 } 39
+Number of check points        :    214153
+Number of restores            :    214152
+Maximum depth                 :        22
+Peak of reversible heap (KiB) :       224
+Number of Boolean domains     :         0
+Number of integer domains     :        23
+Number of set domains         :         0
+Number of range domains       :         0
+Number of filters             :    428822
+Number of filter executions   :  12388659
+Number of fixpoints           :    428303
+Number of choice points       :    214151
+Number of fails               :    214152
+Maximum depth                 :        20
+Number of solutions           :        79
+</cout>
         <cerr></cerr>
-        <secs>0.0</secs>
-        <kb>0.0</kb>
-        <result>skipped</result>
+        <secs>83.280338</secs>
+        <kb>166512</kb>
+        <result>ok</result>
         <categories>
             <category>Benchmark</category>
         </categories>
     </test>
     <test id='./build/release/examples/cp/int/codes'>
         <description>./build/release/examples/cp/int/codes 3 15 35 --distance=11 -t0</description>
-        <cout></cout>
+        <cout>
+{ { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 2, 2, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 2, 0, 1, 2, 2, 2, 0, 0, 0, 1, 1, 1 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 1, 1, 2, 0, 0, 2, 0, 1, 2, 0, 1, 1 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 1, 2, 0, 1, 2, 1, 2, 0, 0, 1, 0, 2 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 2, 2, 1, 0, 1, 2, 1, 1, 2, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 2, 1, 2, 0, 2, 1, 0, 1, 0, 2, 2, 1, 1 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 2, 2, 1, 2, 1, 2, 1, 0, 1, 0, 2, 2, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1, 2, 2, 1, 0, 0, 2, 2, 1, 1, 1, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 1, 0, 1, 1, 0, 2, 0, 1, 2, 0, 2, 1, 2 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 2, 2, 1, 0, 2, 1, 2, 1, 1, 0, 0, 0, 2 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 0, 2, 0, 2, 0, 1, 1, 2, 0, 2, 2, 0, 1 } } : 11
+Number of check points        :    153626
+Number of restores            :    153207
+Maximum depth                 :       423
+Peak of reversible heap (KiB) :      4064
+Number of Boolean domains     :         0
+Number of integer domains     :       526
+Number of set domains         :         0
+Number of range domains       :         0
+Number of filters             :   3254010
+Number of filter executions   :   8432358
+Number of fixpoints           :    306832
+Number of choice points       :    153624
+Number of fails               :    153207
+Maximum depth                 :       421
+Number of solutions           :         1
+</cout>
         <cerr></cerr>
-        <secs>0.0</secs>
-        <kb>0.0</kb>
-        <result>skipped</result>
+        <secs>238.200787</secs>
+        <kb>166508</kb>
+        <result>ok</result>
         <categories>
             <category>Benchmark</category>
         </categories>
@@ -823,8 +935,8 @@ Maximum depth                 :       458
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>122.422388</secs>
-        <kb>166504</kb>
+        <secs>243.257019</secs>
+        <kb>166508</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -851,8 +963,8 @@ Maximum depth                 :        66
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>245.74964</secs>
-        <kb>166504</kb>
+        <secs>346.157375</secs>
+        <kb>166512</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -879,8 +991,8 @@ Maximum depth                 :        78
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>274.056336</secs>
-        <kb>166504</kb>
+        <secs>277.656789</secs>
+        <kb>166508</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -907,8 +1019,8 @@ Maximum depth                 :        54
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>278.966589</secs>
-        <kb>166504</kb>
+        <secs>282.474056</secs>
+        <kb>166508</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -935,8 +1047,8 @@ Maximum depth                 :        29
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>389.335811</secs>
-        <kb>166504</kb>
+        <secs>377.121667</secs>
+        <kb>166512</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -963,8 +1075,8 @@ Maximum depth                 :        14
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>283.206945</secs>
-        <kb>166504</kb>
+        <secs>286.605429</secs>
+        <kb>166508</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -991,8 +1103,8 @@ Maximum depth                 :        26
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>283.479904</secs>
-        <kb>166504</kb>
+        <secs>286.869389</secs>
+        <kb>166508</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -1019,8 +1131,8 @@ Maximum depth                 :       110
 Number of solutions           :         1
 </cout>
         <cerr></cerr>
-        <secs>302.704981</secs>
-        <kb>166504</kb>
+        <secs>305.871499</secs>
+        <kb>166508</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>
@@ -1050,8 +1162,8 @@ Maximum depth                 :        30
 Number of solutions           :         4
 </cout>
         <cerr></cerr>
-        <secs>307.165302</secs>
-        <kb>166504</kb>
+        <secs>310.228837</secs>
+        <kb>166508</kb>
         <result>ok</result>
         <categories>
             <category>Benchmark</category>

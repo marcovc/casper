@@ -49,6 +49,11 @@ template<class T>
 Rel2<DomainSize,CP::Store*,T> domainSize(CP::Store& store,const T& t)
 {	return Rel2<DomainSize,CP::Store*,T>(&store,t);	}
 
+//// requires t to evaluate to a variable (and not suspend)
+//template<class T>
+//Rel1<DomainSize,T> domainSize(const T& t)
+//{	return Rel2<DomainSize,T>(t);	}
+
 template<class T>
 Rel2<Ground,CP::Store*,T> ground(CP::Store& store,const T& t)
 {	return Rel2<Ground,CP::Store*,T>(&store,t);	}
@@ -64,6 +69,10 @@ Rel2<MinInDomain,CP::Store*,T> minInDomain(CP::Store& store,const T& t)
 template<class T>
 Rel2<NonGroundIdxs,CP::Store*,T> nonGroundIdxs(CP::Store& store,const T& t)
 {	return Rel2<NonGroundIdxs,CP::Store*,T>(&store,t);	}
+
+template<class Eval,int dims,class Dom>
+Rel1<NonGroundIdxs,CP::VarArray<Eval,dims,Dom> > nonGroundIdxs(const CP::VarArray<Eval,dims,Dom>& t)
+{	return Rel1<NonGroundIdxs,CP::VarArray<Eval,dims,Dom> >(t);	}
 
 namespace Traits {
 template<class T>
@@ -101,6 +110,10 @@ template<class T>
 struct GetEval<Rel2<NonGroundIdxs,CP::Store*,T> >
 {	typedef	Seq<int>	Type;	};
 
+template<class T>
+struct GetEval<Rel1<NonGroundIdxs,T> >
+{	typedef	Seq<int>	Type;	};
+
 } // Traits
 
 
@@ -133,8 +146,6 @@ template<class View>
 struct IterationView<Rel2<NonGroundIdxs,CP::Store*,View> >
 {
 	typedef typename Traits::GetEval<typename Traits::GetElem<View>::Type>::Type	Eval;
-	//typedef typename CP::Traits::GetDom<View>::Type Dom;
-	//typedef typename Dom::Iterator Iterator;
 	typedef Rel2<NonGroundIdxs,CP::Store*,View> Rel;
 	typedef IterationView<Rel>	Self;
 	void sync()
@@ -155,6 +166,31 @@ struct IterationView<Rel2<NonGroundIdxs,CP::Store*,View> >
 
 	CP::Store& store;
 	CP::ValArrayView<Eval,View>	v;
+	uint idx;
+};
+
+// specialization for finite domain variables
+template<class Eval,int dims, class Dom>
+struct IterationView<Rel1<NonGroundIdxs,CP::VarArray<Eval,dims,Dom> > >
+{
+	typedef Rel1<NonGroundIdxs,CP::VarArray<Eval,dims,Dom>> Rel;
+	typedef IterationView<Rel>	Self;
+	void sync()
+	{
+		for ( ; idx < v.size(); ++idx)
+			if (!v[idx].ground())
+				break;
+	}
+	IterationView(const Rel& r) : v(r.p1),
+								  idx(0) {sync();}
+	IterationView(const CP::VarArray<Eval,dims,Dom>& v, int idx) :
+								  v(v),idx(idx) { sync(); }
+	void		iterate()	{	assert(valid()); ++idx; sync();	}
+	uint	value() const 	{	assert(valid()); return idx;	}
+	bool		valid() const 	{	return idx < v.size();	}
+	Self		next() const {	return Self(v,idx+1); }
+
+	CP::VarArray<Eval,dims,Dom>	v;
 	uint idx;
 };
 

@@ -44,6 +44,7 @@ struct RSUListNodeI
 
 	RPNode		prev;
 	RPNode 		next;
+
 	RSUListNodeI(const RPNode& prev, const RPNode& next) :
 						prev(prev),next(next) {}
 };

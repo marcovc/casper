@@ -90,6 +90,10 @@ template<class T>
 STLIterationView<T> makeSTLIt(const T& v)
 {	return STLIterationView<T>(v); }
 
+template<class T,class Iterator>
+STLIterationView<T> makeSTLIt(Iterator b,Iterator e)
+{	return STLIterationView<T>(b,e); }
+
 template<class View>
 struct IterationView<IterationView<View> >
 {

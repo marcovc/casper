@@ -23,6 +23,7 @@
 #include <casper/util/container/stdvector.h>
 
 namespace Casper {
+namespace CP {
 namespace Detail {
 
 #if defined(USE_CASPER_DOM_ALLDIFF_V1) || defined(USE_CASPER_DOM_ALLDIFF_V2_DELTA)
@@ -37,7 +38,7 @@ struct Edge
 	typedef Edge*				PEdge;
 	typedef Reversible<PEdge>	RPEdge;
 
-	Edge(CPSolver& s,PBoy pBoy, PGirl pGirl) :
+	Edge(Store& s,PBoy pBoy, PGirl pGirl) :
 		pBoy(pBoy),pGirl(pGirl),
 		pPrevEdgeBoy(s,NULL),pNextEdgeBoy(s,NULL),
 		pPrevEdgeGirl(s,NULL),pNextEdgeGirl(s,NULL) {}
@@ -80,7 +81,7 @@ struct DiGraphNode
 		PEdge pEdge;
 	};
 
-	DiGraphNode(CPSolver& s, uint idx) :
+	DiGraphNode(Store& s, uint idx) :
 		edges(s,NULL),match(s,NULL), idx(idx) {}
 
 	bool inMatch() const
@@ -109,7 +110,7 @@ struct DiGraphBoyNode : DiGraphNode
 		{ EdgeIterator ret(*this); pEdge = pEdge->pNextEdgeBoy; return ret; }
 	};
 
-	DiGraphBoyNode(CPSolver& s, uint idx) :
+	DiGraphBoyNode(Store& s, uint idx) :
 		Super(s,idx) {}
 
 	EdgeIterator begin() { return EdgeIterator(edges); }
@@ -135,7 +136,7 @@ struct DiGraphGirlNode : DiGraphNode
 		{ EdgeIterator ret(*this); pEdge = pEdge->pNextEdgeGirl; return ret; }
 	};
 
-	DiGraphGirlNode(CPSolver& s, uint idx) :
+	DiGraphGirlNode(Store& s, uint idx) :
 		Super(s,idx) {}
 
 	EdgeIterator begin() { return EdgeIterator(edges); }
@@ -168,19 +169,19 @@ struct BiDiGraph
 	typedef Util::StdVector<PGirlNode>	GirlNodes;
 	typedef GirlNodes::Iterator	GirlNodeIterator;
 
-	BiDiGraph(CPSolver& solver, uint nBoys, uint nGirls) :
+	BiDiGraph(Store& solver, uint nBoys, uint nGirls) :
 		solver(solver),
-		boys(solver.sHeap(),nBoys,NULL),
-		girls(solver.sHeap(),nGirls,NULL),
+		boys(solver.getStdHeap(),nBoys,NULL),
+		girls(solver.getStdHeap(),nGirls,NULL),
 		_nBoys(nBoys),
 		_nGirls(nGirls),
 		count(0),
-		comp(solver.sHeap(),nBoys+nGirls,0)
+		comp(solver.getStdHeap(),nBoys+nGirls,0)
 	{
 		for (uint i = 0; i < nBoys; i++)
-			boys[i] = new (solver.sHeap()) BoyNode(solver,i);
+			boys[i] = new (solver.getStdHeap()) BoyNode(solver,i);
 		for (uint i = 0; i < nGirls; i++)
-			girls[i] = new (solver.sHeap()) GirlNode(solver,i+nBoys);
+			girls[i] = new (solver.getStdHeap()) GirlNode(solver,i+nBoys);
 	}
 
 	void setBoyGirlEdge(PEdge pEdge)	// match:	O(1)
@@ -204,7 +205,7 @@ struct BiDiGraph
 
 	void addEdgeDec(PGirlNode g, PBoyNode b)	// not in match: O(1)
 	{
-		PEdge e = new (solver.getHeap()) Edge(solver,b,g);
+		PEdge e = new (solver) Edge(solver,b,g);
 		setGirlBoyEdge(e);
 	}
 
@@ -273,7 +274,7 @@ struct BiDiGraph
 	uint nGirls() const	{ return _nGirls;	}
 	uint nNodes() const	{ return nBoys()+nGirls(); }
 
-	CPSolver&		solver;
+	Store&		solver;
 	BoyNodes	boys;
 	GirlNodes	girls;
 
@@ -291,7 +292,7 @@ struct MaximalMatching
 	typedef	BiDiGraph::BoyNode		BoyNode;
 	typedef	BiDiGraph::PBoyNode		PBoyNode;
 
-	MaximalMatching(CPSolver& sol,BiDiGraph& net) :
+	MaximalMatching(Store& sol,BiDiGraph& net) :
 							net(net) {}
 
 	bool compute();
@@ -383,14 +384,14 @@ struct AllDiffHelper
 			 	 (net.comp[b->idx]==net.count && net.comp[g->idx]==net.count);
 	}
 
-	AllDiffHelper(CPSolver& sol,BiDiGraph& net) :
+	AllDiffHelper(Store& sol,BiDiGraph& net) :
 			net(net),
-			d(sol.getHeap(),net.nBoys(),net.nGirls(),0),
-			toVisit(sol.getHeap(),net.nBoys()+net.nGirls(),0),
-			s(sol.getHeap(),net.nBoys()*net.nGirls(),0),
-			rindex(sol.getHeap(),net.nNodes(),0),
-			pre(sol.getHeap(),net.nNodes(),0),
-			low(sol.getHeap(),net.nNodes(),0),
+			d(sol,net.nBoys(),net.nGirls(),0),
+			toVisit(sol,net.nBoys()+net.nGirls(),0),
+			s(sol,net.nBoys()*net.nGirls(),0),
+			rindex(sol,net.nNodes(),0),
+			pre(sol,net.nNodes(),0),
+			low(sol,net.nNodes(),0),
 			cnt1(0),
 			cnt0(0)
 		{}
@@ -433,9 +434,9 @@ struct AllDiffHelper
 						std::cout << "-1 ";
 				else
 					std::cout << "0 ";
-			std::cout << endl;
+			std::cout << std::endl;
 		}
-		std::cout << endl;
+		std::cout << std::endl;
 	}
 
 	BiDiGraph&		net;
@@ -597,7 +598,7 @@ struct Edge
 //	typedef Reversible<PEdge>	RPEdge;
 	typedef PEdge				RPEdge;
 
-	Edge(CPSolver& s,PBoy pBoy, PGirl pGirl) :
+	Edge(Store& s,PBoy pBoy, PGirl pGirl) :
 		pBoy(pBoy),pGirl(pGirl),
 	//	pPrevEdgeBoy(s,NULL),pNextEdgeBoy(s,NULL),
 	//	pPrevEdgeGirl(s,NULL),pNextEdgeGirl(s,NULL) {}
@@ -644,7 +645,7 @@ struct DiGraphNode
 		PEdge pEdge;
 	};
 
-	DiGraphNode(CPSolver& s, uint idx) :
+	DiGraphNode(Store& s, uint idx) :
 		//edges(s,NULL),match(s,NULL), idx(idx) {}
 		edges(NULL),match(NULL), idx(idx) {}
 
@@ -674,7 +675,7 @@ struct DiGraphBoyNode : DiGraphNode
 		{ EdgeIterator ret(*this); pEdge = pEdge->pNextEdgeBoy; return ret; }
 	};
 
-	DiGraphBoyNode(CPSolver& s, uint idx) :
+	DiGraphBoyNode(Store& s, uint idx) :
 		Super(s,idx) {}
 
 	EdgeIterator begin() { return EdgeIterator(edges); }
@@ -700,7 +701,7 @@ struct DiGraphGirlNode : DiGraphNode
 		{ EdgeIterator ret(*this); pEdge = pEdge->pNextEdgeGirl; return ret; }
 	};
 
-	DiGraphGirlNode(CPSolver& s, uint idx) :
+	DiGraphGirlNode(Store& s, uint idx) :
 		Super(s,idx) {}
 
 	EdgeIterator begin() { return EdgeIterator(edges); }
@@ -733,19 +734,19 @@ struct BiDiGraph
 	typedef Util::StdVector<PGirlNode>	GirlNodes;
 	typedef GirlNodes::Iterator	GirlNodeIterator;
 
-	BiDiGraph(CPSolver& solver, uint nBoys, uint nGirls) :
+	BiDiGraph(Store& solver, uint nBoys, uint nGirls) :
 		solver(solver),
-		boys(solver.sHeap(),nBoys,NULL),
-		girls(solver.sHeap(),nGirls,NULL),
+		boys(solver.getStdHeap(),nBoys,NULL),
+		girls(solver.getStdHeap(),nGirls,NULL),
 		_nBoys(nBoys),
 		_nGirls(nGirls),
 		count(0),
-		comp(solver.sHeap(),nBoys+nGirls,0)
+		comp(solver.getStdHeap(),nBoys+nGirls,0)
 	{
 		for (uint i = 0; i < nBoys; i++)
-			boys[i] = new (solver.sHeap()) BoyNode(solver,i);
+			boys[i] = new (solver.getStdHeap()) BoyNode(solver,i);
 		for (uint i = 0; i < nGirls; i++)
-			girls[i] = new (solver.sHeap()) GirlNode(solver,i+nBoys);
+			girls[i] = new (solver.getStdHeap()) GirlNode(solver,i+nBoys);
 	}
 
 	void setBoyGirlEdge(PEdge pEdge)	// match:	O(1)
@@ -769,7 +770,7 @@ struct BiDiGraph
 
 	void addEdgeDec(PGirlNode g, PBoyNode b)	// not in match: O(1)
 	{
-		PEdge e = new (solver.getHeap()) Edge(solver,b,g);
+		PEdge e = new (solver) Edge(solver,b,g);
 		setGirlBoyEdge(e);
 	}
 
@@ -838,7 +839,7 @@ struct BiDiGraph
 	uint nGirls() const	{ return _nGirls;	}
 	uint nNodes() const	{ return nBoys()+nGirls(); }
 
-	CPSolver&		solver;
+	Store&		solver;
 	BoyNodes	boys;
 	GirlNodes	girls;
 
@@ -856,7 +857,7 @@ struct MaximalMatching
 	typedef	BiDiGraph::BoyNode		BoyNode;
 	typedef	BiDiGraph::PBoyNode		PBoyNode;
 
-	MaximalMatching(CPSolver& sol,BiDiGraph& net) :
+	MaximalMatching(Store& sol,BiDiGraph& net) :
 							net(net) {}
 
 	bool compute();
@@ -948,14 +949,14 @@ struct AllDiffHelper
 			 	 (net.comp[b->idx]==net.count && net.comp[g->idx]==net.count);
 	}
 
-	AllDiffHelper(CPSolver& sol,BiDiGraph& net) :
+	AllDiffHelper(Store& sol,BiDiGraph& net) :
 			net(net),
-			d(sol.getHeap(),net.nBoys(),net.nGirls(),0),
-			toVisit(sol.getHeap(),net.nBoys()+net.nGirls(),0),
-			s(sol.getHeap(),net.nBoys()*net.nGirls(),0),
-			rindex(sol.getHeap(),net.nNodes(),0),
-			pre(sol.getHeap(),net.nNodes(),0),
-			low(sol.getHeap(),net.nNodes(),0),
+			d(sol,net.nBoys(),net.nGirls(),0),
+			toVisit(sol,net.nBoys()+net.nGirls(),0),
+			s(sol,net.nBoys()*net.nGirls(),0),
+			rindex(sol,net.nNodes(),0),
+			pre(sol,net.nNodes(),0),
+			low(sol,net.nNodes(),0),
 			cnt1(0),
 			cnt0(0)
 		{}
@@ -1161,7 +1162,7 @@ struct Edge
 	typedef Edge*				PEdge;
 	typedef PEdge				RPEdge;
 
-	Edge(CPSolver& s,PBoy pBoy, PGirl pGirl) :
+	Edge(Store& s,PBoy pBoy, PGirl pGirl) :
 		pBoy(pBoy),pGirl(pGirl),
 		pPrevEdgeBoy(NULL),pNextEdgeBoy(NULL),
 		pPrevEdgeGirl(NULL),pNextEdgeGirl(NULL),
@@ -1207,7 +1208,7 @@ struct DiGraphNode
 		PEdge pEdge;
 	};
 
-	DiGraphNode(CPSolver& s, uint idx) :
+	DiGraphNode(Store& s, uint idx) :
 		edges(NULL),match(NULL), idx(idx) {}
 
 	bool inMatch() const
@@ -1236,7 +1237,7 @@ struct DiGraphBoyNode : DiGraphNode
 		{ EdgeIterator ret(*this); pEdge = pEdge->pNextEdgeBoy; return ret; }
 	};
 
-	DiGraphBoyNode(CPSolver& s, uint idx) :
+	DiGraphBoyNode(Store& s, uint idx) :
 		Super(s,idx) {}
 
 	EdgeIterator begin() { return EdgeIterator(edges); }
@@ -1271,7 +1272,7 @@ struct DiGraphGirlNode : DiGraphNode
 		{ SortedEdgeIterator ret(*this); pEdge = pEdge->pNextSortedEdgeGirl; return ret; }
 	};
 
-	DiGraphGirlNode(CPSolver& s, uint idx) :
+	DiGraphGirlNode(Store& s, uint idx) :
 		Super(s,idx),sortedEdges(NULL) {}
 
 	EdgeIterator begin() { return EdgeIterator(edges); }
@@ -1309,19 +1310,19 @@ struct BiDiGraph
 	typedef Util::StdVector<PGirlNode>	GirlNodes;
 	typedef GirlNodes::Iterator	GirlNodeIterator;
 
-	BiDiGraph(CPSolver& solver, uint nBoys, uint nGirls) :
+	BiDiGraph(Store& solver, uint nBoys, uint nGirls) :
 		solver(solver),
-		boys(solver.sHeap(),nBoys,NULL),
-		girls(solver.sHeap(),nGirls,NULL),
+		boys(solver.getStdHeap(),nBoys,NULL),
+		girls(solver.getStdHeap(),nGirls,NULL),
 		_nBoys(nBoys),
 		_nGirls(nGirls),
 		count(0),
-		comp(solver.sHeap(),nBoys+nGirls,0)
+		comp(solver.getStdHeap(),nBoys+nGirls,0)
 	{
 		for (uint i = 0; i < nBoys; i++)
-			boys[i] = new (solver.sHeap()) BoyNode(solver,i);
+			boys[i] = new (solver.getStdHeap()) BoyNode(solver,i);
 		for (uint i = 0; i < nGirls; i++)
-			girls[i] = new (solver.sHeap()) GirlNode(solver,i+nBoys);
+			girls[i] = new (solver.getStdHeap()) GirlNode(solver,i+nBoys);
 	}
 
 	void setBoyGirlEdge(PEdge pEdge)	// match:	O(1)
@@ -1344,7 +1345,7 @@ struct BiDiGraph
 
 	void addEdgeDec(PGirlNode g, PBoyNode b)	// not in match: O(1)
 	{
-		PEdge e = new (solver.sHeap()) Edge(solver,b,g);
+		PEdge e = new (solver.getStdHeap()) Edge(solver,b,g);
 		setGirlBoyEdge(e);
 		g->edges->pNextSortedEdgeGirl = g->sortedEdges;
 		if (g->sortedEdges)
@@ -1489,7 +1490,7 @@ struct BiDiGraph
 	uint nGirls() const	{ return _nGirls;	}
 	uint nNodes() const	{ return nBoys()+nGirls(); }
 
-	CPSolver&		solver;
+	Store&		solver;
 	BoyNodes	boys;
 	GirlNodes	girls;
 
@@ -1508,7 +1509,7 @@ struct MaximalMatching
 	typedef	BiDiGraph::BoyNode		BoyNode;
 	typedef	BiDiGraph::PBoyNode		PBoyNode;
 
-	MaximalMatching(CPSolver& sol,BiDiGraph& net) :
+	MaximalMatching(Store& sol,BiDiGraph& net) :
 							net(net) {}
 
 	bool compute();
@@ -1523,66 +1524,6 @@ struct MaximalMatching
 	BiDiGraph&		net;
 };
 
-// Hopcroft-Karp algorithm - finds a maximal matching
-bool MaximalMatching::compute()
-{
-	for (uint g = 0; g < net.nGirls(); g++)
-		if (!match(net.girls[g]))
-			return false;
-    assert(size()==net.nGirls());
-    return true;
-}
-
-// DFS for an augmenting path from the vertice
-// currently at the top of the stack to SNK.
-// (part of Hopcroft-Karp algorithm)
-bool MaximalMatching::searchMatch(PGirlNode	pGirl)
-{
-	net.comp[pGirl->idx] = net.count;
-
-    // Try to find matching edge cheaply: is there a free edge around?
-
-	//assert(!pGirl->next.empty());
-    for (GirlNode::EdgeIterator it = pGirl->begin();
-			it != pGirl->end(); ++it)
-    	if (it->pBoy->match == NULL)	// if boy is free
-        {
-        	net.invertEdge(it);
-			return true;
-        }
-
-    // No, find matching edge by augmenting path method
-    for (GirlNode::EdgeIterator it1 = pGirl->begin();
-			it1 != pGirl->end(); ++it1)
-	{
-		BiDiGraph::PEdge pEdge2 = it1->pBoy->match;
-		assert(pEdge2 != NULL);
-		//GirlNode*	pGNode = (GirlNode*) ((BoyNode*)(*it1))->next;
-		if(net.comp[pEdge2->pGirl->idx] < net.count && searchMatch(pEdge2->pGirl))
-		{
-			net.setGirlBoyEdge(pEdge2);
-			net.invertEdge(it1); 	// revert (girl->boy)
-          	return true;
-        }
-	}
-    return false;
-}
-
-bool MaximalMatching::match(PGirlNode pGirl)
-{
-    net.count = net.count + 1;
-    return searchMatch(pGirl);
-}
-
-// public
-uint MaximalMatching::size()
-{
-	uint s = 0;
-	for (uint g = 0; g < net.nGirls(); g++)
-		if (net.girls[g]->inMatch())
-			s++;
-	return s;
-}
 
 struct AllDiffHelper
 {
@@ -1601,14 +1542,14 @@ struct AllDiffHelper
 			  (net.comp[b->idx]==net.count && net.comp[g->idx]==net.count);
 	}
 
-	AllDiffHelper(CPSolver& sol,BiDiGraph& net) :
+	AllDiffHelper(Store& sol,BiDiGraph& net) :
 			net(net),
-			d(sol.getHeap(),net.nBoys(),net.nGirls(),0),
-			toVisit(sol.getHeap(),net.nBoys()+net.nGirls(),0),
-			s(sol.getHeap(),net.nBoys()*net.nGirls(),0),
-			rindex(sol.getHeap(),net.nNodes(),0),
-			pre(sol.getHeap(),net.nNodes(),0),
-			low(sol.getHeap(),net.nNodes(),0),
+			d(sol,net.nBoys(),net.nGirls(),0),
+			toVisit(sol,net.nBoys()+net.nGirls(),0),
+			s(sol,net.nBoys()*net.nGirls(),0),
+			rindex(sol,net.nNodes(),0),
+			pre(sol,net.nNodes(),0),
+			low(sol,net.nNodes(),0),
 			cnt1(0),
 			cnt0(0)
 		{}
@@ -1651,9 +1592,9 @@ struct AllDiffHelper
 						std::cout << "-1 ";
 				else
 					std::cout << "0 ";
-			std::cout << endl;
+			std::cout << std::endl;
 		}
-		std::cout << endl;
+		std::cout << std::endl;
 	}
 
 	void	debugSorted() const
@@ -1674,9 +1615,9 @@ struct AllDiffHelper
 						std::cout << "-1 ";
 				else
 					std::cout << "0 ";
-			std::cout << endl;
+			std::cout << std::endl;
 		}
-		std::cout << endl;
+		std::cout << std::endl;
 	}
 
 	BiDiGraph&		net;
@@ -1696,136 +1637,11 @@ struct AllDiffHelper
 	uint			toVisitSize;
 };
 
-void AllDiffHelper::reset()
-{
-}
-
-// toVisit is a limited size stack, implemented with a vector for efficiency
-void AllDiffHelper::markDirectPaths()
-{
-	toVisitSize = 0;
-	PBoyNode v;
-	net.count = net.count + 1;
-
-	// populate toVisit with free vertices
-	// (which must be boys since we have a maximal matching)
-	for (uint b = 0; b < net.nBoys(); b++)
-		if (!net.boys[b]->inMatch())
-		{
-			toVisit[toVisitSize++] = net.boys[b];
-			net.comp[net.boys[b]->idx] = net.count;
-		}
-
-	// depth-first search for direct paths
-	while (toVisitSize > 0)
-	{
-		v = toVisit[--toVisitSize];
-
-		for (BoyNode::EdgeIterator itg = v->begin();
-				itg != v->end(); ++itg)
-			if (net.comp[itg->pGirl->idx] < net.count)
-			{
-				net.comp[itg->pGirl->idx] = net.count;
-				PBoyNode pb = itg->pGirl->matchNode();
-				assert(pb != NULL);
-				if (net.comp[pb->idx] < net.count)
-				{
-					net.comp[pb->idx] = net.count;
-					toVisit[toVisitSize++] = pb;
-				}
-			}
-	}
-}
-
-void AllDiffHelper::visitSCCGirl(PGirlNode v)
-{
-	bool root = true;
-	rindex[v->idx] = index; index++;
-	PNode w;
-
-	for (GirlNode::EdgeIterator  it = v->begin(); it != v->end(); ++it)
-		if (net.comp[it->pBoy->idx] < net.count)
-		{
-			if (rindex[it->pBoy->idx] == 0)
-				visitSCCBoy(it->pBoy);
-			if (rindex[it->pBoy->idx] < rindex[v->idx])
-			{	rindex[v->idx] = rindex[it->pBoy->idx]; root = false;	}
-		}
-
-	if (root)
-	{
-		--index;
-		while (sSize > 0 and rindex[v->idx] <= rindex[s[sSize-1]->idx])
-		{
-			w = s[--sSize];
-			rindex[w->idx] = c;
-			--index;
-		}
-		rindex[v->idx] = c;
-		--c;
-	}
-	else
-		s[sSize++] = v;
-}
-
-void AllDiffHelper::visitSCCBoy(PBoyNode v)
-{
-	bool root = true;
-	rindex[v->idx] = index; index++;
-	PNode w;
-
-	PGirlNode g = v->matchNode();
-	//GirlNode* g = (GirlNode*)v->next;
-	if (g && net.comp[g->idx] < net.count)
-	{
-		if (rindex[g->idx] == 0)
-			visitSCCGirl(g);
-		if (rindex[g->idx] < rindex[v->idx])
-		{	rindex[v->idx] = rindex[g->idx]; root = false;	}
-	}
-
-	if (root)
-	{
-		--index;
-		while (sSize > 0 and rindex[v->idx] <= rindex[s[sSize-1]->idx])
-		{
-			w = s[--sSize];
-			rindex[w->idx] = c;
-			--index;
-		}
-		rindex[v->idx] = c;
-		--c;
-	}
-	else
-		s[sSize++] = v;
-}
-
-// find strongly connected components of a directed graph g
-void AllDiffHelper::markSCC()
-{
-	sSize = 0;
-	index = 1;
-	c = net.nNodes()-1;
-
-	// zero array
-	rindex = 0;
-
-	// only need visit girls because any SCC has to go through a girl
-	for (BiDiGraph::GirlNodeIterator it = net.girls.begin();
-			it != net.girls.end(); ++it)
-		if (net.comp[(*it)->idx] < net.count)
-	{
-		// optimization: only visit girls which have at least one flow out
-		//if (rindex[getIdx(*it)] == 0 && !((GirlNode*)(*it))->next.empty())
-		if (rindex[(*it)->idx] == 0 && (*it)->inMatch())
-			visitSCCGirl(*it);
-	}
-
-}
 
 #endif //USE_CASPER_DOM_ALLDIFF_V3
 
-};
-};
+} // Detail
+} // CP
+} // Casper
 
 #endif /*_H_CASPER_KERNEL_GRAPH*/

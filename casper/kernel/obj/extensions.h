@@ -17,13 +17,33 @@
  \*************************************************************************/
  
 
-#include <casper/kernel/state/env.h>
+#ifndef CASPER_KERNEL_OBJ_EXTENSIONS_H_
+#define CASPER_KERNEL_OBJ_EXTENSIONS_H_
 
-using namespace std;
+#include <casper/cp/store.h>
 
-ostream& operator<<(ostream& os, const Casper::EnvStats& s)
+namespace Casper {
+namespace CP  {
+
+#if defined(SWIG) | defined(SWIG_BUILD)
+bool Store::post(const Casper::Expr<bool>& expr,
+		  Casper::CP::Consistency consistency)
 {
-	return os << s.getCPUTimer();
+	switch (consistency)
+	{
+		case Casper::CP::Domain:
+			return expr.postDomFilter(*this);
+		case Casper::CP::Bounds:
+			return expr.postBndFilter(*this);
+		case Casper::CP::Value:
+			return expr.postValFilter(*this);
+		default:
+			throw Casper::Exception::InvalidOperation("invalid value for consistency parameter");
+	}
+}
+#endif
+
+}
 }
 
-
+#endif /* CASPER_KERNEL_OBJ_EXTENSIONS_H_ */

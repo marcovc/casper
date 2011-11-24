@@ -70,6 +70,10 @@ struct StateStats
 	counter	getMaxDepth()	const
 	{	return maxLevel;	}
 
+	/// Returns the current depth of the search tree
+	counter	getCurDepth()	const
+	{	return curLevel;	}
+
 	/// Returns the state to which these statistics refer to
 	const State& getState() const
 	{	return state;	}

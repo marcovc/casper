@@ -16,7 +16,7 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-#define EX 12
+#define EX 16
 
 #if EX==1
 
@@ -411,6 +411,7 @@ int main()
 
 #include <casper/kernel.h>
 #include <casper/cp.h>
+#include <casper/kernel/goal/whiledo.h>
 #include <iostream>
 
 using namespace Casper;
@@ -429,32 +430,77 @@ int main(int argc, char** argv)
 
 	cout << v << endl;
 
-	store.post(distinct(v),postDomFilter);
 
 	IntPar i(env);
+	store.post(distinct(v),postDomFilter);
 	store.post(distinct(all(i,range(0,n-1),true,v[i]+i)),postDomFilter);
 	store.post(distinct(all(i,range(0,n-1),true,v[i]-i)),postDomFilter);
+
+//	store.post(distinct(v),postValFilter);
+//	store.post(distinct(all(i,range(0,n-1),true,v[i]+i)),postValFilter);
+//	store.post(distinct(all(i,range(0,n-1),true,v[i]-i)),postValFilter);
 
 	bool valid = store.valid();
 	cout << valid << " : " << v << endl;
 
 	IntPar idx(env),val(env);
+#if 0
 	Goal varSelect(store,
 			assign(idx,
-				argMin(i,nonGroundIdxs(store,v),
-						(cast<int>(domainSize(store,v[i]))*n+abs(i-n/2))*n+i)));
+				argMin(i,nonGroundIdxs(v),
+						cast<int>(domainSize(store,v[i]))*n+abs(i-n/2))));
+	Goal valSelect(store,
+			assign(val,
+				argMax(i,domain(store,v[idx]),
+						randInRange(0,n-1))));
+#else
+	Goal varSelect(store,
+			assign(idx,
+				std::function<int()>([v,n]()
+				{
+					int midx = 0;
+					int mmin = limits<int>::max();
+			        for (int j = 0; j < n; ++j)
+			        	if (!v[j].ground())
+						{
+							int h = v[j].domain().size()*n+std::abs(j-n/2);
+							if (h < mmin)
+							{
+								mmin = h;
+								midx = j;
+							}
+						}
+			        cout << v << endl;
+			        cout << midx;
+					return midx;
+				})));
+	Goal valSelect(store,
+			assign(val,
+				std::function<int()>([&]()
+						{
+							int mmit = 0;
+							int mmin = n;
+							for (auto it = v[idx.value()].domain().begin();
+									it != v[idx.value()].domain().end(); ++it)
+							{
+								int h = std::abs(*it-n/2);
+								if (h < mmin)
+								{
+									mmin = h;
+									mmit = *it;
+								}
+							}
+					        cout << " " << mmit << endl;
+					        return mmit;
+						})));
+#endif
 
 //	Goal valSelect(store,
 //			assign(val,
-//				argMax(i,domain(store,v[idx]),
-//						randInRange(0,n-1))));
-
-	Goal valSelect(store,
-			assign(val,
-				min(i,domain(store,v[idx]),i)));
+//				min(i,domain(store,v[idx]),i)));
 
 	Goal searchTree(env,
-			whileNotGround(v)
+			whileDo(std::function<bool()>([&](){return not v.ground();}))
 			(
 				varSelect and valSelect and
 				(
@@ -466,6 +512,7 @@ int main(int argc, char** argv)
 	DFSExplorer dfs(env);
 
 	bool found = dfs.explore(searchTree);
+
 /*	while (found)
 	{
 		cout << v << endl;
@@ -987,6 +1034,525 @@ int main(int argc, char** argv)
 	}
 	else
 		cerr << "usage: " << argv[0] << " collisions.data subjects.data\n";
+}
+#elif EX==16
+
+#define CASPER_CP_SAFE_FD_DELTAS
+
+#include <casper/kernel.h>
+#include <casper/cp/int.h>
+#include <casper/cp/int/support.h>
+#include <iostream>
+#include <fstream>
+
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/variate_generator.hpp>
+
+using namespace Casper;
+using namespace Casper::CP;
+
+boost::mt19937 gen;
+
+Util::StdList<int> generateRandSet(int lb, int ub)
+{
+	boost::uniform_int<> dist(0, 1);
+	Util::StdList<int> l;
+	for (int i = lb; i <= ub; ++i)
+		if (dist(gen))
+			l.pushBack(i);
+	return l;
+}
+
+IntVar generateRandDomVar(Store& store, int lb, int ub)
+{
+	Util::StdList<int> l(generateRandSet(lb,ub));
+	return IntVar(store,l.begin(),l.end());
+}
+
+struct RandLabelGen
+{
+	RandLabelGen() : eqtypedist(0,1),opdist0(0,1),opdist1(0,3)
+	{}
+
+	template<class Vars1>
+	Goal operator()(Store& s1,DomArrayView<int,Vars1>& v1)
+	{
+		// NOTE: -2 is because last var is the projected one
+		boost::uniform_int<> varidxdist(0, v1.size()-2);
+		varidx = varidxdist(gen);
+		boost::uniform_int<> valdist(v1[varidx]->min(), v1[varidx]->max());
+		val = valdist(gen);
+		eqtype = eqtypedist(gen);
+		if (eqtype == 0)
+			op = opdist0(gen);
+		else
+			op = opdist1(gen);
+
+		if (eqtype == 0)
+		{
+			if (op == 0)
+				return Goal(s1,
+					   post(s1,v1[varidx].getObj()==val,false)	or
+					   post(s1,v1[varidx].getObj()!=val,false));
+			else
+				return Goal(s1,
+					   post(s1,v1[varidx].getObj()!=val,false) or
+					   post(s1,v1[varidx].getObj()==val,false));
+		}
+		else
+		{
+			switch(op)
+			{
+				case 0:
+					return Goal(s1,
+						   post(s1,v1[varidx].getObj()>=val,false) or
+						   post(s1,v1[varidx].getObj()<val,false));
+				case 1:
+					return Goal(s1,
+						   post(s1,v1[varidx].getObj()<=val,false) or
+						   post(s1,v1[varidx].getObj()>val,false));
+				case 2:
+					return Goal(s1,
+						   post(s1,v1[varidx].getObj()<val,false) or
+						   post(s1,v1[varidx].getObj()>=val,false));
+				case 3:
+					return Goal(s1,
+						   post(s1,v1[varidx].getObj()>val,false) or
+						   post(s1,v1[varidx].getObj()<=val,false));
+			}
+		}
+	}
+
+	template<class Vars1,class Vars2>
+	Goal operator()(Store& s1,Store& s2,
+					DomArrayView<int,Vars1>& v1,DomArrayView<int,Vars2>& v2)
+	{
+		// NOTE: -2 is because last var is the projected one
+		boost::uniform_int<> varidxdist(0, v1.size()-2);
+		varidx = varidxdist(gen);
+		boost::uniform_int<> valdist(v1[varidx]->min(), v1[varidx]->max());
+		val = valdist(gen);
+		eqtype = eqtypedist(gen);
+		if (eqtype == 0)
+			op = opdist0(gen);
+		else
+			op = opdist1(gen);
+
+		if (eqtype == 0)
+		{
+			if (op == 0)
+				return Goal(s1,
+					   (post(s1,v1[varidx].getObj()==val,false) and
+						post(s2,v2[varidx].getObj()==val,false))	or
+					   (post(s1,v1[varidx].getObj()!=val,false) and
+						post(s2,v2[varidx].getObj()!=val,false)));
+			else
+				return Goal(s1,
+					   (post(s1,v1[varidx].getObj()!=val,false) and
+						post(s2,v2[varidx].getObj()!=val,false)) or
+					   (post(s1,v1[varidx].getObj()==val,false) and
+						post(s2,v2[varidx].getObj()==val,false)));
+		}
+		else
+		{
+			switch(op)
+			{
+				case 0:
+					return Goal(s1,
+						   (post(s1,v1[varidx].getObj()>=val,false) and
+							post(s2,v2[varidx].getObj()>=val,false)) or
+						   (post(s1,v1[varidx].getObj()<val,false) and
+							post(s2,v2[varidx].getObj()<val,false)));
+				case 1:
+					return Goal(s1,
+						   (post(s1,v1[varidx].getObj()<=val,false) and
+							post(s2,v2[varidx].getObj()<=val,false)) or
+						   (post(s1,v1[varidx].getObj()>val,false) and
+							post(s2,v2[varidx].getObj()>val,false)));
+				case 2:
+					return Goal(s1,
+						   (post(s1,v1[varidx].getObj()<val,false) and
+							post(s2,v2[varidx].getObj()<val,false)) or
+						   (post(s1,v1[varidx].getObj()>=val,false) and
+							post(s2,v2[varidx].getObj()>=val,false)));
+				case 3:
+					return Goal(s1,
+						   (post(s1,v1[varidx].getObj()>val,false) and
+							post(s2,v2[varidx].getObj()>val,false)) or
+						   (post(s1,v1[varidx].getObj()<=val,false) and
+							post(s2,v2[varidx].getObj()<=val,false)));
+			}
+		}
+
+	}
+	int varidx;
+	int val;
+	int eqtype;
+	int op;
+	boost::uniform_int<> eqtypedist;
+	boost::uniform_int<> opdist0;
+	boost::uniform_int<> opdist1;
+};
+
+template<class Vars1,class Vars2>
+struct DebugLabel : IGoal
+{
+	DebugLabel(Store& s1, Store& s2,
+			const Vars1& v1, const Vars2& v2) : s1(s1),s2(s2),v1(s1,v1),v2(s2,v2) {}
+	// v1 must be contained in v2 at all times
+	bool bndsComplete()
+	{
+		for (int i = 0; i < v1.size(); ++i)
+			if (!std::includes(v2[i]->begin(),v2[i]->end(),
+							   v1[i]->begin(),v1[i]->end()))
+				return false;
+		return true;
+	}
+	// v1 must contain all solutions
+	bool sound()
+	{
+		DFSExplorer dfs(s2);
+		VarArray<int> vars(s2,v2.size());
+		for (int i = 0; i < v2.size(); ++i)
+			vars[i] = Var<int>(s2,&*v2[i]);
+		bool f = dfs.explore(label(s2,vars));
+		while (f)
+		{
+			for (int i = 0; i < v1.size(); ++i)
+				if (!std::includes(v1[i]->begin(),v1[i]->end(),
+								   v2[i]->begin(),v2[i]->end()))
+					return false;
+			f = dfs.resume();
+		}
+		return true;
+	}
+
+	bool hasSolutions()
+	{
+		DFSExplorer dfs(s2);
+		VarArray<int> vars(s2,v2.size());
+		for (int i = 0; i < v2.size(); ++i)
+			vars[i] = Var<int>(s2,&*v2[i]);
+		bool f = dfs.explore(label(s2,vars));
+		return f;
+	}
+
+	Goal execute()
+	{
+		// propagate
+		std::cout << "--- begin prop ---\n";
+		std::cout << "initial domains: " << v1 << " , " << v2 << std::endl;
+		bool f1 = s1.valid();
+		std::cout << "final domains: " << v1 << " , " << v2 << std::endl;
+		std::cout << "--- end prop (" << f1 << ")---\n";
+		bool f2 = s2.valid();
+
+		if (!f1 and !f2)
+			return fail();
+
+		// compare propagate() result
+		if (!f2 and f1)
+		{
+			std::cout << "failed : project did not fail as it should.\n";
+			throw "unexpected error";
+		}
+
+		if (!f1 and f2)
+		{
+			if (!hasSolutions())
+				return fail();
+			else
+			{
+				std::cout << "failed : project failed and it shouldn't.\n";
+				throw "unexpected error";
+			}
+		}
+
+		// TODO test soundness
+		if (!sound())
+		{
+			std::cout << "failed: not sound\n";
+			throw "unexpected error";
+		}
+
+		// compare resulting domains
+		if (!bndsComplete())
+		{
+			std::cout << "failed: not bounds complete\n";
+			throw "unexpected error";
+		}
+
+		// if all ground then terminate branch
+		if (v1.ground())
+			return succeed();
+
+
+		// copy all domains to v2
+		for (int i = 0; i < v1.size(); ++i)
+			v2[i]->intersect(v1[i]->begin(),v1[i]->end());
+		f2 = s2.valid();
+		assert(f2);
+
+
+		Goal g(labelGen(s1,s2,v1,v2));
+
+		return Goal(s1,g and Goal(this));
+	}
+	Store& s1;
+	Store& s2;
+	DomArrayView<int,Vars1> v1;
+	DomArrayView<int,Vars2> v2;
+	RandLabelGen labelGen;
+};
+
+template<class Vars1,class Vars2>
+Goal debugLabel(Store& s1, Store& s2,const Vars1& v1,const Vars2& v2)
+{	return new (s1) DebugLabel<Vars1,Vars1>(s1,s2,v1,v2);	}
+
+template<class Vars1>
+struct RandLabel : IGoal
+{
+	RandLabel(Store& s1,const Vars1& v1) : s1(s1),v1(s1,v1) {}
+
+	Goal execute()
+	{
+//		std::cout << " --- begin prop ---\n";
+		if (!s1.valid())
+		{
+//			std::cout << " --- end prop (FAILED) ---\n";
+			return Goal(false);
+		}
+//		std::cout << " --- end prop (Ok) ---\n";
+
+		if (v1.ground())
+			return succeed();
+
+		return Goal(s1,labelGen(s1,v1) and Goal(this));
+	}
+	Store& s1;
+	DomArrayView<int,Vars1> v1;
+	RandLabelGen labelGen;
+};
+
+template<class Vars1>
+Goal randLabel(Store& s1,const Vars1& v1)
+{	return new (s1) RandLabel<Vars1>(s1,v1);	}
+
+template<class Expr1,class Expr2>
+struct ProjectBnd : IFilter
+{
+	ProjectBnd(Store& store,const Expr1& p1,const Expr2& p2)
+		: IFilter(store),p1(store,p1), p2(store,p2)
+		{}
+
+	bool execute()
+	{	return p1.updateMin(p2.min()) and p1.updateMax(p2.max());}
+	void attach(INotifiable* s)
+	{	p2.attach(s);	}
+	void detach(INotifiable* s)
+	{	 p2.detach(s);	}
+
+	BndView<int,Expr1>	p1;
+	BndView<int,Expr2>	p2;
+};
+
+template<class Expr1,class Expr2>
+bool postProjectBnd(Store& s, const Expr1& e1, const Expr2& e2)
+{	return s.post(new (s) ProjectBnd<Expr1,Expr2>(s,e1,e2));	}
+
+bool testProjectRel(int testId)
+{
+	const int lb = 1;
+	const int ub = 20;
+	const int nvars = 3;
+
+	std::vector<Util::StdList<int> > randSets(nvars);
+	for (int i = 0; i < nvars; ++i)
+		randSets[i] = generateRandSet(lb,ub);
+
+	Env env;
+	Store s1(env);
+	Store s2(env);
+
+	IntVarArray lv1(s1,nvars);
+	IntVarArray lv2(s2,nvars);
+
+	for (int i = 0; i < nvars; ++i)
+	{
+		if (randSets[i].empty())
+			return false;
+		lv1[i] = IntVar(s1,randSets[i].begin(),randSets[i].end());
+		lv2[i] = IntVar(s2,randSets[i].begin(),randSets[i].end());
+	}
+
+	// change here
+	auto r1 = lv1[0]+lv1[1];
+	auto r2 = lv2[0]+lv2[1];
+
+	std::cout << "test("<< testId << "): " << r1 << "=" << lv1[nvars-1] << " ... ";
+	std::cout.flush();
+
+	bool f1 = postProject<AC6>(s1,lv1[nvars-1],r1);
+	bool f2 = postProjectBnd(s2,lv2[nvars-1],r2);
+	assert(f1 and f2);
+
+	DFSExplorer dfs(s1);
+	bool f = dfs.explore(debugLabel(s1,s2,lv1,lv2));
+	while (f)
+	{	f = dfs.resume();	}
+	return true;
+}
+
+struct BenchmarkStats
+{
+	int nbFails;
+	int nbProps;
+};
+
+void benchmarkProjectRel(BenchmarkStats& stats)
+{
+	const int lb = 0;
+	const int ub = 20;
+	const int nvars = 4;
+
+	std::vector<Util::StdList<int> > randSets(nvars);
+	for (int i = 0; i < nvars; ++i)
+		randSets[i] = generateRandSet(lb,ub);
+
+	Env env;
+	Store s1(env);
+
+	IntVarArray lv1(s1,nvars);
+
+	for (int i = 0; i < nvars; ++i)
+	{
+		if (randSets[i].empty())
+			return;
+		lv1[i] = IntVar(s1,randSets[i].begin(),randSets[i].end());
+	}
+
+	// change here
+	auto r1 = lv1[0]+lv1[1]+lv1[2];
+
+	std::cout << "benchmarking: " << r1 << "=" << lv1[nvars-1] << "...";
+	std::cout.flush();
+
+	bool f1 = postProject<AC3>(s1,lv1[nvars-1],r1);
+	assert(f1);
+
+	DFSExplorer dfs(s1);
+	bool f = dfs.explore(randLabel(s1,lv1));
+	while (f)
+	{	f = dfs.resume();	}
+	std::cout << "done\n";
+	stats.nbFails = dfs.getStats().getNbFails();
+	stats.nbProps = s1.getStats().getNbPropagations();
+}
+
+
+bool testProject(int nbTests)
+{
+	for (int i = 0; i < nbTests; ++i)
+	{
+		std::ofstream of("last_benchmark.gen");
+		of << gen;
+		of.close();
+
+		if (testProjectRel(i+1))
+			std::cout << "Ok\n";
+		else
+			--i;
+	}
+	return true;
+}
+
+void benchmarkProject(int nbProblems)
+{
+	Util::StdList<int> nbFails;
+	Util::StdList<int> nbProps;
+	for (int i = 0; i < nbProblems; ++i)
+	{
+		std::ofstream of("last_benchmark.gen");
+		of << gen;
+		of.close();
+
+		BenchmarkStats stats;
+		benchmarkProjectRel(stats);
+		nbFails.pushBack(stats.nbFails);
+		nbProps.pushBack(stats.nbProps);
+	}
+	// statistics
+	int avgNbFails,avgNbProps;
+	avgNbFails = avgNbProps = 0;
+	for (auto it = nbFails.begin(); it != nbFails.end(); ++it)
+		avgNbFails += *it;
+	for (auto it = nbProps.begin(); it != nbProps.end(); ++it)
+		avgNbProps += *it;
+	avgNbFails /= nbProblems;
+	avgNbProps /= nbProblems;
+	int stdNbFails,stdNbProps;
+	stdNbFails = stdNbProps = 0;
+	for (auto it = nbFails.begin(); it != nbFails.end(); ++it)
+		stdNbFails += ::pow(*it-avgNbFails,2);
+	for (auto it = nbProps.begin(); it != nbProps.end(); ++it)
+		stdNbProps += ::pow(*it-avgNbProps,2);
+	stdNbFails = sqrt(stdNbFails/nbProblems);
+	stdNbProps = sqrt(stdNbProps/nbProblems);
+	std::cout << "average nb fails: " << avgNbFails << " +- " << stdNbFails << std::endl;
+	std::cout << "average nb props: " << avgNbProps << " +- " << stdNbProps << std::endl;
+}
+
+int main(int argc, char** argv)
+{
+//	Solver solver;
+//	IntVar v(solver,{2,5,6,7,8,9});
+//	std::cout << v << std::endl;
+//	v.domain().updateMin(7);
+
+	if (argc>1)
+	{
+		std::ifstream ff(argv[1]);
+		ff >> gen;
+		ff.close();
+	}
+	std::cout << testProject(1000) << std::endl;
+	//benchmarkProject(1000);
+
+//	Solver solver;
+//	IntVar v1(solver,{1,3,4,6,7,9});
+//	IntVar v2(solver,{2,5,6,7,8,9,10});
+//	IntVar v3(solver,{2,3,4,5,8,9});
+//	IntVar r(solver,{3,4,6,8,10});
+//	bool f = postProject<AC3>(solver,r,v1-v2) and solver.valid();
+//	std::cout << f << std::endl;
+
+//	IntVar v1(solver,{3});
+//	IntVar v2(solver,{2});
+//	std::cout << v1.domain().intersectFwd(v2.domain().begin(),v2.domain().end()) << std::endl;
+
+//	Env env;
+//	Store store(env);
+//	IntVar v1(store,{1,3,6});
+//	IntVar v2(store,{1,4});
+//	IntVar v3(store,{1,3,5,6,7});
+//	std::cout << v1 << " " << v2 << " " << v3 << std::endl;
+
+//	ValuesView<int,Rel2<Sub,IntVar,IntVar> > vv(solver,rel<Sub>(v1,v2));
+//	for (auto it = vv.begin(); it != vv.end(); ++it)
+//		std::cout << *it << std::endl;
+//	std::cout << "---\n";
+//	for (auto it = vv.rbegin(); it != vv.rend(); ++it)
+//		std::cout << *it << std::endl;
+
+//	std::cout << (postProject<AC6>(store,v3,v1+v2) and store.valid()) << std::endl;
+//	std::cout << v1 << " " << v2 << " " << v3 << std::endl;
+//	std::cout << (store.post(v1!=3) and store.valid()) << std::endl;
+//	std::cout << v1 << " " << v2 << " " << v3 << std::endl;
+//	std::cout << (store.post(v1!=6) and store.valid()) << std::endl;
+//	std::cout << v1 << " " << v2 << " " << v3 << std::endl;
+//	std::cout << store.getStats() << std::endl;
+//	std::cout << env.getStats() << std::endl;
 }
 
 #endif

@@ -52,8 +52,8 @@ namespace CP {
 
 Store::Store(Env& env) :
 			env(env),
-//			globalSHeap(new DynamicHeap(CASPER_SHEAP_INIT_SIZE,
-//										CASPER_SHEAP_GROW_RATIO)),
+			globalSHeap(new Util::DynamicHeap(CASPER_SHEAP_INIT_SIZE,
+										CASPER_SHEAP_GROW_RATIO)),
 //			propIDCtr(0),
 		    weightFilters(false),
 		    filters(env),

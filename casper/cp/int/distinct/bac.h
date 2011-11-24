@@ -40,7 +40,6 @@
 #include <casper/cp/filter/common.h>
 #include <casper/kernel/reversible/stack.h>
 #include <casper/cp/view/array.h>
-#include <casper/cp/int/distinct/common.h>
 #include <casper/cp/int/distinct/val.h>
 #include <casper/cp/int/var.h>
 

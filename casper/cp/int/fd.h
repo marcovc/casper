@@ -145,6 +145,8 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		typedef 	typename Super::ReverseIterator ReverseIterator;
 		/// Const iterator used to iterate backwards through a \p FD.
 		typedef 	ReverseIterator ConstReverseIterator;
+		/// Type of underlying container implementing this \p FD
+		typedef		Super	ImplContainer;
 
 		/// Creates a FD with a copy of the range [\a first ,\a last ).
 		template <class InputIterator>
@@ -272,8 +274,10 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		inline bool updateMin(const Value& v);
 		inline bool updateMax(const Value& v);
 		inline bool updateRange(const Value& min,const Value& max);
-		template<class Iterator1>
-		bool intersect(Iterator1 b, Iterator1 e);
+		template<class BiDirIterator1>
+		bool intersect(BiDirIterator1 b, BiDirIterator1 e);
+		template<class FwdIterator1>
+		bool intersectFwd(FwdIterator1 b, FwdIterator1 e);
 		template<class Iterator1>
 		bool erase(Iterator1 b, Iterator1 e);
 
@@ -400,6 +404,7 @@ bool FD<Container,Element,T>::erase(Value min, Value max)
 	Iterator e = upperBound(max);
 	if (b==e)	return true;
 	triggerBeforeErase(b,e);
+
 	if (!EraseInterval<Self>()(*this,b,e))	return false;
 	if (_min >= *delta().first() and _min <= *delta().last())
 		_min = *begin();
@@ -534,6 +539,39 @@ bool FD<Container,Element,T>::intersect(Iterator1 b,Iterator1 e)
 	return true;
 }
 
+/// Like intersect but lifts the restriction of BidirectionalIterator
+/// \pre Values in the range are sorted.
+template<class Container,class Element,class T>
+template<class ForwardIterator1>
+bool FD<Container,Element,T>::intersectFwd(ForwardIterator1 b,ForwardIterator1 e)
+{
+	assert(!empty());
+	assert(b!=e);
+	if (!updateMin(*b))
+		return false;
+	Iterator myIt = begin();
+	while (b != e and myIt != end())
+	{
+		if (*myIt < *b)	// prune value
+		{
+			if (!erase(myIt++))
+				return false;
+		}
+		else
+		if (*myIt == *b)
+		{
+			++b; ++myIt;
+		}
+		else
+		{
+			assert(*b < *myIt);
+			++b;
+		}
+	}
+	if (myIt != end() and (myIt==begin() or !updateMax(myIt)))
+		return false;
+	return true;
+}
 
 /// Erases all values in iterateable range defined by [b,e[ from FD
 /// \pre Values in the range are sorted.

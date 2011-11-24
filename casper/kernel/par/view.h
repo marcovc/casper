@@ -140,6 +140,38 @@ struct ParView<Eval,Eval> : IPar<Eval>
 };
 
 /**
+ * 	ParView over literal.
+ * 	\ingroup Views
+ **/
+template<>
+struct ParView<int,unsigned int> : IPar<int>
+{
+	ParView(State& state, const unsigned int& p1) :
+		p1(p1) {}
+	int value() const { return static_cast<int>(p1); }
+
+	const unsigned int& getObj()  const { return p1; }
+
+	const unsigned int p1;
+};
+
+/**
+ * 	ParView over std::function.
+ * 	\ingroup Views
+ **/
+template<class Eval>
+struct ParView<Eval,std::function<Eval()> > : IPar<Eval>
+{
+	ParView(State& state, const std::function<Eval()>& f) :
+		f(f) {}
+	Eval value() const { return f(); }
+
+	const std::function<Eval()>& getObj()  const { return f; }
+
+	std::function<Eval()> f;
+};
+
+/**
  * 	ParView over a Par.
  * 	\ingroup Views
  **/

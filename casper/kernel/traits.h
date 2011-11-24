@@ -124,9 +124,9 @@ struct GetEval<IterationView<View> >
 {	typedef Seq<typename Traits::GetElem<View>::Type>	Type;	};
 
 #ifdef CASPER_CPP0X
-template<>
-struct GetEval<std::function<Goal()> >
-{	typedef bool Type;	};
+template<class Eval,class... Args>
+struct GetEval<std::function<Eval(Args...)> >
+{	typedef typename GetEval<Eval>::Type Type;	};
 
 #ifndef _MSC_VER
 template<class T>
@@ -257,5 +257,9 @@ struct GetTermElem<std::initializer_list<T> >
 
 }
 }
+
+template<class Eval,class... Args>
+std::ostream& operator<<(std::ostream& os, const std::function<Eval(Args...)>& f)
+{	os << "std::function"; return os; }
 
 #endif /* TRAITS_H_ */

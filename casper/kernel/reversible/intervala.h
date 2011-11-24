@@ -26,6 +26,7 @@
 //#include <set>
 #include <casper/kernel/common.h>
 #include <casper/util/container/sciterator.h>
+#include <casper/util/container/reverseiterator.h>
 #include <casper/util/container/stdpair.h>
 #include <casper/kernel/reversible/reversible.h>
 #include <casper/kernel/reversible/sulist.h>
@@ -173,16 +174,16 @@ class IntervalA
 		public:
 		typedef typename IntervalA::Value Value;
 		typedef typename IntervalA::Reference Reference;
+		typedef typename IntervalA::Difference Difference;
 
 		Iterator() {}
 		Iterator(typename DataT::Iterator curInt) : curInt(curInt) {}
 		Iterator(typename DataT::Iterator curInt,Value curVal) :
 					curInt(curInt),curVal(curVal) {}
-
 		bool operator==(const Iterator& s) const;
 		bool operator!=(const Iterator& s) const;
-		ConstReference operator*() const;
-		typename IntervalA::Pointer operator->() const;
+		Value operator*() const;
+		//typename IntervalA::Pointer operator->() const;
 		Iterator& operator++(); // pre-increment
 		Iterator operator++(int); //post-increment
 		Iterator(const Iterator& i);
@@ -218,7 +219,7 @@ class IntervalA
 	Iterator find(const key_type& k) const;
 	Size count(const key_type& k) const;
 	Util::StdPair<Iterator, Iterator> equal_range(const key_type& k) const;
-	typedef std::reverse_iterator<Iterator> ReverseIterator;
+	typedef Util::ReverseIteratorAdaptor<Iterator> ReverseIterator;
 	typedef ReverseIterator ConstReverseIterator;
 	ReverseIterator rbegin() const {return ReverseIterator(end());}
 	ReverseIterator rend() const {return ReverseIterator(begin());}
@@ -311,17 +312,17 @@ bool IntervalA<T,Container,Compare>::Iterator::
 
 template<class T, class Container, class Compare>
 inline
-typename IntervalA<T,Container,Compare>::ConstReference
+typename IntervalA<T,Container,Compare>::Value
 	IntervalA<T,Container,Compare>::Iterator::
 		operator*() const
 { return curVal; }
 
-template<class T, class Container, class Compare>
-inline
-typename IntervalA<T,Container,Compare>::Pointer
-		IntervalA<T,Container,Compare>::Iterator::
-		operator->() const
-{ return &curVal; }
+//template<class T, class Container, class Compare>
+//inline
+//typename IntervalA<T,Container,Compare>::Pointer
+//		IntervalA<T,Container,Compare>::Iterator::
+//		operator->() const
+//{ return &curVal; }
 
 /**
 	Pre-increment operator
@@ -618,7 +619,21 @@ template<class T, class Container, class Compare>
 inline void IntervalA<T,Container,Compare>::updateMin(Iterator q)
 {
 	assert(q != end());
+
+#ifdef CASPER_CP_SAFE_FD_DELTAS
+	if (q.curVal > q.curInt->min())
+	{
+		auto next(q.curInt);
+		++next;
+		Interval newInt(state,q.curVal,q.curInt->max());
+		q.curInt->max() = q.curVal - 1;
+		insertInterval(next,newInt);
+		data.updateMin(++q.curInt);
+		return;
+	}
+#else
 	q.curInt->min() = q.curVal;
+#endif
 	if (q != begin())
 		data.updateMin(q.curInt);
 }
@@ -628,9 +643,22 @@ template<class T, class Container, class Compare>
 inline void IntervalA<T,Container,Compare>::updateMax(Iterator p)
 {
 	assert(p != end());
+
+#ifdef CASPER_CP_SAFE_FD_DELTAS
+	if (p.curVal < p.curInt->max())
+	{
+		Interval newInt(state,p.curInt->min(),p.curVal);
+		p.curInt->min() = p.curVal + 1;
+		insertInterval(p.curInt,newInt);
+		data.updateMax(--p.curInt);
+		return;
+	}
+#else
 	p.curInt->max() = p.curVal;
+#endif
 	if (p != --end())
 		data.updateMax(p.curInt);
+
 }
 
 /**
@@ -677,6 +705,9 @@ void IntervalA<T,Container,Compare>::
 	erase(typename IntervalA<T,Container,Compare>::Iterator p,
 		  typename IntervalA<T,Container,Compare>::Iterator q)
 {
+#ifdef CASPER_CP_SAFE_FD_DELTAS
+	assert(0);	// TODO: this method may invalidate iterators (see updateMin)
+#endif
 	--q;
 	// change/keep first interval if necessary
 	if (p.curVal > p.curInt->min())

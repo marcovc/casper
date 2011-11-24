@@ -23,7 +23,6 @@
 
 #include <casper/cp/filter/val.h>
 #include <casper/kernel/reversible/stack.h>
-#include <casper/cp/int/distinct/common.h>
 #include <casper/cp/int/var.h>
 #include <casper/cp/view/array.h>
 #include <casper/util/timer.h>	// tmp
@@ -130,8 +129,8 @@ bool ValFilterView1<Distinct,IntSeq,View>::execute()
  *
  *  \ingroup IntFilters
  */
-template<class View>
-struct ValFilterView1<Distinct,IntSeq,View> : IFilter
+template<class Eval,class View>
+struct ValFilterView1<Distinct,Seq<Eval>,View> : IFilter
 {
 	ValFilterView1(Store& store, const View& v) :
 		IFilter(store),store(store),doms(store,v),toRemove(store),
@@ -167,15 +166,15 @@ struct ValFilterView1<Distinct,IntSeq,View> : IFilter
 	};
 
 	Store&						store;
-	DomArrayView<int,View>		doms;
-	Stack<uint>		toRemove;
-	int							minValue;
-	Array<int>				assignedVars;
+	DomArrayView<Eval,View>		doms;
+	Stack<uint>					toRemove;
+	Eval						minValue;
+	Array<int>					assignedVars;
 	INotifiable*				pParent;
 };
 
-template<class View>
-void ValFilterView1<Distinct,IntSeq,View>::attach(INotifiable* pParent)
+template<class Eval,class View>
+void ValFilterView1<Distinct,Seq<Eval>,View>::attach(INotifiable* pParent)
 {
 //	assert(this->pParent==NULL);
 	this->pParent= pParent;
@@ -183,8 +182,8 @@ void ValFilterView1<Distinct,IntSeq,View>::attach(INotifiable* pParent)
 		new (store) VarDemon(this,i);
 }
 
-template<class View>
-void ValFilterView1<Distinct,IntSeq,View>::detach(INotifiable* pParent)
+template<class Eval,class View>
+void ValFilterView1<Distinct,Seq<Eval>,View>::detach(INotifiable* pParent)
 {
 	this->pParent= NULL;
 	// TODO: kill demons
@@ -192,8 +191,8 @@ void ValFilterView1<Distinct,IntSeq,View>::detach(INotifiable* pParent)
 	//	new (solver().getHeap()) VarDemon(this,i);
 }
 
-template<class View>
-bool ValFilterView1<Distinct,IntSeq,View>::execute()
+template<class Eval,class View>
+bool ValFilterView1<Distinct,Seq<Eval>,View>::execute()
 {
 	typedef typename Traits::GetDom<typename Casper::Traits::GetTermElem<View>::Type>::Type::Iterator Iterator;
 	for (uint i = 0; i < doms.size(); i++)
@@ -212,12 +211,12 @@ bool ValFilterView1<Distinct,IntSeq,View>::execute()
 }
 #endif
 
-template<class View>
-struct PostValFilter1<Distinct,Seq<int>,View>
+template<class Eval,class View>
+struct PostValFilter1<Distinct,Seq<Eval>,View>
 {
 	static bool post(Store& s,const View& v)
 	{
-		return s.post(new (s) ValFilterView1<Distinct,Seq<int>,View>(s,v));
+		return s.post(new (s) ValFilterView1<Distinct,Seq<Eval>,View>(s,v));
 	}
 };
 

@@ -273,6 +273,9 @@ struct Store : INotifiable
 	operator Util::IHeap&();
 	operator const Util::IHeap&() const;
 
+	Util::IHeap& getStdHeap() {	return *globalSHeap; }
+	const Util::IHeap& getStdHeap() const {	return *globalSHeap; }
+
 	bool notify()
 	{
 		env.log(this,"CP::Store",Util::Logger::solverNotify);
@@ -282,7 +285,7 @@ struct Store : INotifiable
 
 protected:
 	Env&				env;
-//	IHeap*				globalSHeap;
+	Util::IHeap*		globalSHeap;
 
 	StoreStats			stats;
 //	counter				propIDCtr;
