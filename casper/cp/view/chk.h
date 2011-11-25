@@ -21,6 +21,7 @@
 #define CASPER_CP_VIEW_CHK_H_
 
 #include <casper/cp/view/common.h>
+#include <casper/fwddecl.h>
 
 namespace Casper {
 namespace CP {

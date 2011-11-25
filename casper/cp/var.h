@@ -136,9 +136,11 @@ class Var
 		pDom(store,Detail::VarDomCreator<Dom>()(store,p1,p2,p3,
 													  p4,p5,p6,p7,p8)) {}
 
+#ifndef SWIG
 	/// Creates a new variable and initializes its domain list \p lst.
 	Var(Store& store, std::initializer_list<T> lst) :
 		pDom(store,Detail::VarDomCreator<Dom>()(store,lst)) {}
+#endif
 
 	~Var() {}
 

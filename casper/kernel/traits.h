@@ -258,8 +258,13 @@ struct GetTermElem<std::initializer_list<T> >
 }
 }
 
+#ifndef SWIG
 template<class Eval,class... Args>
 std::ostream& operator<<(std::ostream& os, const std::function<Eval(Args...)>& f)
 {	os << "std::function"; return os; }
+template<class Eval>
+std::ostream& operator<<(std::ostream& os, const std::initializer_list<Eval>& f)
+{	os << "std::initializer_list"; return os; }
+#endif
 
 #endif /* TRAITS_H_ */
