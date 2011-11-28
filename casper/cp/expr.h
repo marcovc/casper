@@ -485,24 +485,6 @@ typedef ValExpr<bool>	BoolValExpr;
 
 } // CP
 
-template<class> struct GetPEnv;
-template<class T>
-struct GetPEnv<CP::BndExpr<T> >
-{	Env* operator()(CP::BndExpr<T> s)
-	{ return &s.getStore().getEnv(); }
-};
-
-template<class T>
-struct GetPEnv<CP::ValExpr<T> >
-{	Env* operator()(CP::ValExpr<T> s)
-	{ return &s.getStore().getEnv(); }
-};
-
-template<class E,class D>
-struct GetPEnv<CP::DomExpr<E,D> >
-{	Env* operator()(CP::DomExpr<E,D> s)
-	{ return &s.getStore().getEnv();}
-};
 
 namespace Traits {
 

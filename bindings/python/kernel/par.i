@@ -18,3 +18,6 @@
 COUTWRAPPER(Casper::Par)
 
 %template(IntPar) Casper::Par<int>;
+
+%include <kernel/intpar_operators.i>
+%include <kernel/boolpar_operators.i>

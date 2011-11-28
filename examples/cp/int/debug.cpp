@@ -16,7 +16,7 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-#define EX 16
+#define EX 13
 
 #if EX==1
 
@@ -530,6 +530,8 @@ int main(int argc, char** argv)
 
 #include <casper/kernel.h>
 #include <casper/cp.h>
+#include <casper/kernel/goal/whiledo.h>
+#include <casper/kernel/goal/select.h>
 #include <iostream>
 
 using namespace Casper;
@@ -538,7 +540,7 @@ using namespace std;
 
 int main()
 {
-	const int n = 100;
+	const int n = 1000;
 
 	Env env;
 
@@ -548,16 +550,28 @@ int main()
 
 	cout << v << endl;
 
-	store.post(distinct(v),postDomFilter);
+	store.post(distinct(v));
 
 	IntPar i(env);
-	store.post(distinct(all(i,range(0,n-1),true,v[i]+i)),postDomFilter);
-	store.post(distinct(all(i,range(0,n-1),true,v[i]-i)),postDomFilter);
+	store.post(distinct(all(i,range(0,n-1),true,v[i]+i)));
+	store.post(distinct(all(i,range(0,n-1),true,v[i]-i)));
 
 	bool valid = store.valid();
 	cout << valid << " : " << v << endl;
 
-	Goal searchTree(env,label(store,v,selectVarMinDom(store,v),selectValsRand(store,v)));
+//	Goal searchTree(env,label(store,v,selectVarMinDom(store,v),selectValsRand(store,v)));
+	IntPar idx(store);
+	IntPar val(store);
+	Goal searchTree(env,
+			whileDo(not ground(v))
+			(
+				selectMin(idx,range(0,n-1),not ground(v[idx]),domainSize(v[idx])*n+abs(idx-n/2)) and
+				//assign(idx,argMin(idx,range(0,n-1),not ground(v[idx]),domainSize(v[idx])*n+abs(idx-n/2))) and
+				selectRand(val,domain(v[idx])) and
+				//assign(val,argMin(val,domain(v[idx]),randInRange(0.0,1.0))) and
+				(post(store,v[idx]==val) or post(store,v[idx]!=val))
+			));
+
 
 	DFSExplorer dfs(env);
 

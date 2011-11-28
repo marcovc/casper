@@ -402,6 +402,11 @@ NEW_REL_3(maxDiff,MaxDiff)
 NEW_REL_3(argMin,ArgMin)
 NEW_REL_3(argMax,ArgMax)
 
+NEW_FN_4(min,Min)
+NEW_FN_4(max,Max)
+NEW_FN_4(argMin,ArgMin)
+NEW_FN_4(argMax,ArgMax)
+
 NEW_REL_3(forSome,ForSome)
 
 NEW_REL_2(assign,Assign)
@@ -645,6 +650,22 @@ template<class T1,class T2,class T3>
 struct GetEval<Rel3<Max,T1,T2,T3> >
 {	typedef typename Traits::GetEval<T3>::Type	Type;	};
 
+template<class T1,class T2,class T3,class T4>
+struct GetEval<Rel4<ArgMin,T1,T2,T3,T4> >
+{	typedef typename Traits::GetEval<T1>::Type	Type;	};
+
+template<class T1,class T2,class T3,class T4>
+struct GetEval<Rel4<ArgMax,T1,T2,T3,T4> >
+{	typedef typename Traits::GetEval<T1>::Type	Type;	};
+
+template<class T1,class T2,class T3,class T4>
+struct GetEval<Rel4<Min,T1,T2,T3,T4> >
+{	typedef typename Traits::GetEval<T4>::Type	Type;	};
+
+template<class T1,class T2,class T3,class T4>
+struct GetEval<Rel4<Max,T1,T2,T3,T4> >
+{	typedef typename Traits::GetEval<T4>::Type	Type;	};
+
 template<class T1,class T2,class T3>
 struct GetEval<Rel3<MaxDiff,T1,T2,T3> >
 {	typedef typename Traits::GetEval<T3>::Type	Type;	};
@@ -681,42 +702,42 @@ struct GetEval<Rel3<SelectFirst,Expr1,Expr2,Expr3> >
 } // Traits
 
 
-template<class> struct GetPEnv;
-struct Env;
+template<class> struct GetPState;
+struct State;
 
 template<class Func,class T1>
-struct GetPEnv<Rel1<Func,T1> >
+struct GetPState<Rel1<Func,T1> >
 {
-	Env* operator()(const Rel1<Func,T1>& s)
-	{ return getPEnv(s.p1); }
+	State* operator()(const Rel1<Func,T1>& s)
+	{ return getPState(s.p1); }
 };
 
 template<class Func,class T1,class T2>
-struct GetPEnv<Rel2<Func,T1,T2> >
+struct GetPState<Rel2<Func,T1,T2> >
 {
-	Env* operator()(const Rel2<Func,T1,T2>& r)
-	{	return getPEnv(r.p1,r.p2); }
+	State* operator()(const Rel2<Func,T1,T2>& r)
+	{	return getPState(r.p1,r.p2); }
 };
 
 template<class Func,class T1,class T2,class T3>
-struct GetPEnv<Rel3<Func,T1,T2,T3> >
+struct GetPState<Rel3<Func,T1,T2,T3> >
 {
-	Env*	operator()(const Rel3<Func,T1,T2,T3>& r)
-	{	return getPEnv(r.p1,r.p2,r.p3);	}
+	State*	operator()(const Rel3<Func,T1,T2,T3>& r)
+	{	return getPState(r.p1,r.p2,r.p3);	}
 };
 
 template<class Func,class T1,class T2,class T3,class T4>
-struct GetPEnv<Rel4<Func,T1,T2,T3,T4> >
+struct GetPState<Rel4<Func,T1,T2,T3,T4> >
 {
-	Env*	operator()(const Rel4<Func,T1,T2,T3,T4>& r)
-	{	return getPEnv(r.p1,r.p2,r.p3,r.p4);}
+	State*	operator()(const Rel4<Func,T1,T2,T3,T4>& r)
+	{	return getPState(r.p1,r.p2,r.p3,r.p4);}
 };
 
 template<class Func,class T1,class T2,class T3,class T4,class T5>
-struct GetPEnv<Rel5<Func,T1,T2,T3,T4,T5> >
+struct GetPState<Rel5<Func,T1,T2,T3,T4,T5> >
 {
-	Env*	operator()(const Rel5<Func,T1,T2,T3,T4,T5>& r)
-	{	return getPEnv(r.p1,r.p2,r.p3,r.p4,r.p5);}
+	State*	operator()(const Rel5<Func,T1,T2,T3,T4,T5>& r)
+	{	return getPState(r.p1,r.p2,r.p3,r.p4,r.p5);}
 };
 
 template<class ArrayT,class IndexT>

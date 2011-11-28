@@ -40,6 +40,7 @@ struct IExpr
 	virtual CP::BndExpr<Eval> toBndExpr(CP::Store& store) const = 0;
 	virtual CP::ValExpr<Eval> toValExpr(CP::Store& store) const = 0;
 	virtual Par<Eval>	toPar(State& state) const = 0;
+	virtual Par<CP::Var<Eval> >	toCPVarPar(State& state) const = 0;
 	virtual std::ostream& print(std::ostream& os) const = 0;
 };
 
@@ -52,6 +53,7 @@ struct IExpr<bool>
 	virtual CP::ValExpr<bool> toValExpr(CP::Store& store) const = 0;
 	virtual CP::ChkExpr 	toChkExpr(CP::Store& store) const = 0;
 	virtual Par<bool>	toPar(State& state) const = 0;
+	virtual Par<CP::Var<bool> >	toCPVarPar(State& state) const = 0;
 	virtual Goal	toGoal(State& state) const = 0;
 
 	virtual bool	postDomFilter(CP::Store& store) const = 0;
@@ -97,6 +99,8 @@ struct ExprWrapper : IExpr<Eval>
 	{	return Create<T,CP::ValExpr<Eval> >()(store,t);	}
 	Par<Eval>	toPar(State& state) const
 	{	return Create<T,Par<Eval> >()(state,t);	}
+	Par<CP::Var<Eval> >	toCPVarPar(State& state) const
+	{	return Create<T,Par<CP::Var<Eval> > >()(state,t);	}
 
 	std::ostream& print(std::ostream& os) const
 	{	return os << t; }
@@ -119,6 +123,8 @@ struct ExprWrapper<bool,T> : IExpr<bool>
 	{	return Create<T,CP::ChkExpr>()(store,t);	}
 	Par<bool>	toPar(State& state) const
 	{	return Create<T,Par<bool> >()(state,t);	}
+	Par<CP::Var<bool> >	toCPVarPar(State& state) const
+	{	return Create<T,Par<CP::Var<bool> > >()(state,t);	}
 	Goal	toGoal(State& state) const
 	{	return Create<T,Goal>()(state,t);	}
 
@@ -177,6 +183,8 @@ struct Expr : Casper::Util::SPImplIdiom<Detail::IExpr<Eval> >
 	{	return this->getImpl().toValExpr(store);	}
 	Par<Eval>	toPar(State& state) const
 	{	return this->getImpl().toPar(state);	}
+	Par<CP::Var<Eval> >	toCPVarPar(State& state) const
+	{	return this->getImpl().toCPVarPar(state);	}
 #endif
 
 	// SWIG needs this
@@ -210,6 +218,8 @@ struct Expr<bool> : Casper::Util::SPImplIdiom<Detail::IExpr<bool> >
 	{	return this->getImpl().toChkExpr(store);	}
 	Par<bool>	toPar(State& state) const
 	{	return this->getImpl().toPar(state);	}
+	Par<CP::Var<bool> >	toCPVarPar(State& state) const
+	{	return this->getImpl().toCPVarPar(state);	}
 	Goal	toGoal(State& state) const
 	{	return this->getImpl().toGoal(state);	}
 
@@ -305,3 +315,5 @@ std::ostream& operator<<(std::ostream& os,const Casper::Expr<T>& expr)
 #include <casper/kernel/obj/par.h>
 #include <casper/kernel/obj/goal.h>
 #include <casper/kernel/obj/extensions.h>
+//#include <casper/kernel/obj/cpvar.h>
+

@@ -166,6 +166,50 @@ struct State
 	StateStats						stats;
 };
 
+template<class T>
+struct GetPState
+{
+	State* operator()(const T&)
+	{ 	return NULL;	}
+};
+
+// convenience
+
+template<class T>
+State*	getPState(const T& t)
+{	return GetPState<T>()(t);	}
+
+template<class T1,class T2>
+State*	getPState(const T1& t1,const T2& t2)
+{
+	State* s = getPState(t1);
+	if (s != NULL)
+		return s;
+	else
+		return getPState(t2);
+}
+
+template<class T1,class T2,class T3>
+State*	getPState(const T1& t1,const T2& t2,const T3& t3)
+{	return getPState(getPState(t1,t2),t3);	}
+
+template<class T1,class T2,class T3,class T4>
+State*	getPState(const T1& t1,const T2& t2,const T3& t3,const T4& t4)
+{	return getPState(getPState(t1,t2,t3),t4);	}
+
+template<class T1,class T2,class T3,class T4,class T5>
+State*	getPState(const T1& t1,const T2& t2,const T3& t3,const T4& t4,const T5& t5)
+{	return getPState(getPState(t1,t2,t3,t4),t5);	}
+
+
+template<class T>
+State& getState(const T& t)
+{
+	State* p = getPState(t);
+	if (p==NULL)
+		throw Exception::Extract("State");
+	return *p;
+}
 
 } // Casper
 

@@ -143,6 +143,22 @@ objs.add(Rule(type="tRel",func="Element",ev="int",nArgs=2,arg1Eval="Casper::IntS
 for t in ["bool","int"]:
 	objs.add(Rule(type="tRel",func="Assign",ev="bool",nArgs=2,arg1Eval=t,arg2Eval=t))
 objs.add(Rule(type="tRel",func="WhileDo",ev="bool",nArgs=2,arg1Eval="bool",arg2Eval="bool"))
+#for t in ["bool","int","float"]:
+#	objs.add(Rule(type="tRel",func="SelectMin",ev="bool",nArgs=4,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t))
+#	objs.add(Rule(type="tRel",func="SelectMin",ev="bool",nArgs=3,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval=t))
+#	objs.add(Rule(type="tRel",func="SelectMax",ev="bool",nArgs=4,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t))
+#	objs.add(Rule(type="tRel",func="SelectMax",ev="bool",nArgs=3,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval=t))
+#	objs.add(Rule(type="tRel",func="SelectRand",ev="bool",nArgs=4,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t))
+#	objs.add(Rule(type="tRel",func="SelectRand",ev="bool",nArgs=3,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval=t))
+
+## Par expressions
+for f in ["bool","int","Casper::IntSet","Casper::BoolSet","Casper::IntSeq","Casper::BoolSeq","Casper::BoolSetSeq","Casper::IntSetSeq"]:
+	objs.add(Rule(type="tRel",func="Ground",ev="bool",nArgs=1,arg1Eval=f))
+for f in ["bool","int"]:
+	objs.add(Rule(type="tRel",func="DomainSize",ev="int",nArgs=1,arg1Eval=f))
+objs.add(Rule(type="tRel",func="Domain",ev="Casper::IntSeq",nArgs=1,arg1Eval="int"))
+objs.add(Rule(type="tRel",func="Domain",ev="Casper::BoolSeq",nArgs=1,arg1Eval="bool"))
+
 
 # TODO later
 #				"fWhileNotGround",
@@ -232,8 +248,14 @@ casperOp2PythonOp = {
 
 customCasperFn2PythonFn = {
 		"Cast<int>" : "asInt",
-		"Cast<bool>" : "asBool"						
+		"Cast<bool>" : "asBool",
+		"Abs" : "_abs",
+		"Min" : "_min",
+		"Max" : "_max",
+		"Sum" : "_sum",
+		"Pow" : "_pow"						
 }
+
 
 def casperFn2PythonFn(casperFn):
 	if casperFn in customCasperFn2PythonFn.keys():
@@ -273,17 +295,6 @@ def printVarOperators(arg1,ev1):
 				printUnaryOperator(r.properties["func"],r.properties["ev"],arg1)
 			if r.properties["nArgs"]==2:
 				ev2 = r.properties["arg2Eval"]
-				'''
-				# self with literal
-				if ev2=="int" or ev2=="bool":
-					arg2 = ev2
-					printBinaryOperator(r.properties["func"],r.properties["ev"],arg1,arg2)
-				# literal with self		
-					printBinaryOperator(r.properties["func"],r.properties["ev"],arg1,arg2,True)
-				# self with var
-				arg2 = "Casper::CP::Var<"+ev2+",Casper::CP::Traits::GetDefaultDom<"+ev2+">::Type>"
-				printBinaryOperator(r.properties["func"],r.properties["ev"],arg1,arg2)
-				'''
 				# self with expression
 				arg2 = "Casper::Expr<"+ev2+">"
 				printBinaryOperator(r.properties["func"],r.properties["ev"],arg1,arg2)

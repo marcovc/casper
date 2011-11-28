@@ -30,11 +30,11 @@ namespace Casper {
  *********************/
 
 template<class>	struct Par;
-template<class,class,class>			struct ParView1;
-template<class,class,class,class>	struct ParView2;
-template<class,class,class,class,class>	struct ParView3;
-template<class,class,class,class,class,class>	struct ParView4;
-template<class,class,class,class,class,class,class>	struct ParView5;
+template<class,class,class,class>			struct ParView1;
+template<class,class,class,class,class,class>	struct ParView2;
+template<class,class,class,class,class,class,class,class>	struct ParView3;
+template<class,class,class,class,class,class,class,class,class,class>	struct ParView4;
+template<class,class,class,class,class,class,class,class,class,class,class,class>	struct ParView5;
 
 template<class Eval,class R>
 struct NoParView : IPar<Eval>
@@ -59,35 +59,37 @@ struct ParView  : NoParView<Eval,View>
 		NoParView<Eval,View>(s,p1) {}
 };
 
-template<class F,class Expr1,class Eval>
+template<class F,class Eval1,class Expr1,class Eval>
 struct ParView1 : NoParView<Eval,Rel1<F,Expr1> >
 {
 	ParView1(State& s,const Expr1& v) :
 		NoParView<Eval,Rel1<F,Expr1> >(s,rel<F>(v)) {}
 };
 
-template<class F,class Expr1,class Expr2,class Eval>
+template<class F,class Eval1,class Expr1,class Eval2,class Expr2,class Eval>
 struct ParView2 :  NoParView<Eval,Rel2<F,Expr1,Expr2> >
 {
 	ParView2(State& s,const Expr1& v1,const Expr2& v2) :
 		NoParView<Eval,Rel2<F,Expr1,Expr2> >(s,rel<F>(v1,v2)) {}
 };
 
-template<class F,class Expr1,class Expr2,class Expr3,class Eval>
+template<class F,class Eval1,class Expr1,class Eval2,class Expr2,class Eval3,class Expr3,class Eval>
 struct ParView3 :  NoParView<Eval,Rel3<F,Expr1,Expr2,Expr3> >
 {
 	ParView3(State& s,const Expr1& v1,const Expr2& v2,const Expr3& v3) :
 		NoParView<Eval,Rel3<F,Expr1,Expr2,Expr3> >(s,rel<F>(v1,v2,v3)) {}
 };
 
-template<class F,class Expr1,class Expr2,class Expr3,class Expr4, class Eval>
+template<class F,class Eval1,class Expr1,class Eval2,class Expr2,class Eval3,class Expr3,
+		 class Eval4,class Expr4, class Eval>
 struct ParView4 :  NoParView<Eval,Rel4<F,Expr1,Expr2,Expr3,Expr4> >
 {
 	ParView4(State& s,const Expr1& v1,const Expr2& v2,const Expr3& v3,const Expr4& v4) :
 		NoParView<Eval,Rel4<F,Expr1,Expr2,Expr3,Expr4> >(s,rel<F>(v1,v2,v3,v4)) {}
 };
 
-template<class F,class Expr1,class Expr2,class Expr3,class Expr4, class Expr5,class Eval>
+template<class F,class Eval1,class Expr1,class Eval2,class Expr2,class Eval3,class Expr3,
+			class Eval4,class Expr4,class Eval5, class Expr5,class Eval>
 struct ParView5 :  NoParView<Eval,Rel5<F,Expr1,Expr2,Expr3,Expr4,Expr5> >
 {
 	ParView5(State& s,const Expr1& v1,const Expr2& v2,const Expr3& v3,const Expr4& v4,const Expr5& v5) :
@@ -175,17 +177,14 @@ struct ParView<Eval,std::function<Eval()> > : IPar<Eval>
  * 	ParView over a Par.
  * 	\ingroup Views
  **/
-template<class Eval,class T>
-struct ParView<Eval,Par<T> > : IPar<Eval>
+template<class T>
+struct ParView<T,Par<T> > : IPar<T>
 {
 	ParView(State& state,const Par<T>& p1) :
 		p1(p1) {}
-	Eval value() const { return p1.value(); }
-	void setValue(const Eval& v)
+	T value() const { return p1.value(); }
+	void setValue(const T& v)
 	{	p1 = v;	}
-
-//	void attach(INotifiable* f) { p1.attach(f); }
-//	void detach(INotifiable* f) { p1.detach(f); }
 
 	const Par<T>& getObj()  const { return p1; }
 	Par<T>	p1;
@@ -196,16 +195,16 @@ struct ParView<Eval,Par<T> > : IPar<Eval>
  * 	\ingroup Views
  **/
 template<class Eval,class F,class View>
-struct ParView<Eval,Rel1<F,View> > : ParView1<F,View,Eval>
+struct ParView<Eval,Rel1<F,View> > :
+	ParView1<F,typename Traits::GetEval<View>::Type,View,Eval>
 {
-//	using ParView1<F,View,Eval>::attach;
-//	using ParView1<F,View,Eval>::detach;
+	typedef typename Traits::GetEval<View>::Type	Eval1;
 
 	ParView(State& state, const Rel1<F,View>& r) :
-		ParView1<F,View,Eval>(state,r.p1) {}
+		ParView1<F,Eval1,View,Eval>(state,r.p1) {}
 	// not sure if the below constructor is ever used
-	ParView(State& state,const ParView1<F,View,Eval>& v) :
-		ParView1<F,View,Eval>(v) {}
+	ParView(State& state,const ParView1<F,Eval1,View,Eval>& v) :
+		ParView1<F,Eval1,View,Eval>(v) {}
 };
 
 /**
@@ -214,16 +213,17 @@ struct ParView<Eval,Rel1<F,View> > : ParView1<F,View,Eval>
  **/
 template<class Eval,class F,class Expr1,class Expr2>
 struct ParView<Eval,Rel2<F,Expr1,Expr2> > :
-	ParView2<F,Expr1,Expr2,Eval>
+	ParView2<F,typename Traits::GetEval<Expr1>::Type,Expr1,
+				typename Traits::GetEval<Expr2>::Type,Expr2,Eval>
 {
-//	using ParView2<F,Expr1,Expr2,Eval>::attach;
-//	using ParView2<F,Expr1,Expr2,Eval>::detach;
+	typedef typename Traits::GetEval<Expr1>::Type Eval1;
+	typedef typename Traits::GetEval<Expr2>::Type Eval2;
 
 	ParView(State& state, const Rel2<F,Expr1,Expr2>& r) :
-		ParView2<F,Expr1,Expr2,Eval>(state,r.p1,r.p2) {}
+		ParView2<F,Eval1,Expr1,Eval2,Expr2,Eval>(state,r.p1,r.p2) {}
 	// not sure if the below constructor is ever used
-	ParView(State& state, const ParView2<F,Expr1,Expr2,Eval>& v) :
-		ParView2<F,Expr1,Expr2,Eval>(v) {}
+	ParView(State& state, const ParView2<F,Eval1,Expr1,Eval2,Expr2,Eval>& v) :
+		ParView2<F,Eval1,Expr1,Eval2,Expr2,Eval>(v) {}
 };
 
 /**
@@ -232,13 +232,16 @@ struct ParView<Eval,Rel2<F,Expr1,Expr2> > :
  **/
 template<class Eval,class F,class Expr1,class Expr2,class Expr3>
 struct ParView<Eval,Rel3<F,Expr1,Expr2,Expr3> > :
-	ParView3<F,Expr1,Expr2,Expr3,Eval>
+	ParView3<F,typename Traits::GetEval<Expr1>::Type,Expr1,
+				typename Traits::GetEval<Expr2>::Type,Expr2,
+				typename Traits::GetEval<Expr3>::Type,Expr3,Eval>
 {
-//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::attach;
-//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::detach;
+	typedef typename Traits::GetEval<Expr1>::Type	Eval1;
+	typedef typename Traits::GetEval<Expr2>::Type	Eval2;
+	typedef typename Traits::GetEval<Expr3>::Type	Eval3;
 
 	ParView(State& state, const Rel3<F,Expr1,Expr2,Expr3>& r) :
-		ParView3<F,Expr1,Expr2,Expr3,Eval>(state,r.p1,r.p2,r.p3) {}
+		ParView3<F,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval>(state,r.p1,r.p2,r.p3) {}
 };
 
 /**
@@ -247,13 +250,18 @@ struct ParView<Eval,Rel3<F,Expr1,Expr2,Expr3> > :
  **/
 template<class Eval,class F,class Expr1,class Expr2,class Expr3,class Expr4>
 struct ParView<Eval,Rel4<F,Expr1,Expr2,Expr3,Expr4> > :
-	ParView4<F,Expr1,Expr2,Expr3,Expr4,Eval>
+	ParView4<F,typename Traits::GetEval<Expr1>::Type,Expr1,
+			   typename Traits::GetEval<Expr2>::Type,Expr2,
+			   typename Traits::GetEval<Expr3>::Type,Expr3,
+			   typename Traits::GetEval<Expr4>::Type,Expr4,Eval>
 {
-//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::attach;
-//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::detach;
+	typedef typename Traits::GetEval<Expr1>::Type Eval1;
+	typedef typename Traits::GetEval<Expr2>::Type Eval2;
+	typedef typename Traits::GetEval<Expr3>::Type Eval3;
+	typedef typename Traits::GetEval<Expr4>::Type Eval4;
 
 	ParView(State& state, const Rel4<F,Expr1,Expr2,Expr3,Expr4>& r) :
-		ParView4<F,Expr1,Expr2,Expr3,Expr4,Eval>(state,r.p1,r.p2,r.p3,r.p4) {}
+		ParView4<F,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4,Eval>(state,r.p1,r.p2,r.p3,r.p4) {}
 };
 
 
@@ -263,48 +271,49 @@ struct ParView<Eval,Rel4<F,Expr1,Expr2,Expr3,Expr4> > :
  **/
 template<class Eval,class F,class Expr1,class Expr2,class Expr3,class Expr4,class Expr5>
 struct ParView<Eval,Rel5<F,Expr1,Expr2,Expr3,Expr4,Expr5> > :
-	ParView5<F,Expr1,Expr2,Expr3,Expr4,Expr5,Eval>
+	ParView5<F,typename Traits::GetEval<Expr1>::Type,Expr1,
+				typename Traits::GetEval<Expr2>::Type,Expr2,
+				typename Traits::GetEval<Expr3>::Type,Expr3,
+				typename Traits::GetEval<Expr4>::Type,Expr4,
+				typename Traits::GetEval<Expr5>::Type,Expr5,Eval>
 {
-//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::attach;
-//	using ParView3<F,Expr1,Expr2,Expr3,Eval>::detach;
-
+	typedef typename Traits::GetEval<Expr1>::Type Eval1;
+	typedef typename Traits::GetEval<Expr2>::Type Eval2;
+	typedef typename Traits::GetEval<Expr3>::Type Eval3;
+	typedef typename Traits::GetEval<Expr4>::Type Eval4;
+	typedef typename Traits::GetEval<Expr5>::Type Eval5;
 	ParView(State& state, const Rel5<F,Expr1,Expr2,Expr3,Expr4,Expr5>& r) :
-		ParView5<F,Expr1,Expr2,Expr3,Expr4,Expr5,Eval>(state,r.p1,r.p2,r.p3,r.p4,r.p5) {}
+		ParView5<F,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4,Eval5,Expr5,Eval>(state,r.p1,r.p2,r.p3,r.p4,r.p5) {}
 };
 
 /**
  * 	ParView over symmetric.
  * 	\ingroup Views
  **/
-template<class View,class Eval>
-struct ParView1<Sym,View,Eval> : IPar<Eval>
+template<class Obj1,class Eval>
+struct ParView1<Sym,Eval,Obj1,Eval> : IPar<Eval>
 {
-	ParView1(State& state, const View& p1) :
+	ParView1(State& state, const Obj1& p1) :
 		p1(state,p1)	{}
 	Eval value() const { return -p1.value(); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); 	}
-//	void detach(INotifiable* f)	{	p1.detach(f);  }
-
-	Rel1<Sym,View> getObj()  const { return -(p1.getObj()); }
-	ParView<Eval,View>	p1;
+	Rel1<Sym,Obj1> getObj()  const { return -(p1.getObj()); }
+	ParView<Eval,Obj1>	p1;
 };
 
-template<class View,class Eval>
-struct ParView1<Abs,View,Eval> : IPar<Eval>
+template<class Obj1,class Eval>
+struct ParView1<Abs,Eval,Obj1,Eval> : IPar<Eval>
 {
-	ParView1(State& state, const View& p1) :
+	ParView1(State& state, const Obj1& p1) :
 		p1(state,p1)	{}
 	Eval value() const
 	{
 		Eval r = p1.value();
 		return (r>=0)?r:-r;
 	}
-//	void attach(INotifiable* f) { 	p1.attach(f); 	}
-//	void detach(INotifiable* f)	{	p1.detach(f);  }
 
-	Rel1<Abs,View> getObj()  const { return abs(p1.getObj()); }
-	ParView<Eval,View>	p1;
+	Rel1<Abs,Obj1> getObj()  const { return abs(p1.getObj()); }
+	ParView<Eval,Obj1>	p1;
 };
 
 // logical
@@ -313,18 +322,15 @@ struct ParView1<Abs,View,Eval> : IPar<Eval>
  * 	ParView over negation.
  * 	\ingroup Views
  **/
-template<class View>
-struct ParView1<Not,View,bool> : IPar<bool>
+template<class Obj1>
+struct ParView1<Not,bool,Obj1,bool> : IPar<bool>
 {
-	ParView1(State& state, const View& p1) :
+	ParView1(State& state, const Obj1& p1) :
 		p1(state,p1)	{}
 	bool value() const { return !p1.value(); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); 	}
-//	void detach(INotifiable* f)	{	p1.detach(f);  }
-
-	Rel1<Not,View> getObj()  const { return not p1.getObj(); }
-	ParView<bool,View>	p1;
+	Rel1<Not,Obj1> getObj()  const { return not p1.getObj(); }
+	ParView<bool,Obj1>	p1;
 };
 
 /**
@@ -332,14 +338,11 @@ struct ParView1<Not,View,bool> : IPar<bool>
  * 	\ingroup Views
  **/
 template<class Expr1,class Expr2>
-struct ParView2<And,Expr1,Expr2,bool> : IPar<bool>
+struct ParView2<And,bool,Expr1,bool,Expr2,bool> : IPar<bool>
 {
 	ParView2(State& state,const Expr1& p1,const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() && p2.value(); }
-
-//	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-//	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
 
 	Rel2<And,Expr1,Expr2> getObj()  const
 	{ return p1.getObj() and p2.getObj(); }
@@ -352,14 +355,11 @@ struct ParView2<And,Expr1,Expr2,bool> : IPar<bool>
  * 	\ingroup Views
  **/
 template<class Expr1,class Expr2>
-struct ParView2<Or,Expr1,Expr2,bool> : IPar<bool>
+struct ParView2<Or,bool,Expr1,bool,Expr2,bool> : IPar<bool>
 {
 	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) 	{}
 	bool value() const { return p1.value() || p2.value(); }
-
-//	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-//	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
 
 	Rel2<Or,Expr1,Expr2> getObj()  const
 	{ return p1.getObj() or p2.getObj(); }
@@ -375,23 +375,17 @@ struct ParView2<Or,Expr1,Expr2,bool> : IPar<bool>
  * 	\ingroup Views
  **/
 template<class Expr1,class Expr2,class Eval>
-struct ParView2<Add,Expr1,Expr2,Eval> : IPar<Eval>
+struct ParView2<Add,Eval,Expr1,Eval,Expr2,Eval> : IPar<Eval>
 {
-	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
-	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
-
 	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	Eval value() const { return p1.value() + p2.value(); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-//	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-
 	Rel2<Add,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()+p2.getObj(); }
 
-	ParView<View1Eval,Expr1>	p1;
-	ParView<View2Eval,Expr2>	p2;
+	ParView<Eval,Expr1>	p1;
+	ParView<Eval,Expr2>	p2;
 };
 
 /**
@@ -399,23 +393,17 @@ struct ParView2<Add,Expr1,Expr2,Eval> : IPar<Eval>
  * 	\ingroup Views
  **/
 template<class Expr1,class Expr2,class Eval>
-struct ParView2<Sub,Expr1,Expr2,Eval> : IPar<Eval>
+struct ParView2<Sub,Eval,Expr1,Eval,Expr2,Eval> : IPar<Eval>
 {
-	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
-	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
-
 	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	Eval value() const { return p1.value() - p2.value(); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-//	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-
 	Rel2<Sub,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()-p2.getObj(); }
 
-	ParView<View1Eval,Expr1>	p1;
-	ParView<View2Eval,Expr2>	p2;
+	ParView<Eval,Expr1>	p1;
+	ParView<Eval,Expr2>	p2;
 };
 
 /**
@@ -423,235 +411,178 @@ struct ParView2<Sub,Expr1,Expr2,Eval> : IPar<Eval>
  * 	\ingroup Views
  **/
 template<class Expr1,class Expr2,class Eval>
-struct ParView2<Mul,Expr1,Expr2,Eval> : IPar<Eval>
+struct ParView2<Mul,Eval,Expr1,Eval,Expr2,Eval> : IPar<Eval>
 {
-	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
-	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
-
 	ParView2(State& state, const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	Eval value() const { return p1.value() * p2.value(); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-//	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-
 	Rel2<Mul,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()*p2.getObj(); }
 
-	ParView<View1Eval,Expr1>	p1;
-	ParView<View2Eval,Expr2>	p2;
+	ParView<Eval,Expr1>	p1;
+	ParView<Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over equality relation.
  * 	\ingroup Views
  **/
-template<class Expr1,class Expr2>
-struct ParView2<Equal,Expr1,Expr2,bool> : IPar<bool>
+template<class Eval,class Expr1,class Expr2>
+struct ParView2<Equal,Eval,Expr1,Eval,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
-	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
-
 	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() == p2.value(); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-//	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-
 	Rel2<Equal,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()==p2.getObj(); }
 
-	ParView<View1Eval,Expr1>	p1;
-	ParView<View2Eval,Expr2>	p2;
+	ParView<Eval,Expr1>	p1;
+	ParView<Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over inequality.
  * 	\ingroup Views
  **/
-template<class Expr1,class Expr2>
-struct ParView2<Greater,Expr1,Expr2,bool> : IPar<bool>
+template<class Eval,class Expr1,class Expr2>
+struct ParView2<Greater,Eval,Expr1,Eval,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
-	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
-
 	ParView2(State& state, const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() > p2.value(); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-//	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-
 	Rel2<Greater,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()>p2.getObj(); }
 
-	ParView<View1Eval,Expr1>	p1;
-	ParView<View2Eval,Expr2>	p2;
+	ParView<Eval,Expr1>	p1;
+	ParView<Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over inequality.
  * 	\ingroup Views
  **/
-template<class Expr1,class Expr2>
-struct ParView2<GreaterEqual,Expr1,Expr2,bool> : IPar<bool>
+template<class Eval,class Expr1,class Expr2>
+struct ParView2<GreaterEqual,Eval,Expr1,Eval,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
-	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
-
 	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() >= p2.value(); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-//	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
-
 	Rel2<GreaterEqual,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()>=p2.getObj(); }
 
-	ParView<View1Eval,Expr1>	p1;
-	ParView<View2Eval,Expr2>	p2;
+	ParView<Eval,Expr1>	p1;
+	ParView<Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over inequality.
  * 	\ingroup Views
  **/
-template<class Expr1,class Expr2>
-struct ParView2<Less,Expr1,Expr2,bool> : IPar<bool>
+template<class Eval,class Expr1,class Expr2>
+struct ParView2<Less,Eval,Expr1,Eval,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
-	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
-
 	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() < p2.value(); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-//	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-
 	Rel2<Less,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()<p2.getObj(); }
 
-	ParView<View1Eval,Expr1>	p1;
-	ParView<View2Eval,Expr2>	p2;
+	ParView<Eval,Expr1>	p1;
+	ParView<Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over inequality.
  * 	\ingroup Views
  **/
-template<class Expr1,class Expr2>
-struct ParView2<LessEqual,Expr1,Expr2,bool> : IPar<bool>
+template<class Eval,class Expr1,class Expr2>
+struct ParView2<LessEqual,Eval,Expr1,Eval,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
-	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
-
 	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() <= p2.value(); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-//	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
-
 	Rel2<LessEqual,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()<=p2.getObj(); }
 
-	ParView<View1Eval,Expr1>	p1;
-	ParView<View2Eval,Expr2>	p2;
+	ParView<Eval,Expr1>	p1;
+	ParView<Eval,Expr2>	p2;
 };
 
 /**
  * 	ParView over disequality.
  * 	\ingroup Views
  **/
-template<class Expr1,class Expr2>
-struct ParView2<Distinct,Expr1,Expr2,bool> : IPar<bool>
+template<class Eval,class Expr1,class Expr2>
+struct ParView2<Distinct,Eval,Expr1,Eval,Expr2,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<Expr1>::Type	View1Eval;
-	typedef typename Traits::GetEval<Expr2>::Type	View2Eval;
-
 	ParView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
 	bool value() const { return p1.value() != p2.value(); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-//	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
-
 	Rel2<Distinct,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()!=p2.getObj(); }
 
-	ParView<View1Eval,Expr1>	p1;
-	ParView<View2Eval,Expr2>	p2;
+	ParView<Eval,Expr1>	p1;
+	ParView<Eval,Expr2>	p2;
 };
 
-template<class View,class Eval>
-struct ParView1<Round,View,Eval> : IPar<Eval>
+template<class Eval1,class Obj1,class Eval>
+struct ParView1<Round,Eval1,Obj1,Eval> : IPar<Eval>
 {
-	ParView1(State& state, const View& p1) :
+	ParView1(State& state, const Obj1& p1) :
 		p1(state,p1)	{}
 	Eval value() const { return ::round(p1.value()); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); }
-//	void detach(INotifiable* f) {	p1.detach(f); }
-
-	Rel1<Round,View> getObj()  const { return round(p1.getObj()); }
-	ParView<Eval,View>	p1;
+	Rel1<Round,Obj1> getObj()  const { return round(p1.getObj()); }
+	ParView<Eval1,Obj1>	p1;
 };
 
-template<class View,class Eval>
-struct ParView1<Ceil,View,Eval> : IPar<Eval>
+template<class Eval1,class Obj1,class Eval>
+struct ParView1<Ceil,Eval1,Obj1,Eval> : IPar<Eval>
 {
-	ParView1(State& state, const View& p1) :
+	ParView1(State& state, const Obj1& p1) :
 		p1(state,p1)	{}
 	Eval value() const { return ::ceil(p1.value()); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); }
-//	void detach(INotifiable* f) {	p1.detach(f); }
-
-	Rel1<Ceil,View> getObj()  const { return ceil(p1.getObj()); }
-	ParView<Eval,View>	p1;
+	Rel1<Ceil,Obj1> getObj()  const { return ceil(p1.getObj()); }
+	ParView<Eval1,Obj1>	p1;
 };
 
-template<class View,class Eval>
-struct ParView1<Floor,View,Eval> : IPar<Eval>
+template<class Eval1,class Obj1,class Eval>
+struct ParView1<Floor,Eval1,Obj1,Eval> : IPar<Eval>
 {
-	ParView1(State& state, const View& p1) :
+	ParView1(State& state, const Obj1& p1) :
 		p1(state,p1)	{}
 	Eval value() const { return ::floor(p1.value()); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); }
-//	void detach(INotifiable* f) {	p1.detach(f); }
-
-	Rel1<Floor,View> getObj()  const { return floor(p1.getObj()); }
-	ParView<Eval,View>	p1;
+	Rel1<Floor,Obj1> getObj()  const { return floor(p1.getObj()); }
+	ParView<Eval1,Obj1>	p1;
 };
 
-template<class Eval,class View>
-struct ParView1<Cast<Eval>,View,Eval> : IPar<Eval>
+template<class Eval1,class Eval,class Obj1>
+struct ParView1<Cast<Eval>,Eval1,Obj1,Eval> : IPar<Eval>
 {
-	typedef typename Traits::GetEval<View>::Type	ViewEval;
-
-	ParView1(State& state, const View& p1) :
+	ParView1(State& state, const Obj1& p1) :
 		p1(state,p1)	{}
 	Eval value() const { return static_cast<Eval>(p1.value()); }
 
-//	void attach(INotifiable* f) { 	p1.attach(f); }
-//	void detach(INotifiable* f) {	p1.detach(f); }
-
-	Rel1<Round,View> getObj()  const { return cast<Eval>(p1.getObj()); }
-	ParView<ViewEval,View>	p1;
+	Rel1<Round,Obj1> getObj()  const { return cast<Eval>(p1.getObj()); }
+	ParView<Eval1,Obj1>	p1;
 };
 
 template<class Eval,class T>
 ParView<Eval,T> newParView(State& state,const T& t)
 {	return ParView<Eval,T>(state,t);	}
 
-template<class Array,class Index,class Eval>
-struct ParView2<Element,Array,Index,Eval> : IPar<Eval>
+template<class ArrayEval,class IndexEval,class Array,class Index,class Eval>
+struct ParView2<Element,ArrayEval,Array,IndexEval,Index,Eval> : IPar<Eval>
 {
-	typedef typename Traits::GetEval<Index>::Type	IndexEval;
 	typedef typename Traits::GetElem<Array>::Type	ArrayElem;
 	ParView2(State& state, const Array& s, const Index& idx) :
 		state(state),s(state,s),idx(state,idx) {}
@@ -669,19 +600,16 @@ struct ParView2<Element,Array,Index,Eval> : IPar<Eval>
 	ParView<IndexEval,Index> idx;
 };
 
-// FIXME: Attach is not correct, must fix when ParArray is ready
-template<class Set, class Expr>
-struct ParView3<ArgMax,Par<int>,Set,Expr,int> : IPar<int>
+template<class Set, class Cond,class ExprEval,class Expr>
+struct ParView4<ArgMax,int,Par<int>,Seq<int>,Set,bool,Cond,ExprEval,Expr,int> : IPar<int>
 {
-	typedef typename Traits::GetEval<Expr>::Type	ExprEval;
-
-	ParView3(State& state, const Par<int>& v, const Set& s, const Expr& e) :
-		v(v),s(s),e(state,e) {}
+	ParView4(State& state, const Par<int>& v, const Set& s, const Cond& c,const Expr& e) :
+		v(v),s(s),c(c),e(state,e) {}
 	int value() const
 	{
 		int bestIdx;
 		ExprEval bestEval = limits<ExprEval>::negInf();
-		for (Casper::Detail::PIteration<Par<int>,Set,bool> it(v,s,true);
+		for (Casper::Detail::PIteration<Par<int>,Set,Cond> it(v,s,c);
 				it.valid(); it.iterate())
 		{
 			if (e.value() > bestEval)
@@ -693,27 +621,32 @@ struct ParView3<ArgMax,Par<int>,Set,Expr,int> : IPar<int>
 		return bestIdx;
 	}
 
-//	void attach(INotifiable* f) { 	e.attach(f); }
-//	void detach(INotifiable* f) {	e.detach(f); }
-
 	Par<int> v;
 	Set	s;
+	Cond c;
 	ParView<ExprEval,Expr> e;
 };
 
-// FIXME: Attach is not correct, must fix when ParArray is ready
-template<class Set, class Expr>
-struct ParView3<ArgMin,Par<int>,Set,Expr,int> : IPar<int>
+template<class Set, class ExprEval,class Expr>
+struct ParView3<ArgMax,int,Par<int>,Seq<int>,Set,ExprEval,Expr,int> :
+	ParView4<ArgMax,int,Par<int>,Seq<int>,Set,bool,bool,ExprEval,Expr,int>
 {
-	typedef typename Traits::GetEval<Expr>::Type	ExprEval;
+	typedef ParView4<ArgMax,int,Par<int>,Seq<int>,Set,bool,bool,ExprEval,Expr,int> Super;
 
 	ParView3(State& state, const Par<int>& v, const Set& s, const Expr& e) :
-		v(v),s(s),e(state,e) {}
+		Super(state,v,s,true,e) {}
+};
+
+template<class Set, class Cond,class ExprEval,class Expr>
+struct ParView4<ArgMin,int,Par<int>,Seq<int>,Set,bool,Cond,ExprEval,Expr,int> : IPar<int>
+{
+	ParView4(State& state, const Par<int>& v, const Set& s, const Cond& c,const Expr& e) :
+		v(v),s(s),c(c),e(state,e) {}
 	int value() const
 	{
 		int bestIdx;
 		ExprEval bestEval = limits<ExprEval>::posInf();
-		for (Casper::Detail::PIteration<Par<int>,Set,bool> it(v,s,true);
+		for (Casper::Detail::PIteration<Par<int>,Set,Cond> it(v,s,c);
 				it.valid(); it.iterate())
 		{
 			if (e.value() < bestEval)
@@ -725,65 +658,86 @@ struct ParView3<ArgMin,Par<int>,Set,Expr,int> : IPar<int>
 		return bestIdx;
 	}
 
-//	void attach(INotifiable* f) { 	e.attach(f); }
-//	void detach(INotifiable* f) {	e.detach(f); }
-
 	Par<int> v;
 	Set	s;
+	Cond c;
 	ParView<ExprEval,Expr> e;
 };
 
-// FIXME: Attach is not correct, must fix when ParArray is ready
-template<class Set, class Expr,class Eval>
-struct ParView3<Max,Par<int>,Set,Expr,Eval> : IPar<Eval>
+template<class Set, class ExprEval,class Expr>
+struct ParView3<ArgMin,int,Par<int>,Seq<int>,Set,ExprEval,Expr,int> :
+	ParView4<ArgMin,int,Par<int>,Seq<int>,Set,bool,bool,ExprEval,Expr,int>
 {
+	typedef ParView4<ArgMin,int,Par<int>,Seq<int>,Set,bool,bool,ExprEval,Expr,int> Super;
+
 	ParView3(State& state, const Par<int>& v, const Set& s, const Expr& e) :
-		v(v),s(s),e(state,e) {}
+		Super(state,v,s,true,e) {}
+};
+
+template<class Set, class Cond,class Expr,class Eval>
+struct ParView4<Max,int,Par<int>,Seq<int>,Set,bool,Cond,Eval,Expr,Eval> : IPar<Eval>
+{
+	ParView4(State& state, const Par<int>& v, const Set& s, const Cond& c,const Expr& e) :
+		v(v),s(s),c(c),e(state,e) {}
 	Eval value() const
 	{
 		Eval bestEval = limits<Eval>::negInf();
-		for (Casper::Detail::PIteration<Par<int>,Set,bool> it(v,s,true);
+		for (Casper::Detail::PIteration<Par<int>,Set,Cond> it(v,s,c);
 				it.valid(); it.iterate())
 			if (e.value() > bestEval)
 				bestEval = e.value();
 		return bestEval;
 	}
 
-//	void attach(INotifiable* f) { 	e.attach(f); }
-//	void detach(INotifiable* f) {	e.detach(f); }
-
 	Par<int> v;
 	Set	s;
+	Cond c;
 	ParView<Eval,Expr> e;
 };
 
-// FIXME: Attach is not correct, must fix when ParArray is ready
+
 template<class Set, class Expr,class Eval>
-struct ParView3<Min,Par<int>,Set,Expr,Eval> : IPar<Eval>
+struct ParView3<Max,int,Par<int>,Seq<int>,Set,Eval,Expr,Eval> :
+	ParView4<Max,int,Par<int>,Seq<int>,Set,bool,bool,Eval,Expr,Eval>
 {
+	typedef ParView4<Max,int,Par<int>,Seq<int>,Set,bool,bool,Eval,Expr,Eval>	Super;
 	ParView3(State& state, const Par<int>& v, const Set& s, const Expr& e) :
-		v(v),s(s),e(state,e) {}
+		Super(state,v,s,true,e) {}
+};
+
+template<class Set, class Cond, class Expr,class Eval>
+struct ParView4<Min,int,Par<int>,Seq<int>,Set,bool,Cond,Eval,Expr,Eval> : IPar<Eval>
+{
+	ParView4(State& state, const Par<int>& v, const Set& s, const Cond& c, const Expr& e) :
+		v(v),s(s),c(c),e(state,e) {}
 	Eval value() const
 	{
 		Eval bestEval = limits<Eval>::posInf();
-		for (Casper::Detail::PIteration<Par<int>,Set,bool> it(v,s,true);
+		for (Casper::Detail::PIteration<Par<int>,Set,Cond> it(v,s,c);
 				it.valid(); it.iterate())
 			if (e.value() < bestEval)
 				bestEval = e.value();
 		return bestEval;
 	}
 
-//	void attach(INotifiable* f) { 	e.attach(f); }
-//	void detach(INotifiable* f) {	e.detach(f); }
-
 	Par<int> v;
 	Set	s;
+	Cond c;
 	ParView<Eval,Expr> e;
+};
+
+template<class Set, class Expr,class Eval>
+struct ParView3<Min,int,Par<int>,Seq<int>,Set,Eval,Expr,Eval> :
+	ParView4<Min,int,Par<int>,Seq<int>,Set,bool,bool,Eval,Expr,Eval>
+{
+	typedef ParView4<Min,int,Par<int>,Seq<int>,Set,bool,bool,Eval,Expr,Eval>	Super;
+	ParView3(State& state, const Par<int>& v, const Set& s, const Expr& e) :
+		Super(state,v,s,true,e) {}
 };
 
 // FIXME: Attach is not correct, must fix when ParArray is ready
 template<class Set, class Expr,class Eval>
-struct ParView3<MaxDiff,Par<int>,Set,Expr,Eval> : IPar<Eval>
+struct ParView3<MaxDiff,int,Par<int>,Seq<int>,Set,Eval,Expr,Eval> : IPar<Eval>
 {
 	ParView3(State& state, const Par<int>& v, const Set& s, const Expr& e) :
 		v(v),s(s),e(state,e) {}
@@ -802,19 +756,14 @@ struct ParView3<MaxDiff,Par<int>,Set,Expr,Eval> : IPar<Eval>
 		return bestMax-bestMin;
 	}
 
-//	void attach(INotifiable* f) { 	e.attach(f); }
-//	void detach(INotifiable* f) {	e.detach(f); }
-
 	Par<int> v;
 	Set	s;
 	ParView<Eval,Expr> e;
 };
 
 template<class Set, class Expr>
-struct ParView3<ForSome,Par<int>,Set,Expr,bool> : IPar<bool>
+struct ParView3<ForSome,int,Par<int>,Seq<int>,Set,bool,Expr,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<Expr>::Type	ExprEval;
-
 	ParView3(State& state, const Par<int>& v, const Set& s, const Expr& e) :
 		v(v),s(s),e(state,e) {}
 	bool value() const
@@ -826,17 +775,14 @@ struct ParView3<ForSome,Par<int>,Set,Expr,bool> : IPar<bool>
 		return false;
 	}
 
-//	void attach(INotifiable* f) { 	e.attach(f); }
-//	void detach(INotifiable* f) {	e.detach(f); }
-
 	Par<int> v;
 	Set	s;
-	ParView<ExprEval,Expr> e;
+	ParView<bool,Expr> e;
 };
 
 
 template<class Eval>
-struct ParView2<RandInRange,Eval,Eval,Eval> : IPar<Eval>
+struct ParView2<RandInRange,Eval,Eval,Eval,Eval,Eval> : IPar<Eval>
 {
 	ParView2(State& state, const Eval& lb, const Eval& ub) :
 		lb(lb),ub(ub) {}
@@ -849,8 +795,9 @@ struct ParView2<RandInRange,Eval,Eval,Eval> : IPar<Eval>
 	const Eval ub;
 };
 
+
 template<class Set, class Cond,class Expr,class Eval>
-struct ParView4<Sum,Par<int>,Set,Cond,Expr,Eval> : IPar<Eval>
+struct ParView4<Sum,int,Par<int>,Seq<int>,Set,bool,Cond,Eval,Expr,Eval> : IPar<Eval>
 {
 	ParView4(State& state, const Par<int>& v, const Set& s, const Cond& c, const Expr& e) :
 		v(v),s(s),cond(c),e(state,e) {}
@@ -868,16 +815,17 @@ struct ParView4<Sum,Par<int>,Set,Cond,Expr,Eval> : IPar<Eval>
 	ParView<Eval,Expr> e;
 };
 
+
 template<class Set, class Expr,class Eval>
-struct ParView3<Sum,Par<int>,Set,Expr,Eval> :
-	ParView4<Sum,Par<int>,Set,bool,Expr,Eval>
+struct ParView3<Sum,int,Par<int>,Seq<int>,Set,Eval,Expr,Eval> :
+	ParView4<Sum,int,Par<int>,Seq<int>,Set,bool,bool,Eval,Expr,Eval>
 {
 	ParView3(State& state, const Par<int>& v, const Set& s, const Expr& e) :
-		ParView4<Sum,Par<int>,Set,bool,Expr,Eval>(state,v,s,true,e) {}
+		ParView4<Sum,int,Par<int>,Seq<int>,Set,bool,bool,Eval,Expr,Eval>(state,v,s,true,e) {}
 };
 
 template<class Cond,class IfTrue, class IfFalse,class Eval>
-struct ParView3<IfThenElse,Cond,IfTrue,IfFalse,Eval> : IPar<Eval>
+struct ParView3<IfThenElse,bool,Cond,Eval,IfTrue,Eval,IfFalse,Eval> : IPar<Eval>
 {
 	ParView3(State& state, const Cond& c, const IfTrue& t, const IfFalse& f) :
 		c(state,c),t(state,t),f(state,f) {}

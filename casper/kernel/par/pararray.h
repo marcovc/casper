@@ -147,11 +147,11 @@ struct IterationView<ParArray<Eval,dims> >
 	const uint					max;
 };
 
-//template<class T,int Dims,class Dom>
-//struct GetPEnv<CP::ParArray<T,Dims,Dom> >
-//{	Env* operator()(const CP::ParArray<T,Dims,Dom>& v)
-//	{ return &v.getState().getEnv(); }
-//};
+template<class T,int Dims>
+struct GetPState<ParArray<T,Dims> >
+{	State* operator()(const ParArray<T,Dims>& v)
+	{ return &v.getState(); }
+};
 
 namespace Traits {
 

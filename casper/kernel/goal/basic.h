@@ -267,6 +267,31 @@ struct GoalView3<SelectFirst,Eval,Par<Eval>,Seq<Eval>,Set,bool,Cond> : IGoal
 	Cond					cond;
 };
 
+
+///**
+//	Selects \a p for which \a cond is \p true that minimizes expression \p expr. Always succeeds.
+//	\ingroup Search
+//*/
+//template<class Set,class Eval,class Cond,class Expr>
+//struct GoalView4<SelectMin,Eval,Par<Eval>,Seq<Eval>,Set,bool,Cond,Eval,Expr> : IGoal
+//{
+//	GoalView4(State& state,const Par<Eval>& p, const Set& s, const Cond& cond,const Expr& expr) :
+//		state(state),p(p),s(s),cond(cond) {}
+//
+//  	Goal execute()
+//	{
+//		Casper::Detail::PIteration<Par<Eval>,Set,bool> it(p,s,cond);
+//		if (it.valid())
+//			return succeed();
+//		return fail();
+//	}
+//
+//  	State&					state;
+//	Par<Eval>				p;
+//	Set						s;
+//	Cond					cond;
+//};
+
 };
 
 #endif /*_H_CASPER_KERNEL_GOAL_BASIC */

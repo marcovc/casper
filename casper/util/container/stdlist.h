@@ -357,11 +357,11 @@ struct QuickList : Detail::StaticMemHolder,StdList<T>
 } // Util
 
 
-template<class> struct GetPEnv;
+template<class> struct GetPState;
 struct Env;
 
 template<class T>
-struct GetPEnv<Util::StdList<T> >
+struct GetPState<Util::StdList<T> >
 {
 	Env* operator()(const Util::StdList<T>& l)
 	{

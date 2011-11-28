@@ -25,6 +25,13 @@
 
 namespace Casper {
 
+namespace Exception {
+struct PyCodeException : std::runtime_error
+{
+	PyCodeException() : std::runtime_error("exception in python callback") {}
+};
+};
+
 namespace Detail {
 
 template<class>
@@ -65,11 +72,28 @@ struct CallablePar : IPar<T>
 	{
 		PyObject *result = NULL;
 		result = PyObject_CallObject(pFunction, NULL);
+		if (result==NULL)
+			throw Casper::Exception::PyCodeException();
 		if (PyBool_Check(result) or PyInt_Check(result))
 			return static_cast<T>(PyInt_AsLong(result));
 		else
 			assert(0);
 	}
+	PyObject* pFunction;
+};
+
+
+template<class Eval>
+struct CallablePar<CP::Var<Eval> > : IPar<CP::Var<Eval>  >
+{
+	CallablePar(State& state, PyObject* pFunction) :
+		state(state),pFunction(pFunction)
+	{
+		Py_XINCREF(pFunction);
+		state.record(new (state) DecPyRef(pFunction));
+	}
+	CP::Var<Eval> value() const;
+	State& state;
 	PyObject* pFunction;
 };
 
@@ -101,6 +125,8 @@ struct ExprFromCallable : IExpr<Eval>
 
 	Par<Eval>	toPar(State& state) const
 	{	return Par<Eval>(state,static_cast<IPar<Eval>*>(new (state) CallablePar<Eval>(state,pFunction)));	}
+	Par<CP::Var<Eval> >	toCPVarPar(State& state) const
+	{	return Par<CP::Var<Eval> >(state,static_cast<IPar<CP::Var<Eval> >*>(new (state) CallablePar<CP::Var<Eval> >(state,pFunction)));	}
 	std::ostream& print(std::ostream& os) const
 	{	return os << "<python callable>"; }
 
@@ -131,7 +157,9 @@ struct ExprFromCallable<bool> : IExpr<bool>
 	}
 
 	Par<bool>	toPar(State& state) const
-	{	return Par<bool>(state,new (state) CallablePar<bool>(state,pFunction));	}
+	{	return Par<bool>(state,static_cast<IPar<bool>*>(new (state) CallablePar<bool>(state,pFunction)));	}
+	Par<CP::Var<bool> >	toCPVarPar(State& state) const
+	{	return Par<CP::Var<bool> >(state,static_cast<IPar<CP::Var<bool> >*>(new (state) CallablePar<CP::Var<bool> >(state,pFunction)));	}
 	Goal	toGoal(State& state) const
 	{	return new (state) CallableGoal(state,pFunction);	}
 	std::ostream& print(std::ostream& os) const
@@ -339,6 +367,20 @@ Goal CallableGoal::execute()
 
 }
 
+
+template<class Eval>
+CP::Var<Eval> CallablePar<Casper::CP::Var<Eval> >::value() const
+{
+	PyObject *result = NULL;
+	result = PyObject_CallObject(pFunction, NULL);
+	if (result==NULL)
+		throw Casper::Exception::PyCodeException();
+	assert(CreateFromPyObject<Eval>::check(result));
+	Casper::Expr<Eval>* r = CreateFromPyObject<Eval>::create(result);
+	Casper::Expr<Eval> rr = *r;
+	delete r;
+	return rr.toCPVarPar(state).value();
+}
 
 } // Detail
 

@@ -32,7 +32,7 @@ struct NoChkView
 	NoChkView(const R& r)
 	{
 		std::ostringstream os;
-		::operator<<(os,r);
+		os << r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::ChkView");
 	}
 	bool isTrue() const
@@ -43,7 +43,7 @@ struct NoChkView
 	{	return true;	}
 	bool setToFalse()
 	{	return true;	}
-	__attribute__((noreturn))  R getObj() const {}
+	__attribute__((noreturn))  R getObj() const { throw "error";}
 	void attach(INotifiable*)	{}
 	void detach(INotifiable*)	{}
 };

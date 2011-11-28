@@ -186,9 +186,9 @@ struct IterationView<CP::VarArray<Eval,dims,Dom> >
 };
 
 template<class T,int Dims,class Dom>
-struct GetPEnv<CP::VarArray<T,Dims,Dom> >
-{	Env* operator()(const CP::VarArray<T,Dims,Dom>& v)
-	{ return &v.getStore().getEnv(); }
+struct GetPState<CP::VarArray<T,Dims,Dom> >
+{	State* operator()(const CP::VarArray<T,Dims,Dom>& v)
+	{ return &v.getState(); }
 };
 
 namespace Traits {

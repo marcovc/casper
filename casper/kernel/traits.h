@@ -54,6 +54,9 @@ struct GetElem;
 template<class T>
 struct GetTermElem;
 
+template<class T>
+struct GetState;
+
 // IsIntegral
 
 // FIXME: replace by c++ builtin traits when ready

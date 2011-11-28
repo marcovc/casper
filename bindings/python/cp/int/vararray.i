@@ -24,15 +24,21 @@
 	%template(IntVarArray) VarArray<int,int>;
 	
 	const Casper::CP::Var<int,Casper::CP::Traits::GetDefaultDom<int>::Type>& 
-	getitem(int i) const { return $self->operator[](i); }
+	getitemi(int i) const { return $self->operator[](i); }
 
+	Casper::Expr<int>
+	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
+	
 	%pythoncode
 	{
 		def __getitem__(self,i):
-			if i>=self.size() or i<0:
+			import numbers
+			if not isinstance(i,numbers.Number):
+				return self.getiteme(i)
+			elif i>=self.size() or i<0:
 				raise IndexError
 			else:
-				return self.getitem(i)
+				return self.getitemi(i)
 	}
 		
 	void 
