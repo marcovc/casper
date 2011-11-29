@@ -218,10 +218,10 @@ struct ChkView<Filter>
 };	// CP
 
 //template<class>
-//struct GetPEnv;
+//struct GetPState;
 //
 //template<>
-//struct GetPEnv<CP::Filter>
+//struct GetPState<CP::Filter>
 //{	CPSolver& operator()(Filter f)	{ return f.solver(); }	};
 
 //namespace Traits {

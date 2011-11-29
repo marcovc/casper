@@ -26,275 +26,136 @@
 namespace Casper {
 
 struct Domain;
-struct InDomain;
 struct Ground;
-struct NonGroundIdxs;
 struct DomainSize;
-struct MaxInDomain;
-struct MinInDomain;
 
 namespace CP {
 struct Store;
 };
 
-template<class T>
-Rel2<Domain,CP::Store*,T> domain(CP::Store& store,const T& t)
-{	return Rel2<Domain,CP::Store*,T>(&store,t);	}
+NEW_REL_1(domain,Domain)
 
-template<class E,class T>
-Rel3<InDomain,CP::Store*,E,T> inDomain(CP::Store& store,const E& e, const T& t)
-{	return Rel3<InDomain,CP::Store*,E,T>(&store,e,t);	}
+NEW_REL_1(domainSize,DomainSize)
 
-template<class T>
-Rel2<DomainSize,CP::Store*,T> domainSize(CP::Store& store,const T& t)
-{	return Rel2<DomainSize,CP::Store*,T>(&store,t);	}
+//template<class T,int dims,class Dom>
+//Rel1<Ground,CP::VarArray<T,dims,Dom> > ground(const CP::VarArray<T,dims,Dom>& vars)
+//{	return Rel1<Ground,CP::VarArray<T,dims,Dom> >(vars);	}
 
-//// requires t to evaluate to a variable (and not suspend)
-//template<class T>
-//Rel1<DomainSize,T> domainSize(const T& t)
-//{	return Rel2<DomainSize,T>(t);	}
-
-template<class T>
-Rel2<Ground,CP::Store*,T> ground(CP::Store& store,const T& t)
-{	return Rel2<Ground,CP::Store*,T>(&store,t);	}
-
-template<class T>
-Rel2<MaxInDomain,CP::Store*,T> maxInDomain(CP::Store& store,const T& t)
-{	return Rel2<MaxInDomain,CP::Store*,T>(&store,t);	}
-
-template<class T>
-Rel2<MinInDomain,CP::Store*,T> minInDomain(CP::Store& store,const T& t)
-{	return Rel2<MinInDomain,CP::Store*,T>(&store,t);	}
-
-template<class T>
-Rel2<NonGroundIdxs,CP::Store*,T> nonGroundIdxs(CP::Store& store,const T& t)
-{	return Rel2<NonGroundIdxs,CP::Store*,T>(&store,t);	}
-
-template<class Eval,int dims,class Dom>
-Rel1<NonGroundIdxs,CP::VarArray<Eval,dims,Dom> > nonGroundIdxs(const CP::VarArray<Eval,dims,Dom>& t)
-{	return Rel1<NonGroundIdxs,CP::VarArray<Eval,dims,Dom> >(t);	}
+NEW_REL_1(ground,Ground)
 
 namespace Traits {
+
 template<class T>
-struct GetEval<Rel2<Domain,CP::Store*,T> >
+struct GetEval<Rel1<Domain,T> >
 {	typedef	Seq<typename GetEval<T>::Type>	Type;	};
 
 template<class T>
-struct GetElem<Rel2<Domain,CP::Store*,T> >
+struct GetElem<Rel1<Domain,T> >
 {	typedef	typename GetEval<T>::Type	Type;	};
 
-template<class E,class T>
-struct GetEval<Rel3<InDomain,CP::Store*,E,T> >
+template<class T>
+struct GetEval<Rel1<Ground,T> >
 {	typedef	bool	Type;	};
 
 
 template<class T>
-struct GetEval<Rel2<Ground,CP::Store*,T> >
-{	typedef	bool	Type;	};
-
-template<class T>
-struct GetEval<Rel2<MaxInDomain,CP::Store*,T> >
-{	typedef	typename GetEval<T>::Type	Type;	};
-
-template<class T>
-struct GetEval<Rel2<MinInDomain,CP::Store*,T> >
-{	typedef	typename GetEval<T>::Type	Type;	};
-
-template<class T>
-struct GetEval<Rel2<DomainSize,CP::Store*,T> >
+struct GetEval<Rel1<DomainSize,T> >
 {
-	typedef	typename Casper::CP::Traits::GetDom<T>::Type::Size	Type;
+	//typedef	typename Casper::CP::Traits::GetDom<T>::Type::Size	Type;
+	typedef	int	Type;
 };
-
-template<class T>
-struct GetEval<Rel2<NonGroundIdxs,CP::Store*,T> >
-{	typedef	Seq<int>	Type;	};
-
-template<class T>
-struct GetEval<Rel1<NonGroundIdxs,T> >
-{	typedef	Seq<int>	Type;	};
 
 } // Traits
 
 
+
 // specialization for finite domain variables
 template<class ParExpr>
-struct IterationView<Rel2<Domain,CP::Store*,ParExpr> >
+struct IterationView<Rel1<Domain,ParExpr> >
 {
 	typedef typename Traits::GetEval<ParExpr>::Type	Eval;
 	typedef typename CP::Traits::GetDom<ParExpr>::Type Dom;
 	typedef typename Dom::Iterator Iterator;
-	typedef Rel2<Domain,CP::Store*,ParExpr> DomainRel;
+	typedef Rel1<Domain,ParExpr> DomainRel;
 	typedef IterationView<DomainRel>	Self;
 	IterationView(const DomainRel& r) : r(r),
-										v(const_cast<CP::Store&>(*r.p1),r.p2),
-										it(v->begin()) {}
+										v(getState(r.p1),r.p1),
+										it(v.value().domain().begin()) {}
 	IterationView(const DomainRel& r, Iterator it) : r(r),
-													 v(const_cast<CP::Store&>(*r.p1),r.p2),
+													 v(getState(r.p1),r.p1),
 													 it(it) {}
 	void		iterate()	{	assert(valid()); ++it;	}
-	int	value() const 	{	assert(valid()); return *it;	}
-	bool		valid() const 	{	return it != v->end();	}
+	int			value() const 	{	assert(valid()); return *it;	}
+	bool		valid() const 	{	return it != v.value().domain().end();	}
 	Self		next() const {	return Self(r,++Iterator(it)); }
 	DomainRel r;
-	CP::DomView<Eval,ParExpr,Dom>	v;
+	ParView<CP::Var<Eval>,ParExpr> v;
 	Iterator it;
 };
 
-// specialization for finite domain variables
-template<class View>
-struct IterationView<Rel2<NonGroundIdxs,CP::Store*,View> >
+
+/**
+ * 	ParView over groundness testing over a sequence type.
+ * 	\ingroup Views
+ **/
+template<class Eval, class Obj>
+struct ParView1<Ground,Seq<Eval>,Obj,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<typename Traits::GetElem<View>::Type>::Type	Eval;
-	typedef Rel2<NonGroundIdxs,CP::Store*,View> Rel;
-	typedef IterationView<Rel>	Self;
-	void sync()
+	typedef typename Traits::GetElem<Obj>::Type	Elem;
+
+	ParView1(State& state,const Obj& obj) :
+		state(state),obj(obj) {}
+	virtual ~ParView1() {}
+	bool value() const
 	{
-		for ( ; idx < v.size(); ++idx)
-			if (!v[idx].ground())
-				break;
+		for (IterationView<Obj> it(obj); it.valid(); it.iterate())
+			if (!ParView<CP::Var<Eval>,Elem>(state,it.value()).value().ground())
+				return false;
+		return true;
 	}
-	IterationView(const Rel& r) : store(const_cast<CP::Store&>(*r.p1)),
-								  v(store,r.p2),
-								  idx(0) {sync();}
-	IterationView(CP::Store& store,const View& v, int idx) :
-								  store(store),v(store,v),idx(idx) { sync(); }
-	void		iterate()	{	assert(valid()); ++idx; sync();	}
-	uint	value() const 	{	assert(valid()); return idx;	}
-	bool		valid() const 	{	return idx < v.size();	}
-	Self		next() const {	return Self(store,v.getObj(),idx+1); }
 
-	CP::Store& store;
-	CP::ValArrayView<Eval,View>	v;
-	uint idx;
-};
+	Rel1<Ground,Obj> getObj()  const { return ground(obj); }
 
-// specialization for finite domain variables
-template<class Eval,int dims, class Dom>
-struct IterationView<Rel1<NonGroundIdxs,CP::VarArray<Eval,dims,Dom> > >
-{
-	typedef Rel1<NonGroundIdxs,CP::VarArray<Eval,dims,Dom>> Rel;
-	typedef IterationView<Rel>	Self;
-	void sync()
-	{
-		for ( ; idx < v.size(); ++idx)
-			if (!v[idx].ground())
-				break;
-	}
-	IterationView(const Rel& r) : v(r.p1),
-								  idx(0) {sync();}
-	IterationView(const CP::VarArray<Eval,dims,Dom>& v, int idx) :
-								  v(v),idx(idx) { sync(); }
-	void		iterate()	{	assert(valid()); ++idx; sync();	}
-	uint	value() const 	{	assert(valid()); return idx;	}
-	bool		valid() const 	{	return idx < v.size();	}
-	Self		next() const {	return Self(v,idx+1); }
-
-	CP::VarArray<Eval,dims,Dom>	v;
-	uint idx;
+	State& state;
+	Obj obj;
 };
 
 /**
  * 	ParView over groundness testing.
  * 	\ingroup Views
  **/
-template<class View>
-struct ParView2<Ground,CP::Store*,View,bool> : IPar<bool>
+template<class Eval,class Obj>
+struct ParView1<Ground,Eval,Obj,bool> : IPar<bool>
 {
-	typedef typename Traits::GetEval<View>::Type	ViewEval;
-	ParView2(State& state,const CP::Store* store, const View& p1) :
-		store(const_cast<CP::Store&>(*store)),p1(p1) {}
+	ParView1(State& state,const Obj& obj) :
+		v(state,obj) {}
+	virtual ~ParView1() {}
 	bool value() const
-	{	return 	CP::ValView<ViewEval,View>(store,p1).ground();	}
+	{	return 	v.value().ground();	}
 
-//	void attach(INotifiable* f) { 	CP::ValView<ViewEval,View>(store,p1).attach(f); }
-//	void detach(INotifiable* f) {	CP::ValView<ViewEval,View>(store,p1).detach(f); }
+	Rel1<Ground,Obj> getObj()  const { return ground(v.getObj()); }
 
-	Rel2<Ground,CP::Store*,View> getObj()  const { return ground(store,p1); }
-
-
-	CP::Store& store;
-	View p1;
+	ParView<CP::Var<Eval>,Obj>	v;
 };
 
-/**
- * 	ParView over groundness testing.
- * 	\ingroup Views
- **/
-template<class Elem,class View>
-struct ParView3<InDomain,CP::Store*,Elem,View,bool> : IPar<bool>
-{
-	typedef typename Traits::GetEval<Elem>::Type	ElemEval;
-	typedef typename Traits::GetEval<View>::Type	ViewEval;
-	ParView3(State& state,const CP::Store* store, const Elem& elem,const View& p1) :
-		store(const_cast<CP::Store&>(*store)),elem(elem),p1(p1) {}
-	bool value() const
-	{
-		CP::DomView<ViewEval,View> v(store,p1);
-		return v->find(ParView<ElemEval,Elem>(store,elem).value())!=v->end();
-	}
 
-	Rel3<InDomain,CP::Store*,Elem,View> getObj()  const { return inDomain(store,elem,p1); }
-
-
-	CP::Store& store;
-	Elem	elem;
-	View p1;
-};
 
 /**
  * 	ParView for obtaining domain size.
  * 	\ingroup Views
  **/
-template<class View,class Size>
-struct ParView2<DomainSize,CP::Store*,View,Size> : IPar<Size>
+template<class ViewEval,class View>
+struct ParView1<DomainSize,ViewEval,View,int> : IPar<int>
 {
-	typedef typename Traits::GetEval<View>::Type	ViewEval;
-	ParView2(State& state,const CP::Store* store, const View& p1) :
-		store(const_cast<CP::Store&>(*store)),p1(p1) {}
-	Size value() const
-	{	return 	CP::DomView<ViewEval,View>(store,p1)->size();	}
-	Rel2<DomainSize,CP::Store*,View> getObj()  const { return domainSize(store,p1); }
+	ParView1(State& state,const View& v) : v(state,v) {}
+	int value() const
+	{	return 	v.value().domain().size();	}
+	Rel1<DomainSize,View> getObj()  const { return domainSize(v.getObj()); }
 
-	CP::Store& store;
-	View p1;
+	ParView<CP::Var<ViewEval>,View>	v;
 };
 
-/**
- * 	ParView for obtaining maximum element in domain.
- * 	\ingroup Views
- **/
-template<class View,class Size>
-struct ParView2<MaxInDomain,CP::Store*,View,Size> : IPar<Size>
-{
-	typedef typename Traits::GetEval<View>::Type	ViewEval;
-	ParView2(State& state,const CP::Store* store, const View& p1) :
-		store(const_cast<CP::Store&>(*store)),p1(p1) {}
-	Size value() const
-	{	return 	CP::BndView<ViewEval,View>(store,p1).max();	}
-	Rel2<MaxInDomain,CP::Store*,View> getObj()  const { return maxInDomain(store,p1); }
 
-	CP::Store& store;
-	View p1;
-};
-
-/**
- * 	ParView for obtaining minimum element in domain.
- * 	\ingroup Views
- **/
-template<class View,class Size>
-struct ParView2<MinInDomain,CP::Store*,View,Size> : IPar<Size>
-{
-	typedef typename Traits::GetEval<View>::Type	ViewEval;
-	ParView2(State& state,const CP::Store* store, const View& p1) :
-		store(const_cast<CP::Store&>(*store)),p1(p1) {}
-	Size value() const
-	{	return 	CP::BndView<ViewEval,View>(store,p1).min();	}
-	Rel2<MinInDomain,CP::Store*,View> getObj()  const { return minInDomain(store,p1); }
-
-	CP::Store& store;
-	View p1;
-};
 
 } // Casper
 

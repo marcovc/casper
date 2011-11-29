@@ -28,5 +28,6 @@
 #include <casper/kernel/goal/terminal.h>
 #include <casper/kernel/goal/tryall.h>
 #include <casper/kernel/goal/whiledo.h>
+#include <casper/kernel/goal/select.h>
 
 #endif /* CASPER_KERNEL_GOAL_H_ */

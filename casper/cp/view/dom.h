@@ -137,7 +137,7 @@ struct GetEval<CP::DomView<EvalT,View,Dom> >
 } // Traits
 
 //template<class E,class V,class D>
-//struct GetPEnv<DomView<E,V,D> >
+//struct GetPState<DomView<E,V,D> >
 //{	Env* operator()(DomView<E,V,D> s)
 //	{ return s.solver(); }
 //};

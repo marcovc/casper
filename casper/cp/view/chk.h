@@ -32,7 +32,7 @@ struct NoChkView
 	NoChkView(const R& r)
 	{
 		std::ostringstream os;
-		::operator<<(os,r);
+		os << r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::ChkView");
 	}
 	bool isTrue() const
@@ -43,7 +43,7 @@ struct NoChkView
 	{	return true;	}
 	bool setToFalse()
 	{	return true;	}
-	__attribute__((noreturn))  R getObj() const {}
+	__attribute__((noreturn))  R getObj() const { throw "error";}
 	void attach(INotifiable*)	{}
 	void detach(INotifiable*)	{}
 };
@@ -74,6 +74,13 @@ struct ChkViewRel3 : NoChkView<Rel3<F,Expr1,Expr2,Expr3> >
 		NoChkView<Rel3<F,Expr1,Expr2,Expr3> >(rel<F>(v1,v2,v3)) {}
 };
 
+template<class F, class Eval1,class Expr1,class Eval2,class Expr2,
+				class Eval3,class Expr3,class Eval4,class Expr4>
+struct ChkViewRel4 : NoChkView<Rel4<F,Expr1,Expr2,Expr3,Expr4> >
+{
+	ChkViewRel4(Store&,const Expr1& v1,const Expr2& v2,const Expr3& v3,const Expr4& v4) :
+		NoChkView<Rel4<F,Expr1,Expr2,Expr3,Expr4> >(rel<F>(v1,v2,v3,v4)) {}
+};
 
 /*
  *	ChkView over a Rel1 relation -> defers to ChkViewRel1
@@ -118,6 +125,24 @@ struct ChkView<Rel3<F,Expr1,Expr2,Expr3> > :
 						{}
 };
 
+/*
+ *	ChkView over a Rel4 relation -> defers to ChkViewRel4
+ *	\ingroup ChkViews
+ **/
+template<class F,class Expr1,class Expr2,class Expr3,class Expr4>
+struct ChkView<Rel4<F,Expr1,Expr2,Expr3,Expr4> > :
+	ChkViewRel4<F,typename Casper::Traits::GetEval<Expr1>::Type,Expr1,
+					typename Casper::Traits::GetEval<Expr2>::Type,Expr2,
+					typename Casper::Traits::GetEval<Expr3>::Type,Expr3,
+					typename Casper::Traits::GetEval<Expr4>::Type,Expr4>
+{
+	ChkView(Store& store, const Rel4<F,Expr1,Expr2,Expr3,Expr4>& r) :
+		ChkViewRel4<F,typename Casper::Traits::GetEval<Expr1>::Type,Expr1,
+						typename Casper::Traits::GetEval<Expr2>::Type,Expr2,
+						typename Casper::Traits::GetEval<Expr3>::Type,Expr3,
+						typename Casper::Traits::GetEval<Expr4>::Type,Expr4>(store,r.p1,r.p2,r.p3,r.p4)
+						{}
+};
 
 // caches the value of the expression once it is set, and never
 // asks it again from the viewed object

@@ -174,6 +174,9 @@ class Var
 //		return *this;
 //	}
 
+	/// Returns the state manager for this object.
+	State& getState() const {	return pDom.get()->getState();	}
+
 	private:
 	RPDom 	pDom;
 };
@@ -194,12 +197,12 @@ struct GetEval<CP::Var<T,D> >
 {	typedef	T	Type;	};
 } // Traits
 
-template<class> struct GetPEnv;
+template<class> struct GetPState;
 
 template<class T,class Dom>
-struct GetPEnv<CP::Var<T,Dom> >
-{	Env* operator()(const CP::Var<T,Dom>& v)
-	{ return &v.getStore().getEnv(); }
+struct GetPState<CP::Var<T,Dom> >
+{	State* operator()(const CP::Var<T,Dom>& v)
+	{ return &v.getState(); }
 };
 
 

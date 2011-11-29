@@ -49,13 +49,48 @@ struct GoalView3<ForAll,T,Par<T>,Seq<T>,Iter,bool,Obj> : IGoal
 		if (!iter.valid())
 			return succeed();
 		it = iter.value();
-		return Goal(state,v and forAll(it,iter.next(),v));
+		iter.iterate();
+		return Goal(state,rel<And>(v,Goal(this)));
 	}
     State& state;
 	Par<T> it;
 	Iter r;
-	//IterationView<T,Iter>	iter;
 	IterationView<Iter>	iter;
+	Obj v;
+};
+
+NEW_FN_4(forAll,ForAll)
+
+namespace Traits {
+template<class T1,class T2,class T3,class T4>
+struct GetEval<Rel4<ForAll,T1,T2,T3,T4> >
+{	typedef	bool	Type;	};
+} // Traits
+
+/**
+ * 	Executes \a v for all \a it in \a r for which \a c is true. Succeeds if \a v
+ * 	always succeeded, fails on the first \a it that fails \a v.
+ * 	\ingroup Search
+ */
+template<class T,class Iter,class Cond,class Obj>
+struct GoalView4<ForAll,T,Par<T>,Seq<T>,Iter,bool,Cond,bool,Obj> : IGoal
+{
+	GoalView4(State& state, const Par<T>& it,
+				const Iter& r, const Cond& c, const Obj& v) :
+		state(state),it(it),r(r),iter(this->r),c(c),v(v) {}
+    Goal execute()
+	{
+		if (!iter.valid())
+			return succeed();
+		it = iter.value();
+		iter.iterate();
+		return Goal(state,rel<And>(v,rel<Or>(rel<Not>(c),Goal(this))));
+	}
+    State& state;
+	Par<T> it;
+	Iter r;
+	IterationView<Iter>	iter;
+	Cond c;
 	Obj v;
 };
 

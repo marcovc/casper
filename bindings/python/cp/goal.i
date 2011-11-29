@@ -12,5 +12,5 @@
 
 // Post
 %import <casper/kernel/goal/store.h>
-%template(post) Casper::post<Casper::CP::Solver,Casper::Expr<bool> >;
+%template(post) Casper::post<Casper::CP::Store,Casper::Expr<bool> >;
 

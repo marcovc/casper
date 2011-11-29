@@ -77,53 +77,7 @@ struct Env
 	Util::Logger 	logger;
 };
 
-typedef Env* PEnv;
 
-template<class T>
-struct GetPEnv
-{
-	PEnv operator()(const T&)
-	{ 	return NULL;	}
-};
-
-// convenience
-
-template<class T>
-PEnv	getPEnv(const T& t)
-{	return GetPEnv<T>()(t);	}
-
-template<class T1,class T2>
-PEnv	getPEnv(const T1& t1,const T2& t2)
-{
-	PEnv s = getPEnv(t1);
-	assert(s==NULL or getPEnv(t2)==NULL or s==getPEnv(t2));
-	if (s != NULL)
-		return s;
-	else
-		return getPEnv(t2);
-}
-
-template<class T1,class T2,class T3>
-PEnv	getPEnv(const T1& t1,const T2& t2,const T3& t3)
-{	return getPEnv(getPEnv(t1,t2),t3);	}
-
-template<class T1,class T2,class T3,class T4>
-PEnv	getPEnv(const T1& t1,const T2& t2,const T3& t3,const T4& t4)
-{	return getPEnv(getPEnv(t1,t2,t3),t4);	}
-
-template<class T1,class T2,class T3,class T4,class T5>
-PEnv	getPEnv(const T1& t1,const T2& t2,const T3& t3,const T4& t4,const T5& t5)
-{	return getPEnv(getPEnv(t1,t2,t3,t4),t5);	}
-
-
-template<class T>
-Env& getEnv(const T& t)
-{
-	PEnv p = getPEnv(t);
-	if (p==NULL)
-		throw Exception::Extract("Env");
-	return *p;
-}
 
 };
 

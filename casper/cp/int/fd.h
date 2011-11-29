@@ -257,6 +257,9 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		/// Returns the number of elements in finite domain.
 		inline Size size() const  { return Super::size(); }
 
+		/// Returns the state manager for this object.
+		State& getState() const {	return _min.getState();	}
+
 		/// Returns the number of filters referencing this domain
 		uint getNbSuspFilters() const;
 		/// Returns the number of weighted filters referencing this domain

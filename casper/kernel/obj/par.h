@@ -59,6 +59,19 @@ struct ParArrayView<Expr<Seq<Eval> > >
 	Util::StdArray<Expr<Eval> > a;
 };
 
+
+template<class Eval>
+struct ParView<CP::Var<Eval>,Expr<Eval> > : IPar<CP::Var<Eval> >
+{
+	ParView(State& state, const Expr<Eval>& e) :
+		par(e.toCPVarPar(state)),expr(e) {}
+	const Expr<Eval>& getObj() const {	return expr; }
+	CP::Var<Eval> value() const { return par.value(); }
+	//void setValue(const Eval& v)	{	par.setValue(v);	}
+	Par<CP::Var<Eval> > par;
+	Expr<Eval> expr;
+};
+
 }
 
 #endif /* CASPER_KERNEL_OBJ_PAR_H_ */

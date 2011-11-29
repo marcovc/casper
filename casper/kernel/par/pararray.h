@@ -29,6 +29,8 @@
 
 namespace Casper {
 
+template<class> struct Expr;
+
 
 /**
  * 	Multidimensional array of parameters.
@@ -55,7 +57,7 @@ struct ParArray : Util::StdArray<Par<T>,dims>
 	ParArray(const ParArray& s) : Super(s) { }
 
 	/// Creates a new ParArray pointing to an existing ParArray \p s.
-	ParArray(State& state, const Super& s) : Super(s) {}
+	ParArray(State& state, const Super& s) : Super(state,s) {}
 
 	/** Creates a new ParArray with a copy of variables in the given
 	 	range [\p b, \p e[.	*/
@@ -66,6 +68,8 @@ struct ParArray : Util::StdArray<Par<T>,dims>
 	ParArray(State& state,uint p1) :
 		Super(Util::Detail::ArrayDataTraits<Self,dims>::initData(state,p1,state))
 		{}
+
+	ParArray(State& state,const Expr<Seq<T> >& expr);
 
 	/** Creates a new ParArray with \p p1 variables, and initializes each
 		with the remaining parameter.	*/
@@ -147,11 +151,11 @@ struct IterationView<ParArray<Eval,dims> >
 	const uint					max;
 };
 
-//template<class T,int Dims,class Dom>
-//struct GetPEnv<CP::ParArray<T,Dims,Dom> >
-//{	Env* operator()(const CP::ParArray<T,Dims,Dom>& v)
-//	{ return &v.getState().getEnv(); }
-//};
+template<class T,int Dims>
+struct GetPState<ParArray<T,Dims> >
+{	State* operator()(const ParArray<T,Dims>& v)
+	{ return &v.getState(); }
+};
 
 namespace Traits {
 

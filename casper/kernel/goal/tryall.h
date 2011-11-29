@@ -52,11 +52,13 @@ struct GoalView3<TryAll,T,Par<T>,Seq<T>,Iter,bool,Obj> : IGoal
 
 		it = iter.value();
 
+		iter.iterate();
+
 		// logically redundant: just to avoid an extra disjunction
-		if (!iter.next().valid())
+		if (!iter.valid())
 			return Goal(state,v);
 
-		return Goal(state,v or tryAll(it,iter.next(),v));
+		return Goal(state,rel<Or>(v,Goal(this)));
 	}
     State&				state;
 	Par<T> 				it;
@@ -94,12 +96,11 @@ struct GoalView4<TryAll,T,Par<T>,Seq<T>,Iter,
 			return fail();
 		it = iter.value();
 		iter.iterate();
-		return Goal(state,v1 or (v2 and Goal(this)));
+		return Goal(state,rel<Or>(v1,rel<And>(v2,Goal(this))));
 	}
     State&	state;
 	Par<T> it;
 	Iter					r;
-	//IterationView<T,Iter>	iter;
 	IterationView<Iter>	iter;
 	Expr1	v1;
 	Expr2	v2;

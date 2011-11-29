@@ -689,10 +689,12 @@ pycasper_target_libs = confCommonEnv['LIBS']+[libcasper]
 import distutils.sysconfig
 
 def generate_wrapper(iface):
-	return env.SharedObject(env['PREFIX']+"/bindings/python/"+iface+".i",
+	r =   env.SharedObject(env['PREFIX']+"/bindings/python/"+iface+".i",
 									 CCFLAGS=env['CCFLAGS']+['-fPIC','-DSWIG_BUILD'],
 									 CPPPATH=['#.',distutils.sysconfig.get_python_inc()],
 									 SWIGFLAGS = ' -c++ -python -I. -Ibindings/python -Wall -outdir '+env['PREFIX']+"/bindings/python/casper")
+	Depends(File("build/"+MODE+"/bindings/python/casper/"+iface+".py"),env['PREFIX']+"/bindings/python/"+iface+".i")
+	return r
 
 def compile_wrapper(iface,pycasper_obj):
 #	vars = distutils.sysconfig.get_config_vars('CC', 'CXX', 'OPT', 'BASECFLAGS', 'CCSHARED', 'LDSHARED', 'SO')
@@ -728,11 +730,12 @@ Requires(pycasper_wrappers,pycasper_builddir)
 py_gen_scripts = []
 pref = "bindings/python/"
 for src in ['cp/int/intvar_operators.i','cp/int/boolvar_operators.i',
+			'kernel/intpar_operators.i','kernel/boolpar_operators.i',
 			'kernel/intexpr_operators.i','kernel/boolexpr_operators.i',
 			'kernel/expr_predicates.i','kernel/goal_operators.i']:
 	py_gen_scripts.append(env.Command(pref+src,['bindings/python/pyutils/objdb.py',pref+src+'.py'],'python '+pref+src+'.py'+' > $TARGET'))
 
-copy_init = [Command(env['PREFIX']+"/bindings/python/casper/__init__.py", pycasper_wrappers[0], Copy("$TARGET", env['PREFIX']+"/bindings/python/casper/kernel.py"))]
+copy_init = [Command(env['PREFIX']+"/bindings/python/casper/__init__.py", "build/"+MODE+"/bindings/python/casper/kernel.py", Copy("$TARGET", env['PREFIX']+"/bindings/python/casper/kernel.py"))]
 Alias('casper_python',py_gen_scripts+pycasper_libs+copy_init)
 	
 ### support for packaging py-casper ###

@@ -148,6 +148,9 @@ struct GetEval<Par<T> >
 {	typedef	T	Type;	};
 } // Traits
 
+template<class Eval>
+struct GetPState<Par<Eval> >
+{	State* operator()(const Par<Eval>& p) { return &p.getState(); } };
 
 typedef Par<int>			IntPar;
 typedef Par<bool>			BoolPar;

@@ -41,3 +41,24 @@ COUTWRAPPER(Casper::CP::StoreStats)
 
 }
 */
+
+/* // Not needed, Solver is a subclass of Store
+%typemap(typecheck,precedence=0) Casper::CP::Store&
+{
+	void * argp = NULL;
+	$1 = SWIG_IsOK(SWIG_ConvertPtr($input, &argp, $descriptor(Casper::CP::Solver*), 0)) or
+	 	 SWIG_IsOK(SWIG_ConvertPtr($input, &argp, $descriptor(Casper::CP::Store*), 0));
+};
+
+%typemap(in) Casper::CP::Store&
+{
+	void * argp = NULL;
+	if (SWIG_IsOK(SWIG_ConvertPtr($input, &argp, $descriptor(Casper::CP::Solver*), 0)))
+		$1 = &static_cast<Casper::CP::Store&>(*static_cast<Casper::CP::Solver*>(argp));
+	else
+	if (SWIG_IsOK(SWIG_ConvertPtr($input, &argp, $descriptor(Casper::CP::Store*), 0)))
+		$1 = &static_cast<Casper::CP::Store&>(*static_cast<Casper::CP::Store*>(argp));
+	else
+	assert(0);
+};
+*/

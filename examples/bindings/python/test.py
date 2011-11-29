@@ -1,59 +1,33 @@
 
-import sys
 from casper import *
 from casper.cp import *
-import random
 
-n = 100
+n = 10
+m = 55 
 
 solver = Solver()
 
-vars = IntVarArray(solver,n,1,n)
+marks = IntVarArray(solver,n,0,m)
 
-solver.post(distinct(vars))
-solver.post(distinct([vars[i]+i for i in range(0,n)]))
-solver.post(distinct([vars[i]-i for i in range(0,n)]))
+solver.post(distinct([marks[i]-marks[j] for i in range(n) for j in range(i)]))
+	
+for i in range(n-1):
+	solver.post(marks[i] < marks[i+1])
 
-#x = IntVarRef(solver)
-#v = IntRef(solver)
-#search = whiledo(lambda:not vars.ground()) (
-#					assign(x,min(vars,key=lambda x: len(x.domain()))) &
-#					assignMin(x,vars,domainSize(x)*ground(x)))	
-#					assign(v,lambda:min(x)) &
-#					(post(solver,x==v) | post(solver,x!=v)) 
-#				)
+solver.post(marks[0]==0)
+solver.post(marks[n-1]==m)
 
-
-def search():
-	builtin = __builtins__ 
-	if vars.ground():
-		return True
-
-	idx = mmin(range(n),key=lambda idx: vars[idx].ground()*n*n+len(vars[idx].domain())*n+
-								builtin.abs(idx-n/2))
-	x = vars[idx]
-#	x = __builtins__.min(nonground,key=lambda v: len(v.domain()))
-	v = random.choice(list(x.domain()))
-	return  (post(solver,x==v) | post(solver,x!=v)) & search
-
+idx = IntPar(solver)
+v = IntPar(solver)
+search = forAll(idx,range(n),
+			tryAll(v,domain(marks[idx]),
+				post(solver,marks[idx]==v)))
+						
 found = solver.solve(search)
 if found:
-    print vars
+    print marks
 else:
 	print "no solution"
 	    
 print solver.getStats()
 print solver.getCPUTimer()
-
-#search = whiledo(lambda:not vars.ground()) (
-#					assign(x,lambda:min(vars,key=domainSize)) &	
-#					assign(v,lambda:min(x)) &
-#					(post(solver,x==v) | post(solver,x!=v))) 
-
-#
-#p = IntPar(solver.getState(),lambda:8)
-#print p
-#e = IntExpr(lambda:8)
-#print e
-        
-             

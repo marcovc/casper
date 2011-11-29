@@ -357,17 +357,17 @@ struct QuickList : Detail::StaticMemHolder,StdList<T>
 } // Util
 
 
-template<class> struct GetPEnv;
-struct Env;
+template<class> struct GetPState;
+struct State;
 
 template<class T>
-struct GetPEnv<Util::StdList<T> >
+struct GetPState<Util::StdList<T> >
 {
-	Env* operator()(const Util::StdList<T>& l)
+	State* operator()(const Util::StdList<T>& l)
 	{
 		for (auto it = l.begin();	it != l.end(); ++it)
 		{
-			Env* p = getPEnv(*it);
+			State* p = getPState(*it);
 			if (p != NULL)
 				return p;
 		}

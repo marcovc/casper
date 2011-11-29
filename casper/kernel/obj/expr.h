@@ -40,6 +40,8 @@ struct IExpr
 	virtual CP::BndExpr<Eval> toBndExpr(CP::Store& store) const = 0;
 	virtual CP::ValExpr<Eval> toValExpr(CP::Store& store) const = 0;
 	virtual Par<Eval>	toPar(State& state) const = 0;
+	virtual Par<CP::Var<Eval> >	toCPVarPar(State& state) const = 0;
+	virtual State* const getPState() const = 0;
 	virtual std::ostream& print(std::ostream& os) const = 0;
 };
 
@@ -52,11 +54,13 @@ struct IExpr<bool>
 	virtual CP::ValExpr<bool> toValExpr(CP::Store& store) const = 0;
 	virtual CP::ChkExpr 	toChkExpr(CP::Store& store) const = 0;
 	virtual Par<bool>	toPar(State& state) const = 0;
+	virtual Par<CP::Var<bool> >	toCPVarPar(State& state) const = 0;
 	virtual Goal	toGoal(State& state) const = 0;
 
 	virtual bool	postDomFilter(CP::Store& store) const = 0;
 	virtual bool	postBndFilter(CP::Store& store) const = 0;
 	virtual bool	postValFilter(CP::Store& store) const = 0;
+	virtual State* const getPState() const = 0;
 	virtual std::ostream& print(std::ostream& os) const = 0;
 };
 
@@ -67,6 +71,7 @@ struct IExpr<Seq<Eval> >
 	virtual Util::StdArray<Eval,2> toLitStdArray2() const = 0;
 	virtual Util::StdArray<Expr<Eval> > toStdArray() const = 0;
 	virtual IterationExpr<Expr<Eval> > toIterationExpr() const = 0;
+	virtual State* const getPState() const = 0;
 	virtual std::ostream& print(std::ostream& os) const = 0;
 };
 
@@ -97,6 +102,10 @@ struct ExprWrapper : IExpr<Eval>
 	{	return Create<T,CP::ValExpr<Eval> >()(store,t);	}
 	Par<Eval>	toPar(State& state) const
 	{	return Create<T,Par<Eval> >()(state,t);	}
+	Par<CP::Var<Eval> >	toCPVarPar(State& state) const
+	{	return Create<T,Par<CP::Var<Eval> > >()(state,t);	}
+	State* const getPState() const
+	{	return GetPState<T>()(t);	}
 
 	std::ostream& print(std::ostream& os) const
 	{	return os << t; }
@@ -119,6 +128,8 @@ struct ExprWrapper<bool,T> : IExpr<bool>
 	{	return Create<T,CP::ChkExpr>()(store,t);	}
 	Par<bool>	toPar(State& state) const
 	{	return Create<T,Par<bool> >()(state,t);	}
+	Par<CP::Var<bool> >	toCPVarPar(State& state) const
+	{	return Create<T,Par<CP::Var<bool> > >()(state,t);	}
 	Goal	toGoal(State& state) const
 	{	return Create<T,Goal>()(state,t);	}
 
@@ -128,6 +139,8 @@ struct ExprWrapper<bool,T> : IExpr<bool>
 	{	return Casper::CP::postBndFilter(store,t);	}
 	bool	postValFilter(CP::Store& store) const
 	{	return Casper::CP::postValFilter(store,t);	}
+	State* const getPState() const
+	{	return GetPState<T>()(t);	}
 	std::ostream& print(std::ostream& os) const
 	{	return os << t; }
 	T t;
@@ -145,6 +158,8 @@ struct ExprWrapper<Seq<Eval>,T> : IExpr<Seq<Eval> >
 	{	return Create<T,Util::StdArray<Expr<Eval> > >()(t);	}
 	IterationExpr<Expr<Eval> > toIterationExpr() const
 	{	return Create<T,IterationExpr<Expr<Eval> > >()(t);	}
+	State* const getPState() const
+	{	return GetPState<T>()(t);	}
 	std::ostream& print(std::ostream& os) const
 	{	return ::operator<<(os,t); }
 	T t;
@@ -177,6 +192,11 @@ struct Expr : Casper::Util::SPImplIdiom<Detail::IExpr<Eval> >
 	{	return this->getImpl().toValExpr(store);	}
 	Par<Eval>	toPar(State& state) const
 	{	return this->getImpl().toPar(state);	}
+	Par<CP::Var<Eval> >	toCPVarPar(State& state) const
+	{	return this->getImpl().toCPVarPar(state);	}
+	State* const getPState() const
+	{	return this->getImpl().getPState();	}
+
 #endif
 
 	// SWIG needs this
@@ -210,6 +230,8 @@ struct Expr<bool> : Casper::Util::SPImplIdiom<Detail::IExpr<bool> >
 	{	return this->getImpl().toChkExpr(store);	}
 	Par<bool>	toPar(State& state) const
 	{	return this->getImpl().toPar(state);	}
+	Par<CP::Var<bool> >	toCPVarPar(State& state) const
+	{	return this->getImpl().toCPVarPar(state);	}
 	Goal	toGoal(State& state) const
 	{	return this->getImpl().toGoal(state);	}
 
@@ -219,6 +241,8 @@ struct Expr<bool> : Casper::Util::SPImplIdiom<Detail::IExpr<bool> >
 	{	return this->getImpl().postBndFilter(store);	}
 	bool postValFilter(CP::Store& store) const
 	{	return this->getImpl().postValFilter(store);	}
+	State* const getPState() const
+	{	return this->getImpl().getPState();	}
 
 #endif
 
@@ -255,12 +279,35 @@ struct Expr<Casper::Seq<Eval> > : Casper::Util::SPImplIdiom<Detail::IExpr<Casper
 //	operator const Util::StdArray<Eval,2>&() const
 //	{	return toStdArray2(); }
 //
+	State* const getPState() const
+	{	return this->getImpl().getPState();	}
+
 #endif
 
 	// SWIG needs this
 	~Expr() {}
 };
 
+namespace Detail {
+template<class Eval>
+uint getIterationExprSize(const Expr<Seq<Eval> >& expr)
+{
+	uint c=0;
+	for (auto e(expr.toIterationExpr()) ; e.valid(); e.iterate())
+		++c;
+	return c;
+}
+}
+
+template<class T,int dims>
+ParArray<T,dims>::ParArray(State& state,const Expr<Seq<T> >& expr) :
+	Super(state,Detail::getIterationExprSize(expr))
+{
+	uint i = 0;
+	for (auto e(expr.toIterationExpr()); e.valid(); e.iterate())
+		::new (&Super::operator[](i++)) Par<T>(e.value().toPar(state));
+
+}
 
 namespace Traits {
 template<class Eval>
@@ -277,6 +324,10 @@ struct GetElem<Expr<Seq<T> > >
 {	typedef Expr<T> Type;	};
 
 } // Traits
+
+template<class Eval>
+struct GetPState<Expr<Eval> >
+{	State* operator()(const Expr<Eval>& e) { return e.getPState();	}};
 
 //namespace CP {
 //namespace Traits {
@@ -305,3 +356,5 @@ std::ostream& operator<<(std::ostream& os,const Casper::Expr<T>& expr)
 #include <casper/kernel/obj/par.h>
 #include <casper/kernel/obj/goal.h>
 #include <casper/kernel/obj/extensions.h>
+//#include <casper/kernel/obj/cpvar.h>
+

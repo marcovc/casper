@@ -234,6 +234,10 @@ struct StdArray
 	StdArray(IHeap& heap, Iterator b, Iterator e) :
 			pData(new (heap) Data(heap,b,e)),mustFree(!heap.doesGC()) {}
 
+	/// Creates a new array with a copy of the existing array \p s.
+	StdArray(IHeap& heap,const StdArray& s) :
+		pData(new (heap) Data(heap,s.begin(),s.end())),mustFree(!heap.doesGC()) {}
+
 	/// Creates a new (uninitialized) array with room for \p n elements.
 	StdArray(IHeap& heap,uint n) :
 			pData(new (heap) Data(heap,n)),mustFree(!heap.doesGC())	{}
@@ -295,6 +299,10 @@ struct StdArray
 	/// Creates a new array from an initializer list
 	StdArray(const std::initializer_list<Elem>& l) :
 		pData(new (stdHeap) Data(l)),
+		mustFree(true) {}
+	/// Creates a new array from an initializer list
+	StdArray(IHeap& heap,const std::initializer_list<Elem>& l) :
+		pData(new (heap) Data(l)),
 		mustFree(true) {}
 #endif
 

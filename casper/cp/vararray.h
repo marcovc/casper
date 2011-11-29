@@ -124,6 +124,9 @@ struct VarArray : Util::StdArray<Var<T,Dom1>,dims>
 	/// Returns the Store object associated with this array.
 	Store& getStore() const {	return store;	}
 
+	/// Returns the State object associated with this array.
+	State& getState() const {	return store;	}
+
 	/// Returns \a true if all variables are ground, \a false otherwise.
 	bool ground() const;
 
@@ -186,9 +189,9 @@ struct IterationView<CP::VarArray<Eval,dims,Dom> >
 };
 
 template<class T,int Dims,class Dom>
-struct GetPEnv<CP::VarArray<T,Dims,Dom> >
-{	Env* operator()(const CP::VarArray<T,Dims,Dom>& v)
-	{ return &v.getStore().getEnv(); }
+struct GetPState<CP::VarArray<T,Dims,Dom> >
+{	State* operator()(const CP::VarArray<T,Dims,Dom>& v)
+	{ return &v.getState(); }
 };
 
 namespace Traits {

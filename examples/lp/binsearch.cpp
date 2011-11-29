@@ -436,10 +436,10 @@ bool binsearchFD_MIP(int size)
 //	Goal g(env,label(cp,labelVars,selectVarMinDom(cp,labelVars)));
 //	Goal g(env,label(cp,labelVars,selectVarMinDom(cp,labelVars)) and validate(lp));
 	Goal g(env,
-			whileNotGround(labelVars)
+			whileDo(not ground(labelVars))
 			(
-				assign(ip,argMin(k,nonGroundIdxs(cp,labelVars),domainSize(cp,labelVars[k]))) and
-				selectFirst(vp,domain(cp,labelVars[ip])) and
+				selectMin(ip,range(0,labelVars.size()-1),not ground(labelVars[ip]),domainSize(labelVars[ip])) and
+				selectFirst(vp,domain(labelVars[ip])) and
 				(
 						post(cp,labelVars[ip]==vp) or
 						post(cp,labelVars[ip]!=vp)
@@ -601,8 +601,9 @@ bool binsearchFD_MIP_2(int size)
 	Goal g(env,
 			whileNotGround(labelVars)
 			(
-				assign(ip,argMin(k,nonGroundIdxs(cp,labelVars),domainSize(cp,labelVars[k]))) and
-				selectFirst(vp,domain(cp,labelVars[ip])) and
+				selectMin(ip,range(0,labelVars.size()-1),
+							not ground(labelVars[ip]),domainSize(labelVars[k])) and
+				selectFirst(vp,domain(labelVars[ip])) and
 				(
 						post(cp,labelVars[ip]==vp) or
 						post(cp,labelVars[ip]!=vp)

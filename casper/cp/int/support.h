@@ -21,6 +21,7 @@
 #define CASPER_CP_INT_SUPPORT_H_
 
 #include <casper/kernel/notify/susplist.h>
+#include <casper/kernel/reversible/sulist.h>
 #include <map>
 #include <algorithm>
 #include <list>
@@ -216,7 +217,10 @@ struct ValuesView<EvalT,Var<EvalT,Dom> >
 				if (it != rOwner.notifyMap.end())
 					for (auto lit = it->second.begin(); lit != it->second.end(); )
 						if (not (*(lit++))->notify())
+						{
+							std::cout << "notify is failing\n";
 							return false;
+						}
 			}
 			return true;
 		}
@@ -626,7 +630,7 @@ template<class Func, class ValsView1, class ValsView2, class EvalT>
 struct CachedRODomView
 {
 	typedef EvalT	Eval;
-	typedef typename Traits::GetDefaultDom<EvalT>::Type::ImplContainer	Container;
+	typedef SUList<EvalT>	Container;
 	typedef typename Container::Iterator Iterator;
 	typedef typename Container::ReverseIterator ReverseIterator;
 	typedef typename ValsView1::Iterator Iterator1;
@@ -670,6 +674,7 @@ struct CachedRODomView
 			}
 			std::cout << "not found, notifying.\n";
 			owner.container.erase(it);
+			std::cout << "after erase " << owner.container << std::endl;
 			return !owner.container.empty() and pNot->notify();
 		}
 		void detach()
@@ -732,14 +737,14 @@ struct CachedRODomView
 		delete attachRef;
 	}
 
-	void initialize()
+	bool initialize()
 	{
 		std::list<int> l;
 		for (auto it1 = v1.begin(); it1 != v1.end(); ++it1)
 			for (auto it2 = v2.begin(); it2 != v2.end(); ++it2)
 				l.push_back(func3.eval(*it1,*it2));
 		if (l.empty())
-			return;
+			return false;
 		std::vector<int> v(l.begin(),l.end());
 		std::sort(v.begin(),v.end());
 		Eval c = *v.begin();
@@ -747,9 +752,10 @@ struct CachedRODomView
 		for (auto it = ++v.begin(); it != v.end(); ++it)
 			if (*it>c)
 			{
-				container.insert(container.end(),c);
 				c = *it;
+				container.insert(container.end(),c);
 			}
+		return !container.empty();
 	}
 
 protected:
@@ -887,7 +893,8 @@ struct Project<AC3,Var<Eval,Dom>,Obj2> : IFilter
 		{
 			std::cout << "AC3:init\n";
 			first = false;
-			v2.initialize();
+			if (!v2.initialize())
+				return false;
 		}
 		return d.intersectFwd(v2.begin(), v2.end());
 	}
@@ -912,12 +919,18 @@ struct Project<AC6,Var<Eval,Dom>,Obj2> : IFilter
 		if (first)
 		{
 			first = false;
-			v2.initialize();
+			if (!v2.initialize())
+				return false;
 		}
 		return d.intersectFwd(v2.begin(), v2.end());
 	}
 	void attach(INotifiable* f)
 	{
+		if (first)
+		{
+			first = false;
+			assert(v2.initialize());
+		}
 		auto dit = d.begin();
 		auto vit = v2.begin();	// TODO: could use v2.findGreater
 		for ( ; vit != v2.end() and dit != d.end(); )
