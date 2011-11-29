@@ -44,7 +44,7 @@ struct IExpr
 	virtual State* const getPState() const = 0;
 	virtual std::ostream& print(std::ostream& os) const = 0;
 };
-
+ 
 template<>
 struct IExpr<bool>
 {

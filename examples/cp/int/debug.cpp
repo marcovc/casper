@@ -572,7 +572,7 @@ int main()
 				(post(store,v[idx]==val) or post(store,v[idx]!=val))
 			));
 
-
+ 
 	DFSExplorer dfs(env);
 
 	bool found = dfs.explore(searchTree);

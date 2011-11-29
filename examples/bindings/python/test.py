@@ -4,7 +4,7 @@ from casper.cp import *
 
 n = 10
 m = 55 
-
+ 
 solver = Solver()
 
 marks = IntVarArray(solver,n,0,m)

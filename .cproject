@@ -70,7 +70,11 @@
 			<target name="example-r" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
 				<buildArguments>-j 3 optimize_level=3</buildArguments>
+<<<<<<< HEAD
 				<buildTarget>build/release/examples/cp/int/golomb</buildTarget>
+=======
+				<buildTarget>build/release/examples/cp/real/inverse</buildTarget>
+>>>>>>> branch 'master' of git@mvctrash.unfuddle.com:mvctrash/casper.git
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
@@ -157,7 +161,6 @@
 			</target>
 			<target name="gcc-version" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>gcc</buildCommand>
-				<buildArguments/>
 				<buildTarget>--version</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>

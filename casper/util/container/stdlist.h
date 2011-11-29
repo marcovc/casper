@@ -359,7 +359,7 @@ struct QuickList : Detail::StaticMemHolder,StdList<T>
 
 template<class> struct GetPState;
 struct State;
-
+ 
 template<class T>
 struct GetPState<Util::StdList<T> >
 {

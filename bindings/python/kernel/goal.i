@@ -129,7 +129,7 @@ Casper::Expr<bool> tryAll(const Casper::IntPar& par,
 							 const Casper::Expr<Casper::Seq<int> >& set,
 							 const Casper::Expr<bool>& goal)
 {	return rel<TryAll>(par,set,goal); }
-
+ 
 Casper::Expr<bool> tryAll(const Casper::IntPar& par, 
 							 const Casper::Expr<Casper::Seq<int> >& set,
 							 const Casper::Expr<bool>& cond,
