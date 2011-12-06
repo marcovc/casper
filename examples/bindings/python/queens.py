@@ -2,7 +2,7 @@
 from casper import *
 from casper.cp import *
 
-n = 20
+n = 1000
 
 solver = Solver()
 

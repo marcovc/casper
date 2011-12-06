@@ -145,7 +145,7 @@ struct IterationView<ParArray<Eval,dims> >
 	void		iterate()	{	assert(valid()); ++idx;	}
 	const Par<Eval>& 	value() const 	{	assert(valid()); return v(idx);	}
 	bool		valid() const 	{	return idx < max;	}
-	Self		next() const {	return Self(v,idx+1); }
+//	Self		copy() const {	return Self(*this); }
 	uint						idx;
 	ParArray<Eval,dims>	v;
 	const uint					max;

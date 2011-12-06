@@ -34,11 +34,9 @@ struct IterationView
 	typedef IterationView<View>	Self;
 	IterationView(const View& v) : b(v.begin()),e(v.end()) {}
 	IterationView(const IterationView& s) : b(s.b),e(s.e) {}
-	IterationView(Iterator b,Iterator e) : b(b),e(e) {}
 	void		iterate()	{	assert(valid()); ++b;	}
 	const Elem& 	value() const 	{	assert(valid()); return *b;	}
 	bool		valid() const 	{	return b!=e;	}
-	Self		next() const {	return Self(++Iterator(b),e);	}
 	Iterator	b;
 	Iterator	e;
 };
@@ -57,7 +55,7 @@ struct IterationView<std::initializer_list<T> >
 	void		iterate()	{	assert(valid()); ++b;	}
 	const Elem& 	value() const 	{	assert(valid()); return *b;	}
 	bool		valid() const 	{	return b!=e;	}
-	Self		next() const {	Iterator c(b); return Self(++c,e);	}
+//	Self		copy() const {	return Self(*this);	}
 	Iterator	b;
 	Iterator	e;
 };
@@ -81,7 +79,7 @@ struct STLIterationView
 	void		iterate()	{	assert(valid()); ++b;	}
 	const Elem& 	value() const 	{	assert(valid()); return *b;	}
 	bool		valid() const 	{	return b!=e;	}
-	Self		next() const {	return Self(++Iterator(b),e);	}
+//	Self		copy() const {	return Self(*this);	}
 	Iterator	b;
 	Iterator	e;
 };
@@ -94,20 +92,21 @@ template<class T,class Iterator>
 STLIterationView<T> makeSTLIt(Iterator b,Iterator e)
 {	return STLIterationView<T>(b,e); }
 
+#if 0 // too dangerous
 template<class View>
 struct IterationView<IterationView<View> >
 {
 	typedef typename Traits::GetElem<View>::Type Elem;
-	typedef typename IterationView<View>::Iterator Iterator;
+	//typedef typename IterationView<View>::Iterator Iterator;
 	IterationView(const IterationView<View>& v) : v(v) {}
 	void		iterate()	{	v.iterate(); }
 	Elem 	value() const 	{	return v.value(); }
 	bool		valid() const 	{	return v.valid();	}
-	IterationView<View>	next() const
-	{	return v.next(); }
+//	IterationView<View>	copy() const
+//	{	return v.copy(); }
 	IterationView<View> v;
 };
-
+#endif
 
 // Expr1 is iteration, Pred is a predicate function on Expr1
 template<class Expr1,class Expr2>
@@ -565,7 +564,7 @@ struct IterationView<Util::StdArray<T,dims> >
 	void		iterate()	{	assert(valid()); ++idx;	}
 	const T& 	value() const 	{	assert(valid()); return v(idx);	}
 	bool		valid() const 	{	return idx < max;	}
-	Self		next() const {	return Self(v,idx+1); }
+//	Self		copy() const {	return Self(*this); }
 	uint						idx;
 	const Util::StdArray<T,dims>&		v;
 	const uint					max;

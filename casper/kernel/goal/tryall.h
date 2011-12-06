@@ -32,39 +32,47 @@ struct GetEval<Rel3<TryAll,T1,T2,T3> >
 };
 
 /**
- * 	Executes \a v for all \a it in \a r. Succeeds on the first \a it that makes \a v succeed.
- * 	Fails if, after trying to execute \a v for all \a it in \a r, v never succeeded.
+ * 	Executes \a v for all \a it in \a s. Succeeds on the first \a it that makes \a v succeed.
+ * 	Fails if, after trying to execute \a v for all \a it in \a s, v never succeeded.
  *
  * 	\ingroup Search
  */
-template<class T,class Iter,class Obj>
-struct GoalView3<TryAll,T,Par<T>,Seq<T>,Iter,bool,Obj> : IGoal
+template<class T,class Set,class Obj>
+struct GoalView3<TryAll,T,Par<T>,Seq<T>,Set,bool,Obj> : IGoal
 {
-	GoalView3(State& state, const Par<T>& it, const Iter& r, const Obj& v) :
-		state(state),it(it),r(r),
-		iter(this->r),
+	typedef GoalView3<TryAll,T,Par<T>,Seq<T>,Set,bool,Obj> Self;
+	GoalView3(State& state, const Par<T>& it, const Set& s, const Obj& v) :
+		state(state),it(it),
+		pSet(new (state) Set(s)),
+		iter(*pSet),
+		v(v)
+		{}
+	GoalView3(State& state, const Par<T>& it, const IterationView<Set>& iter, const Obj& v) :
+		state(state),it(it),
+		pSet(NULL), // set needs to be saved only once for all iteration
+		iter(iter),
 		v(v)
 		{}
     Goal execute()
 	{
-		if (!iter.valid())
+       	IterationView<Set> curIter(iter);
+
+		if (pSet==NULL) // i.e this is not the first iteration
+			curIter.iterate();
+
+		if (!curIter.valid())
 			return fail();
 
-		it = iter.value();
+		it = curIter.value();
 
-		iter.iterate();
+		return Goal(state,
+				rel<Or>(v, Goal(new (state) Self(state,it,curIter,v))));
 
-		// logically redundant: just to avoid an extra disjunction
-		if (!iter.valid())
-			return Goal(state,v);
-
-		return Goal(state,rel<Or>(v,Goal(this)));
 	}
     State&				state;
 	Par<T> 				it;
-	Iter					r;
-	//IterationView<T,Iter>	iter;
-	IterationView<Iter>	iter;
+	Set*				pSet;	// IterationView protocol requires *pSet to exist during the full iteration
+	IterationView<Set>	iter;
 	Obj					v;
 };
 
@@ -83,27 +91,109 @@ struct GetEval<Rel4<TryAll,T1,T2,T3,T4> >
  *
  * 	\ingroup Search
  */
-template<class T,class Iter,class Expr1,class Expr2>
-struct GoalView4<TryAll,T,Par<T>,Seq<T>,Iter,
-				bool,Expr1,bool,Expr2> : IGoal
+template<class T,class Set,class Cond,class Obj>
+struct GoalView4<TryAll,T,Par<T>,Seq<T>,Set,bool,Cond,bool,Obj> : IGoal
 {
-	GoalView4(State& state, const Par<T>& it,
-				const Iter& r, const Expr1& v1,const Expr2& v2) :
-		state(state),it(it),r(r),iter(this->r),v1(v1),v2(v2) {}
+	typedef GoalView4<TryAll,T,Par<T>,Seq<T>,Set,bool,Cond,bool,Obj> Self;
+	GoalView4(State& state, const Par<T>& it,const Set& s, const Cond& c,const Obj& v) :
+		state(state),it(it),pSet(new(state)Set(s)),iter(*pSet),c(state,c),v(v) {}
+	GoalView4(State& state, const Par<T>& it, const IterationView<Set>& iter, const Cond& c, const Obj& v) :
+		state(state),it(it),pSet(NULL),iter(iter),c(state,c),v(v) {}
+
     Goal execute()
 	{
-		if (!iter.valid())
+    	IterationView<Set> curIter(iter);
+
+    	if (pSet==NULL) // i.e this is not the first iteration
+    		curIter.iterate();
+
+    	for ( ; curIter.valid(); curIter.iterate())
+    	{
+    		it = curIter.value();
+    		if (c.value())
+    			break;
+    	}
+
+		if (!curIter.valid())
 			return fail();
-		it = iter.value();
-		iter.iterate();
-		return Goal(state,rel<Or>(v1,rel<And>(v2,Goal(this))));
+
+		return Goal(state,
+				rel<Or>(v, Goal(new (state) Self(state,it,curIter,c.getObj(),v))));
 	}
-    State&	state;
+    State& state;
 	Par<T> it;
-	Iter					r;
-	IterationView<Iter>	iter;
-	Expr1	v1;
-	Expr2	v2;
+	Set* pSet;	// IterationView protocol requires *pSet to exist during the full iteration
+	IterationView<Set>	iter;
+	ParView<bool,Cond> c;
+	Obj v;
+};
+
+NEW_FN_5(tryAll,TryAll)
+
+namespace Traits {
+template<class T1,class T2,class T3,class T4,class T5>
+struct GetEval<Rel5<TryAll,T1,T2,T3,T4,T5> >
+{	typedef	bool	Type;	};
+} // Traits
+
+/**
+ * 	Executes \a v2 for all \a it in \a r where \a v1 is true, sorted by ascending values of \a o. Succeeds on the first \a it that makes \a v2 succeed.
+ * 	Fails if, after trying to execute \a v2 for all \a it in \a r where \a v1 is true, \a v2 never succeeded.
+ *
+ * 	\ingroup Search
+ */
+template<class T,class Set,class Cond,class OrderT,class Order,class Obj>
+struct GoalView5<TryAll,T,Par<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> : IGoal
+{
+	typedef GoalView5<TryAll,T,Par<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> Self;
+	GoalView5(State& state, const Par<T>& it,const Set& s, const Cond& c,const Order& o, const Obj& v) :
+		state(state),it(it),pSet(new(state)Set(s)),iter(*pSet),c(state,c),o(state,o),v(v),
+		pSelected(new (state) SList<int>(state)) {}
+	GoalView5(State& state, const Par<T>& it, const IterationView<Set>& iter, const Cond& c,
+			const Order& o,const Obj& v,SList<int>* pSelected) :
+		state(state),it(it),pSet(NULL),iter(iter),c(state,c),o(state,o),v(v),pSelected(pSelected) {}
+
+	bool selected(int i)
+	{
+		for (auto itt = pSelected->begin(); itt != pSelected->end(); ++itt)
+			if (*itt == i)
+				return true;
+		return false;
+	}
+
+    Goal execute()
+	{
+    	// find the it that minimizes o, satisfies c, and was not yet selected
+    	int bestIt;
+    	OrderT bestS = limits<OrderT>::posInf();
+    	for (IterationView<Set> curIter(iter); curIter.valid(); curIter.iterate())
+    	{
+    		it = curIter.value();
+    		if (c.value() and o.value() < bestS and !selected(it.value()))
+    		{
+    			bestS = o.value();
+    			bestIt = it.value();
+    		}
+    	}
+
+    	if (bestS == limits<OrderT>::posInf()) // i.e., not found
+   			return fail();
+
+    	it = bestIt;
+
+    	pSelected->pushFront(it.value());
+
+		return Goal(state,
+				rel<Or>(v, Goal(new (state) Self(state,it,iter,c.getObj(),o.getObj(),v,pSelected))));
+	}
+    State& state;
+	Par<T> it;
+	Set* pSet;	// IterationView protocol requires *pSet to exist during the full iteration
+	IterationView<Set>	iter;
+	ParView<bool,Cond> c;
+	ParView<OrderT,Order> o;
+	Obj v;
+	SList<int>* pSelected;
 };
 
 } // Casper

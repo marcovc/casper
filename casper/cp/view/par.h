@@ -78,18 +78,19 @@ struct IterationView<Rel1<Domain,ParExpr> >
 	typedef typename Dom::Iterator Iterator;
 	typedef Rel1<Domain,ParExpr> DomainRel;
 	typedef IterationView<DomainRel>	Self;
-	IterationView(const DomainRel& r) : r(r),
-										v(getState(r.p1),r.p1),
-										it(v.value().domain().begin()) {}
-	IterationView(const DomainRel& r, Iterator it) : r(r),
-													 v(getState(r.p1),r.p1),
-													 it(it) {}
+	IterationView(const DomainRel& r) :var(ParView<CP::Var<Eval>,ParExpr>(getState(r.p1),r.p1).value()),
+									   it(var.domain().begin()) {}
+//	IterationView(const DomainRel& r, Iterator it) : r(r),
+//													 v(getState(r.p1),r.p1),
+//													 it(it) {}
+	IterationView(const IterationView& s) : var(s.var),
+											it(s.it) {}
 	void		iterate()	{	assert(valid()); ++it;	}
 	int			value() const 	{	assert(valid()); return *it;	}
-	bool		valid() const 	{	return it != v.value().domain().end();	}
-	Self		next() const {	return Self(r,++Iterator(it)); }
-	DomainRel r;
-	ParView<CP::Var<Eval>,ParExpr> v;
+	bool		valid() const 	{	return it != var.domain().end();	}
+	//Self		copy() const {	return Self(r,it); }
+	//ParView<CP::Var<Eval>,ParExpr> v;
+	CP::Var<Eval> var;
 	Iterator it;
 };
 

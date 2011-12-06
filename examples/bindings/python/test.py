@@ -3,26 +3,34 @@ from casper import *
 from casper.cp import *
 
 n = 10
-m = 55 
+m = 55
  
 solver = Solver()
 
 marks = IntVarArray(solver,n,0,m)
 
 solver.post(distinct([marks[i]-marks[j] for i in range(n) for j in range(i)]))
-	
+
 for i in range(n-1):
 	solver.post(marks[i] < marks[i+1])
 
 solver.post(marks[0]==0)
 solver.post(marks[n-1]==m)
+	
+idx,v = IntPar(solver),IntPar(solver)
 
-idx = IntPar(solver)
-v = IntPar(solver)
-search = forAll(idx,range(n),
+print solver.valid(),solver.getStats()
+
+search = forAll(idx,range(n),~ground(marks[idx]),domainSize(marks[idx]),
 			tryAll(v,domain(marks[idx]),
 				post(solver,marks[idx]==v)))
-						
+
+#search = forAll(idx,range(n),cond=~marks[idx].ground(),orderby=marks[idx].domain().size()) (
+#			tryAll(v,marks[idx].domain()) (
+#				post(solver,marks[idx]==v)
+#				)
+#			)
+
 found = solver.solve(search)
 if found:
     print marks

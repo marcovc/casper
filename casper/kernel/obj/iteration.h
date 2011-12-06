@@ -25,18 +25,22 @@
 namespace Casper {
 namespace Detail {
 
-
 template<class FromObj,class ToEval>
 struct ExprIterationAdaptor : IIterationExpr<Expr<ToEval> >
 {
+	typedef IIterationExpr<Expr<ToEval> > Super;
 	typedef ExprIterationAdaptor<FromObj,ToEval> Self;
 	typedef Expr<ToEval> Elem;
 	ExprIterationAdaptor(const FromObj& e) : it(e) {}
+	ExprIterationAdaptor(const ExprIterationAdaptor& s) : it(s.it) {}
 
 	void		iterate()			{	it.iterate(); }
 	Elem 		value() const 	{	return Elem(it.value()); }
 	bool		valid() const 		{	return it.valid(); }
-	Self		next() const		{	return it.next(); }
+	IterationExpr<Elem>		copy() const
+	{
+		return static_cast<Super*>(new Self(*this));
+	}
 
 	IterationView<FromObj>	it;
 };

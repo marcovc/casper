@@ -182,7 +182,7 @@ struct IterationView<CP::VarArray<Eval,dims,Dom> >
 	void		iterate()	{	assert(valid()); ++idx;	}
 	const CP::Var<Eval,Dom>& 	value() const 	{	assert(valid()); return v(idx);	}
 	bool		valid() const 	{	return idx < max;	}
-	Self		next() const {	return Self(v,idx+1); }
+	//Self		copy() const {	return Self(v,idx); }
 	uint						idx;
 	CP::VarArray<Eval,dims,Dom>	v;
 	const uint					max;

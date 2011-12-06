@@ -76,6 +76,8 @@ template<class,class,class,class,class,class,class>
 struct GoalView3;
 template<class,class,class,class,class,class,class,class,class>
 struct GoalView4;
+template<class,class,class,class,class,class,class,class,class,class,class>
+struct GoalView5;
 
 /**
  * 	Wrapper over an IGoal object.
@@ -130,6 +132,16 @@ struct Goal : Util::PImplIdiom<IGoal>
 			typename Traits::GetEval<T2>::Type,T2,
 			typename Traits::GetEval<T3>::Type,T3,
 			typename Traits::GetEval<T4>::Type,T4>(s,r.p1,r.p2,r.p3,r.p4)) {}
+
+	template<class Func,class T1,class T2,class T3,class T4,class T5>
+	Goal(State& s,const Rel5<Func,T1,T2,T3,T4,T5>& r) :
+		Super(new (s)
+			GoalView5<Func,
+			typename Traits::GetEval<T1>::Type,T1,
+			typename Traits::GetEval<T2>::Type,T2,
+			typename Traits::GetEval<T3>::Type,T3,
+			typename Traits::GetEval<T4>::Type,T4,
+			typename Traits::GetEval<T5>::Type,T5>(s,r.p1,r.p2,r.p3,r.p4,r.p5)) {}
 
 #ifndef SWIG
 	Goal(State& s, const std::function<Goal()>& fn);

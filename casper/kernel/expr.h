@@ -40,8 +40,8 @@ struct IIterationExpr
 	virtual Elem 		value() const 	= 0;
 	/// Returns if the current pointer is still valid
 	virtual bool		valid() const 	= 0;
-	/// Returns a copy of *this but where the iterator has been iterated
-	//virtual IterationExpr<Elem>		next() const = 0;
+	/// Returns a copy of *this
+	virtual IterationExpr<Elem>		copy() const = 0;
 };
 
 // wrappers
@@ -54,7 +54,8 @@ struct IterationExprWrapper : IIterationExpr<Elem>
 	void		iterate()	{	v.iterate(); }
 	Elem	 	value() const 	{	return v.value(); }
 	bool		valid() const 	{	return v.valid(); }
-	//IterationExpr<Elem>		next() const {	return v.next(); }
+	IterationExpr<Elem>		copy() const
+	{	return static_cast<IIterationExpr<Elem>*>(new IterationView<View>(v)); }
 
 	IterationView<View>	v;
 };
@@ -86,7 +87,8 @@ struct IterationExpr : Util::SPImplIdiom<Detail::IIterationExpr<Elem> >
 	template<class T1>
 	IterationExpr(const T1& t);
 
-	IterationExpr(const IterationExpr<Elem>& t) : Super(t) {}
+	/// Copy constructor. \note The IterationView protocol does not allow shallow copies.
+	IterationExpr(const IterationExpr<Elem>& t) : Super(t.copy()) {}
 
 	/// Replaces the referenced bounded expression with a new expression.
 	const IterationExpr<Elem>& operator=(IterationExpr<Elem> s)
@@ -101,8 +103,8 @@ struct IterationExpr : Util::SPImplIdiom<Detail::IIterationExpr<Elem> >
 	Elem 		value() const 	{	return Super::getImpl().value(); }
 	/// Returns if the current pointer is still valid
 	bool		valid() const 	{	return Super::getImpl().valid(); }
-	/// Returns a copy of *this but where the iterator has been iterated
-	//Self		next() const {	return Super::getImpl().next(); }
+	/// Returns a copy of *this
+	Self		copy() const {	return Super::getImpl().copy(); }
 
 };
 

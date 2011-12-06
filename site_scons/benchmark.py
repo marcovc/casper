@@ -35,35 +35,13 @@ onlinux = os.name=="posix"
 if onlinux:
     import resource
 
-def leastsquares(X, Y):
-    """
-    Summary
-        Linear regression of y = ax + b
-    Usage
-        real, real, real = linreg(list, list)
-    Returns coefficients to the regression line "y=ax+b" from x[] and y[], and R^2 Value
-    (stolen from http://www.answermysearches.com/how-to-do-a-simple-linear-regression-in-python/124/)
-    """
-    if len(X) != len(Y):  raise ValueError, 'unequal length'
-    N = len(X)
-    Sx = Sy = Sxx = Syy = Sxy = 0.0
-    for x, y in map(None, X, Y):
-        Sx = Sx + x
-        Sy = Sy + y
-        Sxx = Sxx + x*x
-        Syy = Syy + y*y
-        Sxy = Sxy + x*y   
-    det = Sxx * N - Sx * Sx
-    a, b = (Sxy * N - Sy * Sx)/det, (Sxx * Sy - Sx * Sxy)/det
-    meanerror = residual = 0.0
-    for x, y in map(None, X, Y):
-        meanerror = meanerror + (y - Sy/N)**2
-        residual = residual + (y - a * x - b)**2
-    RR = 1 - residual/meanerror
-    ss = residual / (N-2)
-    #Var_a, Var_b = ss * N / det, ss * Sxx / det
-    return a, b, RR
-
+def calcETA(x, y, total):
+    import numpy
+    maxdegree = 4
+    x = numpy.array(x)
+    y = numpy.array(y)
+    p = numpy.poly1d(numpy.polyfit(x,y,min(len(x),maxdegree)))
+    return p(total-len(x)),0
         
 import math
 
@@ -104,17 +82,19 @@ class ProgressBar:
     
 class Stats:
     def start(self):
-        if not onlinux:
+        if  onlinux:
+            usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+            self.secs = usage.ru_utime+usage.ru_stime
+        else:
             self.startTime = time.clock()
     def finish(self):
         if onlinux:
             usage = resource.getrusage(resource.RUSAGE_CHILDREN)
-            self.secs = usage.ru_utime+usage.ru_stime
-            self.memkb = usage.ru_maxrss
+            self.secs = usage.ru_utime+usage.ru_stime - self.secs
         else:
             self.secs = time.clock()-self.startTime 
-            self.memkb = 0
-
+        self.memkb = 0
+        
 class Benchmark:
     skipped, ok, timeout, memout,error = range(5)
     result2str = { 0 : "skipped", 1 : "ok", 2 : "timeout", 3 : "memout", 4 : "error"}
@@ -241,17 +221,15 @@ class RunQueue:
         avg = average(self.exectimes)
         stddev = std(self.exectimes)
         
-        if False: #self.nbCompleted>5:
+        if False: #self.nbCompleted>1:
             x=[]; y=[]
             s = 0; c= 0
             for i in self.exectimes:
-                s += i
                 c += 1
-                y.append(s)
+                s += i
                 x.append(c)
-            a,b,r2 = leastsquares(x,y)
-            eta = a*(self.nbTasks-self.nbCompleted)+b
-            stddev = math.sqrt(r2)
+                y.append(s)
+            eta,stddev = calcETA(x,y,self.nbTasks)
         else:
             eta = avg * (self.nbTasks-self.nbCompleted)
                
@@ -273,6 +251,7 @@ class RunQueue:
         self.exectimes += [stats.secs]
         self.displayProgress()
         self.lock.release()
+        print self.nbCompleted,self.progressBar.count
         
     def add(self,benchmark,endTaskHandler,maxtime=None,maxmem=None):
         self.pool.apply_async(func=benchmark,args=[maxtime,maxmem],callback=endTaskHandler)
@@ -281,9 +260,12 @@ class RunQueue:
         
     def wait(self):          
         self.pool.close()
+        print "passed close"
         self.pool.join()
+        print "passed join"
         sys.stdout.write("\n")
         sys.stdout.flush()
+        print "passed wait"
 
 class EndTaskHandler:
     def __init__(self,benchmark,runqueue,samplecount):
