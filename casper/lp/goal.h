@@ -51,10 +51,10 @@ struct PostLessEqual2 : IGoal
 	Goal execute()
 	{
 //		std::cout << solver.getEnv().getState().getStats().curLevel << " : posting "
-//				<< ParView<IdxEval,Idx>(solver,idx).value() << " <= "
-//				<< ParView<RHSEval,RHS>(solver,rhs).value() << std::endl;
-		return solver.postLessEqual(ParView<IdxEval,Idx>(solver,idx).value(),
-							 	 	ParView<RHSEval,RHS>(solver,rhs).value());
+//				<< RefView<IdxEval,Idx>(solver,idx).value() << " <= "
+//				<< RefView<RHSEval,RHS>(solver,rhs).value() << std::endl;
+		return solver.postLessEqual(RefView<IdxEval,Idx>(solver,idx).value(),
+							 	 	RefView<RHSEval,RHS>(solver,rhs).value());
 	}
 	Solver& solver;
 	Idx idx;
@@ -71,10 +71,10 @@ struct PostGreaterEqual2 : IGoal
 	Goal execute()
 	{
 //		std::cout << solver.getEnv().getState().getStats().curLevel << " : posting "
-//				<< ParView<IdxEval,Idx>(solver,idx).value() << " >= "
-//				<< ParView<RHSEval,RHS>(solver,rhs).value() << std::endl;
-		return solver.postGreaterEqual(ParView<IdxEval,Idx>(solver,idx).value(),
-							 	 	   ParView<RHSEval,RHS>(solver,rhs).value());
+//				<< RefView<IdxEval,Idx>(solver,idx).value() << " >= "
+//				<< RefView<RHSEval,RHS>(solver,rhs).value() << std::endl;
+		return solver.postGreaterEqual(RefView<IdxEval,Idx>(solver,idx).value(),
+							 	 	   RefView<RHSEval,RHS>(solver,rhs).value());
 	}
 	Solver& solver;
 	Idx idx;
@@ -91,10 +91,10 @@ struct PostEqual2 : IGoal
 	Goal execute()
 	{
 //		std::cout << solver.getEnv().getState().getStats().curLevel << " : posting "
-//				<< ParView<IdxEval,Idx>(solver,idx).value() << " == "
-//				<< ParView<RHSEval,RHS>(solver,rhs).value() << std::endl;
-		return solver.postEqual(ParView<IdxEval,Idx>(solver,idx).value(),
-							    ParView<RHSEval,RHS>(solver,rhs).value());
+//				<< RefView<IdxEval,Idx>(solver,idx).value() << " == "
+//				<< RefView<RHSEval,RHS>(solver,rhs).value() << std::endl;
+		return solver.postEqual(RefView<IdxEval,Idx>(solver,idx).value(),
+							    RefView<RHSEval,RHS>(solver,rhs).value());
 	}
 	Solver& solver;
 	Idx idx;
@@ -109,8 +109,8 @@ struct PostLessEqual3 : IGoal
 	Goal execute()
 	{
 //		std::cout << solver.getEnv().getState().getStats().curLevel << " : posting "
-//				<< ParView<IdxEval,Idx>(solver,idx).value() << " <= "
-//				<< ParView<RHSEval,RHS>(solver,rhs).value() << std::endl;
+//				<< RefView<IdxEval,Idx>(solver,idx).value() << " <= "
+//				<< RefView<RHSEval,RHS>(solver,rhs).value() << std::endl;
 		solver.postLessEqual(idxs,coeffs,rhs);
 		return solver.solve();
 	}
@@ -128,8 +128,8 @@ struct PostGreaterEqual3 : IGoal
 	Goal execute()
 	{
 //		std::cout << solver.getEnv().getState().getStats().curLevel << " : posting "
-//				<< ParView<IdxEval,Idx>(solver,idx).value() << " <= "
-//				<< ParView<RHSEval,RHS>(solver,rhs).value() << std::endl;
+//				<< RefView<IdxEval,Idx>(solver,idx).value() << " <= "
+//				<< RefView<RHSEval,RHS>(solver,rhs).value() << std::endl;
 		solver.postGreaterEqual(idxs,coeffs,rhs);
 		return solver.solve();
 	}
@@ -147,8 +147,8 @@ struct PostEqual3 : IGoal
 	Goal execute()
 	{
 //		std::cout << solver.getEnv().getState().getStats().curLevel << " : posting "
-//				<< ParView<IdxEval,Idx>(solver,idx).value() << " <= "
-//				<< ParView<RHSEval,RHS>(solver,rhs).value() << std::endl;
+//				<< RefView<IdxEval,Idx>(solver,idx).value() << " <= "
+//				<< RefView<RHSEval,RHS>(solver,rhs).value() << std::endl;
 		solver.postEqual(idxs,coeffs,rhs);
 		return solver.solve();
 	}

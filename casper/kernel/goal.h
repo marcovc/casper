@@ -27,6 +27,7 @@
 #include <casper/kernel/goal/store.h>
 #include <casper/kernel/goal/terminal.h>
 #include <casper/kernel/goal/tryall.h>
+#include <casper/kernel/goal/tryall2.h>
 #include <casper/kernel/goal/whiledo.h>
 #include <casper/kernel/goal/select.h>
 

@@ -592,9 +592,9 @@ struct ValViewRel1<Abs,Expr1,Eval>
  * 	\ingroup ValViews
  **/
 template<class Eval>
-struct ValView<Eval,Casper::Par<Eval> >
+struct ValView<Eval,Casper::Ref<Eval> >
 {
-	ValView(Store& store, const Casper::Par<Eval>& p1) :
+	ValView(Store& store, const Casper::Ref<Eval>& p1) :
 		state(p1.getState()),val(p1.value()) {}
 	Eval value() const {	return val;}
 	bool setValue(const Eval& v)
@@ -603,8 +603,8 @@ struct ValView<Eval,Casper::Par<Eval> >
 	bool ground() const { return true; }
 	void attach(INotifiable* f) {}
 	void detach(INotifiable* f) {}
-	Casper::Par<Eval>	getObj() const
-	{	return Casper::Par<Eval>(state,val);	}
+	Casper::Ref<Eval>	getObj() const
+	{	return Casper::Ref<Eval>(state,val);	}
 
 	State&	state;
 	const Eval	val;

@@ -121,7 +121,7 @@ void packing(const char* instance)
 		ordering.pushBack(cards[j].first);
 
 	solver.setExplorer(bbMinimize(solver,-cardinal(packing)));
-	Par<int> val(solver);
+	Ref<int> val(solver);
 	bool found = solver.solve( forAll(val,ordering,
 									member(val,packing) or
 									notMember(val,packing)));

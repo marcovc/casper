@@ -60,9 +60,9 @@ struct DecPyRef : ITrailAgent
 };
 
 template<class T>
-struct CallablePar : IPar<T>
+struct CallableRef : IRef<T>
 {
-	CallablePar(State& state, PyObject* pFunction) :
+	CallableRef(State& state, PyObject* pFunction) :
 		pFunction(pFunction)
 	{
 		Py_XINCREF(pFunction);
@@ -84,9 +84,9 @@ struct CallablePar : IPar<T>
 
 
 template<class Eval>
-struct CallablePar<CP::Var<Eval> > : IPar<CP::Var<Eval>  >
+struct CallableRef<CP::Var<Eval> > : IRef<CP::Var<Eval>  >
 {
-	CallablePar(State& state, PyObject* pFunction) :
+	CallableRef(State& state, PyObject* pFunction) :
 		state(state),pFunction(pFunction)
 	{
 		Py_XINCREF(pFunction);
@@ -123,10 +123,10 @@ struct ExprFromCallable : IExpr<Eval>
 		Py_XDECREF(pFunction);
 	}
 
-	Par<Eval>	toPar(State& state) const
-	{	return Par<Eval>(state,static_cast<IPar<Eval>*>(new (state) CallablePar<Eval>(state,pFunction)));	}
-	Par<CP::Var<Eval> >	toCPVarPar(State& state) const
-	{	return Par<CP::Var<Eval> >(state,static_cast<IPar<CP::Var<Eval> >*>(new (state) CallablePar<CP::Var<Eval> >(state,pFunction)));	}
+	Ref<Eval>	toRef(State& state) const
+	{	return Ref<Eval>(state,static_cast<IRef<Eval>*>(new (state) CallableRef<Eval>(state,pFunction)));	}
+	Ref<CP::Var<Eval> >	toCPVarRef(State& state) const
+	{	return Ref<CP::Var<Eval> >(state,static_cast<IRef<CP::Var<Eval> >*>(new (state) CallableRef<CP::Var<Eval> >(state,pFunction)));	}
 	std::ostream& print(std::ostream& os) const
 	{	return os << "<python callable>"; }
 
@@ -158,10 +158,10 @@ struct ExprFromCallable<bool> : IExpr<bool>
 		Py_XDECREF(pFunction);
 	}
 
-	Par<bool>	toPar(State& state) const
-	{	return Par<bool>(state,static_cast<IPar<bool>*>(new (state) CallablePar<bool>(state,pFunction)));	}
-	Par<CP::Var<bool> >	toCPVarPar(State& state) const
-	{	return Par<CP::Var<bool> >(state,static_cast<IPar<CP::Var<bool> >*>(new (state) CallablePar<CP::Var<bool> >(state,pFunction)));	}
+	Ref<bool>	toRef(State& state) const
+	{	return Ref<bool>(state,static_cast<IRef<bool>*>(new (state) CallableRef<bool>(state,pFunction)));	}
+	Ref<CP::Var<bool> >	toCPVarRef(State& state) const
+	{	return Ref<CP::Var<bool> >(state,static_cast<IRef<CP::Var<bool> >*>(new (state) CallableRef<CP::Var<bool> >(state,pFunction)));	}
 	Goal	toGoal(State& state) const
 	{	return new (state) CallableGoal(state,pFunction);	}
 	std::ostream& print(std::ostream& os) const
@@ -199,7 +199,7 @@ template<class Eval>
 struct CreateFromPyObject
 {
 	static swig_type_info * isCPVar;
-	static swig_type_info * isPar;
+	static swig_type_info * isRef;
 	static swig_type_info * isExpr;
 	static swig_type_info * isGoal;
 
@@ -208,7 +208,7 @@ struct CreateFromPyObject
 		isCPVar =  SWIG_TypeQuery((std::string("Casper::CP::Var<")+
 								   Detail::EvalStr<Eval>()()+
 								   std::string(">*")).c_str());
-		isPar =	SWIG_TypeQuery((std::string("Casper::Par<")+
+		isRef =	SWIG_TypeQuery((std::string("Casper::Ref<")+
 								 Detail::EvalStr<Eval>()()+
 								 std::string(">*")).c_str());
 		isExpr = SWIG_TypeQuery((std::string("Casper::Expr<")+
@@ -233,8 +233,8 @@ struct CreateFromPyObject
 		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVar, 0)))
 			return new Casper::Expr<Eval>(*static_cast<Casper::CP::Var<Eval,typename Casper::CP::Traits::GetDefaultDom<Eval>::Type>*>(argp));
 		else
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isPar, 0)))
-			return new Casper::Expr<Eval>(*static_cast<Casper::Par<Eval>*>(argp));
+		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isRef, 0)))
+			return new Casper::Expr<Eval>(*static_cast<Casper::Ref<Eval>*>(argp));
 		else
 		if (Detail::EvalStr<Eval>()()=="bool" and
 			SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isGoal, 0)))
@@ -254,7 +254,7 @@ struct CreateFromPyObject
 		void * argp = NULL;
 
 		return 	SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVar, 0)) or
-				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isPar, 0)) or
+				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isRef, 0)) or
 				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isExpr, 0)) or
 				(SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isGoal, 0))) or
 				PyCallable_Check(pObj) or
@@ -264,7 +264,7 @@ struct CreateFromPyObject
 };
 
 template<class T> swig_type_info * CreateFromPyObject<T>::isCPVar = NULL;
-template<class T> swig_type_info * CreateFromPyObject<T>::isPar = NULL;
+template<class T> swig_type_info * CreateFromPyObject<T>::isRef = NULL;
 template<class T> swig_type_info * CreateFromPyObject<T>::isExpr = NULL;
 template<class T> swig_type_info * CreateFromPyObject<T>::isGoal = NULL;
 
@@ -374,7 +374,7 @@ Goal CallableGoal::execute()
 
 
 template<class Eval>
-CP::Var<Eval> CallablePar<Casper::CP::Var<Eval> >::value() const
+CP::Var<Eval> CallableRef<Casper::CP::Var<Eval> >::value() const
 {
 	PyObject *result = NULL;
 	result = PyObject_CallObject(pFunction, NULL);
@@ -384,7 +384,7 @@ CP::Var<Eval> CallablePar<Casper::CP::Var<Eval> >::value() const
 	Casper::Expr<Eval>* r = CreateFromPyObject<Eval>::create(result);
 	Casper::Expr<Eval> rr = *r;
 	delete r;
-	return rr.toCPVarPar(state).value();
+	return rr.toCPVarRef(state).value();
 }
 
 } // Detail

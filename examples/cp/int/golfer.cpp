@@ -40,7 +40,7 @@ int golfers(uint w, uint g, uint s, bool labeling,const Util::ExampleOptions& op
 			for (uint gi = 0; gi < g; gi++)
 				for (uint gj = 0; gj < g; gj++)
 				{
-					IntPar i(solver),j(solver);
+					IntRef i(solver),j(solver);
 					solver.post(sum(all(Casper::pair(i,j),range(0,s-1),true,
 									cast<int>(vars[wi][gi][i]==vars[wj][gj][j])))<=1);
 				}
@@ -71,7 +71,7 @@ int golfers(uint w, uint g, uint s, bool labeling,const Util::ExampleOptions& op
 		found = solver.solve(label(solver,vars,selectVarMinDom(solver,vars)));
 	else
 	{
-		IntPar pi(solver),wi(solver),gi(solver),si(solver);
+		IntRef pi(solver),wi(solver),gi(solver),si(solver);
 		found = solver.solve(forAll(pi,range(1,g*s)) (
 							   forAll(wi,range(0,w-1)) (
 							   	 tryAll(gi,range(0,g-1)) (

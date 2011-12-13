@@ -17,10 +17,10 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_CP_PAR_PAR_H_
-#define CASPER_CP_PAR_PAR_H_
+#ifndef CASPER_CP_REF_REF_H_
+#define CASPER_CP_REF_REF_H_
 
-#include <casper/kernel/par/view.h>
+#include <casper/kernel/ref/view.h>
 #include <casper/cp/view/val.h>
 
 namespace Casper {
@@ -70,15 +70,15 @@ struct GetEval<Rel1<DomainSize,T> >
 
 
 // specialization for finite domain variables
-template<class ParExpr>
-struct IterationView<Rel1<Domain,ParExpr> >
+template<class RefExpr>
+struct IterationView<Rel1<Domain,RefExpr> >
 {
-	typedef typename Traits::GetEval<ParExpr>::Type	Eval;
-	typedef typename CP::Traits::GetDom<ParExpr>::Type Dom;
+	typedef typename Traits::GetEval<RefExpr>::Type	Eval;
+	typedef typename CP::Traits::GetDom<RefExpr>::Type Dom;
 	typedef typename Dom::Iterator Iterator;
-	typedef Rel1<Domain,ParExpr> DomainRel;
+	typedef Rel1<Domain,RefExpr> DomainRel;
 	typedef IterationView<DomainRel>	Self;
-	IterationView(const DomainRel& r) :var(ParView<CP::Var<Eval>,ParExpr>(getState(r.p1),r.p1).value()),
+	IterationView(const DomainRel& r) :var(RefView<CP::Var<Eval>,RefExpr>(getState(r.p1),r.p1).value()),
 									   it(var.domain().begin()) {}
 //	IterationView(const DomainRel& r, Iterator it) : r(r),
 //													 v(getState(r.p1),r.p1),
@@ -89,28 +89,28 @@ struct IterationView<Rel1<Domain,ParExpr> >
 	int			value() const 	{	assert(valid()); return *it;	}
 	bool		valid() const 	{	return it != var.domain().end();	}
 	//Self		copy() const {	return Self(r,it); }
-	//ParView<CP::Var<Eval>,ParExpr> v;
+	//RefView<CP::Var<Eval>,RefExpr> v;
 	CP::Var<Eval> var;
 	Iterator it;
 };
 
 
 /**
- * 	ParView over groundness testing over a sequence type.
+ * 	RefView over groundness testing over a sequence type.
  * 	\ingroup Views
  **/
 template<class Eval, class Obj>
-struct ParView1<Ground,Seq<Eval>,Obj,bool> : IPar<bool>
+struct RefView1<Ground,Seq<Eval>,Obj,bool> : IRef<bool>
 {
 	typedef typename Traits::GetElem<Obj>::Type	Elem;
 
-	ParView1(State& state,const Obj& obj) :
+	RefView1(State& state,const Obj& obj) :
 		state(state),obj(obj) {}
-	virtual ~ParView1() {}
+	virtual ~RefView1() {}
 	bool value() const
 	{
 		for (IterationView<Obj> it(obj); it.valid(); it.iterate())
-			if (!ParView<CP::Var<Eval>,Elem>(state,it.value()).value().ground())
+			if (!RefView<CP::Var<Eval>,Elem>(state,it.value()).value().ground())
 				return false;
 		return true;
 	}
@@ -122,38 +122,38 @@ struct ParView1<Ground,Seq<Eval>,Obj,bool> : IPar<bool>
 };
 
 /**
- * 	ParView over groundness testing.
+ * 	RefView over groundness testing.
  * 	\ingroup Views
  **/
 template<class Eval,class Obj>
-struct ParView1<Ground,Eval,Obj,bool> : IPar<bool>
+struct RefView1<Ground,Eval,Obj,bool> : IRef<bool>
 {
-	ParView1(State& state,const Obj& obj) :
+	RefView1(State& state,const Obj& obj) :
 		v(state,obj) {}
-	virtual ~ParView1() {}
+	virtual ~RefView1() {}
 	bool value() const
 	{	return 	v.value().ground();	}
 
 	Rel1<Ground,Obj> getObj()  const { return ground(v.getObj()); }
 
-	ParView<CP::Var<Eval>,Obj>	v;
+	RefView<CP::Var<Eval>,Obj>	v;
 };
 
 
 
 /**
- * 	ParView for obtaining domain size.
+ * 	RefView for obtaining domain size.
  * 	\ingroup Views
  **/
 template<class ViewEval,class View>
-struct ParView1<DomainSize,ViewEval,View,int> : IPar<int>
+struct RefView1<DomainSize,ViewEval,View,int> : IRef<int>
 {
-	ParView1(State& state,const View& v) : v(state,v) {}
+	RefView1(State& state,const View& v) : v(state,v) {}
 	int value() const
 	{	return 	v.value().domain().size();	}
 	Rel1<DomainSize,View> getObj()  const { return domainSize(v.getObj()); }
 
-	ParView<CP::Var<ViewEval>,View>	v;
+	RefView<CP::Var<ViewEval>,View>	v;
 };
 
 

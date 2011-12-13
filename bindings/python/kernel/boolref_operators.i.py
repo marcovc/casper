@@ -7,11 +7,11 @@ sys.path.append(libPath)
 
 import objdb
 
-obj = "Casper::Par<int>"
-ev = "int"
+obj = "Casper::Ref<bool>"
+ev = "bool"
 
 print "%module kernel"
-print "%import <kernel/par.i>" 
+print "%import <kernel/ref.i>" 
 print "%extend "+obj+"{"
 
 objdb.printVarOperators(obj,ev)

@@ -19,7 +19,7 @@
 Casper::Detail::CreateFromPyObject<Eval>::isExpr = $descriptor(Casper::Expr<Eval>*);
 Casper::Detail::CreateFromPyObject<Eval>::isCPVar = 
 			$descriptor(Casper::CP::Var<Eval,Casper::CP::Traits::GetDefaultDom<Eval>::Type >*);
-Casper::Detail::CreateFromPyObject<Eval>::isPar = $descriptor(Casper::Par<Eval>*);
+Casper::Detail::CreateFromPyObject<Eval>::isRef = $descriptor(Casper::Ref<Eval>*);
 Casper::Detail::CreateFromPyObject<Eval>::isGoal = $descriptor(Casper::Goal*);				
 %enddef
 

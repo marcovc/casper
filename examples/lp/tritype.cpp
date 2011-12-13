@@ -20,7 +20,7 @@
 #include <casper/lp/goal.h>
 
 #include <casper/kernel/goal.h>
-#include <casper/kernel/par/view.h>
+#include <casper/kernel/ref/view.h>
 
 #include <casper/util/container/stdrange.h>
 

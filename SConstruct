@@ -730,7 +730,7 @@ Requires(pycasper_wrappers,pycasper_builddir)
 py_gen_scripts = []
 pref = "bindings/python/"
 for src in ['cp/int/intvar_operators.i','cp/int/boolvar_operators.i',
-			'kernel/intpar_operators.i','kernel/boolpar_operators.i',
+			'kernel/intref_operators.i','kernel/boolref_operators.i',
 			'kernel/intexpr_operators.i','kernel/boolexpr_operators.i',
 			'kernel/expr_predicates.i','kernel/goal_operators.i']:
 	py_gen_scripts.append(env.Command(pref+src,['bindings/python/pyutils/objdb.py',pref+src+'.py'],'python '+pref+src+'.py'+' > $TARGET'))

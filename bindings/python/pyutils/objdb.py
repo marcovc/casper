@@ -258,7 +258,8 @@ customCasperFn2PythonFn = {
 		"Min" : "_min",
 		"Max" : "_max",
 		"Sum" : "_sum",
-		"Pow" : "_pow"						
+		"Pow" : "_pow",
+		"WhileDo" : "_whileDo"						
 }
 
 

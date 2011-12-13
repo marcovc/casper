@@ -39,13 +39,13 @@ struct GetEval<Rel3<ForAll,T1,T2,T3> >
  * 	\ingroup Search
  */
 template<class T,class Set,class Obj>
-struct GoalView3<ForAll,T,Par<T>,Seq<T>,Set,bool,Obj> : IGoal
+struct GoalView3<ForAll,T,Ref<T>,Seq<T>,Set,bool,Obj> : IGoal
 {
-	typedef GoalView3<ForAll,T,Par<T>,Seq<T>,Set,bool,Obj> Self;
-	GoalView3(State& state, const Par<T>& it,
+	typedef GoalView3<ForAll,T,Ref<T>,Seq<T>,Set,bool,Obj> Self;
+	GoalView3(State& state, const Ref<T>& it,
 				const Set& s, const Obj& v) :
 		state(state),it(it),pSet(new(state)Set(s)),iter(*pSet),v(v) {}
-	GoalView3(State& state, const Par<T>& it,
+	GoalView3(State& state, const Ref<T>& it,
 				const IterationView<Set>& iter, const Obj& v) :
 		state(state),it(it),pSet(NULL),iter(iter),v(v) {}
 
@@ -65,7 +65,7 @@ struct GoalView3<ForAll,T,Par<T>,Seq<T>,Set,bool,Obj> : IGoal
 				rel<And>(v, Goal(new (state) Self(state,it,curIter,v))));
 	}
     State& state;
-	Par<T> it;
+	Ref<T> it;
 	Set* pSet;	// IterationView protocol requires *pSet to exist during the full iteration
 	IterationView<Set>	iter;
 	Obj v;
@@ -85,12 +85,12 @@ struct GetEval<Rel4<ForAll,T1,T2,T3,T4> >
  * 	\ingroup Search
  */
 template<class T,class Set,class Cond,class Obj>
-struct GoalView4<ForAll,T,Par<T>,Seq<T>,Set,bool,Cond,bool,Obj> : IGoal
+struct GoalView4<ForAll,T,Ref<T>,Seq<T>,Set,bool,Cond,bool,Obj> : IGoal
 {
-	typedef GoalView4<ForAll,T,Par<T>,Seq<T>,Set,bool,Cond,bool,Obj> Self;
-	GoalView4(State& state, const Par<T>& it,const Set& s, const Cond& c,const Obj& v) :
+	typedef GoalView4<ForAll,T,Ref<T>,Seq<T>,Set,bool,Cond,bool,Obj> Self;
+	GoalView4(State& state, const Ref<T>& it,const Set& s, const Cond& c,const Obj& v) :
 		state(state),it(it),pSet(new(state)Set(s)),iter(*pSet),c(state,c),v(v) {}
-	GoalView4(State& state, const Par<T>& it, const IterationView<Set>& iter, const Cond& c, const Obj& v) :
+	GoalView4(State& state, const Ref<T>& it, const IterationView<Set>& iter, const Cond& c, const Obj& v) :
 		state(state),it(it),pSet(NULL),iter(iter),c(state,c),v(v) {}
 
     Goal execute()
@@ -114,10 +114,10 @@ struct GoalView4<ForAll,T,Par<T>,Seq<T>,Set,bool,Cond,bool,Obj> : IGoal
 				rel<And>(v, Goal(new (state) Self(state,it,curIter,c.getObj(),v))));
 	}
     State& state;
-	Par<T> it;
+	Ref<T> it;
 	Set* pSet;	// IterationView protocol requires *pSet to exist during the full iteration
 	IterationView<Set>	iter;
-	ParView<bool,Cond> c;
+	RefView<bool,Cond> c;
 	Obj v;
 };
 
@@ -135,13 +135,13 @@ struct GetEval<Rel5<ForAll,T1,T2,T3,T4,T5> >
  * 	\ingroup Search
  */
 template<class T,class Set,class Cond,class OrderT,class Order,class Obj>
-struct GoalView5<ForAll,T,Par<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> : IGoal
+struct GoalView5<ForAll,T,Ref<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> : IGoal
 {
-	typedef GoalView5<ForAll,T,Par<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> Self;
-	GoalView5(State& state, const Par<T>& it,const Set& s, const Cond& c,const Order& o, const Obj& v) :
+	typedef GoalView5<ForAll,T,Ref<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> Self;
+	GoalView5(State& state, const Ref<T>& it,const Set& s, const Cond& c,const Order& o, const Obj& v) :
 		state(state),it(it),pSet(new(state)Set(s)),iter(*pSet),c(state,c),o(state,o),v(v),
 		pSelected(new (state) SList<int>(state)) {}
-	GoalView5(State& state, const Par<T>& it, const IterationView<Set>& iter, const Cond& c,
+	GoalView5(State& state, const Ref<T>& it, const IterationView<Set>& iter, const Cond& c,
 			const Order& o,const Obj& v,SList<int>* pSelected) :
 		state(state),it(it),pSet(NULL),iter(iter),c(state,c),o(state,o),v(v),pSelected(pSelected) {}
 
@@ -179,11 +179,11 @@ struct GoalView5<ForAll,T,Par<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> : I
 				rel<And>(v, Goal(new (state) Self(state,it,iter,c.getObj(),o.getObj(),v,pSelected))));
 	}
     State& state;
-	Par<T> it;
+	Ref<T> it;
 	Set* pSet;	// IterationView protocol requires *pSet to exist during the full iteration
 	IterationView<Set>	iter;
-	ParView<bool,Cond> c;
-	ParView<OrderT,Order> o;
+	RefView<bool,Cond> c;
+	RefView<OrderT,Order> o;
 	Obj v;
 	SList<int>* pSelected;
 };

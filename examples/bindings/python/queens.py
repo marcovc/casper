@@ -2,7 +2,7 @@
 from casper import *
 from casper.cp import *
 
-n = 1000
+n = 4
 
 solver = Solver()
 
@@ -12,13 +12,22 @@ solver.post(distinct(vars))
 solver.post(distinct([vars[i]+i for i in range(n)]))
 solver.post(distinct([vars[i]-i for i in range(n)]))
 		
-idx = IntPar(solver)
-v = IntPar(solver)
+idx = IntRef(solver)
+v = IntRef(solver)
+
 search = whileDo(~ground(vars)) (
-					selectMin(idx,range(n),~ground(vars[idx])) ([domainSize(vars[idx]),abs(idx-n/2)]) &
+					selectMin(idx,range(n),cond=~ground(vars[idx])) ([domainSize(vars[idx]),abs(idx-n/2)]) &
 					selectRand(v,domain(vars[idx])) &
 					(post(solver,vars[idx]==v) | post(solver,vars[idx]!=v))
 				)
+
+#search = \
+#whileDo(~vars.ground()) (
+#	selectMin(idx,range(n),cond=~vars[idx].ground()) 
+#				([vars[idx].domain().size(),abs(idx-n/2)]) &
+#	selectRand(v,vars[idx].domain()) &
+#	(solver.post(vars[idx]==v) | solver.post(vars[idx]!=v))
+#)
 						
 found = solver.solve(search)
 if found:

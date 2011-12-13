@@ -96,7 +96,7 @@ using namespace std;
 int main()
 {
 	State state;
-	IntPar v(state);
+	IntRef v(state);
 	Goal searchTree(state,assign(v,1) or assign(v,2));
 
 	DFSExplorer dfs(state);
@@ -121,7 +121,7 @@ using namespace std;
 int main()
 {
 	State state;
-	IntParArray v(state,3);
+	IntRefArray v(state,3);
 	Goal a0(state, assign(v[0],1) or assign(v[0],2));
 	Goal a1(state, assign(v[1],1) or assign(v[1],2));
 	Goal a2(state, assign(v[2],1) or assign(v[2],2));
@@ -149,9 +149,9 @@ using namespace std;
 int main()
 {
 	State state;
-	IntParArray v(state,3);
+	IntRefArray v(state,3);
 
-	IntPar i(state);
+	IntRef i(state);
 
 	Goal searchTree(state,
 			forAll(i,range(0,2))
@@ -183,9 +183,9 @@ using namespace std;
 int main()
 {
 	State state;
-	IntParArray v(state,3);
+	IntRefArray v(state,3);
 
-	IntPar i(state),j(state);
+	IntRef i(state),j(state);
 
 	Goal searchTree(state,
 			forAll(i,range(0,2)) (
@@ -217,9 +217,9 @@ using namespace std;
 int main()
 {
 	State state;
-	IntParArray v(state,4);
+	IntRefArray v(state,4);
 
-	IntPar i(state),j(state);
+	IntRef i(state),j(state);
 
 	Goal searchTree(state,
 			forAll(i,range(0,3)) (
@@ -228,7 +228,7 @@ int main()
 			)
 	);
 
-	IntPar r(state, v[0]*8 + v[1]*4 + v[2]*2 + v[3]);
+	IntRef r(state, v[0]*8 + v[1]*4 + v[2]*2 + v[3]);
 
 	DDSIteration dds(state,2);
 	bool found = dds.explore(searchTree);
@@ -252,9 +252,9 @@ using namespace std;
 int main()
 {
 	State state;
-	IntParArray v(state,4);
+	IntRefArray v(state,4);
 
-	IntPar i(state),j(state);
+	IntRef i(state),j(state);
 
 	Goal searchTree(state,
 			forAll(i,range(0,3)) (
@@ -263,7 +263,7 @@ int main()
 			)
 	);
 
-	IntPar r(state, v[0]*8 + v[1]*4 + v[2]*2 + v[3]);
+	IntRef r(state, v[0]*8 + v[1]*4 + v[2]*2 + v[3]);
 
 	LDSIteration lds(state,2);
 	bool found = lds.explore(searchTree);
@@ -287,9 +287,9 @@ using namespace std;
 int main()
 {
 	State state;
-	IntParArray v(state,4);
+	IntRefArray v(state,4);
 
-	IntPar i(state),j(state);
+	IntRef i(state),j(state);
 
 	Goal searchTree1(state,
 			forAll(i,range(0,1)) (
@@ -305,7 +305,7 @@ int main()
 			)
 	);
 
-	IntPar r(state, v[0]*8 + v[1]*4 + v[2]*2 + v[3]);
+	IntRef r(state, v[0]*8 + v[1]*4 + v[2]*2 + v[3]);
 
 	DFSExplorer dfs(state);
 
@@ -380,14 +380,14 @@ int main()
 
 	store.post(distinct(v),postDomFilter);
 
-	IntPar i(env);
+	IntRef i(env);
 	store.post(distinct(all(i,range(0,n-1),true,v[i]+i)),postDomFilter);
 	store.post(distinct(all(i,range(0,n-1),true,v[i]-i)),postDomFilter);
 
 	bool valid = store.valid();
 	cout << valid << " : " << v << endl;
 
-	IntPar j(env);
+	IntRef j(env);
 	Goal searchTree(env,
 			forAll(i,range(0,n-1)) (
 				tryAll(j,range(1,n))
@@ -431,7 +431,7 @@ int main(int argc, char** argv)
 	cout << v << endl;
 
 
-	IntPar i(env);
+	IntRef i(env);
 	store.post(distinct(v),postDomFilter);
 	store.post(distinct(all(i,range(0,n-1),true,v[i]+i)),postDomFilter);
 	store.post(distinct(all(i,range(0,n-1),true,v[i]-i)),postDomFilter);
@@ -443,7 +443,7 @@ int main(int argc, char** argv)
 	bool valid = store.valid();
 	cout << valid << " : " << v << endl;
 
-	IntPar idx(env),val(env);
+	IntRef idx(env),val(env);
 #if 0
 	Goal varSelect(store,
 			assign(idx,
@@ -552,7 +552,7 @@ int main()
 
 	store.post(distinct(v));
 
-	IntPar i(env);
+	IntRef i(env);
 	store.post(distinct(all(i,range(0,n-1),true,v[i]+i)));
 	store.post(distinct(all(i,range(0,n-1),true,v[i]-i)));
 
@@ -560,12 +560,12 @@ int main()
 	cout << valid << " : " << v << endl;
 
 //	Goal searchTree(env,label(store,v,selectVarMinDom(store,v),selectValsRand(store,v)));
-	IntPar idx(store);
-	IntPar val(store);
+	IntRef idx(store);
+	IntRef val(store);
 	Goal searchTree(env,
 			whileDo(not ground(v))
 			(
-				selectMin(idx,range(0,n-1),not ground(v[idx]),{IntPar(store,domainSize(v[idx])),IntPar(store,abs(idx-n/2))}) and
+				selectMin(idx,range(0,n-1),not ground(v[idx]),{IntRef(store,domainSize(v[idx])),IntRef(store,abs(idx-n/2))}) and
 				//assign(idx,argMin(idx,range(0,n-1),not ground(v[idx]),domainSize(v[idx])*n+abs(idx-n/2))) and
 				selectRand(val,domain(v[idx])) and
 				//assign(val,argMin(val,domain(v[idx]),randInRange(0.0,1.0))) and
@@ -608,7 +608,7 @@ int main()
 
 	solver.post(distinct(v),postDomFilter);
 
-	IntPar i(solver);
+	IntRef i(solver);
 	solver.post(distinct(all(i,range(0,n-1),true,v[i]+i)),postDomFilter);
 	solver.post(distinct(all(i,range(0,n-1),true,v[i]-i)),postDomFilter);
 
@@ -975,7 +975,7 @@ void solve(int nbSubjects, int nbClasses,
 
 	//solver.setExplorer(lds(solver,8));
 
-	IntPar idx(solver),val(solver),i(solver),j(solver);
+	IntRef idx(solver),val(solver),i(solver),j(solver);
 
 	const int maxHours = (20-8)*hour;
 	IntVarArray timeCoord(solver,nbClasses,0,5*maxHours-1);

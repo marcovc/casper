@@ -22,7 +22,7 @@
 #include <casper/kernel/notify/notifiable.h>
 #include <casper/kernel/notify/notifier.h>
 #include <casper/cp/store.h>
-#include <casper/kernel/par/par.h>
+#include <casper/kernel/ref/ref.h>
 
 //#include <casper/kernel/notify/susplist.h>
 //#include <casper/kernel/relation.h>
@@ -73,7 +73,7 @@ namespace expression {
 struct Domain;
 struct Bound;
 struct Value;
-struct Par;
+struct Ref;
 struct Relation;
 struct Filter;
 struct Ground;
@@ -112,11 +112,11 @@ struct ExprMatch<ValView<Eval,View>,expression::Value>
 {	static const bool value = true;	};
 
 template<class Eval>
-struct ExprMatch<Par<Eval>,expression::Par>
+struct ExprMatch<Ref<Eval>,expression::Ref>
 {	static const bool value = true;	};
 
 template<class Eval,class View>
-struct ExprMatch<ParView<Eval,View>,expression::Par>
+struct ExprMatch<RefView<Eval,View>,expression::Ref>
 {	static const bool value = true;	};
 
 template<class Func,class View>
@@ -144,7 +144,7 @@ struct ExprMatch<Rel2<Func,Expr1,Expr2>,Test>
 template<class Func,class View>
 struct ExprMatch<Rel1<Func,View>,expression::Ground>
 {	static const bool value = ExprMatch<View,expression::Value>::value or
-							  ExprMatch<View,expression::Par>::value;	};
+							  ExprMatch<View,expression::Ref>::value;	};
 
 template<class View>
 bool isDomExpr(const View& v)
@@ -159,8 +159,8 @@ bool isValExpr(const View& v)
 {	return ExprMatch<View,expression::Value>::value;	}
 
 template<class View>
-bool isPar(const View& v)
-{	return ExprMatch<View,expression::Par>::value;	}
+bool isRef(const View& v)
+{	return ExprMatch<View,expression::Ref>::value;	}
 
 template<class View>
 bool isFilter(const View& v)

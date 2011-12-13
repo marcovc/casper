@@ -31,7 +31,7 @@ namespace Casper {
  *	or
  *	whiledo = (cond and block and whiledo)
  *
- *	The first promotes cond from Par to a Goal and hence
+ *	The first promotes cond from Ref to a Goal and hence
  *	allows backtracking to explore the block part even if
  *	cond is false, which looks like dangerous.
  *
@@ -63,7 +63,7 @@ struct GoalView2<WhileDo,bool,Cond,bool,Statm> : IGoal
 		return Goal(state,Goal(state,statm) and Goal(this));
 	}
     State& 		state;
-	Par<bool> 	cond;
+	Ref<bool> 	cond;
 	Statm 		statm;
 };
 

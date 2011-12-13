@@ -21,7 +21,7 @@
 
 #include <casper/kernel/view/iteration.h>
 #include <casper/util/container/stdpair.h>
-#include <casper/kernel/par/par.h>
+#include <casper/kernel/ref/ref.h>
 
 namespace Casper {
 namespace Detail {
@@ -30,9 +30,9 @@ template<class VarT,class SetT,class CondT>
 struct PIteration;
 
 template<class T,class SetT,class CondT>
-struct PIteration<Par<T>,SetT,CondT>
+struct PIteration<Ref<T>,SetT,CondT>
 {
-	PIteration(const Par<T>& v, const SetT& s,const CondT& c) :
+	PIteration(const Ref<T>& v, const SetT& s,const CondT& c) :
 		v(v),it(s),cond(v.getState(),c)
 	{
 		sync();
@@ -54,15 +54,15 @@ struct PIteration<Par<T>,SetT,CondT>
 			v = it.value();
 	}
 
-	Par<T> v;
+	Ref<T> v;
 	IterationView<SetT>	it;
-	ParView<bool,CondT>	cond;
+	RefView<bool,CondT>	cond;
 };
 
 template<class T,class SetT,class CondT>
-struct PIteration<Util::StdPair<Par<T>,Par<T> >,SetT,CondT>
+struct PIteration<Util::StdPair<Ref<T>,Ref<T> >,SetT,CondT>
 {
-	PIteration(const Util::StdPair<Par<T>,Par<T> >& p, const SetT& s,const CondT& c) :
+	PIteration(const Util::StdPair<Ref<T>,Ref<T> >& p, const SetT& s,const CondT& c) :
 		v1(p.first),v2(p.second),it1(s),s(s),it2(new IterationView<SetT>(s)),
 		cond(p.first.getState(),c)
 	{
@@ -98,12 +98,12 @@ struct PIteration<Util::StdPair<Par<T>,Par<T> >,SetT,CondT>
 			v2 = it2->value();
 	}
 
-	Par<T> v1;
-	Par<T> v2;
+	Ref<T> v1;
+	Ref<T> v2;
 	IterationView<SetT>	it1;
 	SetT					s;
 	IterationView<SetT>*	it2;
-	ParView<bool,CondT>	cond;
+	RefView<bool,CondT>	cond;
 };
 
 }

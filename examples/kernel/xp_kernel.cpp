@@ -32,7 +32,7 @@ int main()
 
 	cout << v << endl;
 
-	Par<int>	v1(solver),v2(solver);
+	Ref<int>	v1(solver),v2(solver);
 
 //	Goal g(	forAll(v1,1,3,true,orderDec(v1),
 //				   v[v1]>v[v1-1] or v[v1]<v[v1-1]));
@@ -72,7 +72,7 @@ void nqueens(uint n)
 	bool found = solver.solve();
 
 	//found = found and solver.solve( label(vars) );
-	Par<int> v1(solver),v2(solver);
+	Ref<int> v1(solver),v2(solver);
 
 	Goal g(forAll(v1,range(0,n-1),
 				tryAll(v2,range(1,n),
@@ -95,8 +95,8 @@ int main()
 {
 	CPSolver&	solver;
 	VarArray<int,3> vars(solver,2,3,4,1,10);
-	Par<int>	v1(solver),v2(solver);
-	BndArrayView<int,Rel2<Element,Rel2<Element,VarArray<int,3>,Par<int> >,Par<int> > > v(solver,vars[v1][v2]);
+	Ref<int>	v1(solver),v2(solver);
+	BndArrayView<int,Rel2<Element,Rel2<Element,VarArray<int,3>,Ref<int> >,Ref<int> > > v(solver,vars[v1][v2]);
 
 	v1 = 1;
 	v2 = 2;

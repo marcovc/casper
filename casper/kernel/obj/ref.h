@@ -17,8 +17,8 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_OBJ_PAR_H_
-#define CASPER_KERNEL_OBJ_PAR_H_
+#ifndef CASPER_KERNEL_OBJ_REF_H_
+#define CASPER_KERNEL_OBJ_REF_H_
 
 #include <casper/kernel/obj/expr.h>
 
@@ -26,32 +26,32 @@ namespace Casper {
 namespace Detail {
 
 template<class T,class Eval>
-struct Create<T,Par<Eval> >
+struct Create<T,Ref<Eval> >
 {
-	Par<Eval> operator()(State& state, const T& t)
-	{	return Par<Eval>(state,t);	}
+	Ref<Eval> operator()(State& state, const T& t)
+	{	return Ref<Eval>(state,t);	}
 };
 
 } // Detail
 
 template<class Eval>
-struct ParView<Eval,Expr<Eval> > : IPar<Eval>
+struct RefView<Eval,Expr<Eval> > : IRef<Eval>
 {
-	ParView(State& state, const Expr<Eval>& e) :
-		par(e.toPar(state)),expr(e) {}
+	RefView(State& state, const Expr<Eval>& e) :
+		par(e.toRef(state)),expr(e) {}
 	const Expr<Eval>& getObj() const {	return expr; }
 	Eval value() const { return par.value(); }
 	void setValue(const Eval& v)	{	par.setValue(v);	}
-	Par<Eval> par;
+	Ref<Eval> par;
 	Expr<Eval> expr;
 };
 
 // Extracts a given element of any array type
 template<class Eval>
-struct ParArrayView<Expr<Seq<Eval> > >
+struct RefArrayView<Expr<Seq<Eval> > >
 {
 	typedef Expr<Eval>	Elem;
-	ParArrayView(State& s,const Expr<Seq<Eval> >& e) : a(e.toStdArray()) {}
+	RefArrayView(State& s,const Expr<Seq<Eval> >& e) : a(e.toStdArray()) {}
 	Elem& operator[](int idx)
 	{	return a[idx];	}
 	const Elem& operator[](int idx) const
@@ -61,14 +61,14 @@ struct ParArrayView<Expr<Seq<Eval> > >
 
 
 template<class Eval>
-struct ParView<CP::Var<Eval>,Expr<Eval> > : IPar<CP::Var<Eval> >
+struct RefView<CP::Var<Eval>,Expr<Eval> > : IRef<CP::Var<Eval> >
 {
-	ParView(State& state, const Expr<Eval>& e) :
-		par(e.toCPVarPar(state)),expr(e) {}
+	RefView(State& state, const Expr<Eval>& e) :
+		par(e.toCPVarRef(state)),expr(e) {}
 	const Expr<Eval>& getObj() const {	return expr; }
 	CP::Var<Eval> value() const { return par.value(); }
 	//void setValue(const Eval& v)	{	par.setValue(v);	}
-	Par<CP::Var<Eval> > par;
+	Ref<CP::Var<Eval> > par;
 	Expr<Eval> expr;
 };
 

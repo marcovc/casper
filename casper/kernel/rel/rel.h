@@ -66,7 +66,7 @@ namespace Casper {
  *  \ingroup Relations
  */
 
-template<class>	struct Par;
+template<class>	struct Ref;
 //template<class,int>	struct Util::StdArray;
 
 template<class Functor> struct Rel0;

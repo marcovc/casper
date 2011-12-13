@@ -42,7 +42,7 @@ void codes(int a, int n, int l, int cd, bool maximize, bool lee, const Util::Exa
 
 	IntVarArray2 v(solver,n,l,0,a-1);
 	IntVar	d(solver,cd,l);
-	IntPar	k(solver);
+	IntRef	k(solver);
 
 	for (int i = 0; i < n; i++)
 		for (int j = i+1; j < n; ++j)

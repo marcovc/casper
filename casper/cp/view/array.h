@@ -25,7 +25,7 @@
 #include <casper/cp/vararray.h>
 #include <casper/kernel/view/iteration.h>
 #include <casper/cp/view/dom.h>
-#include <casper/kernel/par/piteration.h>
+#include <casper/kernel/ref/piteration.h>
 #include <casper/kernel/reversible/array.h> // tmp
 
 namespace Casper {
@@ -813,18 +813,18 @@ struct BndViewRel1<Sum,Expr1,Eval>
 
 template<class Expr1,class Expr2,class Eval>
 struct BndViewRel2<SumProduct,Expr1,Expr2,Eval> :
-	BndViewRel1<Sum,Rel4<All,Par<int>,Casper::Util::StdRange<int>,bool,
-		Rel2<Mul,Rel2<Element,Expr1,Par<int> >,
-				 Rel2<Element,Expr2,Par<int> > > >,Eval>
+	BndViewRel1<Sum,Rel4<All,Ref<int>,Casper::Util::StdRange<int>,bool,
+		Rel2<Mul,Rel2<Element,Expr1,Ref<int> >,
+				 Rel2<Element,Expr2,Ref<int> > > >,Eval>
 {
-	typedef Rel4<All,Par<int>,Casper::Util::StdRange<int>,bool,
-				Rel2<Mul,Rel2<Element,Expr1,Par<int> >,
-						 Rel2<Element,Expr2,Par<int> > > > Agg;
+	typedef Rel4<All,Ref<int>,Casper::Util::StdRange<int>,bool,
+				Rel2<Mul,Rel2<Element,Expr1,Ref<int> >,
+						 Rel2<Element,Expr2,Ref<int> > > > Agg;
 	typedef BndViewRel1<Sum,Agg,Eval> Super;
 	Agg agg(Store& store,const Expr1& v1, const Expr2& v2)
 	{
 		BndArrayView<Eval,Expr1> b1(store,v1);
-		Par<int> i(store);
+		Ref<int> i(store);
 		return all(i,range(0,b1.size()-1),true,element(v1,i)*element(v2,i));
 	}
 
@@ -837,18 +837,18 @@ struct BndViewRel2<SumProduct,Expr1,Expr2,Eval> :
 
 // dom view over element expression
 template<class Expr1,class Eval>
-struct DomView<Eval,Rel2<Element,Expr1,Par<int> > >
+struct DomView<Eval,Rel2<Element,Expr1,Ref<int> > >
 {
 	typedef typename Casper::Traits::GetElem<Expr1>::Type	Elem;
 	typedef typename Traits::GetDom<Elem>::Type	Dom;
-	DomView(Store& store,const Rel2<Element,Expr1,Par<int> >& p) :
+	DomView(Store& store,const Rel2<Element,Expr1,Ref<int> >& p) :
 		store(store),v(store,p.p1),i(p.p2.value()) {}
 	Dom*	operator->()			{	return &*v[i];	}
 	Dom*	operator->() const	{	return const_cast<Dom*>(&*v[i]);	}
 	Dom&	operator*()				{	return *v[i];	}
 	Dom&	operator*() const	{	return const_cast<Dom&>(*v[i]); }
-	Rel2<Element,Expr1,Par<int> > getObj() const
-	{	return Rel2<Element,Expr1,Par<int> >(v.getObj(),Par<int>(store,i));}
+	Rel2<Element,Expr1,Ref<int> > getObj() const
+	{	return Rel2<Element,Expr1,Ref<int> >(v.getObj(),Ref<int>(store,i));}
 
 	Store& store;
 	DomArrayView<Eval,Expr1>	v;

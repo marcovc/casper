@@ -22,8 +22,8 @@
 #include <casper/kernel/goal/goal.h>
 #include <casper/kernel/goal/explorer.h>
 //#include <casper/kernel/filter/mutfilter.h>
-#include <casper/kernel/par/par.h>
-#include <casper/kernel/par/piteration.h>
+#include <casper/kernel/ref/ref.h>
+#include <casper/kernel/ref/piteration.h>
 
 namespace Casper {
 
@@ -191,7 +191,7 @@ struct GoalView2<Assign,Eval,Expr1,Eval,Expr2> : IGoal
 
   	Goal execute()
 	{
-		v1 = ParView<Eval,Expr2>(s,v2).value();
+		v1 = RefView<Eval,Expr2>(s,v2).value();
 		return succeed();
 	}
 
@@ -208,7 +208,7 @@ struct GoalView2<Assign,Eval,Expr1,Eval,Expr2> : IGoal
 
   	Goal execute()
 	{
-		Par<Eval>(s,v1).setValue(Par<Eval>(s,v2).value());
+		Ref<Eval>(s,v1).setValue(Ref<Eval>(s,v2).value());
 		return succeed();
 	}
 
@@ -224,21 +224,21 @@ struct GoalView2<Assign,Eval,Expr1,Eval,Expr2> : IGoal
 	\ingroup Search
 */
 template<class Set,class Eval>
-struct GoalView2<SelectFirst,Eval,Par<Eval>,Seq<Eval>,Set> : IGoal
+struct GoalView2<SelectFirst,Eval,Ref<Eval>,Seq<Eval>,Set> : IGoal
 {
-	GoalView2(State& state,const Par<Eval>& p, const Set& s) :
+	GoalView2(State& state,const Ref<Eval>& p, const Set& s) :
 		state(state),p(p),s(s) {}
 
   	Goal execute()
 	{
-		Casper::Detail::PIteration<Par<Eval>,Set,bool> it(p,s,true);
+		Casper::Detail::PIteration<Ref<Eval>,Set,bool> it(p,s,true);
 		if (it.valid())
 			return succeed();
 		return fail();
 	}
 
   	State&					state;
-	Par<Eval>				p;
+	Ref<Eval>				p;
 	Set						s;
 };
 
@@ -248,21 +248,21 @@ struct GoalView2<SelectFirst,Eval,Par<Eval>,Seq<Eval>,Set> : IGoal
 	\ingroup Search
 */
 template<class Set,class Eval,class Cond>
-struct GoalView3<SelectFirst,Eval,Par<Eval>,Seq<Eval>,Set,bool,Cond> : IGoal
+struct GoalView3<SelectFirst,Eval,Ref<Eval>,Seq<Eval>,Set,bool,Cond> : IGoal
 {
-	GoalView3(State& state,const Par<Eval>& p, const Set& s, const Cond& cond) :
+	GoalView3(State& state,const Ref<Eval>& p, const Set& s, const Cond& cond) :
 		state(state),p(p),s(s),cond(cond) {}
 
   	Goal execute()
 	{
-		Casper::Detail::PIteration<Par<Eval>,Set,bool> it(p,s,cond);
+		Casper::Detail::PIteration<Ref<Eval>,Set,bool> it(p,s,cond);
 		if (it.valid())
 			return succeed();
 		return fail();
 	}
 
   	State&					state;
-	Par<Eval>				p;
+	Ref<Eval>				p;
 	Set						s;
 	Cond					cond;
 };
@@ -273,21 +273,21 @@ struct GoalView3<SelectFirst,Eval,Par<Eval>,Seq<Eval>,Set,bool,Cond> : IGoal
 //	\ingroup Search
 //*/
 //template<class Set,class Eval,class Cond,class Expr>
-//struct GoalView4<SelectMin,Eval,Par<Eval>,Seq<Eval>,Set,bool,Cond,Eval,Expr> : IGoal
+//struct GoalView4<SelectMin,Eval,Ref<Eval>,Seq<Eval>,Set,bool,Cond,Eval,Expr> : IGoal
 //{
-//	GoalView4(State& state,const Par<Eval>& p, const Set& s, const Cond& cond,const Expr& expr) :
+//	GoalView4(State& state,const Ref<Eval>& p, const Set& s, const Cond& cond,const Expr& expr) :
 //		state(state),p(p),s(s),cond(cond) {}
 //
 //  	Goal execute()
 //	{
-//		Casper::Detail::PIteration<Par<Eval>,Set,bool> it(p,s,cond);
+//		Casper::Detail::PIteration<Ref<Eval>,Set,bool> it(p,s,cond);
 //		if (it.valid())
 //			return succeed();
 //		return fail();
 //	}
 //
 //  	State&					state;
-//	Par<Eval>				p;
+//	Ref<Eval>				p;
 //	Set						s;
 //	Cond					cond;
 //};

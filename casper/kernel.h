@@ -23,18 +23,13 @@
 #include <casper/kernel/traits.h>
 
 // goal
-#include <casper/kernel/goal/basic.h>
-#include <casper/kernel/goal/explorer.h>
-#include <casper/kernel/goal/goal.h>
-#include <casper/kernel/goal/store.h>
-#include <casper/kernel/goal/forall.h>
-#include <casper/kernel/goal/tryall.h>
+#include <casper/kernel/goal.h>
 
 // par
-#include <casper/kernel/par/par.h>
-#include <casper/kernel/par/pararray.h>
+#include <casper/kernel/ref/ref.h>
+#include <casper/kernel/ref/refarray.h>
 //#include <casper/kernel/par/parexpr.h>
-#include <casper/kernel/par/view.h>
+#include <casper/kernel/ref/view.h>
 
 // rel
 #include <casper/kernel/rel.h>

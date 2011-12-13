@@ -22,7 +22,7 @@
 #include <casper/lp/vararray.h>
 
 #include <casper/kernel/goal.h>
-#include <casper/kernel/par/view.h>
+#include <casper/kernel/ref/view.h>
 
 #include <casper/util/container/stdrange.h>
 
@@ -304,7 +304,7 @@ bool binsearchFD_LP(int size, int maxint)
 	//labelVars[c++] = j;
 
 	// solve
-	IntPar i(env),v(env);
+	IntRef i(env),v(env);
 	Goal g(env, label(cp,labelVars) and
 					function<Goal()>([&](){
 						assert(index[nbLoops].ground());
@@ -315,7 +315,7 @@ bool binsearchFD_LP(int size, int maxint)
 							for (uint k = 0; k < ltab.size(); ++k)
 								r = Goal(env,r or post(lp, lx == ltab[k]));
 							return r;
-//							IntPar k(env);
+//							IntRef k(env);
 //							return Goal(env,tryAll(k,range(0,ltab.size()-1)) (
 //											post(lp, lx == ltab[k])
 //											));
@@ -431,7 +431,7 @@ bool binsearchFD_MIP(int size)
 
 	// solving
 
-	IntPar ip(env),vp(env),k(env);
+	IntRef ip(env),vp(env),k(env);
 
 //	Goal g(env,label(cp,labelVars,selectVarMinDom(cp,labelVars)));
 //	Goal g(env,label(cp,labelVars,selectVarMinDom(cp,labelVars)) and validate(lp));
@@ -594,7 +594,7 @@ bool binsearchFD_MIP_2(int size)
 
 	// solving
 
-	IntPar ip(env),vp(env),k(env);
+	IntRef ip(env),vp(env),k(env);
 
 //	Goal g(env,label(cp,labelVars,selectVarMinDom(cp,labelVars)));
 //	Goal g(env,label(cp,labelVars,selectVarMinDom(cp,labelVars)) and validate(lp));

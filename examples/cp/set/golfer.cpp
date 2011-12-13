@@ -100,10 +100,10 @@ void golfers(uint w, uint g, uint s, uint labeling, const Util::ExampleOptions& 
 	else
 	if (labeling == 1)
 	{
-		IntPar	pi(solver),wi(solver),gi(solver);
+		IntRef	pi(solver),wi(solver),gi(solver);
 		found = solver.solve(forAll(pi,range(1,g*s)) (
 								forAll(wi,range(0,w-1)) (
-									tryAll(gi,range(0,g-1),
+									tryAll2(gi,range(0,g-1),
 										post(solver,member(pi,vars[wi][gi])),
 										post(solver,!member(pi,vars[wi][gi]))
 							))));

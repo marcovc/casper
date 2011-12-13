@@ -158,7 +158,7 @@ void test()
 
 	Var<Set<IntPair> >	v(solver,list(IntPair(0,1),IntPair(5,9)));
 
-	Par<IntPair>	i(solver);
+	Ref<IntPair>	i(solver);
 	bool found = solver.solve();
 
 	found = found and solver.solve(forAll(i,List<IntPair>(stdHeap,v.domain().beginPoss(),

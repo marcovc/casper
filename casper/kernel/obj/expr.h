@@ -39,8 +39,8 @@ struct IExpr
 	virtual CP::DomExpr<Eval> toDomExpr(CP::Store& store) const = 0;
 	virtual CP::BndExpr<Eval> toBndExpr(CP::Store& store) const = 0;
 	virtual CP::ValExpr<Eval> toValExpr(CP::Store& store) const = 0;
-	virtual Par<Eval>	toPar(State& state) const = 0;
-	virtual Par<CP::Var<Eval> >	toCPVarPar(State& state) const = 0;
+	virtual Ref<Eval>	toRef(State& state) const = 0;
+	virtual Ref<CP::Var<Eval> >	toCPVarRef(State& state) const = 0;
 	virtual State* const getPState() const = 0;
 	virtual std::ostream& print(std::ostream& os) const = 0;
 };
@@ -53,8 +53,8 @@ struct IExpr<bool>
 	virtual CP::BndExpr<bool> toBndExpr(CP::Store& store) const = 0;
 	virtual CP::ValExpr<bool> toValExpr(CP::Store& store) const = 0;
 	virtual CP::ChkExpr 	toChkExpr(CP::Store& store) const = 0;
-	virtual Par<bool>	toPar(State& state) const = 0;
-	virtual Par<CP::Var<bool> >	toCPVarPar(State& state) const = 0;
+	virtual Ref<bool>	toRef(State& state) const = 0;
+	virtual Ref<CP::Var<bool> >	toCPVarRef(State& state) const = 0;
 	virtual Goal	toGoal(State& state) const = 0;
 
 	virtual bool	postDomFilter(CP::Store& store) const = 0;
@@ -100,10 +100,10 @@ struct ExprWrapper : IExpr<Eval>
 	{	return Create<T,CP::BndExpr<Eval> >()(store,t);	}
 	CP::ValExpr<Eval> toValExpr(CP::Store& store) const
 	{	return Create<T,CP::ValExpr<Eval> >()(store,t);	}
-	Par<Eval>	toPar(State& state) const
-	{	return Create<T,Par<Eval> >()(state,t);	}
-	Par<CP::Var<Eval> >	toCPVarPar(State& state) const
-	{	return Create<T,Par<CP::Var<Eval> > >()(state,t);	}
+	Ref<Eval>	toRef(State& state) const
+	{	return Create<T,Ref<Eval> >()(state,t);	}
+	Ref<CP::Var<Eval> >	toCPVarRef(State& state) const
+	{	return Create<T,Ref<CP::Var<Eval> > >()(state,t);	}
 	State* const getPState() const
 	{	return GetPState<T>()(t);	}
 
@@ -126,10 +126,10 @@ struct ExprWrapper<bool,T> : IExpr<bool>
 	{	return Create<T,CP::ValExpr<bool> >()(store,t);	}
 	CP::ChkExpr toChkExpr(CP::Store& store) const
 	{	return Create<T,CP::ChkExpr>()(store,t);	}
-	Par<bool>	toPar(State& state) const
-	{	return Create<T,Par<bool> >()(state,t);	}
-	Par<CP::Var<bool> >	toCPVarPar(State& state) const
-	{	return Create<T,Par<CP::Var<bool> > >()(state,t);	}
+	Ref<bool>	toRef(State& state) const
+	{	return Create<T,Ref<bool> >()(state,t);	}
+	Ref<CP::Var<bool> >	toCPVarRef(State& state) const
+	{	return Create<T,Ref<CP::Var<bool> > >()(state,t);	}
 	Goal	toGoal(State& state) const
 	{	return Create<T,Goal>()(state,t);	}
 
@@ -190,10 +190,10 @@ struct Expr : Casper::Util::SPImplIdiom<Detail::IExpr<Eval> >
 	{	return this->getImpl().toBndExpr(store);	}
 	CP::ValExpr<Eval> toValExpr(CP::Store& store) const
 	{	return this->getImpl().toValExpr(store);	}
-	Par<Eval>	toPar(State& state) const
-	{	return this->getImpl().toPar(state);	}
-	Par<CP::Var<Eval> >	toCPVarPar(State& state) const
-	{	return this->getImpl().toCPVarPar(state);	}
+	Ref<Eval>	toRef(State& state) const
+	{	return this->getImpl().toRef(state);	}
+	Ref<CP::Var<Eval> >	toCPVarRef(State& state) const
+	{	return this->getImpl().toCPVarRef(state);	}
 	State* const getPState() const
 	{	return this->getImpl().getPState();	}
 
@@ -228,10 +228,10 @@ struct Expr<bool> : Casper::Util::SPImplIdiom<Detail::IExpr<bool> >
 	{	return this->getImpl().toValExpr(store);	}
 	CP::ChkExpr toChkExpr(CP::Store& store) const
 	{	return this->getImpl().toChkExpr(store);	}
-	Par<bool>	toPar(State& state) const
-	{	return this->getImpl().toPar(state);	}
-	Par<CP::Var<bool> >	toCPVarPar(State& state) const
-	{	return this->getImpl().toCPVarPar(state);	}
+	Ref<bool>	toRef(State& state) const
+	{	return this->getImpl().toRef(state);	}
+	Ref<CP::Var<bool> >	toCPVarRef(State& state) const
+	{	return this->getImpl().toCPVarRef(state);	}
 	Goal	toGoal(State& state) const
 	{	return this->getImpl().toGoal(state);	}
 
@@ -300,12 +300,12 @@ uint getIterationExprSize(const Expr<Seq<Eval> >& expr)
 }
 
 template<class T,int dims>
-ParArray<T,dims>::ParArray(State& state,const Expr<Seq<T> >& expr) :
+RefArray<T,dims>::RefArray(State& state,const Expr<Seq<T> >& expr) :
 	Super(state,Detail::getIterationExprSize(expr))
 {
 	uint i = 0;
 	for (auto e(expr.toIterationExpr()); e.valid(); e.iterate())
-		::new (&Super::operator[](i++)) Par<T>(e.value().toPar(state));
+		::new (&Super::operator[](i++)) Ref<T>(e.value().toRef(state));
 
 }
 
@@ -353,7 +353,7 @@ std::ostream& operator<<(std::ostream& os,const Casper::Expr<T>& expr)
 #include <casper/kernel/obj/iteration.h>
 #include <casper/kernel/obj/literal.h>
 #include <casper/kernel/obj/variable.h>
-#include <casper/kernel/obj/par.h>
+#include <casper/kernel/obj/ref.h>
 #include <casper/kernel/obj/goal.h>
 #include <casper/kernel/obj/extensions.h>
 //#include <casper/kernel/obj/cpvar.h>

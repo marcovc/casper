@@ -34,8 +34,8 @@ void labs_open(uint n, const Util::ExampleOptions& opt)
 {
 	Solver solver;
 
-	IntPar i(solver);
-	IntPar j(solver);
+	IntRef i(solver);
+	IntRef j(solver);
 	IntVarArray s(solver,n,-1,1);
 
 	for (uint k = 0; k < n; k++)

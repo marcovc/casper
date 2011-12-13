@@ -24,7 +24,7 @@
 #include <casper/cp/store.h>
 // not needed by this header (just for user convenience)
 #include <casper/cp/goal/bb.h>
-#include <casper/cp/view/par.h>
+#include <casper/cp/view/ref.h>
 #include <casper/cp/filter/objective.h>
 
 namespace Casper {

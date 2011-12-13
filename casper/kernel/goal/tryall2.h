@@ -1,3 +1,4 @@
+
 /**************************************************************************\
  *   This file is part of CaSPER.                                          *
  *                                                                         *
@@ -17,41 +18,44 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_GOAL_TRYALL_H_
-#define CASPER_KERNEL_GOAL_TRYALL_H_
+#ifndef CASPER_KERNEL_GOAL_TRYALL2_H_
+#define CASPER_KERNEL_GOAL_TRYALL2_H_
 
 namespace Casper {
 
-NEW_REL_2(tryAll,TryAll)
-NEW_FN_3(tryAll,TryAll)
+NEW_REL_2(tryAll2,TryAll2)
+NEW_FN_4(tryAll2,TryAll2)
 
 namespace Traits {
-template<class T1,class T2,class T3>
-struct GetEval<Rel3<TryAll,T1,T2,T3> >
+template<class T1,class T2,class T3,class T4>
+struct GetEval<Rel4<TryAll2,T1,T2,T3,T4> >
 {	typedef bool	Type;	};
 };
 
 /**
  * 	Executes \a v for all \a it in \a s. Succeeds on the first \a it that makes \a v succeed.
  * 	Fails if, after trying to execute \a v for all \a it in \a s, v never succeeded.
+ * 	Goal \a f is executed for all \a it in \a s whenever \a v fails.
  *
  * 	\ingroup Search
  */
-template<class T,class Set,class Obj>
-struct GoalView3<TryAll,T,Ref<T>,Seq<T>,Set,bool,Obj> : IGoal
+template<class T,class Set,class Obj1,class Obj2>
+struct GoalView4<TryAll2,T,Ref<T>,Seq<T>,Set,bool,Obj1,bool,Obj2> : IGoal
 {
-	typedef GoalView3<TryAll,T,Ref<T>,Seq<T>,Set,bool,Obj> Self;
-	GoalView3(State& state, const Ref<T>& it, const Set& s, const Obj& v) :
+	typedef GoalView4<TryAll2,T,Ref<T>,Seq<T>,Set,bool,Obj1,bool,Obj2> Self;
+	GoalView4(State& state, const Ref<T>& it, const Set& s, const Obj1& v, const Obj2& f) :
 		state(state),it(it),
 		pSet(new (state) Set(s)),
 		iter(*pSet),
-		v(v)
+		v(v),
+		f(f)
 		{}
-	GoalView3(State& state, const Ref<T>& it, const IterationView<Set>& iter, const Obj& v) :
+	GoalView4(State& state, const Ref<T>& it, const IterationView<Set>& iter, const Obj1& v, const Obj2& f) :
 		state(state),it(it),
 		pSet(NULL), // set needs to be saved only once for all iteration
 		iter(iter),
-		v(v)
+		v(v),
+		f(f)
 		{}
     Goal execute()
 	{
@@ -66,22 +70,25 @@ struct GoalView3<TryAll,T,Ref<T>,Seq<T>,Set,bool,Obj> : IGoal
 		it = curIter.value();
 
 		return Goal(state,
-				rel<Or>(v, Goal(new (state) Self(state,it,curIter,v))));
+				rel<Or>(v,
+					rel<And>(f,Goal(new (state) Self(state,it,curIter,v,f)))));
 
 	}
     State&				state;
 	Ref<T> 				it;
 	Set*				pSet;	// IterationView protocol requires *pSet to exist during the full iteration
 	IterationView<Set>	iter;
-	Obj					v;
+	Obj1				v;
+	Obj2				f;
 };
 
-
-NEW_FN_4(tryAll,TryAll)
+// TODO: adapt from tryAll
+#if 0
+NEW_FN_4(tryAll2,TryAll2)
 
 namespace Traits {
 template<class T1,class T2,class T3,class T4>
-struct GetEval<Rel4<TryAll,T1,T2,T3,T4> >
+struct GetEval<Rel4<TryAll2,T1,T2,T3,T4> >
 {	typedef	bool	Type;	};
 } // Traits
 
@@ -92,9 +99,9 @@ struct GetEval<Rel4<TryAll,T1,T2,T3,T4> >
  * 	\ingroup Search
  */
 template<class T,class Set,class Cond,class Obj>
-struct GoalView4<TryAll,T,Ref<T>,Seq<T>,Set,bool,Cond,bool,Obj> : IGoal
+struct GoalView4<TryAll2,T,Ref<T>,Seq<T>,Set,bool,Cond,bool,Obj> : IGoal
 {
-	typedef GoalView4<TryAll,T,Ref<T>,Seq<T>,Set,bool,Cond,bool,Obj> Self;
+	typedef GoalView4<TryAll2,T,Ref<T>,Seq<T>,Set,bool,Cond,bool,Obj> Self;
 	GoalView4(State& state, const Ref<T>& it,const Set& s, const Cond& c,const Obj& v) :
 		state(state),it(it),pSet(new(state)Set(s)),iter(*pSet),c(state,c),v(v) {}
 	GoalView4(State& state, const Ref<T>& it, const IterationView<Set>& iter, const Cond& c, const Obj& v) :
@@ -128,11 +135,11 @@ struct GoalView4<TryAll,T,Ref<T>,Seq<T>,Set,bool,Cond,bool,Obj> : IGoal
 	Obj v;
 };
 
-NEW_FN_5(tryAll,TryAll)
+NEW_FN_5(tryAll2,TryAll2)
 
 namespace Traits {
 template<class T1,class T2,class T3,class T4,class T5>
-struct GetEval<Rel5<TryAll,T1,T2,T3,T4,T5> >
+struct GetEval<Rel5<TryAll2,T1,T2,T3,T4,T5> >
 {	typedef	bool	Type;	};
 } // Traits
 
@@ -143,9 +150,9 @@ struct GetEval<Rel5<TryAll,T1,T2,T3,T4,T5> >
  * 	\ingroup Search
  */
 template<class T,class Set,class Cond,class OrderT,class Order,class Obj>
-struct GoalView5<TryAll,T,Ref<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> : IGoal
+struct GoalView5<TryAll2,T,Ref<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> : IGoal
 {
-	typedef GoalView5<TryAll,T,Ref<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> Self;
+	typedef GoalView5<TryAll2,T,Ref<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> Self;
 	GoalView5(State& state, const Ref<T>& it,const Set& s, const Cond& c,const Order& o, const Obj& v) :
 		state(state),it(it),pSet(new(state)Set(s)),iter(*pSet),c(state,c),o(state,o),v(v),
 		pSelected(new (state) SList<int>(state)) {}
@@ -195,7 +202,8 @@ struct GoalView5<TryAll,T,Ref<T>,Seq<T>,Set,bool,Cond,OrderT,Order,bool,Obj> : I
 	Obj v;
 	SList<int>* pSelected;
 };
+#endif
 
 } // Casper
 
-#endif /* CASPER_KERNEL_GOAL_TRYALL_H_ */
+#endif /* CASPER_KERNEL_GOAL_TRYALL2_H_ */

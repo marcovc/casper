@@ -265,9 +265,9 @@ double Solver::getObjValue() const
 	return driver.getObjValue();
 }
 
-//struct GetValue : IPar<double>
+//struct GetValue : IRef<double>
 //{
-//	typedef IPar<double> Super;
+//	typedef IRef<double> Super;
 //	GetValue(const Solver& solver,uint idx) :
 //		solver(solver),idx(idx) {}
 //	double value() const
@@ -277,9 +277,9 @@ double Solver::getObjValue() const
 //	const uint idx;
 //};
 //
-//struct GetObjValue : IPar<double>
+//struct GetObjValue : IRef<double>
 //{
-//	typedef IPar<double> Super;
+//	typedef IRef<double> Super;
 //	GetObjValue(const Solver& solver) :
 //		solver(solver) {}
 //	double value() const
@@ -289,19 +289,19 @@ double Solver::getObjValue() const
 //};
 //
 //DoublePar Solver::getValuePar(uint idx) const
-//{	return DoublePar(env,static_cast<const IPar<double>*>(new (env) GetValue(*this,idx)));	}
+//{	return DoublePar(env,static_cast<const IRef<double>*>(new (env) GetValue(*this,idx)));	}
 //
-//DoubleParArray Solver::getValuePars() const
+//DoubleRefArray Solver::getValuePars() const
 //{
 //	const uint s = idxColMap.size();
-//	DoubleParArray ret(env,s);
+//	DoubleRefArray ret(env,s);
 //	for (uint i = 0; i < s; ++i)
-//		ret[i] = DoublePar(env,static_cast<const IPar<double>*>(new (env) GetValue(*this,i)));
+//		ret[i] = DoublePar(env,static_cast<const IRef<double>*>(new (env) GetValue(*this,i)));
 //	return ret;
 //}
 //
 //DoublePar Solver::getObjValuePar() const
-//{	return DoublePar(env,static_cast<const IPar<double>*>(new (env) GetObjValue(*this)));	}
+//{	return DoublePar(env,static_cast<const IRef<double>*>(new (env) GetObjValue(*this)));	}
 
 
 

@@ -16,29 +16,29 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-#ifndef _M_CASPER_KERNEL_PAR_OP_PAR
-#define _M_CASPER_KERNEL_PAR_OP_PAR
+#ifndef _M_CASPER_KERNEL_PAR_OP_REF
+#define _M_CASPER_KERNEL_PAR_OP_REF
  
 #include <casper/kernel/rel/macros.h>
 
-#define AT_Par(T)			Par< AT_ ## T >
-#define AD_Par(T)			AD_ ## T
+#define AT_Ref(T)			Ref< AT_ ## T >
+#define AD_Ref(T)			AD_ ## T
 
 namespace Casper {
 
-REL_FROM_UNARY_OPERATORS(Par(T1))
-REL_FROM_BINARY_OPERATORS(Par(T1),T)
+REL_FROM_UNARY_OPERATORS(Ref(T1))
+REL_FROM_BINARY_OPERATORS(Ref(T1),T)
 
-REL_FROM_ARITH_OPERATORS(int,Par(int))
-REL_FROM_COMPARISON_OPERATORS(int,Par(int))
+REL_FROM_ARITH_OPERATORS(int,Ref(int))
+REL_FROM_COMPARISON_OPERATORS(int,Ref(int))
 
-REL_FROM_ARITH_OPERATORS(double,Par(double))
-REL_FROM_COMPARISON_OPERATORS(double,Par(double))
+REL_FROM_ARITH_OPERATORS(double,Ref(double))
+REL_FROM_COMPARISON_OPERATORS(double,Ref(double))
 
-REL_FROM_ARITH_OPERATORS(float,Par(float))
-REL_FROM_COMPARISON_OPERATORS(float,Par(float))
+REL_FROM_ARITH_OPERATORS(float,Ref(float))
+REL_FROM_COMPARISON_OPERATORS(float,Ref(float))
 
-REL_FROM_BINARY_OPERATORS(bool,Par(bool))
+REL_FROM_BINARY_OPERATORS(bool,Ref(bool))
 
 } // Casper
 

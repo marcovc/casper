@@ -1934,9 +1934,9 @@ struct BndViewRel1<Log,Expr1,Eval>
  * 	\ingroup BndViews
  **/
 template<class Eval>
-struct BndView<Eval,Par<Eval> >
+struct BndView<Eval,Ref<Eval> >
 {
-	BndView(Store& store, const Par<Eval>& p1) :
+	BndView(Store& store, const Ref<Eval>& p1) :
 		state(p1.getState()),val(p1.value())	{}
 	Eval min() const {	return val;}
 	Eval max() const {	return val;}
@@ -1948,8 +1948,8 @@ struct BndView<Eval,Par<Eval> >
 
 	void attach(INotifiable* f) {}
 	void detach(INotifiable* f) 	{}
-	Par<Eval>	getObj() const
-	{	return Par<Eval>(state,val);	}
+	Ref<Eval>	getObj() const
+	{	return Ref<Eval>(state,val);	}
 
 	State&	state;
 	Eval	val;

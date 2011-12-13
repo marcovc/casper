@@ -21,7 +21,7 @@
 #define CASPER_LP_SOLVER_H_
 
 #include <casper/kernel/state/env.h>
-#include <casper/kernel/par/par.h>
+#include <casper/kernel/ref/ref.h>
 #include <casper/lp/driver.h>
 //#include <casper/lp/lineareqrepr.h>
 #include <casper/lp/lineareqvalview.h>
@@ -76,7 +76,7 @@ struct Solver
 	double getObjValue() const;
 
 //	DoublePar 		getValuePar(uint idx) const;
-//	DoubleParArray 	getValuePars() const;
+//	DoubleRefArray 	getValuePars() const;
 //	DoublePar 		getObjValuePar() const;
 
 	double getValue(uint idx) const;

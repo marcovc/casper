@@ -21,40 +21,40 @@
 #define CASPER_KERNEL_GOAL_SELECT_H_
 
 #include <casper/kernel/view/iteration.h>
-#include <casper/kernel/par/par.h>
+#include <casper/kernel/ref/ref.h>
 
 namespace Casper {
 
 #ifndef SWIG
 
 template<class Set,class Cond,class Expr>
-Casper::Rel2<Casper::Assign,Casper::Par<int>,Casper::Rel4<Casper::ArgMin,Casper::Par<int>,Set,Cond,Expr> >
-selectMin(const Casper::Par<int>& p, const Set& s, const Cond& c, const Expr& e)
+Casper::Rel2<Casper::Assign,Casper::Ref<int>,Casper::Rel4<Casper::ArgMin,Casper::Ref<int>,Set,Cond,Expr> >
+selectMin(const Casper::Ref<int>& p, const Set& s, const Cond& c, const Expr& e)
 {	return assign(p,argMin(p,s,c,e));	}
 
 template<class Set,class Expr>
-Casper::Rel2<Casper::Assign,Casper::Par<int>,Casper::Rel3<Casper::ArgMin,Casper::Par<int>,Set,Expr> >
-selectMin(const Casper::Par<int>& p, const Set& s, const Expr& e)
+Casper::Rel2<Casper::Assign,Casper::Ref<int>,Casper::Rel3<Casper::ArgMin,Casper::Ref<int>,Set,Expr> >
+selectMin(const Casper::Ref<int>& p, const Set& s, const Expr& e)
 {	return assign(p,argMin(p,s,e));	}
 
 template<class Set,class Cond,class Expr>
-Casper::Rel2<Casper::Assign,Casper::Par<int>,Casper::Rel4<Casper::ArgMax,Casper::Par<int>,Set,Cond,Expr> >
-selectMax(const Casper::Par<int>& p, const Set& s, const Cond& c, const Expr& e)
+Casper::Rel2<Casper::Assign,Casper::Ref<int>,Casper::Rel4<Casper::ArgMax,Casper::Ref<int>,Set,Cond,Expr> >
+selectMax(const Casper::Ref<int>& p, const Set& s, const Cond& c, const Expr& e)
 {	return assign(p,argMax(p,s,c,e));	}
 
 template<class Set,class Expr>
-Casper::Rel2<Casper::Assign,Casper::Par<int>,Casper::Rel3<Casper::ArgMax,Casper::Par<int>,Set,Expr> >
-selectMax(const Casper::Par<int>& p, const Set& s, const Expr& e)
+Casper::Rel2<Casper::Assign,Casper::Ref<int>,Casper::Rel3<Casper::ArgMax,Casper::Ref<int>,Set,Expr> >
+selectMax(const Casper::Ref<int>& p, const Set& s, const Expr& e)
 {	return assign(p,argMax(p,s,e));	}
 
 template<class Set,class Cond>
-Casper::Rel2<Casper::Assign,Casper::Par<int>,Casper::Rel4<Casper::ArgMin,Casper::Par<int>,Set,Cond,Casper::Rel2<Casper::RandInRange,double,double> > >
-selectRand(const Casper::Par<int>& p, const Set& s, const Cond& c)
+Casper::Rel2<Casper::Assign,Casper::Ref<int>,Casper::Rel4<Casper::ArgMin,Casper::Ref<int>,Set,Cond,Casper::Rel2<Casper::RandInRange,double,double> > >
+selectRand(const Casper::Ref<int>& p, const Set& s, const Cond& c)
 {	return assign(p,argMin(p,s,c,randInRange(0.0,1.0)));	}
 
 template<class Set>
-Casper::Rel2<Casper::Assign,Casper::Par<int>,Casper::Rel3<Casper::ArgMin,Casper::Par<int>,Set,Casper::Rel2<Casper::RandInRange,double,double> > >
-selectRand(const Casper::Par<int>& p, const Set& s)
+Casper::Rel2<Casper::Assign,Casper::Ref<int>,Casper::Rel3<Casper::ArgMin,Casper::Ref<int>,Set,Casper::Rel2<Casper::RandInRange,double,double> > >
+selectRand(const Casper::Ref<int>& p, const Set& s)
 {	return assign(p,argMin(p,s,randInRange(0.0,1.0)));	}
 
 #endif

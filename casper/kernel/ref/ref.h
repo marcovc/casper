@@ -17,8 +17,8 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_PAR_PAR_H_
-#define CASPER_KERNEL_PAR_PAR_H_
+#ifndef CASPER_KERNEL_REF_REF_H_
+#define CASPER_KERNEL_REF_REF_H_
 
 #include <casper/util/pimpl.h>
 #include <casper/kernel/reversible/reversible.h>
@@ -28,7 +28,7 @@
 
 namespace Casper {
 
-template<class> struct Par;
+template<class> struct Ref;
 
 /** \defgroup DataStructures Data Structures
  * 	\ingroup Kernel
@@ -36,13 +36,13 @@ template<class> struct Par;
  */
 
 /**
- *	An IPar subclassed object is like a typed version of a logical variable. It provides copy-by-reference
+ *	An IRef subclassed object is like a typed version of a logical variable. It provides copy-by-reference
  *  and reversible policies to plain c++ types.
  *
  *  \ingroup DataStructures
  */
 template<class T>
-struct IPar
+struct IRef
 {
 	/// Returns the current evaluation of the expression.
 	virtual T 		value() const = 0;
@@ -51,43 +51,43 @@ struct IPar
 	{	throw Casper::Exception::InvalidOperation("cannot set value for current par expression"); }
 };
 
-template<class,class> struct ParView;
+template<class,class> struct RefView;
 
 /**
- * A Par object is like a typed version of a logical variable. It provides copy-by-reference
+ * A Ref object is like a typed version of a logical variable. It provides copy-by-reference
  * and reversible policies to plain c++ types.
  * \ingroup DataStructures
  */
 template<class T>
-struct Par : Util::PImplIdiom<Reversible<IPar<T>*> >
+struct Ref : Util::PImplIdiom<Reversible<IRef<T>*> >
 {
 	public:
 
 	typedef T						Eval;
-	typedef Par<Eval> 				Self;
+	typedef Ref<Eval> 				Self;
 
-	typedef IPar<T> Iface;
-	typedef IPar<T>* PIface;
+	typedef IRef<T> Iface;
+	typedef IRef<T>* PIface;
 	typedef Reversible<PIface> 	RPIface;
 	typedef Util::PImplIdiom<RPIface> Super;
 
 	/// The default constructor
-	Par(State& state) :
-		Super(new (state) RPIface(state,new (state) ParView<Eval,Eval>(state,Eval())))
+	Ref(State& state) :
+		Super(new (state) RPIface(state,new (state) RefView<Eval,Eval>(state,Eval())))
 	{}
 
-	Par(State& state, PIface pimpl) :
+	Ref(State& state, PIface pimpl) :
 		Super(new (state) RPIface(state,pimpl)) {}
 
 	/// Builds a new parameter pointing to the data of \a s.
-	Par(const Self& s) : Super(s) {}
+	Ref(const Self& s) : Super(s) {}
 
 	/// Constructor from a generic object.
 	template<class T1>
-	Par(State& state, const T1& t) :
-		Super(new (state) RPIface(state, new (state) ParView<Eval,T1>(state,t))) {}
+	Ref(State& state, const T1& t) :
+		Super(new (state) RPIface(state, new (state) RefView<Eval,T1>(state,t))) {}
 
-	~Par() {}
+	~Ref() {}
 
 	/// Returns the value of the expression
 	Eval value() const {	assert(Super::getPImpl()!=NULL); return Super::getImpl().get()->value();	}
@@ -96,7 +96,7 @@ struct Par : Util::PImplIdiom<Reversible<IPar<T>*> >
 	template<class T1>
 	const Self& operator=(const T1& t)
 	{
-		Super::getImpl() = new (getState()) ParView<Eval,T1>(getState(),t);
+		Super::getImpl() = new (getState()) RefView<Eval,T1>(getState(),t);
 		return *this;
 	}
 
@@ -144,34 +144,34 @@ struct Par : Util::PImplIdiom<Reversible<IPar<T>*> >
 namespace Traits {
 template<class> struct GetEval;
 template<class T>
-struct GetEval<Par<T> >
+struct GetEval<Ref<T> >
 {	typedef	T	Type;	};
 } // Traits
 
 template<class Eval>
-struct GetPState<Par<Eval> >
-{	State* operator()(const Par<Eval>& p) { return &p.getState(); } };
+struct GetPState<Ref<Eval> >
+{	State* operator()(const Ref<Eval>& p) { return &p.getState(); } };
 
-typedef Par<int>			IntPar;
-typedef Par<bool>			BoolPar;
-typedef Par<double>			DoublePar;
+typedef Ref<int>			IntRef;
+typedef Ref<bool>			BoolRef;
+typedef Ref<double>			DoubleRef;
 
 } // Casper
 
 template<class T>
-std::ostream& operator<<(std::ostream& os, const Casper::Par<T>& v)
+std::ostream& operator<<(std::ostream& os, const Casper::Ref<T>& v)
 {
 	os << v.value();
 	return os;
 }
 
-#endif /* CASPER_KERNEL_PAR_PAR_H_ */
+#endif /* CASPER_KERNEL_REF_REF_H_ */
 
 
 #ifndef CASPER_NO_OPERATORS
-#ifndef CASPER_KERNEL_PAR_OP_PAR_H
-#define CASPER_KERNEL_PAR_OP_PAR_H
-#include <casper/kernel/par/op_par.h>
+#ifndef CASPER_KERNEL_PAR_OP_REF_H
+#define CASPER_KERNEL_PAR_OP_REF_H
+#include <casper/kernel/ref/op_ref.h>
 #endif
 #endif
 

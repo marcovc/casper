@@ -35,8 +35,8 @@ void golomb(uint n,uint m,uint g, bool minimize, const Util::ExampleOptions& opt
 	// create an array for storing n marks, each one with the domain [0,m]
     IntVarArray	marks(solver,n,0,m);
 
-	IntPar	i1(solver,0);
-	IntPar	i2(solver,0);
+	IntRef	i1(solver,0);
+	IntRef	i2(solver,0);
 	if (g == 0)
 		solver.post(distinct(all(Casper::pair(i2,i1),range(0,n-1),i1>i2,
 									cache(marks[i1]-marks[i2],(int)1,(int)m))),postValFilter);

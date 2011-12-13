@@ -172,8 +172,8 @@ bool bubbleMIP(int size)
 	cp.post( sum(terms) >= 1);
 
 
-	IntPar ip(env),k(env);
-	BoolPar vp(env);
+	IntRef ip(env),k(env);
+	BoolRef vp(env);
 
 	Goal labelIneqs(env,
 			forAll( ip, range(0,labelVars.size()-1) )
