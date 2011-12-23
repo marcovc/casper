@@ -19,7 +19,7 @@
 #include <casper/cp/filter/val.h>
 #include <casper/cp/traits.h>
 #include <casper/cp/int/fd.h>
-#include <casper/kernel/obj/expr.h>
+#include <casper/kernel/spexpr/expr.h>
 
 namespace Casper {
 namespace CP {
@@ -28,9 +28,9 @@ PostValFilter postValFilter;
 bool PostValFilter::operator()(Store& s,const bool& b) const
 {	return b;	}
 
-bool PostValFilter::operator()(Store& s,const Var<bool>& v) const
-{	return s.post(
-		new (s) BndFilterView<Rel2<Equal,Var<bool>,bool> >(s,rel<Equal>(v,true)));	}
+//bool PostValFilter::operator()(Store& s,const Var<bool>& v) const
+//{	return s.post(
+//		new (s) BndFilterView<Rel2<Equal,Var<bool>,bool> >(s,rel<Equal>(v,true)));	}
 
 bool PostValFilter::operator()(Store& s,const Casper::Expr<bool>& v) const
 {	return v.postValFilter(s);	}

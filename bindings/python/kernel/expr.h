@@ -20,7 +20,7 @@
 #ifndef CASPER_BINDINGS_PYTHON_KERNEL_EXPR_H_
 #define CASPER_BINDINGS_PYTHON_KERNEL_EXPR_H_
 
-#include <casper/kernel/obj/expr.h>
+#include <casper/kernel/spexpr/expr.h>
 #include <string>
 
 namespace Casper {
@@ -132,11 +132,11 @@ struct ExprFromCallable : IExpr<Eval>
 
 	Eval toLiteral() const
 	{	throw Casper::Exception::TypeCoercion("<python callable>","Eval");	}
-	CP::DomExpr<Eval> toDomExpr(CP::Store& store) const
+	CP::DomExpr<Eval> toCPDomExpr(CP::Store& store) const
 	{	throw Casper::Exception::TypeCoercion("<python callable>","Casper::CP::DomExpr<Eval>");	}
-	CP::BndExpr<Eval> toBndExpr(CP::Store& store) const
+	CP::BndExpr<Eval> toCPBndExpr(CP::Store& store) const
 	{	throw Casper::Exception::TypeCoercion("<python callable>","Casper::CP::BndExpr<Eval>");	}
-	CP::ValExpr<Eval> toValExpr(CP::Store& store) const
+	CP::ValExpr<Eval> toCPValExpr(CP::Store& store) const
 	{	throw Casper::Exception::TypeCoercion("<python callable>","Casper::CP::ValExpr<Eval>");	}
 	State* const getPState() const
 	{	return NULL;	}
@@ -169,11 +169,11 @@ struct ExprFromCallable<bool> : IExpr<bool>
 
 	bool toLiteral() const
 	{	throw Casper::Exception::TypeCoercion("<python callable>","bool");	}
-	CP::DomExpr<bool> toDomExpr(CP::Store& store) const
+	CP::DomExpr<bool> toCPDomExpr(CP::Store& store) const
 	{	throw Casper::Exception::TypeCoercion("<python callable>","Casper::CP::DomExpr<bool>");	}
-	CP::BndExpr<bool> toBndExpr(CP::Store& store) const
+	CP::BndExpr<bool> toCPBndExpr(CP::Store& store) const
 	{	throw Casper::Exception::TypeCoercion("<python callable>","Casper::CP::BndExpr<bool>");	}
-	CP::ValExpr<bool> toValExpr(CP::Store& store) const
+	CP::ValExpr<bool> toCPValExpr(CP::Store& store) const
 	{	throw Casper::Exception::TypeCoercion("<python callable>","Casper::CP::ValExpr<bool>");	}
 	CP::ChkExpr toChkExpr(CP::Store& store) const
 	{	throw Casper::Exception::TypeCoercion("<python callable>","Casper::CP::ChkExpr<bool>");	}

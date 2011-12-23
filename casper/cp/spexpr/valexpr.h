@@ -17,30 +17,38 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_OBJ_LITERAL_H_
-#define CASPER_KERNEL_OBJ_LITERAL_H_
+#ifndef CASPER_KERNEL_OBJ_VALEXPR_H_
+#define CASPER_KERNEL_OBJ_VALEXPR_H_
 
-#include <casper/kernel/obj/expr.h>
+#include <casper/kernel/spexpr/expr.h>
 
 namespace Casper {
 namespace Detail {
 
-template<>
-struct Create<int,int>
+
+template<class T,class Eval>
+struct Create<T,CP::ValExpr<Eval> >
 {
-	int operator()(const int& t)
-	{	return t;	}
+	CP::ValExpr<Eval> operator()(CP::Store& store, const T& t)
+	{	return CP::ValExpr<Eval>(store,t);	}
 };
 
-template<>
-struct Create<bool,bool>
-{
-	bool operator()(const bool& t)
-	{	return t;	}
-};
 
 } // Detail
 
+namespace CP {
+
+template<class Eval>
+struct ValView<Eval,Expr<Eval> > : ValExpr<Eval>
+{
+	ValView(Store& store, const Expr<Eval>& e) :
+		ValExpr<Eval>(e.toCPValExpr(store)),expr(e) {}
+	const Expr<Eval>& getObj() const {	return expr; }
+	Expr<Eval> expr;
+};
+
+} // CP
+
 }
 
-#endif /* CASPER_KERNEL_OBJ_LITERAL_H_ */
+#endif /* CASPER_KERNEL_OBJ_VALEXPR_H_ */

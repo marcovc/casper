@@ -46,6 +46,9 @@
 namespace Casper {
 namespace CP {
 
+//template<class View>
+//struct BndFilterView1<Distinct,IntSeq,View>;
+
 /**
  *  Enforces the all distinct constraint over a sequence of
  *  integer variables [\ref ortiz03].
@@ -433,6 +436,7 @@ bool	BndFilterView1<Distinct,IntSeq,View>::execute()
   	}
   	return true;
 }
+
 
 } // CP
 } // Casper

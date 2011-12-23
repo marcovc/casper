@@ -143,11 +143,17 @@ struct RangeDom
 	/// Registers notifiable \a f on bound update event
 	void attachOnBounds(INotifiable*	f) { boundsSL.attach(f); }
 
+	/// Registers notifiable \a f on domain update event
+	void attachOnDomain(INotifiable*	f) { boundsSL.attach(f); }
+
 	/// Unregisters notifiable \a f from groundness event
 	void detachOnGround(INotifiable*	f) { groundSL.detach(f); }
 
 	/// Unregisters notifiable \a f from bound update event
 	void detachOnBounds(INotifiable*	f) { boundsSL.detach(f); }
+
+	/// Unregisters notifiable \a f from domain update event
+	void detachOnDomain(INotifiable*	f) { boundsSL.detach(f); }
 
 	/// Access the lower bound of the last erased range (delta).
 	Value	getLastMin()	const { return lastMin;	}

@@ -797,6 +797,8 @@ std::ostream& operator<<(std::ostream& os, const Casper::Rel5<F,T1,T2,T3,T4,T5>&
 
 #endif
 
+#include <casper/kernel/rel/setrel.h>
+#include <casper/kernel/rel/goalrel.h>
 
 #ifndef CASPER_NO_OPERATORS
 #ifndef CASPER_KERNEL_REL_OP_REL_H

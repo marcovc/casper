@@ -17,17 +17,16 @@
  \*************************************************************************/
 
 #include <casper/cp/filter/bnd.h>
-#include <casper/kernel/obj/expr.h>
+#include <casper/kernel/spexpr/expr.h>
 
 namespace Casper {
 namespace CP {
-
 
 PostBndFilter postBndFilter;
 
 PostD1BndFilter postD1BndFilter;
 
-bool PostBndFilter::operator()(Store& s,BndExpr<bool> v) const
+bool PostBndFilter::operator()(Store& s,const BndExpr<bool>& v) const
 {
 	return new (s) BndFilterView<BndExpr<bool> >(s,v);
 }

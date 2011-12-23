@@ -102,18 +102,23 @@ casper_kernel+=['goal/terminal.cpp']
 casper_kernel+=['notify/susplist.cpp']
 casper_kernel+=['state/state.cpp']
 casper_kernel+=['state/env.cpp']
-#casper_kernel+=['obj/obj.cpp']
+#casper_kernel+=['spexpr/obj.cpp']
 
 casper_cp=[]
 casper_cp+=['filter/common.cpp']
 casper_cp+=['filter/dom.cpp']
 casper_cp+=['filter/bnd.cpp']
 casper_cp+=['filter/val.cpp']
-casper_cp+=['int/distinct/graph.cpp']
 casper_cp+=['goal/heuristic.cpp']
 casper_cp+=['scheduler.cpp']
 casper_cp+=['store.cpp']
 casper_cp+=['solver.cpp']
+
+casper_cp_int=[]
+casper_cp_int+=['distinct/graph.cpp']
+
+casper_cp_set=[]
+casper_cp_real=[]
 
 casper_util=[]
 casper_util+=['container/stdrange.cpp']
@@ -240,6 +245,7 @@ vars.Add(EnumVariable('debug_level', '0 (none) to 3 (full)', '0',
 						allowed_values=('0','1', '2','3')), converter=int)
 vars.Add(EnumVariable('optimize_level', '0 (none) to 3 (full)', '0',
 						allowed_values=('0','1', '2','3')), converter=int)
+vars.Add(BoolVariable('precompile', 'precompile a large set of expressions', False))
 vars.Add(BoolVariable('warnings', 'compilation with -Wall', True))
 vars.Add(BoolVariable('profile', 'build for profiling with gprof/gcov', False))
 vars.Add(BoolVariable('safe_rounding', 'perform safe rounded operations with float types', 1))
@@ -378,6 +384,9 @@ if env['cpp0x']:
 	
 if env['subpoly_rels']:
 	defined_macros += ['CASPER_SUBPOLY_RELS']
+
+if env['precompile']:
+	defined_macros += ['CASPER_PRECOMPILED']
 	
 env.Append(CPPDEFINES = defined_macros)
 
@@ -412,8 +421,8 @@ def getBuildFlags(env,debug_level,optimize_level):
 			link_flags += ['-static']
 		if env['cpp0x']:
 			build_flags += ['-std=gnu++0x']
-		#build_flags += ['-Wfatal-errors']
-		build_flags += ['-fPIC']
+		build_flags += ['-Wfatal-errors']
+		#build_flags += ['-fPIC']
 		#build_flags += ['-ffast-math']
 		#link_flags += ['-ffast-math']	
 		#factor = 64
@@ -519,6 +528,41 @@ if env["CC"].find('gcc')>=0:
 	preprocessMacros(env)
 
 
+############ support for generating cpp code from python scripts ############
+
+import fnmatch
+import os
+import string
+
+#def createPyScanner():
+#	include_re = re.compile(r'^import\s+(\S+)$', re.M)
+#	def pyfile_scan(node, env, path):
+#		contents = node.get_text_contents()
+#		includes = include_re.findall(contents)
+#		return env.File([i+".py" for i in includes])
+#	pyscan = Scanner(function = pyfile_scan,
+#					skeys = ['.py'])
+#	env.Append(SCANNERS = pyscan)
+    
+def createSrcBuilderFromPy(suffix):
+	builder = Builder(single_source=1,
+						src_suffix='.'+suffix+'.py',
+						suffix='.'+suffix,
+						action="python $SOURCE > $TARGET")
+
+	env.Append(BUILDERS = {suffix+'SrcBuilder':builder} )
+
+#createPyScanner()
+createSrcBuilderFromPy("cpp")
+createSrcBuilderFromPy("h")
+#createSrcBuilderFromPy("i")
+
+for i in RecursiveGlob(".","*.h.py"):
+	env.hSrcBuilder(source=File(i),target=File(i[:-3]))
+#for i in RecursiveGlob(".","*.cpp.py"):
+#	env.cppSrcBuilder(source=File(i),target=File(i[:-3]))
+
+
 ############ support for debug/release variant builds ############
 
 SUFFIX=""
@@ -543,7 +587,7 @@ renv.VariantDir(renv['PREFIX'], '.', duplicate=0)
 ############ support for building library ############
 
 def defineVersionObj(env):
-	return env.Object(env['PREFIX']+"/casper/version.cpp",CPPDEFINES=version_macros) 
+	return env.Object(env['PREFIX']+"/casper/version.cpp",CPPDEFINES=version_macros)  
 	
 versionObjs = {}
 versionObjs[env['ID']] = defineVersionObj(env)
@@ -555,6 +599,12 @@ for i in casper_kernel:
 	casper_srcs+=["casper/kernel/"+i]
 for i in casper_cp:
 	casper_srcs+=["casper/cp/"+i]
+for i in casper_cp_int:
+	casper_srcs+=["casper/cp/int/"+i]
+for i in casper_cp_set:
+	casper_srcs+=["casper/cp/set/"+i]
+for i in casper_cp_real:
+	casper_srcs+=["casper/cp/real/"+i]
 for i in casper_util:
 	casper_srcs+=["casper/util/"+i]
 if env['lp']:
@@ -583,6 +633,90 @@ if env['debug_level']==3 and env['optimize_level']==0:
 	dlibcasper=libcasper
 else:
 	dlibcasper=defineLibrary(denv)
+
+############ support for building modular library ############
+
+def defineKernelModule(env):
+	objs=[]
+	objs += env.SharedObject(env['PREFIX']+"/casper/version.cpp",CPPDEFINES=version_macros)
+	for i in casper_kernel:
+		objs+=env.SharedObject(env['PREFIX']+"/casper/kernel/"+i)
+	if env['precompile']:
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/kernel/spexpr/explicit_goal.cpp.py"))
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/kernel/spexpr/explicit_ref.cpp.py"))
+	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_kernel",source=objs,
+							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_kernel${SHLIBSUFFIX}",
+							LIBS=confCommonEnv['LIBS'])
+
+def defineUtilModule(env):
+	objs=[]
+	for i in casper_util:
+		objs+=env.SharedObject(env['PREFIX']+"/casper/util/"+i)
+	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_util",source=objs,
+							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_util${SHLIBSUFFIX}",
+							LIBS=confCommonEnv['LIBS'])
+
+def defineCPModule(env):
+	objs=[]
+	for i in casper_cp:
+		objs+=env.SharedObject(env['PREFIX']+"/casper/cp/"+i)
+	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_cp",source=objs,
+							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_cp${SHLIBSUFFIX}",
+							LIBS=confCommonEnv['LIBS'])
+
+def defineCPIntModule(env):
+	objs=[]
+	for i in casper_cp_int:
+		objs+=env.SharedObject(env['PREFIX']+"/casper/cp/int/"+i)
+	if env['precompile']:
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/view.cpp.py"))
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/explicit_postdom.cpp.py"))
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/explicit_postbnd.cpp.py"))
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/explicit_postval.cpp.py"))
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/ref.cpp.py"))
+	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_cp_int",source=objs,
+							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_cp_int${SHLIBSUFFIX}",
+							LIBS=confCommonEnv['LIBS'])
+
+def defineCPSetModule(env):
+	objs=[]
+	for i in casper_cp_set:
+		objs+=env.SharedObject(env['PREFIX']+"/casper/cp/set/"+i)
+	if env['precompile']:
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/set/spexpr/view.cpp.py"))
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/set/spexpr/post.cpp.py"))
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/set/spexpr/ref.cpp.py"))
+	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_cp_set",source=objs,
+							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_cp_set${SHLIBSUFFIX}",
+							LIBS=confCommonEnv['LIBS'])
+
+def defineCPRealModule(env):
+	objs=[]
+	for i in casper_cp_real:
+		objs+=env.SharedObject(env['PREFIX']+"/casper/cp/real/"+i)
+	objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/real/spexpr/view.cpp.py"))
+	objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/real/spexpr/post.cpp.py"))
+	objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/real/spexpr/ref.cpp.py"))
+	objs+=env.SharedObject(env['PREFIX']+"/casper/cp/real/spexpr/ref_extra.cpp")
+	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_cp_real",source=objs,
+							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_cp_real${SHLIBSUFFIX}",
+							LIBS=confCommonEnv['LIBS'])
+	
+library_module_kernel=defineKernelModule(env)
+library_module_util=defineUtilModule(env)
+library_module_cp=defineCPModule(env)
+library_module_cp_int=defineCPIntModule(env)
+library_module_cp_set=defineCPSetModule(env)
+library_module_cp_real=defineCPRealModule(env)
+
+library_modules=[library_module_kernel,library_module_util,
+				library_module_cp,library_module_cp_int,library_module_cp_set,
+				library_module_cp_real]
+
+#Depends(library_modules,modular_library_srcs)
+	
+Alias('library_modular',library_modules)
+
 
 ############ support for building examples ############
 
@@ -684,7 +818,7 @@ Alias('casperbind_fzn',casperbind_fzn_target)
 ### support for building py-casper ###
 
 pycasper_target_libpath = confCommonEnv['LIBPATH']
-pycasper_target_libs = confCommonEnv['LIBS']+[libcasper]
+pycasper_target_libs = library_modules #confCommonEnv['LIBS']+[libcasper]
 
 import distutils.sysconfig
 
@@ -717,7 +851,10 @@ pycasper_modules=['kernel','cp','util']
 pycasper_wrappers=[]
 pycasper_builddir = env.Command(env['PREFIX']+'bindings/python/casper/dummy', '', 
 							[Mkdir(env['PREFIX']+'bindings/python/casper')]),
-						
+	
+#module_dependencies = { 'kernel':[library_module_kernel],
+#						'cp':[library_module_kernel]}					
+
 pycasper_libs=[] 
 
 for i in pycasper_modules:
@@ -733,7 +870,7 @@ for src in ['cp/int/intvar_operators.i','cp/int/boolvar_operators.i',
 			'kernel/intref_operators.i','kernel/boolref_operators.i',
 			'kernel/intexpr_operators.i','kernel/boolexpr_operators.i',
 			'kernel/expr_predicates.i','kernel/goal_operators.i']:
-	py_gen_scripts.append(env.Command(pref+src,['bindings/python/pyutils/objdb.py',pref+src+'.py'],'python '+pref+src+'.py'+' > $TARGET'))
+	py_gen_scripts.append(env.Command(pref+src,['pyutils/objdb.py',pref+src+'.py'],'python '+pref+src+'.py'+' > $TARGET'))
 
 copy_init = [Command(env['PREFIX']+"/bindings/python/casper/__init__.py", "build/"+MODE+"/bindings/python/casper/kernel.py", Copy("$TARGET", env['PREFIX']+"/bindings/python/casper/kernel.py"))]
 Alias('casper_python',py_gen_scripts+pycasper_libs+copy_init)
@@ -869,6 +1006,7 @@ if env.has_key('MSVSPROJECTCOM'):
 
 ### installing ###
 
+'''
 def createLibInstallTarget(env):
 	common_install_target = []
 	for i in dist_sources:
@@ -890,7 +1028,6 @@ lib_install_target = createLibInstallTarget(env)
 Alias('library-install',lib_install_target)	
               
 
-
 ### packaging ###
 
 newenv = env.Clone()
@@ -911,6 +1048,9 @@ Alias('package_macosx',
 					 VERSION="\""+casper_version+"\"")])
 
 dist_sources.append(File('REVISION'))
+
+'''
+
 '''
 package_libsrc_dist = env.Package( 
 			 source			= dist_sources,

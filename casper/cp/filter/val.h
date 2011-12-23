@@ -174,33 +174,6 @@ struct PostValFilter5
 	}
 };
 
-/**
- * FIXME: see same relation for bnd and dom
- * Enforces the conjunction of two constraints. It succeeds if both
- * constraints are satisfiable, fails otherwise.
- */
-template<class Eval1,class Expr1,class Eval2,class Expr2>
-struct ValFilterView2<And,Eval1,Expr1,Eval2,Expr2> : IFilter
-{
-	ValFilterView2(Store& s,const Expr1& p1, const Expr2& p2) :
-		IFilter(s),store(s),v1(p1),v2(p2) {}
-
-	bool execute()
-	{	return postValFilter(store,v1) and postValFilter(store,v2);	}
-/*
-	bool entailed() const
-	{	return p1.min()==p2.min() && p1.min()==true; }
-	Filter operator!()
-	{	return Val(!v1 or !v2); }
-*/
-	void attach(INotifiable* s) {}
-	void detach(INotifiable* s) {}
-
-	Store&				store;
-	Expr1	v1;
-	Expr2	v2;
-};
-
 struct PostValFilter
 {
 	template<class Func,class Expr1>
@@ -250,11 +223,54 @@ struct PostValFilter
 	}
 
 	bool operator()(Store& s,const bool& b) const;
-	bool operator()(Store& s,const Var<bool>& v) const;
+	template<class Dom>
+	bool operator()(Store& s,const Var<bool,Dom>& v) const
+	{	return s.post(
+			new (s) BndFilterView<Rel2<Equal,Var<bool,Dom>,bool> >(s,rel<Equal>(v,true)));	}
+
 	bool operator()(Store& s,const Casper::Expr<bool>& v) const;
 };
 
 extern PostValFilter postValFilter;
+
+} // CP
+} // Casper
+
+#ifdef CASPER_PRECOMPILED
+#include <casper/cp/int/spexpr/explicit_postval.h>
+#endif
+
+namespace Casper {
+namespace CP {
+
+/**
+ * FIXME: see same relation for bnd and dom
+ * Enforces the conjunction of two constraints. It succeeds if both
+ * constraints are satisfiable, fails otherwise.
+ */
+template<class Eval1,class Expr1,class Eval2,class Expr2>
+struct ValFilterView2<And,Eval1,Expr1,Eval2,Expr2> : IFilter
+{
+	ValFilterView2(Store& s,const Expr1& p1, const Expr2& p2) :
+		IFilter(s),store(s),v1(p1),v2(p2) {}
+
+	bool execute()
+	{	return postValFilter(store,v1) and postValFilter(store,v2);	}
+/*
+	bool entailed() const
+	{	return p1.min()==p2.min() && p1.min()==true; }
+	Filter operator!()
+	{	return Val(!v1 or !v2); }
+*/
+	void attach(INotifiable* s) {}
+	void detach(INotifiable* s) {}
+
+	Store&				store;
+	Expr1	v1;
+	Expr2	v2;
+};
+
+
 
 // must update below to use Rels
 #if 0

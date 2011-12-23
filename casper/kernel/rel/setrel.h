@@ -8,10 +8,8 @@
  *   (at your option) any later version.                                   *
  ***************************************************************************/
 
-#ifndef CASPER_SET_RELATION_H_
-#define CASPER_SET_RELATION_H_
-
-#include <casper/cp/traits.h>
+#ifndef CASPER_KERNEL_SETREL_H_
+#define CASPER_KERNEL_SETREL_H_
 
 namespace Casper {
 
@@ -41,14 +39,6 @@ NEW_REL_1(partition,Partition)
 NEW_FN_3(sumEqual,SumEqual)
 
 //NEW_REL_2(symDiff,SymDiff)
-
-namespace CP {
-namespace Traits {
-template<class View>
-struct GetDom<Rel1<Cardinal,View> >
-{	typedef typename Traits::GetDefaultDom<int>::Type	Type;	};
-} // Traits
-} // CP
 
 namespace Traits {
 
@@ -104,4 +94,4 @@ struct GetEval<Rel3<SumEqual,T1,T2,T3> >
 } // Traits
 } // Casper
 
-#endif /*CASPER_SET_RELATION_H_*/
+#endif /*CASPER_KERNEL_SETREL_H_*/

@@ -22,15 +22,6 @@
 
 namespace Casper {
 
-NEW_REL_2(tryAll,TryAll)
-NEW_FN_3(tryAll,TryAll)
-
-namespace Traits {
-template<class T1,class T2,class T3>
-struct GetEval<Rel3<TryAll,T1,T2,T3> >
-{	typedef bool	Type;	};
-};
-
 /**
  * 	Executes \a v for all \a it in \a s. Succeeds on the first \a it that makes \a v succeed.
  * 	Fails if, after trying to execute \a v for all \a it in \a s, v never succeeded.
@@ -77,14 +68,6 @@ struct GoalView3<TryAll,T,Ref<T>,Seq<T>,Set,bool,Obj> : IGoal
 };
 
 
-NEW_FN_4(tryAll,TryAll)
-
-namespace Traits {
-template<class T1,class T2,class T3,class T4>
-struct GetEval<Rel4<TryAll,T1,T2,T3,T4> >
-{	typedef	bool	Type;	};
-} // Traits
-
 /**
  * 	Executes \a v2 for all \a it in \a r where \a v1 is true. Succeeds on the first \a it that makes \a v2 succeed.
  * 	Fails if, after trying to execute \a v2 for all \a it in \a r where \a v1 is true, \a v2 never succeeded.
@@ -128,13 +111,6 @@ struct GoalView4<TryAll,T,Ref<T>,Seq<T>,Set,bool,Cond,bool,Obj> : IGoal
 	Obj v;
 };
 
-NEW_FN_5(tryAll,TryAll)
-
-namespace Traits {
-template<class T1,class T2,class T3,class T4,class T5>
-struct GetEval<Rel5<TryAll,T1,T2,T3,T4,T5> >
-{	typedef	bool	Type;	};
-} // Traits
 
 /**
  * 	Executes \a v2 for all \a it in \a r where \a v1 is true, sorted by ascending values of \a o. Succeeds on the first \a it that makes \a v2 succeed.

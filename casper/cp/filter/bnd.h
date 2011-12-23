@@ -37,45 +37,6 @@ template<class> struct Expr;
 
 namespace CP {
 
-#if 0
-template<class F,class,class V1> // TODO: default is to use FilterExpr1
-struct BndFilterView1
-{
-#ifdef CASPER_CPP0X
-	static_assert(sizeof(V1)==0,"Undefined specialization of BndFilterView1");
-#else
-	BndFilterView1(Store& s,const V1&) { assert(0);	}
-#endif
-};
-
-template<class,class,class V1,class,class V2>
-struct BndFilterView2
-{
-#ifdef CASPER_CPP0X
-	static_assert(sizeof(V1)==0,"Undefined specialization of BndFilterView2");
-#else
-	BndFilterView2(Store& s,const V1&,const V2&) { assert(0);}
-#endif
-};
-
-template<class R,class E1,class V1,class E2,class V2,class E3,class V3>
-struct BndFilterView3
-{
-#ifdef CASPER_CPP0X
-	static_assert(sizeof(V1)==0,"Undefined specialization of BndFilterView3");
-#else
-	BndFilterView3(Store& s,const V1&,const V2&,const V3&) { assert(0);}
-#endif
-};
-
-template<class R,class E1,class V1,class E2,class V2,class E3,class V3,class E4,class V4>
-struct BndFilterView4 : UndefinedFilter
-{	BndFilterView4(Store& s,const V1&,const V2&,const V3&,const V4&) : UndefinedFilter(s,*this) {}	};
-
-template<class R,class E1,class V1,class E2,class V2,class E3,class V3,class E4,class V4,class E5,class V5>
-struct BndFilterView5 : UndefinedFilter
-{	BndFilterView5(Store& s,const V1&,const V2&,const V3&,const V4&,const V5&) : UndefinedFilter(s,*this) {}	};
-#else
 
 template<class Rel>
 struct ChkView2BndFilter : IFilter
@@ -114,17 +75,15 @@ struct BndFilterView4 : ChkView2BndFilter<Rel4<F,V1,V2,V3,V4> >
 	BndFilterView4(Store& s,const V1& v1,const V2& v2,const V3& v3,const V4& v4) :
 		ChkView2BndFilter<Rel4<F,V1,V2,V3,V4> >(s,rel<F>(v1,v2,v3,v4)) {}
 };
-/*
+
 template<class F,class E1,class V1,class E2,class V2,class E3,class V3,class E4,class V4,class E5,class V5>
 struct BndFilterView5 : ChkView2BndFilter<Rel5<F,V1,V2,V3,V4,V5> >
 {
 	BndFilterView5(Store& s,const V1& v1,const V2& v2,const V3& v3,
 							const V4& v4,const V5& v5) :
-				ChkView2BndFilter(s,rel<F>(v1,v2,v3,v4,v5)) {}
-};*/
+		ChkView2BndFilter<Rel5<F,V1,V2,V3,V4,V5> >(s,rel<F>(v1,v2,v3,v4,v5)) {}
+};
 
-
-#endif
 
 template<class Func,class Eval1,class Expr1>
 struct PostBndFilter1
@@ -181,6 +140,86 @@ struct PostBndFilter5
 	}
 };
 
+
+template<class,class> class Var;
+template<class,class> struct DomExpr;
+
+struct PostBndFilter
+{
+	bool operator()(Store& s,const bool& v) const
+	{	return v and PostBndFilter()(s,BndExpr<bool>(s,v));	}
+
+	template<class Dom>
+	bool operator()(Store& s,const Var<bool,Dom>& v) const
+	{	return PostBndFilter()(s,BndExpr<bool>(s,v));	}
+
+	template<class Dom>
+	bool operator()(Store& s,const DomExpr<bool,Dom>& v) const
+	{	return PostBndFilter()(s,BndExpr<bool>(s,v));	}
+
+	bool operator()(Store& s,const BndExpr<bool>& v) const;
+
+	bool operator()(Store& s,const Casper::Expr<bool>& v) const;
+
+//	bool operator()(Filter f) const;
+
+	bool operator()(Store& s,const Filter& f) const
+	{	return s.post(f); }
+
+	template<class Func,class Expr1>
+	bool operator()(Store& s,const Rel1<Func,Expr1>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef PostBndFilter1<Func,Eval1,Expr1>		Post;
+		return Post::post(s,v.p1);
+	}
+
+	template<class Func,class Expr1,class Expr2>
+	bool operator()(Store& s,const Rel2<Func,Expr1,Expr2>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef PostBndFilter2<Func,Eval1,Expr1,Eval2,Expr2>	Post;
+		return Post::post(s,v.p1,v.p2);
+	}
+
+	template<class Func,class Expr1,class Expr2,class Expr3>
+	bool operator()(Store& s,const Rel3<Func,Expr1,Expr2,Expr3>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
+		typedef PostBndFilter3<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3>	Post;
+		return Post::post(s,v.p1,v.p2,v.p3);
+	}
+
+	template<class Func,class Expr1,class Expr2,class Expr3,class Expr4>
+	bool operator()(Store& s,const Rel4<Func,Expr1,Expr2,Expr3,Expr4>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
+		typedef typename Casper::Traits::GetEval<Expr4>::Type	Eval4;
+		typedef PostBndFilter4<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4>	Post;
+		return Post::post(s,v.p1,v.p2,v.p3,v.p4);
+	}
+
+	template<class Func,class Expr1,class Expr2,class Expr3,class Expr4,class Expr5>
+	bool operator()(Store& s,const Rel5<Func,Expr1,Expr2,Expr3,Expr4,Expr5>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
+		typedef typename Casper::Traits::GetEval<Expr4>::Type	Eval4;
+		typedef typename Casper::Traits::GetEval<Expr5>::Type	Eval5;
+		typedef PostBndFilter5<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4,Eval5,Expr5>	Post;
+		return Post::post(s,v.p1,v.p2,v.p3,v.p4,v.p5);
+	}
+};
+
+
+extern PostBndFilter postBndFilter;
+
 template<class Rel>
 struct BndFilterView; // default is to complain at compile time
 
@@ -209,6 +248,40 @@ struct PostD1BndFilter2
 
 template<class Rel>
 struct BndD1FilterView; // default is to complain at compile time
+
+struct PostD1BndFilter
+{
+	template<class Func,class Expr1>
+	bool operator()(Store& s,const Rel1<Func,Expr1>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef PostD1BndFilter1<Func,Eval1,Expr1>	Post;
+		return Post::post(s,v.p1);
+	}
+
+	template<class Func,class Expr1,class Expr2>
+	bool operator()(Store& s,const Rel2<Func,Expr1,Expr2>& v) const
+	{
+		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
+		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
+		typedef PostD1BndFilter2<Func,Eval1,Expr1,Eval2,Expr2>	Post;
+		return Post::post(s,v.p1,v.p2);
+	}
+
+};
+
+extern PostD1BndFilter postD1BndFilter;
+
+} // CP
+} // Casper
+
+#ifdef CASPER_PRECOMPILED
+#include <casper/cp/int/spexpr/explicit_postbnd.h>
+#endif
+
+namespace Casper {
+namespace CP {
+
 
 // happens for example when the negation for a relation is not defined
 template<>
@@ -276,96 +349,6 @@ struct BndFilterView<Rel5<F,T1,T2,T3,T4,T5> > :
 					  	 typename Casper::Traits::GetEval<T4>::Type,T4,
 					  	 typename Casper::Traits::GetEval<T5>::Type,T5>(s,r.p1,r.p2,r.p3,r.p4,r.p5) {}
 };
-
-template<class,class> class Var;
-template<class,class> struct DomExpr;
-
-struct PostBndFilter
-{
-	bool operator()(Store& s,const bool& v) const
-	{	return v and PostBndFilter()(s,BndExpr<bool>(s,v));	}
-
-	template<class Dom>
-	bool operator()(Store& s,Var<bool,Dom> v) const
-	{	return PostBndFilter()(s,BndExpr<bool>(s,v));	}
-
-	template<class Dom>
-	bool operator()(Store& s,DomExpr<bool,Dom> v) const
-	{	return PostBndFilter()(s,BndExpr<bool>(s,v));	}
-
-	bool operator()(Store& s,BndExpr<bool> v) const;
-
-	bool operator()(Store& s,const Casper::Expr<bool>& v) const;
-
-//	bool operator()(Filter f) const;
-
-	bool operator()(Store& s,const Filter& f) const
-	{	return s.post(f); }
-
-	template<class Func,class Expr1>
-	bool operator()(Store& s,const Rel1<Func,Expr1>& v) const
-	{
-		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
-		typedef PostBndFilter1<Func,Eval1,Expr1>		Post;
-		return Post::post(s,v.p1);
-	}
-
-	template<class Func,class Expr1,class Expr2>
-	bool operator()(Store& s,const Rel2<Func,Expr1,Expr2>& v) const
-	{
-		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
-		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
-		typedef PostBndFilter2<Func,Eval1,Expr1,Eval2,Expr2>	Post;
-		return Post::post(s,v.p1,v.p2);
-	}
-
-	template<class Func,class Expr1,class Expr2,class Expr3>
-	bool operator()(Store& s,const Rel3<Func,Expr1,Expr2,Expr3>& v) const
-	{
-		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
-		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
-		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
-		typedef PostBndFilter3<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3>	Post;
-		return Post::post(s,v.p1,v.p2,v.p3);
-	}
-
-	template<class Func,class Expr1,class Expr2,class Expr3,class Expr4>
-	bool operator()(Store& s,const Rel4<Func,Expr1,Expr2,Expr3,Expr4>& v) const
-	{
-		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
-		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
-		typedef typename Casper::Traits::GetEval<Expr3>::Type	Eval3;
-		typedef typename Casper::Traits::GetEval<Expr4>::Type	Eval4;
-		typedef PostBndFilter4<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4>	Post;
-		return Post::post(s,v.p1,v.p2,v.p3,v.p4);
-	}
-
-};
-
-extern PostBndFilter postBndFilter;
-
-struct PostD1BndFilter
-{
-	template<class Func,class Expr1>
-	bool operator()(Store& s,const Rel1<Func,Expr1>& v) const
-	{
-		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
-		typedef PostD1BndFilter1<Func,Eval1,Expr1>	Post;
-		return Post::post(s,v.p1);
-	}
-
-	template<class Func,class Expr1,class Expr2>
-	bool operator()(Store& s,const Rel2<Func,Expr1,Expr2>& v) const
-	{
-		typedef typename Casper::Traits::GetEval<Expr1>::Type	Eval1;
-		typedef typename Casper::Traits::GetEval<Expr2>::Type	Eval2;
-		typedef PostD1BndFilter2<Func,Eval1,Expr1,Eval2,Expr2>	Post;
-		return Post::post(s,v.p1,v.p2);
-	}
-
-};
-
-extern PostD1BndFilter postD1BndFilter;
 
 // FIXME: why this is not just a Post object?
 /**

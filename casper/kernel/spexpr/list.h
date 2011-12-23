@@ -17,61 +17,38 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_OBJ_REF_H_
-#define CASPER_KERNEL_OBJ_REF_H_
+#ifndef CASPER_KERNEL_OBJ_LIST_H_
+#define CASPER_KERNEL_OBJ_LIST_H_
 
-#include <casper/kernel/obj/expr.h>
+#include <casper/kernel/spexpr/expr.h>
+#include <casper/util/container/stdlist.h>
+
+#include <typeinfo>
 
 namespace Casper {
 namespace Detail {
 
-template<class T,class Eval>
-struct Create<T,Ref<Eval> >
+template<class T,class Elem>
+struct Create<T,Util::StdList<Elem> >
 {
-	Ref<Eval> operator()(State& state, const T& t)
-	{	return Ref<Eval>(state,t);	}
+	Util::StdList<Elem> operator()(const T& t)
+	{	throw Casper::Exception::TypeCoercion(typeid(T).name(),typeid(Util::StdList<Elem>).name());	}
 };
+
+template<class Elem>
+struct Create<Util::StdList<Elem>,Util::StdList<Elem> >
+{
+	const Util::StdList<Elem>& operator()(const Util::StdList<Elem>& t)
+	{	return t;	}
+};
+
 
 } // Detail
 
-template<class Eval>
-struct RefView<Eval,Expr<Eval> > : IRef<Eval>
-{
-	RefView(State& state, const Expr<Eval>& e) :
-		par(e.toRef(state)),expr(e) {}
-	const Expr<Eval>& getObj() const {	return expr; }
-	Eval value() const { return par.value(); }
-	void setValue(const Eval& v)	{	par.setValue(v);	}
-	Ref<Eval> par;
-	Expr<Eval> expr;
-};
+namespace CP {
 
-// Extracts a given element of any array type
-template<class Eval>
-struct RefArrayView<Expr<Seq<Eval> > >
-{
-	typedef Expr<Eval>	Elem;
-	RefArrayView(State& s,const Expr<Seq<Eval> >& e) : a(e.toStdArray()) {}
-	Elem& operator[](int idx)
-	{	return a[idx];	}
-	const Elem& operator[](int idx) const
-	{	return a[idx];	}
-	Util::StdArray<Expr<Eval> > a;
-};
-
-
-template<class Eval>
-struct RefView<CP::Var<Eval>,Expr<Eval> > : IRef<CP::Var<Eval> >
-{
-	RefView(State& state, const Expr<Eval>& e) :
-		par(e.toCPVarRef(state)),expr(e) {}
-	const Expr<Eval>& getObj() const {	return expr; }
-	CP::Var<Eval> value() const { return par.value(); }
-	//void setValue(const Eval& v)	{	par.setValue(v);	}
-	Ref<CP::Var<Eval> > par;
-	Expr<Eval> expr;
-};
+} // CP
 
 }
 
-#endif /* CASPER_KERNEL_OBJ_PAR_H_ */
+#endif /* CASPER_KERNEL_OBJ_LIST_H_ */

@@ -17,40 +17,37 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_OBJ_GOAL_H_
-#define CASPER_KERNEL_OBJ_GOAL_H_
+#ifndef CASPER_KERNEL_OBJ_CHKEXPR_H_
+#define CASPER_KERNEL_OBJ_CHKEXPR_H_
 
-#include <casper/kernel/obj/expr.h>
+#include <casper/kernel/spexpr/expr.h>
 
 namespace Casper {
 namespace Detail {
 
+
 template<class T>
-struct Create<T,Goal>
+struct Create<T,CP::ChkExpr>
 {
-	Goal operator()(State& state, const T& t)
-	{	return Goal(state,t);	}
+	CP::ChkExpr operator()(CP::Store& store, const T& t)
+	{	return CP::ChkExpr(store,t);	}
 };
 
-template<>
-struct Create<bool,Goal>
-{
-	Goal operator()(State& state, const bool& t)
-	{	return Goal(t);	}
-};
 } // Detail
 
+namespace CP {
 
 template<class Eval>
-struct GoalView<Expr<Eval> > : IGoal
+struct ChkView<Expr<Eval> > : ChkExpr
 {
-	GoalView(State& state, const Expr<Eval>& e) :
-		g(e.toGoal(state)) {}
-	Goal execute() {	return g; }
-	Goal g;
+	ChkView(Store& store, const Expr<Eval>& e) :
+		ChkExpr(e.toChkExpr(store)),expr(e) {}
+	const Expr<Eval>& getObj() const {	return expr; }
+	Expr<Eval> expr;
 };
 
+} // CP
 
 }
 
-#endif /* CASPER_KERNEL_OBJ_GOAL_H_ */
+#endif /* CASPER_KERNEL_OBJ_BNDEXPR_H_ */

@@ -17,37 +17,55 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_OBJ_CHKEXPR_H_
-#define CASPER_KERNEL_OBJ_CHKEXPR_H_
-
-#include <casper/kernel/obj/expr.h>
+#ifndef CASPER_KERNEL_REL_GOALREL_H_
+#define CASPER_KERNEL_REL_GOALREL_H_
 
 namespace Casper {
-namespace Detail {
 
-template<class T>
-struct Create<T,CP::ChkExpr>
-{
-	CP::ChkExpr operator()(CP::Store& store, const T& t)
-	{	return CP::ChkExpr(store,t);	}
-};
+NEW_REL_2(forAll,ForAll)
+NEW_FN_3(forAll,ForAll)
+NEW_FN_4(forAll,ForAll)
+NEW_FN_5(forAll,ForAll)
+NEW_REL_1(whileDo,WhileDo)
+NEW_FN_2(whileDo,WhileDo)
+NEW_REL_2(tryAll,TryAll)
+NEW_FN_3(tryAll,TryAll)
+NEW_FN_5(tryAll,TryAll)
+NEW_FN_4(tryAll,TryAll)
 
+namespace Traits {
 
-} // Detail
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<ForAll,T1,T2,T3> >
+{	typedef	bool	Type;	};
 
-namespace CP {
+template<class T1,class T2,class T3,class T4>
+struct GetEval<Rel4<ForAll,T1,T2,T3,T4> >
+{	typedef	bool	Type;	};
 
-template<class Eval>
-struct ChkView<Expr<Eval> > : ChkExpr
-{
-	ChkView(Store& store, const Expr<Eval>& e) :
-		ChkExpr(e.toChkExpr(store)),expr(e) {}
-	const Expr<Eval>& getObj() const {	return expr; }
-	Expr<Eval> expr;
-};
+template<class T1,class T2,class T3,class T4,class T5>
+struct GetEval<Rel5<ForAll,T1,T2,T3,T4,T5> >
+{	typedef	bool	Type;	};
 
-} // CP
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<WhileDo,T1,T2,T3> >
+{	typedef	bool	Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<TryAll,T1,T2,T3> >
+{	typedef bool	Type;	};
+
+template<class T1,class T2,class T3,class T4>
+struct GetEval<Rel4<TryAll,T1,T2,T3,T4> >
+{	typedef	bool	Type;	};
+
+template<class T1,class T2,class T3,class T4,class T5>
+struct GetEval<Rel5<TryAll,T1,T2,T3,T4,T5> >
+{	typedef	bool	Type;	};
+
+} // Traits
 
 }
 
-#endif /* CASPER_KERNEL_OBJ_BNDEXPR_H_ */
+
+#endif /* CASPER_KERNEL_REL_GOALREL_H_ */

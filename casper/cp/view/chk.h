@@ -82,6 +82,14 @@ struct ChkViewRel4 : NoChkView<Rel4<F,Expr1,Expr2,Expr3,Expr4> >
 		NoChkView<Rel4<F,Expr1,Expr2,Expr3,Expr4> >(rel<F>(v1,v2,v3,v4)) {}
 };
 
+template<class F, class Eval1,class Expr1,class Eval2,class Expr2,
+				class Eval3,class Expr3,class Eval4,class Expr4,class Eval5,class Expr5>
+struct ChkViewRel5 : NoChkView<Rel5<F,Expr1,Expr2,Expr3,Expr4,Expr5> >
+{
+	ChkViewRel5(Store&,const Expr1& v1,const Expr2& v2,const Expr3& v3,const Expr4& v4,const Expr5& v5) :
+		NoChkView<Rel5<F,Expr1,Expr2,Expr3,Expr4,Expr5> >(rel<F>(v1,v2,v3,v4,v5)) {}
+};
+
 /*
  *	ChkView over a Rel1 relation -> defers to ChkViewRel1
  *	\ingroup ChkViews

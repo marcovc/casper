@@ -46,10 +46,16 @@ struct NoRefView : IRef<Eval>
 		os << r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"RefView");
 	}
+	Eval value() const;
+	void setValue(const Eval& val);
+	bool ground() const;
+	R getObj()  const;
+#if 0
 	__attribute__((noreturn)) Eval value() const { assert(0); }
 	__attribute__((noreturn)) void setValue(const Eval& val) { assert(0); }
 	__attribute__((noreturn)) bool ground() const { assert(0); }
 	__attribute__((noreturn)) R getObj()  const { assert(0); }
+#endif
 };
 
 
@@ -437,7 +443,7 @@ struct RefView2<Equal,Eval,Expr1,Eval,Expr2,bool> : IRef<bool>
 	bool value() const { return p1.value() == p2.value(); }
 
 	Rel2<Equal,Expr1,Expr2> getObj()  const
-	{ return p1.getObj()==p2.getObj(); }
+	{ return rel<Equal>(p1.getObj(),p2.getObj()); }
 
 	RefView<Eval,Expr1>	p1;
 	RefView<Eval,Expr2>	p2;
@@ -455,7 +461,7 @@ struct RefView2<Greater,Eval,Expr1,Eval,Expr2,bool> : IRef<bool>
 	bool value() const { return p1.value() > p2.value(); }
 
 	Rel2<Greater,Expr1,Expr2> getObj()  const
-	{ return p1.getObj()>p2.getObj(); }
+	{ return rel<Greater>(p1.getObj(),p2.getObj()); }
 
 	RefView<Eval,Expr1>	p1;
 	RefView<Eval,Expr2>	p2;
@@ -473,7 +479,7 @@ struct RefView2<GreaterEqual,Eval,Expr1,Eval,Expr2,bool> : IRef<bool>
 	bool value() const { return p1.value() >= p2.value(); }
 
 	Rel2<GreaterEqual,Expr1,Expr2> getObj()  const
-	{ return p1.getObj()>=p2.getObj(); }
+	{ return rel<GreaterEqual>(p1.getObj(),p2.getObj()); }
 
 	RefView<Eval,Expr1>	p1;
 	RefView<Eval,Expr2>	p2;
@@ -491,7 +497,7 @@ struct RefView2<Less,Eval,Expr1,Eval,Expr2,bool> : IRef<bool>
 	bool value() const { return p1.value() < p2.value(); }
 
 	Rel2<Less,Expr1,Expr2> getObj()  const
-	{ return p1.getObj()<p2.getObj(); }
+	{ return rel<Less>(p1.getObj(),p2.getObj()); }
 
 	RefView<Eval,Expr1>	p1;
 	RefView<Eval,Expr2>	p2;
@@ -509,7 +515,7 @@ struct RefView2<LessEqual,Eval,Expr1,Eval,Expr2,bool> : IRef<bool>
 	bool value() const { return p1.value() <= p2.value(); }
 
 	Rel2<LessEqual,Expr1,Expr2> getObj()  const
-	{ return p1.getObj()<=p2.getObj(); }
+	{ return rel<LessEqual>(p1.getObj(),p2.getObj()); }
 
 	RefView<Eval,Expr1>	p1;
 	RefView<Eval,Expr2>	p2;
@@ -527,7 +533,7 @@ struct RefView2<Distinct,Eval,Expr1,Eval,Expr2,bool> : IRef<bool>
 	bool value() const { return p1.value() != p2.value(); }
 
 	Rel2<Distinct,Expr1,Expr2> getObj()  const
-	{ return p1.getObj()!=p2.getObj(); }
+	{ return rel<Distinct>(p1.getObj(),p2.getObj()); }
 
 	RefView<Eval,Expr1>	p1;
 	RefView<Eval,Expr2>	p2;

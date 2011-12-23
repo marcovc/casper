@@ -20,7 +20,7 @@
 #define CASPER_KERNEL_OBJ_ITERATION_H_
 
 #include <casper/kernel/expr.h>
-#include <casper/kernel/obj/expr.h>
+#include <casper/kernel/spexpr/expr.h>
 
 namespace Casper {
 namespace Detail {

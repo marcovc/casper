@@ -173,6 +173,12 @@ typedef Seq<IntSet>	IntSetSeq;
 ///	Sequence of sets of booleans. \ingroup Kernel
 typedef Seq<BoolSet>	BoolSetSeq;
 
+///	Sequence of integers. \ingroup Kernel
+typedef Seq<float>	FloatSeq;
+
+///	Sequence of booleans. \ingroup Kernel
+typedef Seq<double>	DoubleSeq;
+
 //msvc defines these as macros
 #undef min
 #undef max

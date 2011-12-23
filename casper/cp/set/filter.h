@@ -11,7 +11,7 @@
 #ifndef _H_CASPER_SET_FILTER
 #define _H_CASPER_SET_FILTER
 
-#include <casper/cp/set/relation.h>
+#include <casper/kernel/rel/setrel.h>
 #include <casper/cp/set/util.h>
 #include <casper/cp/set/chkview.h>
 #include <casper/cp/filter/common.h>
@@ -27,6 +27,11 @@ namespace Casper {
 
 namespace CP {
 
+namespace Traits {
+template<class View>
+struct GetDom<Rel1<Cardinal,View> >
+{	typedef typename Traits::GetDefaultDom<int>::Type	Type;	};
+} // Traits
 
 
 /**

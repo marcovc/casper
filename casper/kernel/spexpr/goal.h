@@ -17,36 +17,41 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_OBJ_VALEXPR_H_
-#define CASPER_KERNEL_OBJ_VALEXPR_H_
+#ifndef CASPER_KERNEL_OBJ_GOAL_H_
+#define CASPER_KERNEL_OBJ_GOAL_H_
 
-#include <casper/kernel/obj/expr.h>
+//#include <casper/kernel/spexpr/expr.h>
 
 namespace Casper {
 namespace Detail {
 
-template<class T,class Eval>
-struct Create<T,CP::ValExpr<Eval> >
+
+template<class T>
+struct Create<T,Goal>
 {
-	CP::ValExpr<Eval> operator()(CP::Store& store, const T& t)
-	{	return CP::ValExpr<Eval>(store,t);	}
+	Goal operator()(State& state, const T& t)
+	{	return Goal(state,t);	}
 };
 
+template<>
+struct Create<bool,Goal>
+{
+	Goal operator()(State& state, const bool& t)
+	{	return Goal(t);	}
+};
 } // Detail
 
-namespace CP {
 
 template<class Eval>
-struct ValView<Eval,Expr<Eval> > : ValExpr<Eval>
+struct GoalView<Expr<Eval> > : IGoal
 {
-	ValView(Store& store, const Expr<Eval>& e) :
-		ValExpr<Eval>(e.toValExpr(store)),expr(e) {}
-	const Expr<Eval>& getObj() const {	return expr; }
-	Expr<Eval> expr;
+	GoalView(State& state, const Expr<Eval>& e) :
+		g(e.toGoal(state)) {}
+	Goal execute() {	return g; }
+	Goal g;
 };
 
-} // CP
 
 }
 
-#endif /* CASPER_KERNEL_OBJ_VALEXPR_H_ */
+#endif /* CASPER_KERNEL_OBJ_GOAL_H_ */
