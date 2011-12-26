@@ -24,14 +24,6 @@
 
 namespace Casper {
 
-NEW_REL_2(forAll,ForAll)
-NEW_FN_3(forAll,ForAll)
-
-namespace Traits {
-template<class T1,class T2,class T3>
-struct GetEval<Rel3<ForAll,T1,T2,T3> >
-{	typedef	bool	Type;	};
-} // Traits
 
 /**
  * 	Executes \a v for all \a it in \a s. Succeeds if \a v
@@ -70,14 +62,6 @@ struct GoalView3<ForAll,T,Ref<T>,Seq<T>,Set,bool,Obj> : IGoal
 	IterationView<Set>	iter;
 	Obj v;
 };
-
-NEW_FN_4(forAll,ForAll)
-
-namespace Traits {
-template<class T1,class T2,class T3,class T4>
-struct GetEval<Rel4<ForAll,T1,T2,T3,T4> >
-{	typedef	bool	Type;	};
-} // Traits
 
 /**
  * 	Executes \a v for all \a it in \a r for which \a c is true. Succeeds if \a v
@@ -121,13 +105,6 @@ struct GoalView4<ForAll,T,Ref<T>,Seq<T>,Set,bool,Cond,bool,Obj> : IGoal
 	Obj v;
 };
 
-NEW_FN_5(forAll,ForAll)
-
-namespace Traits {
-template<class T1,class T2,class T3,class T4,class T5>
-struct GetEval<Rel5<ForAll,T1,T2,T3,T4,T5> >
-{	typedef	bool	Type;	};
-} // Traits
 
 /**
  * 	Executes \a v for all \a it in \a s for which \a c is true, sorted by increasing values of \a o. Succeeds if \a v

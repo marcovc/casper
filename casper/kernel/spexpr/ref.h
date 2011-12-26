@@ -17,43 +17,67 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_OBJ_DOMEXPR_H_
-#define CASPER_KERNEL_OBJ_DOMEXPR_H_
-
-#include <casper/kernel/obj/expr.h>
+#ifndef CASPER_KERNEL_OBJ_REF_H_
+#define CASPER_KERNEL_OBJ_REF_H_
 
 namespace Casper {
 namespace Detail {
 
+
 template<class T,class Eval>
-struct Create<T,CP::DomExpr<Eval> >
+struct Create<T,Ref<Eval> >
 {
-	CP::DomExpr<Eval> operator()(CP::Store& store, const T& t)
-	{	return CP::DomExpr<Eval>(store,t);	}
+	Ref<Eval> operator()(Casper::State& state, const T& t)
+	{	return Ref<Eval>(state,t);	}
 };
 
-template<class Eval>
-struct Create<Goal,CP::DomExpr<Eval> >
+template<class T,class Eval>
+struct Create<T,Ref<CP::Var<Eval> > >
 {
-	CP::DomExpr<Eval> operator()(CP::Store& store, const Goal& t)
-	{	throw Casper::Exception::TypeCoercion("Goal",typeid(CP::DomExpr<Eval>).name()); }
+	Ref<CP::Var<Eval> > operator()(State& state, const T& t)
+	{	throw Casper::Exception::TypeCoercion(typeid(T).name(),"CP::Var<Eval>");	}
 };
 
 } // Detail
 
-namespace CP {
-
 template<class Eval>
-struct DomView<Eval,Expr<Eval> > : DomExpr<Eval>
+struct RefView<Eval,Expr<Eval> > : IRef<Eval>
 {
-	DomView(Store& store, const Expr<Eval>& e) :
-		DomExpr<Eval>(e.toDomExpr(store)),expr(e) {}
+	RefView(State& state, const Expr<Eval>& e) :
+		par(e.toRef(state)),expr(e) {}
 	const Expr<Eval>& getObj() const {	return expr; }
+	Eval value() const { return par.value(); }
+	void setValue(const Eval& v)	{	par.setValue(v);	}
+	Ref<Eval> par;
 	Expr<Eval> expr;
 };
 
-} // CP
+// Extracts a given element of any array type
+template<class Eval>
+struct RefArrayView<Expr<Seq<Eval> > >
+{
+	typedef Expr<Eval>	Elem;
+	RefArrayView(State& s,const Expr<Seq<Eval> >& e) : a(e.toStdArray()) {}
+	Elem& operator[](int idx)
+	{	return a[idx];	}
+	const Elem& operator[](int idx) const
+	{	return a[idx];	}
+	Util::StdArray<Expr<Eval> > a;
+};
+
+
+template<class Eval>
+struct RefView<CP::Var<Eval>,Expr<Eval> > : IRef<CP::Var<Eval> >
+{
+	RefView(State& state, const Expr<Eval>& e) :
+		par(e.toCPVarRef(state)),expr(e) {}
+	const Expr<Eval>& getObj() const {	return expr; }
+	CP::Var<Eval> value() const { return par.value(); }
+	//void setValue(const Eval& v)	{	par.setValue(v);	}
+	Ref<CP::Var<Eval> > par;
+	Expr<Eval> expr;
+};
 
 }
 
-#endif /* CASPER_KERNEL_OBJ_DOMEXPR_H_ */
+#endif /* CASPER_KERNEL_OBJ_PAR_H_ */

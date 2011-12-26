@@ -17,30 +17,37 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_OBJ_LITERAL_H_
-#define CASPER_KERNEL_OBJ_LITERAL_H_
+#ifndef CASPER_KERNEL_OBJ_CHKEXPR_H_
+#define CASPER_KERNEL_OBJ_CHKEXPR_H_
 
-#include <casper/kernel/obj/expr.h>
+#include <casper/kernel/spexpr/expr.h>
 
 namespace Casper {
 namespace Detail {
 
-template<>
-struct Create<int,int>
-{
-	int operator()(const int& t)
-	{	return t;	}
-};
 
-template<>
-struct Create<bool,bool>
+template<class T>
+struct Create<T,CP::ChkExpr>
 {
-	bool operator()(const bool& t)
-	{	return t;	}
+	CP::ChkExpr operator()(CP::Store& store, const T& t)
+	{	return CP::ChkExpr(store,t);	}
 };
 
 } // Detail
 
+namespace CP {
+
+template<class Eval>
+struct ChkView<Expr<Eval> > : ChkExpr
+{
+	ChkView(Store& store, const Expr<Eval>& e) :
+		ChkExpr(e.toChkExpr(store)),expr(e) {}
+	const Expr<Eval>& getObj() const {	return expr; }
+	Expr<Eval> expr;
+};
+
+} // CP
+
 }
 
-#endif /* CASPER_KERNEL_OBJ_LITERAL_H_ */
+#endif /* CASPER_KERNEL_OBJ_BNDEXPR_H_ */

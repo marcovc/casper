@@ -20,7 +20,7 @@
 
 #include <casper/kernel.h>
 #include <casper/cp.h>
-#include <casper/kernel/obj/expr.h>
+#include <casper/kernel/spexpr/expr.h>
 
 using namespace Casper;
 using namespace std;

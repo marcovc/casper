@@ -3,7 +3,7 @@
 %{
 #include <casper/kernel.h>
 #include <casper/cp.h>
-#include <casper/kernel/obj/expr.h>
+#include <casper/kernel/spexpr/expr.h>
 #include <bindings/python/util/iterator.h>
 %}
 

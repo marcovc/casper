@@ -17,40 +17,25 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_OBJ_GOAL_H_
-#define CASPER_KERNEL_OBJ_GOAL_H_
-
-#include <casper/kernel/obj/expr.h>
-
-namespace Casper {
-namespace Detail {
-
-template<class T>
-struct Create<T,Goal>
-{
-	Goal operator()(State& state, const T& t)
-	{	return Goal(state,t);	}
-};
-
-template<>
-struct Create<bool,Goal>
-{
-	Goal operator()(State& state, const bool& t)
-	{	return Goal(t);	}
-};
-} // Detail
+#ifndef CASPER_KERNEL_SPEXPR_EXPLICIT_H_
+#define CASPER_KERNEL_SPEXPR_EXPLICIT_H_
 
 
-template<class Eval>
-struct GoalView<Expr<Eval> > : IGoal
-{
-	GoalView(State& state, const Expr<Eval>& e) :
-		g(e.toGoal(state)) {}
-	Goal execute() {	return g; }
-	Goal g;
-};
+#ifdef CASPER_PRECOMPILED
+#include <casper/cp/int/spexpr/view.h>
+#include <casper/cp/int/spexpr/ref.h>
+#include <casper/cp/int/spexpr/explicit_postdom.h>
+#include <casper/cp/int/spexpr/explicit_postbnd.h>
+#include <casper/cp/int/spexpr/explicit_postval.h>
+#include <casper/cp/set/spexpr/view.h>
+#include <casper/cp/set/spexpr/post.h>
+#include <casper/cp/set/spexpr/ref.h>
+#include <casper/kernel/spexpr/explicit_ref.h>
+#include <casper/kernel/spexpr/explicit_goal.h>
+#include <casper/cp/int/spexpr/explicit_postbnd.h>
+#include <casper/cp/set/spexpr/explicit_postbnd.h>
+
+#endif
 
 
-}
-
-#endif /* CASPER_KERNEL_OBJ_GOAL_H_ */
+#endif /* CASPER_KERNEL_SPEXPR_EXPLICIT_H_ */

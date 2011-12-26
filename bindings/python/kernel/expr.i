@@ -4,7 +4,7 @@
 %{
 #include <casper/kernel.h>
 #include <casper/cp.h>
-#include <casper/kernel/obj/expr.h>
+#include <casper/kernel/spexpr/expr.h>
 #include <casper/kernel/goal/whiledo.h>
 #include <bindings/python/kernel/expr.h>
 %}
@@ -121,7 +121,7 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 %template() Casper::Util::SPImplIdiom< Casper::Detail::IExpr< Casper::Seq<bool> > >;
 %template() Casper::Util::SPImplIdiom< Casper::Detail::IExpr< Casper::Seq<int> > >;
 
-%include <casper/kernel/obj/expr.h>
+%include <casper/kernel/spexpr/expr.h>
 
 // This is needed since SWIG confuses partial specializations (bug #3431508)
 

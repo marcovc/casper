@@ -2,7 +2,7 @@
 import sys
 import os
 
-libPath = os.path.abspath('bindings/python/pyutils')
+libPath = os.path.abspath('pyutils')
 sys.path.append(libPath)
 
 import objdb

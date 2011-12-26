@@ -545,6 +545,11 @@ bool SUList<T,Compare>::operator==(const SUList& s) const
 }
 
 namespace Traits {
+
+template<class> struct GetEval;
+template<class> struct GetElem;
+template<class> struct GetTermElem;
+
 template<class T,class Comp>
 struct GetEval<SUList<T,Comp> >
 {	typedef Seq<T>	Type;	};

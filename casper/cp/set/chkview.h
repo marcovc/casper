@@ -20,7 +20,7 @@
 #define CASPER_SET_CHKVIEW_H_
 
 #include <casper/cp/view/chk.h>
-#include <casper/cp/set/relation.h>
+#include <casper/kernel/rel/setrel.h>
 
 namespace Casper {
 namespace CP {

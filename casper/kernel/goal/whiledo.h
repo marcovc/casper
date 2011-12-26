@@ -38,14 +38,6 @@ namespace Casper {
  *  Therefore we implement the second version.
  */
 
-NEW_REL_1(whileDo,WhileDo)
-NEW_FN_2(whileDo,WhileDo)
-
-namespace Traits {
-template<class T1,class T2,class T3>
-struct GetEval<Rel3<WhileDo,T1,T2,T3> >
-{	typedef	bool	Type;	};
-} // Traits
 
 /**
  * 	While \a cond evaluates to \p true, executes \a statm.

@@ -143,9 +143,13 @@ struct Ref : Util::PImplIdiom<Reversible<IRef<T>*> >
 
 namespace Traits {
 template<class> struct GetEval;
+template<class> struct GetElem;
+
 template<class T>
 struct GetEval<Ref<T> >
 {	typedef	T	Type;	};
+
+
 } // Traits
 
 template<class Eval>
