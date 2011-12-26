@@ -71,7 +71,7 @@ def printPost(h,kind):
 		
 	objdb.forAllRelOperList(PostCreator("set"),varArg)	
 	objdb.forAllRelPredList(PostCreator("set"))
-	
+	 
 def printRef(h):
 	header = h
 

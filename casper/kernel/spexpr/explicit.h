@@ -15,7 +15,7 @@
  *   See the License for the specific language governing permissions and   * 
  *   limitations under the License.                                        *
  \*************************************************************************/
- 
+
 
 #ifndef CASPER_KERNEL_SPEXPR_EXPLICIT_H_
 #define CASPER_KERNEL_SPEXPR_EXPLICIT_H_

@@ -647,7 +647,7 @@ def defineKernelModule(env):
 	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_kernel",source=objs,
 							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_kernel${SHLIBSUFFIX}",
 							LIBS=confCommonEnv['LIBS'])
-
+ 
 def defineUtilModule(env):
 	objs=[]
 	for i in casper_util:
