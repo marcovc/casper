@@ -115,7 +115,7 @@
                 <runProgram>
                     <explanation>Registering PyCaSPER as a new python extension</explanation>
                     <program>easy_install</program>
-                    <programArguments>--user PyCasper-${project.version}-py2.7.egg</programArguments>
+                    <programArguments>PyCasper-${project.version}-py2.7.egg</programArguments>
                     <progressText>Registering PyCaSPER as a new python extension</progressText>
                     <workingDirectory>${system_temp_directory}</workingDirectory>
                     <ruleList>
@@ -155,6 +155,7 @@
     <enableTimestamp>1</enableTimestamp>
     <osxPlatforms>osx-intel</osxPlatforms>
     <outputDirectory>.</outputDirectory>
+    <requireInstallationByRootUser>1</requireInstallationByRootUser>
     <saveRelativePaths>1</saveRelativePaths>
     <singleInstanceCheck>1</singleInstanceCheck>
     <vendor>CaSPER Team</vendor>
