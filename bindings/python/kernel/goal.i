@@ -15,8 +15,7 @@
 %inline %{
 
 namespace Casper {
-
-
+ 
 Casper::Expr<bool> _selectMin(const Casper::IntRef& par, 
 							 const Casper::Expr<Casper::Seq<int> >& set,
 							 const Casper::Expr<bool>& cond,
@@ -114,45 +113,6 @@ Casper::Expr<bool> selectRand(const Casper::IntRef& par,
 							 const Casper::Expr<Casper::Seq<int> >& set)
 {	return selectRand<Casper::Expr<Casper::Seq<int> > >(par,set); }
 
-/*
-
-Casper::Expr<bool> _forAll(const Casper::IntRef& par, 
-							 const Casper::Expr<Casper::Seq<int> >& set,
-							 const Casper::Expr<bool>& goal)
-{	return rel<ForAll>(par,set,goal); }
-
-Casper::Expr<bool> _forAll(const Casper::IntRef& par, 
-							 const Casper::Expr<Casper::Seq<int> >& set,
-							 const Casper::Expr<bool>& cond,
-							 const Casper::Expr<bool>& goal)
-{	return rel<ForAll>(par,set,cond,goal); }
-
-Casper::Expr<bool> _forAll(const Casper::IntRef& par, 
-							 const Casper::Expr<Casper::Seq<int> >& set,
-							 const Casper::Expr<bool>& cond,
-							 const Casper::Expr<int>& sort,
-							 const Casper::Expr<bool>& goal)
-{	return rel<ForAll>(par,set,cond,sort,goal); }
-
-Casper::Expr<bool> _tryAll(const Casper::IntRef& par, 
-							 const Casper::Expr<Casper::Seq<int> >& set,
-							 const Casper::Expr<bool>& goal)
-{	return rel<TryAll>(par,set,goal); }
- 
-Casper::Expr<bool> _tryAll(const Casper::IntRef& par, 
-							 const Casper::Expr<Casper::Seq<int> >& set,
-							 const Casper::Expr<bool>& cond,
-							 const Casper::Expr<bool>& goal)
-{	return rel<TryAll>(par,set,cond,goal); }
-
-Casper::Expr<bool> _tryAll(const Casper::IntRef& par, 
-							 const Casper::Expr<Casper::Seq<int> >& set,
-							 const Casper::Expr<bool>& cond,
-							 const Casper::Expr<int>& sort,
-							 const Casper::Expr<bool>& goal)
-{	return rel<TryAll>(par,set,cond,sort,goal); }
-
-*/
 
 } // Casper
 

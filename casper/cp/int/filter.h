@@ -25,6 +25,11 @@
 #include <casper/cp/int/fd.h>
 #include <casper/cp/view/dom.h>
 
+//#ifdef CASPER_PRECOMPILED
+//#include <casper/cp/int/spexpr/explicit_postbnd.h>
+//#include <casper/cp/int/spexpr/explicit_postdom.h>
+//#endif
+
 namespace Casper {
 namespace CP {
 

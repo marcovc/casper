@@ -158,6 +158,15 @@ struct VarDomCreator<BD>
 	// returned domain is the union of all domains in the array
 	template<class View>
 	BD* unionOf(Store& store, const View& v);
+
+	BD* operator()(Store& store,std::initializer_list<bool>& l)
+	{
+		std::set<bool> s(l);
+		if (s.size()>1)
+			return operator()(store,false,true);
+		else
+			return operator()(store,*s.begin());
+	}
 };
 
 // returned domain is the union of all domains in the array
@@ -184,7 +193,6 @@ BD* VarDomCreator<BD>::unionOf(Store& store, const View& v)
 }; // CP::Detail
 
 
-
 #endif
 
 
@@ -208,6 +216,19 @@ typedef Casper::CP::VarArray<bool,3> BoolVarArray3;
 typedef Casper::CP::VarArray<int,4> IntVarArray4;
 /// Fourdimensional matrix of Boolean variables \ingroup CPIntegerDataStructures
 typedef Casper::CP::VarArray<bool,4> BoolVarArray4;
+
+#ifdef CASPER_PRECOMPILED
+extern template struct Var<int>;
+extern template struct Var<bool>;
+extern template struct VarArray<int>;
+extern template struct VarArray<bool>;
+extern template struct VarArray<int,2>;
+extern template struct VarArray<bool,2>;
+extern template struct VarArray<int,3>;
+extern template struct VarArray<bool,3>;
+extern template struct VarArray<int,4>;
+extern template struct VarArray<bool,4>;
+#endif
 
 } // CP
 } // Casper

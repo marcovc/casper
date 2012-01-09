@@ -41,72 +41,7 @@ namespace CP {
 
 struct Store;
 
-#if 0
-// converts a view to a checkview
-template<class Eval,class View>
-struct BndChkViewWrapper;
-
-template<class> struct CChkView;
-template<class> struct ChkView;
-
-template<class View>
-struct BndChkViewWrapper<bool,View>
-{
-	BndChkViewWrapper(Store& store,const View& v) :
-		v(store,v) {}
-	bool min() const
-	{	return v.isTrue();	}
-	bool max() const
-	{	return v.canBeTrue();	}
-	bool updateMin(const bool& val)
-	{	return !val or v.isTrue() or v.setToTrue();	}
-	bool updateMax(const bool& val)
-	{	return val or !v.canBeTrue() or v.setToFalse();	}
-	// TODO: improve:
-	void range(bool& l,bool& u) const
-	{	l = min(); u = max();	}
-	bool updateRange(const bool& l, const bool& u)
-	{	return updateMin(l) and updateMax(u);	}
-	void attach(INotifiable* f) { v.attach(f);	}
-	void detach(INotifiable* f) { v.detach(f);	}
-	View getObj()  const { return v.getObj(); }
-
-	CChkView<View>	v;
-};
-
-
-// specializations for bndview over boolean (reificable) expressions
-
-/**
- * 	A BndView allows to access or update the bounds of an associated expression.
- * 	\ingroup BndViews
- **/
-template<class Eval,class View>
-struct BndView : BndChkViewWrapper<Eval,View>
-{
-	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
-	BndView(Store& store, const View& v) :
-		BndChkViewWrapper<Eval,View>(store,v) {}
-};
-
-template<class F,class Expr1,class Eval>
-struct BndViewRel1 : BndChkViewWrapper<Eval,Rel1<F,Expr1> >
-{
-	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
-	BndViewRel1(Store& store, const Expr1& v) :
-		BndChkViewWrapper<Eval,Rel1<F,Expr1> >(store,rel<F>(v)) {}
-};
-
-template<class F,class Expr1,class Expr2,class Eval>
-struct BndViewRel2 : BndChkViewWrapper<Eval,Rel2<F,Expr1,Expr2> >
-{
-	CASPER_ASSERT_CHKVIEW_EVAL(Eval)
-	BndViewRel2(Store& store, const Expr1& v1, const Expr2& v2) :
-		BndChkViewWrapper<Eval,Rel2<F,Expr1,Expr2> >(store,rel<F>(v1,v2)) {}
-};
-
-#else
-
+#if 1
 template<class Eval,class R>
 struct NoBndView
 {
@@ -116,16 +51,33 @@ struct NoBndView
 		os << r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::BndView");
 	}
-	__attribute__((noreturn)) Eval min() const { assert(0); }
-	__attribute__((noreturn)) Eval max() const { assert(0); }
-	__attribute__((noreturn)) bool updateMin(const Eval& val) { assert(0); }
-	__attribute__((noreturn)) bool updateMax(const Eval& val) { assert(0); }
-	__attribute__((noreturn)) void range(Eval& v1,Eval& v2) const {	assert(0); }
-	__attribute__((noreturn)) bool updateRange(const Eval& v1, const Eval& v2) {	assert(0);	}
-	__attribute__((noreturn)) void attach(INotifiable*) { assert(0); }
-	__attribute__((noreturn)) void detach(INotifiable*) { assert(0); }
-	__attribute__((noreturn)) Eval getObj()  const { assert(0); }
+	Eval min() const { throw 0; }
+	Eval max() const { throw 0; }
+	bool updateMin(const Eval& val) { throw 0; }
+	bool updateMax(const Eval& val) { throw 0; }
+	void range(Eval& v1,Eval& v2) const {	throw 0; }
+	bool updateRange(const Eval& v1, const Eval& v2) {	throw 0;	}
+	void attach(INotifiable*) { throw 0; }
+	void detach(INotifiable*) { throw 0; }
+	Eval getObj()  const { throw 0; }
 };
+#else
+template<class Eval,class R>
+struct NoBndView
+{
+	NoBndView(Store& s,const R& r);
+	Eval min() const;
+	Eval max() const;
+	bool updateMin(const Eval& val);
+	bool updateMax(const Eval& val);
+	void range(Eval& v1,Eval& v2) const;
+	bool updateRange(const Eval& v1, const Eval& v2);
+	void attach(INotifiable*);
+	void detach(INotifiable*);
+	R getObj()  const;
+};
+
+#endif
 
 template<class> struct CChkView;
 template<class> struct ChkView;
@@ -190,7 +142,6 @@ struct BndViewRel3 :  NoBndView<Eval,Rel3<F,Expr1,Expr2,Expr3> >
 		NoBndView<Eval,Rel3<F,Expr1,Expr2,Expr3> >(s,rel<F>(v1,v2,v3)) {}
 };
 
-#endif
 
 
 /**

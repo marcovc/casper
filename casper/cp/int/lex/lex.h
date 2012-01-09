@@ -24,6 +24,10 @@
 #include <casper/kernel/reversible/stack.h>
 #include <casper/cp/delta.h>
 
+//#ifdef CASPER_PRECOMPILED
+//#include <casper/cp/int/spexpr/explicit_postbnd.h>
+//#endif
+
 namespace Casper {
 namespace CP {
 

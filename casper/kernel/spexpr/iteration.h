@@ -35,7 +35,7 @@ struct ExprIterationAdaptor : IIterationExpr<Expr<ToEval> >
 	ExprIterationAdaptor(const ExprIterationAdaptor& s) : it(s.it) {}
 
 	void		iterate()			{	it.iterate(); }
-	Elem 		value() const 	{	return Elem(it.value()); }
+	Elem 		value() const 	{	return Elem(it.value());  }
 	bool		valid() const 		{	return it.valid(); }
 	IterationExpr<Elem>		copy() const
 	{

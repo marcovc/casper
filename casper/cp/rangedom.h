@@ -42,52 +42,46 @@ struct RangeDom
 	typedef T	Size;
 
 	// Constructors
-	RangeDom(Env& env) :  	env(env),
-							  lb(env,limits<Value>::negInf()),
-							  ub(env,limits<Value>::posInf()),
-							  groundSL(env),
-							  boundsSL(env) {}
+	RangeDom(State& state) :  lb(state,limits<Value>::negInf()),
+							  ub(state,limits<Value>::posInf()),
+							  groundSL(state),
+							  boundsSL(state) {}
 
-	RangeDom(Env& env, const Value& v) :
-							  env(env),
-							  lb(env,v),ub(env,v),
-							  groundSL(env),
-							  boundsSL(env)  {}
+	RangeDom(State& state, const Value& v) :
+							  lb(state,v),ub(state,v),
+							  groundSL(state),
+							  boundsSL(state)  {}
 
   	template<class T1>
-  	RangeDom(Env& env, const T1& v) :
-  							  env(env),
-  							  lb(env,Casper::Util::convLb<Value>(v)),
-  							  ub(env,Casper::Util::convUb<Value>(v)),
-  							  groundSL(env),
-							  boundsSL(env)  {}
+  	RangeDom(State& state, const T1& v) :
+  							  lb(state,Casper::Util::convLb<Value>(v)),
+  							  ub(state,Casper::Util::convUb<Value>(v)),
+  							  groundSL(state),
+							  boundsSL(state)  {}
 
-  	RangeDom(Env& env, const Value& l, const Value& u) :
-  							  env(env),lb(env,l),ub(env,u),
-  							  groundSL(env),
-							  boundsSL(env)  {}
+  	RangeDom(State& state, const Value& l, const Value& u) :
+  							  lb(state,l),ub(state,u),
+  							  groundSL(state),
+							  boundsSL(state)  {}
 
   	template<class T1, class T2>
-  	RangeDom(Env& env, const T1& l, const T2& u) :
-  							  env(env),
-  							  lb(env,Casper::Util::convLb<Value>(l)),
-  							  ub(env,Casper::Util::convUb<Value>(u)),
-  							  groundSL(env),
-							  boundsSL(env)  {}
+  	RangeDom(State& state, const T1& l, const T2& u) :
+  							  lb(state,Casper::Util::convLb<Value>(l)),
+  							  ub(state,Casper::Util::convUb<Value>(u)),
+  							  groundSL(state),
+							  boundsSL(state)  {}
 
   	RangeDom(const RangeDom& r) :
-  							env(r.getEnv()),
   							lb(r.lb),ub(r.ub),
-  							groundSL(env),
-							boundsSL(env)  {}
+  							groundSL(r.getState()),
+							boundsSL(r.getState())  {}
 
   	template<class T1>
   	RangeDom(const RangeDom<T1>& r) :
-  							env(r.getEnv()),
-							lb(env,Casper::Util::convLb<Value>(r.lb.get())),
-  							ub(env,Casper::Util::convUb<Value>(r.ub.get())),
-  							groundSL(env),
-							boundsSL(env)  {}
+							lb(r.getState(),Casper::Util::convLb<Value>(r.lb.get())),
+  							ub(r.getState(),Casper::Util::convUb<Value>(r.ub.get())),
+  							groundSL(r.getState()),
+							boundsSL(r.getState())  {}
 
 	// Operators
 
@@ -108,7 +102,7 @@ struct RangeDom
  */
   	// Other
 
-	Env& getEnv() const {	return env;	}
+	State& getState() const {	return lb.getState();	}
 
 	const Value&	min() const { return lb;	}
 	const Value&	max() const { return ub;	}
@@ -162,7 +156,6 @@ struct RangeDom
 	Value	getLastMax()	const { return lastMax;	}
 
 	private:
-	Env& 				env;
 	Reversible<Value>	lb;
 	Reversible<Value>	ub;
 

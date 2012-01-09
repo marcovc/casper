@@ -29,10 +29,20 @@ namespace Detail {
 template<class T,class Eval>
 struct Create<T,CP::ValExpr<Eval> >
 {
-	CP::ValExpr<Eval> operator()(CP::Store& store, const T& t)
-	{	return CP::ValExpr<Eval>(store,t);	}
+	CP::ValExpr<Eval> operator()(CP::Store& store, const T& t);
 };
 
+template<class T,class Eval>
+CP::ValExpr<Eval> Create<T,CP::ValExpr<Eval> >::operator()(CP::Store& store, const T& t)
+{	return CP::ValExpr<Eval>(store,t);	}
+
+//template<class Eval,class T>
+//CP::ValExpr<Eval> ExprWrapper<Eval,T>::toCPValExpr(CP::Store& store) const
+//{	return Create<T,CP::ValExpr<Eval> >()(store,t);	}
+//
+//template<class T>
+//CP::ValExpr<bool> ExprWrapper<bool,T>::toCPValExpr(CP::Store& store) const
+//{	return Create<T,CP::ValExpr<bool> >()(store,t);	}
 
 } // Detail
 

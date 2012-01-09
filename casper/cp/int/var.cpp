@@ -1,8 +1,8 @@
-/**************************************************************************\
- *   This file is part of CaSPER.                                          *
+ /*************************************************************************\
+ *   This file is part of CaSPER (http://proteina.di.fct.unl.pt/casper).   *
  *                                                                         *
  *   Copyright:                                                            *
- *   2011-2011 - Marco Correia <marco.v.correia@gmail.com>           *
+ *   2003-2011 - Marco Correia <marco.v.correia@gmail.com>                 *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       *
  *   you may not use this file except in compliance with the License.      *
@@ -16,17 +16,27 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-#include <casper/kernel/spexpr/expr.h>
+#include <casper/cp/var.h>
+#include <casper/cp/int/var.h>
+#include <casper/cp/int/fd.h>
 
 namespace Casper {
-namespace Detail {
+namespace CP {
+
+#ifdef CASPER_PRECOMPILED
+template struct Var<int>;
+template struct Var<bool>;
+template struct VarArray<int>;
+template struct VarArray<bool>;
+template struct VarArray<int,2>;
+template struct VarArray<bool,2>;
+template struct VarArray<int,3>;
+template struct VarArray<bool,3>;
+template struct VarArray<int,4>;
+template struct VarArray<bool,4>;
+#endif
+
+} // CP
+} // Casper
 
 
-template<>
-Ref<bool> Create<Rel1<Ground,CP::VarArray<float> >,Ref<bool> >::operator()(State& state, const Rel1<Ground,CP::VarArray<float> >& t)
-{	return Ref<bool>(state,t);	}
-
-
-
-}
-}

@@ -29,9 +29,12 @@ namespace Detail {
 template<class T>
 struct Create<T,Goal>
 {
-	Goal operator()(State& state, const T& t)
-	{	return Goal(state,t);	}
+	Goal operator()(State& state, const T& t);
 };
+
+template<class T>
+Goal Create<T,Goal>::operator()(State& state, const T& t)
+{	return Goal(state,t);	}
 
 template<>
 struct Create<bool,Goal>

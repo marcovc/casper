@@ -86,7 +86,7 @@ struct IterationView<Rel1<Domain,RefExpr> >
 	IterationView(const IterationView& s) : var(s.var),
 											it(s.it) {}
 	void		iterate()	{	assert(valid()); ++it;	}
-	int			value() const 	{	assert(valid()); return *it;	}
+	Eval		value() const 	{	assert(valid()); return *it;	}
 	bool		valid() const 	{	return it != var.domain().end();	}
 	//Self		copy() const {	return Self(r,it); }
 	//RefView<CP::Var<Eval>,RefExpr> v;

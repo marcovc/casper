@@ -27,16 +27,19 @@ namespace Detail {
 template<class T,class Eval>
 struct Create<T,Ref<Eval> >
 {
-	Ref<Eval> operator()(Casper::State& state, const T& t)
-	{	return Ref<Eval>(state,t);	}
+	Ref<Eval> operator()(Casper::State& state, const T& t);
 };
 
 template<class T,class Eval>
-struct Create<T,Ref<CP::Var<Eval> > >
-{
-	Ref<CP::Var<Eval> > operator()(State& state, const T& t)
-	{	throw Casper::Exception::TypeCoercion(typeid(T).name(),"CP::Var<Eval>");	}
-};
+Ref<Eval> Create<T,Ref<Eval> >::operator()(Casper::State& state, const T& t)
+{	return Ref<Eval>(state,t);	}
+
+//template<class T,class Eval>
+//struct Create<T,Ref<CP::Var<Eval> > >
+//{
+//	Ref<CP::Var<Eval> > operator()(State& state, const T& t)
+//	{	throw Casper::Exception::TypeCoercion(typeid(T).name(),"CP::Var<Eval>");	}
+//};
 
 } // Detail
 

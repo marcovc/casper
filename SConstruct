@@ -116,6 +116,7 @@ casper_cp+=['solver.cpp']
 
 casper_cp_int=[]
 casper_cp_int+=['distinct/graph.cpp']
+casper_cp_int+=['var.cpp']
 
 casper_cp_set=[]
 casper_cp_real=[]
@@ -224,7 +225,7 @@ for root,dir,files in os.walk("examples"):
 			example_sources.append(f)
 
 
-extra_files_info = ['AUTHORS','LICENSE','NOTICE','README','REVISION']
+extra_files_info = ['AUTHORS','LICENSE','NOTICE','README','REVISION','CHANGES']
 extra_files = ['Doxyfile','SConstruct','.project','.cproject']+extra_files_info
 for root,dir,files in os.walk("site_scons"):
 	if '.svn' not in root:        
@@ -259,6 +260,7 @@ vars.Add(PathVariable('install_prefix', 'installation prefix', '.'))
 vars.Add(PathVariable('boost_path','path where boost libraries are installed',None))
 vars.Add(PathVariable('gmp_path','path where gmp library is installed',None))
 vars.Add(PathVariable('mpfr_path','path where mpfr library is installed',None))
+vars.Add(PathVariable('installbuilder_path','path to installbuilder tool','.'))
 
 
 compiler = ARGUMENTS.get('tool', 'default')   #allows user defined compiler
@@ -421,7 +423,7 @@ def getBuildFlags(env,debug_level,optimize_level):
 			link_flags += ['-static']
 		if env['cpp0x']:
 			build_flags += ['-std=gnu++0x']
-		build_flags += ['-Wfatal-errors']
+		#build_flags += ['-Wfatal-errors']
 		#build_flags += ['-fPIC']
 		#build_flags += ['-ffast-math']
 		#link_flags += ['-ffast-math']	
@@ -487,6 +489,12 @@ version_macros = defined_macros+\
 				[("CASPER_BUILDFLAGS",build_str)]
 				#+ \
 				#[("CASPER_BUILDDATE",time.asctime())]
+
+
+########### updates CHANGES file from git information ###########
+
+env.Command("CHANGES",".git/HEAD",
+			["echo CHANGELOG > $TARGET; echo \"---------\" >> $TARGET; echo >> $TARGET; echo >> $TARGET; git log --pretty=format:\"Date: %cd%n  %s%n\" >> $TARGET"]),
 
        
 ############ support for preprocessing macro headers ############
@@ -642,12 +650,13 @@ def defineKernelModule(env):
 	for i in casper_kernel:
 		objs+=env.SharedObject(env['PREFIX']+"/casper/kernel/"+i)
 	if env['precompile']:
-		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/kernel/spexpr/explicit_goal.cpp.py"))
-		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/kernel/spexpr/explicit_ref.cpp.py"))
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/kernel/spexpr/explicit.cpp.py"))
+		#objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/wrapper.cpp.py"))
+		#objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/set/spexpr/wrapper.cpp.py"))
 	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_kernel",source=objs,
 							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_kernel${SHLIBSUFFIX}",
 							LIBS=confCommonEnv['LIBS'])
-
+ 
 def defineUtilModule(env):
 	objs=[]
 	for i in casper_util:
@@ -660,6 +669,8 @@ def defineCPModule(env):
 	objs=[]
 	for i in casper_cp:
 		objs+=env.SharedObject(env['PREFIX']+"/casper/cp/"+i)
+	#if env['precompile']:
+	#	objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/spexpr/wrapper.cpp.py"))
 	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_cp",source=objs,
 							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_cp${SHLIBSUFFIX}",
 							LIBS=confCommonEnv['LIBS'])
@@ -669,23 +680,17 @@ def defineCPIntModule(env):
 	for i in casper_cp_int:
 		objs+=env.SharedObject(env['PREFIX']+"/casper/cp/int/"+i)
 	if env['precompile']:
-		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/view.cpp.py"))
-		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/explicit_postdom.cpp.py"))
-		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/explicit_postbnd.cpp.py"))
-		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/explicit_postval.cpp.py"))
-		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/ref.cpp.py"))
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/int/spexpr/explicit.cpp.py"))	
 	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_cp_int",source=objs,
-							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_cp_int${SHLIBSUFFIX}",
-							LIBS=confCommonEnv['LIBS'])
+						LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_cp_int${SHLIBSUFFIX}",
+						LIBS=confCommonEnv['LIBS'])
 
 def defineCPSetModule(env):
 	objs=[]
 	for i in casper_cp_set:
 		objs+=env.SharedObject(env['PREFIX']+"/casper/cp/set/"+i)
 	if env['precompile']:
-		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/set/spexpr/view.cpp.py"))
-		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/set/spexpr/explicit_postbnd.cpp.py"))
-		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/set/spexpr/ref.cpp.py"))
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/set/spexpr/explicit.cpp.py"))	
 	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_cp_set",source=objs,
 							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_cp_set${SHLIBSUFFIX}",
 							LIBS=confCommonEnv['LIBS'])
@@ -694,10 +699,8 @@ def defineCPRealModule(env):
 	objs=[]
 	for i in casper_cp_real:
 		objs+=env.SharedObject(env['PREFIX']+"/casper/cp/real/"+i)
-	objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/real/spexpr/view.cpp.py"))
-	objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/real/spexpr/post.cpp.py"))
-	objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/real/spexpr/ref.cpp.py"))
-	objs+=env.SharedObject(env['PREFIX']+"/casper/cp/real/spexpr/ref_extra.cpp")
+	if env['precompile']:
+		objs+=env.SharedObject(env.cppSrcBuilder(env['PREFIX']+"/casper/cp/real/spexpr/explicit.cpp.py"))
 	return env.SharedLibrary(target=env['PREFIX']+"/casper/casper_cp_real",source=objs,
 							LINKFLAGS="-Wl,-soname,${SHLIBPREFIX}casper_cp_real${SHLIBSUFFIX}",
 							LIBS=confCommonEnv['LIBS'])
@@ -820,6 +823,18 @@ Alias('casperbind_fzn',casperbind_fzn_target)
 pycasper_target_libpath = confCommonEnv['LIBPATH']
 pycasper_target_libs = library_modules #confCommonEnv['LIBS']+[libcasper]
 
+if env['precompile']:
+	iface_libs = {'kernel': [library_module_kernel,library_module_util],
+				  'util' : [library_module_util],
+				  'cp': [library_module_cp,library_module_cp_int,
+						 library_module_cp_set,library_module_cp_real]
+				  }
+else:
+	iface_libs = {'kernel': confCommonEnv['LIBS']+[libcasper],
+				  'util' : confCommonEnv['LIBS']+[libcasper],
+				  'cp': confCommonEnv['LIBS']+[libcasper]
+				  }
+	
 import distutils.sysconfig
 
 def generate_wrapper(iface):
@@ -843,7 +858,7 @@ def compile_wrapper(iface,pycasper_obj):
 								   LINKFLAGS=env['LINKFLAGS'],
 								   LDMODULEPREFIX='_',
 								   LDMODULESUFFIX='.so',
-								   LIBS=pycasper_target_libs,
+								   LIBS=iface_libs[iface],
 								   FRAMEWORKSFLAGS='-flat_namespace -undefined dynamic_lookup')
 
 	
@@ -873,7 +888,8 @@ for src in ['cp/int/intvar_operators.i','cp/int/boolvar_operators.i',
 	py_gen_scripts.append(env.Command(pref+src,['pyutils/objdb.py',pref+src+'.py'],'python '+pref+src+'.py'+' > $TARGET'))
 
 copy_init = [Command(env['PREFIX']+"/bindings/python/casper/__init__.py", "build/"+MODE+"/bindings/python/casper/kernel.py", Copy("$TARGET", env['PREFIX']+"/bindings/python/casper/kernel.py"))]
-Alias('casper_python',py_gen_scripts+pycasper_libs+copy_init)
+pycasper_target = py_gen_scripts+pycasper_libs+copy_init
+Alias('pycasper',pycasper_target)
 	
 ### support for packaging py-casper ###
 
@@ -1006,7 +1022,7 @@ if env.has_key('MSVSPROJECTCOM'):
 
 ### installing ###
 
-'''
+
 def createLibInstallTarget(env):
 	common_install_target = []
 	for i in dist_sources:
@@ -1027,30 +1043,64 @@ def createLibInstallTarget(env):
 lib_install_target = createLibInstallTarget(env)
 Alias('library-install',lib_install_target)	
               
-
 ### packaging ###
 
 newenv = env.Clone()
-newenv['install_prefix']="./dist/usr/"
-bindist_install_target = createLibInstallTarget(newenv)
+newenv['install_prefix']="dist/casper/"
+library_bindist = createLibInstallTarget(newenv)
+env.Clean(library_bindist,"dist/casper/")
+Alias('library-bindist',library_bindist)	
 
-bindist = [env.Install("dist/Library/Python/2.7/site-packages/",Dir(env["PREFIX"]+"bindings/python/casper")),
-					 env.Command("dist/License.txt","LICENSE",[Copy("$TARGET","$SOURCE")]),
-					 env.Command("dist/Readme.txt","README",[Copy("$TARGET","$SOURCE")]),
-					 env.Command("dist/Changelog.txt",".git/HEAD",
-							["echo CHANGELOG > $TARGET; echo \"---------\" >> $TARGET; echo >> $TARGET; echo >> $TARGET; git log --pretty=format:\"Date: %cd%n  %s%n\" >> $TARGET"]),
-					 bindist_install_target]
-Alias('bindist',bindist)
-			
-Alias('package_macosx',
-					[env.PackageMaker(source=[bindist,"dist/CaSPER.pmdoc"],
-									target=File("dist/CaSPER-"+casper_version+".pkg"),
-					 VERSION="\""+casper_version+"\"")])
 
-dist_sources.append(File('REVISION'))
+pycasper_bindist = [env.Install(target="dist/pycasper/casper/",source=pycasper_target), #Dir(env["PREFIX"]+"/bindings/python/casper")
+				 	env.Install(target="dist/pycasper/data/",source = extra_files_info)]
+env.Clean(pycasper_bindist,"dist/pycasper/")
+Alias('pycasper-bindist',pycasper_bindist)
 
-'''
 
+def build_egg(source,target,env):
+	#from  distutils.core import setup
+	from  setuptools import setup
+	
+	setup(script_name = 'setup.py',
+	   	 script_args = ['bdist_egg'],
+	   	 name="PyCasper",
+	   	 version=casper_version,
+		 description='Python bindings for the CaSPER C++ library (Constraint Solving Platform for Engineering and Research)',
+		 author='Marco Correia',
+		 author_email='marco.v.correia@gmail.com',
+		 url='http://proteina.di.fct.unl.pt/casper',
+		 package_dir = {'': 'dist/pycasper'},
+	   	 packages=['casper'],
+	   	 package_data= {'casper': ['_cp.so','_kernel.so','_util.so']},
+	   	 data_files = [('info',[i for i in os.listdir('dist/pycasper/data')])],
+	   	 classifiers=[
+	        'Development Status :: 4 - Beta',
+	        'Environment :: Console',
+	        'Intended Audience :: End Users/Desktop',
+	        'Intended Audience :: Developers',
+	        'License :: OSI Approved :: Apache Software License'
+	        'Operating System :: MacOS :: MacOS X',
+	        'Operating System :: Microsoft :: Windows',
+	        'Operating System :: POSIX',
+	        'Programming Language :: Python',
+	        'Programming Language :: C++',
+	        'Topic :: Education',
+	        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+	        'Topic :: Software Development :: Libraries',
+        ])
+	
+pycasper_egg = env.Command(File('dist/PyCasper-'+casper_version+'-py2.7.egg'),pycasper_bindist,[build_egg])
+Alias('pycasper-package-egg',pycasper_egg)
+	
+
+Alias('package-bin',[library_bindist,pycasper_egg,
+					env.Command(target=['casper-'+casper_version+'-linux-installer.run',
+										'casper-'+casper_version+'-windows-installer.exe',
+										'casper-'+casper_version+'-osx-installer.app'],
+							    source='dist/casper-proj.xml',
+								action=env['installbuilder_path']+"/bin/builder build $SOURCE --setvars project.version="+casper_version)])
+	
 '''
 package_libsrc_dist = env.Package( 
 			 source			= dist_sources,

@@ -2,7 +2,7 @@
  *   This file is part of CaSPER.                                          *
  *                                                                         *
  *   Copyright:                                                            *
- *   2011-2011 - Marco Correia <marco.v.correia@gmail.com>           *
+ *   2012-2012 - Marco Correia <marco.v.correia@gmail.com>           *
  *                                                                         *
  *   Licensed under the Apache License, Version 2.0 (the "License");       * 
  *   you may not use this file except in compliance with the License.      * 
@@ -17,33 +17,46 @@
  \*************************************************************************/
  
 
-#ifndef CASPER_KERNEL_OBJ_EXTENSIONS_H_
-#define CASPER_KERNEL_OBJ_EXTENSIONS_H_
+#ifndef CASPER_CP_SPEXPR_EXPR_H_
+#define CASPER_CP_SPEXPR_EXPR_H_
 
-#include <casper/cp/store.h>
+#include <casper/kernel/spexpr/expr_wrapper.h>
+
+#include <casper/cp/spexpr/domexpr.h>
+#include <casper/cp/spexpr/bndexpr.h>
+#include <casper/cp/spexpr/valexpr.h>
+#include <casper/cp/spexpr/chkexpr.h>
 
 namespace Casper {
-namespace CP  {
+namespace Detail {
 
-#if defined(SWIG) | defined(SWIG_BUILD)
-bool Store::post(const Casper::Expr<bool>& expr,
-		  Casper::CP::Consistency consistency)
-{
-	switch (consistency)
-	{
-		case Casper::CP::Domain:
-			return expr.postDomFilter(*this);
-		case Casper::CP::Bounds:
-			return expr.postBndFilter(*this);
-		case Casper::CP::Value:
-			return expr.postValFilter(*this);
-		default:
-			throw Casper::Exception::InvalidOperation("invalid value for consistency parameter");
-	}
+//
+//template<class Eval,class T>
+//Ref<CP::Var<Eval> >	ExprWrapper<Eval,T>::toCPVarRef(State& state) const
+//{	return Create<T,Ref<CP::Var<Eval> > >()(state,t);	}
+//
+//template<class T>
+//Ref<CP::Var<bool> >	ExprWrapper<bool,T>::toCPVarRef(State& state) const
+//{	return Create<T,Ref<CP::Var<bool> > >()(state,t);	}
+//
+//template<class T>
+//bool	ExprWrapper<bool,T>::postDomFilter(CP::Store& store) const
+//{	return PostFilter<T>::dom(store,t);	}
+//
+//template<class T>
+//bool	ExprWrapper<bool,T>::postBndFilter(CP::Store& store) const
+//{	return PostFilter<T>::bnd(store,t);	}
+//
+//template<class T>
+//bool	ExprWrapper<bool,T>::postValFilter(CP::Store& store) const
+//{	return PostFilter<T>::val(store,t);	}
+
 }
+}
+
+#ifdef CASPER_PRECOMPILE
+#include <casper/cp/int/spexpr/explicit.h>
+#include <casper/cp/set/spexpr/explicit.h>
 #endif
 
-}
-}
-
-#endif /* CASPER_KERNEL_OBJ_EXTENSIONS_H_ */
+#endif /* CASPER_CP_SPEXPR_EXPR_H_ */

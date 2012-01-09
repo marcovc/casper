@@ -156,7 +156,7 @@ struct Store : INotifiable
 #endif
 
 #if defined(SWIG) | defined(SWIG_BUILD)
-	bool post(const Casper::Expr<bool>& expr,
+	inline bool post(const Casper::Expr<bool>& expr,
 			  Casper::CP::Consistency consistency = Casper::CP::Bounds);
 #endif
 
@@ -296,6 +296,7 @@ protected:
 	Reversible<bool> 	bValid;
 	Reversible<bool> 	bPending;
 };
+
 
 } // CP
 } // Casper

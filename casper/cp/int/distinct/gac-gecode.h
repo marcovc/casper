@@ -832,6 +832,9 @@ VarValGraph<View>::sync(void)
 } // CP
 } // Casper
 
+//#ifdef CASPER_PRECOMPILED
+//#include <casper/cp/int/spexpr/explicit_postdom.h>
+//#endif
 
 namespace Casper {
 namespace CP {

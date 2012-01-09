@@ -30,6 +30,7 @@ namespace CP {
  * Value View
  *********************/
 
+#if 1
 template<class Eval,class R>
 struct NoValView
 {
@@ -39,13 +40,27 @@ struct NoValView
 		os << r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::ValView");
 	}
-	__attribute__((noreturn)) Eval value() const { assert(0); }
-	__attribute__((noreturn)) bool setValue(const Eval& val) { assert(0); }
-	__attribute__((noreturn)) bool ground() const { assert(0); }
-	__attribute__((noreturn)) void attach(INotifiable*) { assert(0); }
-	__attribute__((noreturn)) void detach(INotifiable*) { assert(0); }
-	__attribute__((noreturn)) Eval getObj()  const { assert(0); }
+	Eval value() const {	throw 0;	}
+	bool setValue(const Eval& val) {	throw 0;	}
+	bool ground() const {	throw 0;	}
+	void attach(INotifiable*) {	throw 0;	}
+	void detach(INotifiable*) {	throw 0;	}
+	Eval getObj()  const {	throw 0;	}
 };
+#else
+template<class Eval,class R>
+struct NoValView
+{
+	NoValView(Store& s,const R& r);
+	Eval value() const;
+	bool setValue(const Eval& val);
+	bool ground() const;
+	void attach(INotifiable*);
+	void detach(INotifiable*);
+	R getObj()  const;
+};
+#endif
+
 
 template<class> struct CChkView;
 template<class> struct ChkView;

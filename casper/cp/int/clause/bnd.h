@@ -22,6 +22,10 @@
 
 #include <casper/cp/int/clause/common.h>
 
+//#ifdef CASPER_PRECOMPILED
+//#include <casper/cp/int/spexpr/explicit_postbnd.h>
+//#endif
+
 namespace Casper {
 namespace CP {
 

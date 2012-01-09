@@ -37,41 +37,59 @@ def printViews(h):
 	for arg in [varArg]:
 		objdb.forAllRelOper(ViewCreator("CP::DomExpr<Casper::IntSet>","Casper::IntSet","set"),arg)
 		objdb.forAllRelOper(ViewCreator("CP::DomExpr<Casper::BoolSet>","Casper::BoolSet","set"),arg)
-	
+
+		for ev in ["int","bool"]: 	
+			objdb.forAllRelOper(ViewCreator("CP::DomExpr<"+ev+">",ev,"set"),arg)
+			objdb.forAllRelOper(ViewCreator("CP::BndExpr<"+ev+">",ev,"set"),arg)
+			objdb.forAllRelOper(ViewCreator("CP::ValExpr<"+ev+">",ev,"set"),arg)
+		objdb.forAllRelOper(ViewCreator("CP::ChkExpr","bool","set"),arg)
+
 	objdb.forAllRelPred(ViewCreator("CP::DomExpr<Casper::IntSet>","Casper::IntSet","set"))
 	objdb.forAllRelPred(ViewCreator("CP::DomExpr<Casper::BoolSet>","Casper::BoolSet","set"))
 	
+	for ev in ["int","bool"]: 	
+		objdb.forAllRelPred(ViewCreator("CP::DomExpr<"+ev+">",ev,"set"))
+		objdb.forAllRelPred(ViewCreator("CP::BndExpr<"+ev+">",ev,"set"))
+		objdb.forAllRelPred(ViewCreator("CP::ValExpr<"+ev+">",ev,"set"))
 	
-
-def printPost(h,kind):
+	objdb.forAllRelPred(ViewCreator("CP::ChkExpr","bool","set"))
+				
+def printPost2(h):
 	header = h
+	
 	class PostCreator:
 		def __init__(self,m=None):
+			self.header = header
 			self.m = m
-		def printRel(self,func,args,argevs):
-			if header:
-				print "extern",
-			print "template struct Post"+kind+"Filter"+str(len(args))+"<Casper::"+func+","+",".join([argevs[i]+","+args[i] for i in range(len(args))])+" >;" 
-#			if header:
-#				print "extern",
-#			print "template struct "+kind+"FilterView"+str(len(args))+"<Casper::"+func+","+",".join([argevs[i]+","+args[i] for i in range(len(args))])+" >;" 
 		def print1(self,f):
-			if header:
+			if self.header:
 				print "extern",
-			print "template bool Post"+kind+"Filter::operator()(Store&,const "+f+"&) const;"
-		def __call__(self,r,func,args,argevs):
+			print "template struct PostFilter<"+f+">;"		
+		def __call__(self,r,f):
 			if r.properties["ev"]=="bool" and objdb.getCPModule(r)==self.m:
-				if r.properties["type"]=="tRel":
-					self.printRel(func,args,argevs)
+				self.print1(f)
 	
 	def varArg(ev):
 		if ev!="Casper::IntSet" and ev!="Casper::BoolSet":
 			return None
 		return "CP::Var<"+ev+">"
-		
-	objdb.forAllRelOperList(PostCreator("set"),varArg)	
-	objdb.forAllRelPredList(PostCreator("set"))
 	
+#	def refArg(ev):
+#		if ev!="bool" and ev!="int":
+#			return None
+#		return "Ref<"+ev+">"
+#
+#	def goalArg(ev):
+#		if ev!="bool":
+#			return None
+#		return "Goal"
+	
+	
+	for arg in [varArg]: #,refArg,goalArg]:
+		objdb.forAllRelOper(PostCreator("set"),arg)	
+	objdb.forAllRelPred(PostCreator("set"))
+
+		 
 def printRef(h):
 	header = h
 
@@ -87,6 +105,62 @@ def printRef(h):
 		def __call__(self,r,f):
 			if r.properties["ev"]==self.ev and objdb.getCPModule(r)==self.m:
 				self.print1(f)
+
+	def varArg(ev):
+		if ev not in ["Casper::BoolSet","Casper::IntSet"]:
+			return None
+		return "CP::Var<"+ev+">"
+
+	if header:
+		for arg in [varArg]:
+			objdb.forAllRelOper(RefCreator("Ref<int>","int","set"),arg)
+			objdb.forAllRelOper(RefCreator("Ref<bool>","bool","set"),arg)
 		
 	objdb.forAllRelPred(RefCreator("Ref<CP::Var<Casper::IntSet> >","Casper::IntSet","set"))
 	objdb.forAllRelPred(RefCreator("Ref<CP::Var<Casper::BoolSet> >","Casper::BoolSet","set"))
+
+
+def printExprWrapper(h):
+	header = h
+	
+	class ExprWrapper:
+		def print1(self,ev,f):
+			if header:
+				print "extern",
+			print "template struct ExprWrapper<"+ev+","+f+">;"
+		def __call__(self,r,f):
+			if objdb.getCPModule(r)=="set":
+				self.print1(r.properties["ev"],f)
+	
+	def varArg(ev):
+		if ev not in ["Casper::BoolSet","Casper::IntSet"]:
+			return None
+		return "CP::Var<"+ev+">"
+
+	for ev in ["Casper::BoolSet","Casper::IntSet"]:
+		ExprWrapper().print1(ev,"CP::Var<"+ev+">")
+		ExprWrapper().print1("Seq<"+ev+">","CP::VarArray<"+ev+",1>")
+		ExprWrapper().print1("Seq<"+ev+">","CP::VarArray<"+ev+",2>")
+	
+	for arg in [varArg]:
+		objdb.forAllRelOper(ExprWrapper(),arg)
+	objdb.forAllRelPred(ExprWrapper())
+
+def printRel(h):
+	header = h
+	
+	class Rel:
+		def print1(self,ev,f):
+			if header:
+				print "extern",
+			print "template struct "+f+";"			
+		def __call__(self,r,f):
+			self.print1(r.properties["ev"],f)
+	
+	def varArg(ev):
+		if ev not in ["Casper::BoolSet","Casper::IntSet"]:
+			return None
+		return "CP::Var<"+ev+">"
+	
+	for arg in [varArg]:
+		objdb.forAllRelOper(Rel(),arg)

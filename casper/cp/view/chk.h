@@ -26,6 +26,7 @@
 namespace Casper {
 namespace CP {
 
+#if 1
 template<class R>
 struct NoChkView
 {
@@ -36,17 +37,31 @@ struct NoChkView
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::ChkView");
 	}
 	bool isTrue() const
-	{	return true;	}
+	{	throw 0;	}
 	bool canBeTrue() const
-	{	return true;	}
+	{	throw 0;	}
 	bool setToTrue()
-	{	return true;	}
+	{	throw 0;	}
 	bool setToFalse()
-	{	return true;	}
-	__attribute__((noreturn))  R getObj() const { throw "error";}
-	void attach(INotifiable*)	{}
-	void detach(INotifiable*)	{}
+	{	throw 0;	}
+	R getObj() const { throw 0; }
+	void attach(INotifiable*)	{	throw 0;	}
+	void detach(INotifiable*)	{	throw 0;	}
 };
+#else
+template<class R>
+struct NoChkView
+{
+	NoChkView(const R& r);
+	bool isTrue() const;
+	bool canBeTrue() const;
+	bool setToTrue();
+	bool setToFalse();
+	R getObj() const;
+	void attach(INotifiable*);
+	void detach(INotifiable*);
+};
+#endif
 
 template<class View>
 struct ChkView : NoChkView<View>

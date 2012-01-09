@@ -272,18 +272,6 @@ struct PostD1BndFilter
 
 extern PostD1BndFilter postD1BndFilter;
 
-} // CP
-} // Casper
-
-#ifdef CASPER_PRECOMPILED
-//#include <casper/cp/int/spexpr/explicit_postbnd.h>
-//#include <casper/cp/set/spexpr/explicit_postbnd.h>
-#endif
-
-namespace Casper {
-namespace CP {
-
-
 // happens for example when the negation for a relation is not defined
 template<>
 struct BndFilterView<Rel0<UnknownRel> > : UndefinedFilter

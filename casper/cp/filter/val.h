@@ -233,16 +233,6 @@ struct PostValFilter
 
 extern PostValFilter postValFilter;
 
-} // CP
-} // Casper
-
-#ifdef CASPER_PRECOMPILED
-#include <casper/cp/int/spexpr/explicit_postval.h>
-#endif
-
-namespace Casper {
-namespace CP {
-
 /**
  * FIXME: see same relation for bnd and dom
  * Enforces the conjunction of two constraints. It succeeds if both

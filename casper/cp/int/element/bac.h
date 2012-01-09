@@ -24,6 +24,10 @@
 #include <casper/cp/view/array.h>
 #include <casper/cp/filter/common.h>
 
+//#ifdef CASPER_PRECOMPILED
+//#include <casper/cp/int/spexpr/explicit_postbnd.h>
+//#endif
+
 namespace Casper {
 namespace CP {
 
@@ -45,7 +49,7 @@ struct BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>
 	void 	detach(INotifiable* pParent);
 	bool 	notify();
 	Cost 	cost() const {	return linearLo; }
-	Filter  operator!() { return Bnd(array.getObj()[idx.getObj()]!=res.getObj()); }
+//	Filter  operator!() { return Bnd(array.getObj()[idx.getObj()]!=res.getObj()); }
 
   private:
   	//typedef typename BndArrayView<int,ArrayView>::Elem ArrayElem;

@@ -20,11 +20,8 @@ def printViews(h):
 			if self.header:
 				print "extern",
 			print "template struct Create<"+f+","+self.t+">;"		
-			if self.header:
-				print "extern",
-			print "template "+self.t+" Create<"+f+","+self.t+">::operator()(CP::Store&,const "+f+"&);"		
 		def __call__(self,r,f):
-			if r.properties["ev"]==self.ev and objdb.getCPModule(r)==self.m:
+			if r.properties["ev"]==self.ev and (self.m == None or objdb.getCPModule(r)==self.m):
 				self.print1(f)
 	
 	def varArg(ev):
@@ -36,20 +33,31 @@ def printViews(h):
 		if ev!="bool" and ev!="int":
 			return None
 		return "Ref<"+ev+">"
+
+	def goalArg(ev):
+		if ev!="bool":
+			return None
+		return "Goal"
 	
-	for arg in ["CP::Var<int>","Ref<int>"]:
+	for arg in ["CP::Var<int>","Ref<int>","int","bool"]:
 		ViewCreator("CP::DomExpr<int>").print1(arg)
 		ViewCreator("CP::BndExpr<int>").print1(arg)
 		ViewCreator("CP::ValExpr<int>").print1(arg)
 	
-	for arg in ["Goal","Ref<bool>","CP::Var<bool>"]:
+	for arg in ["Goal","Ref<bool>","CP::Var<bool>","bool","int"]:
 		ViewCreator("CP::BndExpr<bool>").print1(arg)
 		ViewCreator("CP::ValExpr<bool>").print1(arg)
 		ViewCreator("CP::ChkExpr").print1(arg)
 	
-	ViewCreator("CP::DomExpr<bool>").print1("Ref<bool>")
-	
-	for arg in [varArg]:
+	for arg in ["Ref<bool>","CP::Var<bool>","bool"]:
+		ViewCreator("CP::DomExpr<bool>").print1(arg)
+
+	if header:
+		args = [varArg,refArg,goalArg]
+	else:
+		args = [varArg]
+		
+	for arg in args:
 		objdb.forAllRelOper(ViewCreator("CP::DomExpr<int>","int","int"),arg)
 		objdb.forAllRelOper(ViewCreator("CP::BndExpr<int>","int","int"),arg)
 		objdb.forAllRelOper(ViewCreator("CP::ValExpr<int>","int","int"),arg)
@@ -70,38 +78,39 @@ def printViews(h):
 	
 	objdb.forAllRelPred(ViewCreator("CP::ChkExpr","bool","int"))
 	
+	if header:
+		objdb.forAllInstObjs(ViewCreator("CP::DomExpr<bool>","bool"))
+		objdb.forAllInstObjs(ViewCreator("CP::BndExpr<bool>","bool"))
+		objdb.forAllInstObjs(ViewCreator("CP::ValExpr<bool>","bool"))	
+		objdb.forAllInstObjs(ViewCreator("CP::ChkExpr","bool"))
 
-def printPost(h,kind):
+
+				
+def printPost2(h):
 	header = h
+	
 	class PostCreator:
 		def __init__(self,m=None):
+			self.header = header
 			self.m = m
-		def printRel(self,func,args,argevs):
-			if header:
-				print "extern",
-			print "template struct Post"+kind+"Filter"+str(len(args))+"<Casper::"+func+","+",".join([argevs[i]+","+args[i] for i in range(len(args))])+" >;" 
-#			if header:
-#				print "extern",
-#			print "template struct "+kind+"FilterView"+str(len(args))+"<Casper::"+func+","+",".join([argevs[i]+","+args[i] for i in range(len(args))])+" >;" 
 		def print1(self,f):
-			if header:
+			if self.header:
 				print "extern",
-			print "template bool Post"+kind+"Filter::operator()(Store&,const "+f+"&) const;"
-		def __call__(self,r,func,args,argevs):
-			if r.properties["ev"]=="bool" and objdb.getCPModule(r)==self.m:
-				if r.properties["type"]=="tRel":
-					self.printRel(func,args,argevs)
-					
+			print "template struct PostFilter<"+f+">;"		
+		def __call__(self,r,f):
+			if r.properties["ev"]=="bool" and (self.m==None or objdb.getCPModule(r)==self.m):
+				self.print1(f)
+	
 	def varArg(ev):
 		if ev!="bool" and ev!="int":
 			return None
-		return "CP::Var<"+ev+" >"
+		return "CP::Var<"+ev+">"
 	
 	def refArg(ev):
 		if ev!="bool" and ev!="int":
 			return None
-		return "Ref<"+ev+" >"
-	
+		return "Ref<"+ev+">"
+
 	def goalArg(ev):
 		if ev!="bool":
 			return None
@@ -109,8 +118,13 @@ def printPost(h,kind):
 	
 	PostCreator("int").print1("CP::Var<bool>")
 	
-	objdb.forAllRelOperList(PostCreator("int"),varArg)	
-	objdb.forAllRelPredList(PostCreator("int"))
+	for arg in [varArg,refArg,goalArg]:
+		objdb.forAllRelOper(PostCreator("int"),arg)	
+	objdb.forAllRelPred(PostCreator("int"))
+
+	if header:
+		objdb.forAllInstObjs(PostCreator())
+	
 	
 def printRef(h):
 	header = h
@@ -133,8 +147,10 @@ def printRef(h):
 			return None
 		return "Ref<"+ev+">"
 	
+	RefCreator("Ref<int>").print1("CP::Var<int>")
 	RefCreator("Ref<CP::Var<int> >").print1("CP::Var<int>")
 	RefCreator("Ref<CP::Var<int> >").print1("Ref<int>")
+	RefCreator("Ref<bool>").print1("CP::Var<bool>")
 	RefCreator("Ref<CP::Var<bool> >").print1("CP::Var<bool>")
 	RefCreator("Ref<CP::Var<bool> >").print1("Goal")
 	RefCreator("Ref<CP::Var<bool> >").print1("Ref<bool>")
@@ -144,3 +160,47 @@ def printRef(h):
 	
 	objdb.forAllRelPred(RefCreator("Ref<CP::Var<int> >","int","int"))
 	objdb.forAllRelPred(RefCreator("Ref<CP::Var<bool> >","bool","int"))
+	
+
+def printExprWrapper(h):
+	header = h
+	
+	class ExprWrapper:
+		def print1(self,ev,f):
+			if header:
+				print "extern",
+			print "template struct ExprWrapper<"+ev+","+f+">;"
+		def __call__(self,r,f):
+			self.print1(r.properties["ev"],f)
+	
+	def varArg(ev):
+		if ev not in ["bool","int"]:
+			return None
+		return "CP::Var<"+ev+">"
+
+	for ev in ["bool","int"]:
+		ExprWrapper().print1(ev,"CP::Var<"+ev+">")
+		ExprWrapper().print1("Seq<"+ev+">","CP::VarArray<"+ev+",1>")
+		ExprWrapper().print1("Seq<"+ev+">","CP::VarArray<"+ev+",2>")
+	
+	for arg in [varArg]:
+		objdb.forAllRelOper(ExprWrapper(),arg)
+
+def printRel(h):
+	header = h
+	
+	class Rel:
+		def print1(self,ev,f):
+			if header:
+				print "extern",
+			print "template struct "+f+";"
+		def __call__(self,r,f):
+			self.print1(r.properties["ev"],f)
+	
+	def varArg(ev):
+		if ev not in ["bool","int"]:
+			return None
+		return "CP::Var<"+ev+">"
+
+	for arg in [varArg]:
+		objdb.forAllRelOper(Rel(),arg)

@@ -27,6 +27,10 @@
 #include <casper/cp/view/array.h>
 #include <casper/util/timer.h>	// tmp
 
+//#ifdef CASPER_PRECOMPILED
+//#include <casper/cp/int/spexpr/explicit_postval.h>
+//#endif
+
 namespace Casper {
 namespace CP {
 

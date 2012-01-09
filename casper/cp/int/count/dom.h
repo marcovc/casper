@@ -20,6 +20,10 @@
 #ifndef CASPER_CP_INT_COUNT_DOM_H_
 #define CASPER_CP_INT_COUNT_DOM_H_
 
+//#ifdef CASPER_PRECOMPILED
+//#include <casper/cp/int/spexpr/explicit_postdom.h>
+//#endif
+
 namespace Casper {
 namespace CP {
 

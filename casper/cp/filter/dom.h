@@ -135,8 +135,6 @@ struct PostDomFilter1
 	}
 };
 
-//extern template struct PostDomFilter1<Casper::Distinct, Casper::Seq<int>, Casper::Expr<Casper::Seq<int> > >;
-
 template<class Func,class Eval1,class Expr1,class Eval2,class Expr2>
 struct PostDomFilter2
 {
@@ -247,15 +245,6 @@ struct PostDomFilter
 };
 
 extern PostDomFilter postDomFilter;
-} // CP
-} // Casper
-
-#ifdef CASPER_PRECOMPILED
-#include <casper/cp/int/spexpr/explicit_postdom.h>
-#endif
-
-namespace Casper {
-namespace CP {
 
 /**
  * Enforces the conjunction of two constraints by creating a Dom filter

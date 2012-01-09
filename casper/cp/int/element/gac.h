@@ -22,6 +22,10 @@
 #include <casper/cp/int/element/common.h>
 #include <casper/util/util.h>
 
+//#ifdef CASPER_PRECOMPILED
+//#include <casper/cp/int/spexpr/explicit_postdom.h>
+//#endif
+
 //#define ELEMENT_USE_WATCHED_LITERALS
 
 

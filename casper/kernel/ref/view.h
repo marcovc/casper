@@ -40,22 +40,17 @@ template<class,class,class,class,class,class,class,class,class,class,class,class
 template<class Eval,class R>
 struct NoRefView : IRef<Eval>
 {
-	NoRefView(State& s,const R& r)
+	NoRefView(State& s,const R& r) throw (Casper::Exception::UndefinedView)
 	{
 		std::ostringstream os;
-		os << r;
+		os << "REF"; // r;
 		throw Casper::Exception::UndefinedView(os.str().c_str(),"RefView");
 	}
-	Eval value() const;
-	void setValue(const Eval& val);
-	bool ground() const;
-	R getObj()  const;
-#if 0
-	__attribute__((noreturn)) Eval value() const { assert(0); }
-	__attribute__((noreturn)) void setValue(const Eval& val) { assert(0); }
-	__attribute__((noreturn)) bool ground() const { assert(0); }
-	__attribute__((noreturn)) R getObj()  const { assert(0); }
-#endif
+
+	Eval value() const { throw 0; }
+	void setValue(const Eval& val) { throw 0; }
+	bool ground() const { throw 0; }
+	R getObj()  const { throw 0; }
 };
 
 
@@ -349,7 +344,7 @@ struct RefView2<And,bool,Expr1,bool,Expr2,bool> : IRef<bool>
 {
 	RefView2(State& state,const Expr1& p1,const Expr2& p2) :
 		p1(state,p1),p2(state,p2) {}
-	bool value() const { return p1.value() && p2.value(); }
+	bool value() const { return p1.value() and p2.value(); }
 
 	Rel2<And,Expr1,Expr2> getObj()  const
 	{ return p1.getObj() and p2.getObj(); }
@@ -366,10 +361,28 @@ struct RefView2<Or,bool,Expr1,bool,Expr2,bool> : IRef<bool>
 {
 	RefView2(State& state,const Expr1& p1, const Expr2& p2) :
 		p1(state,p1),p2(state,p2) 	{}
-	bool value() const { return p1.value() || p2.value(); }
+	bool value() const { return p1.value() or p2.value(); }
 
 	Rel2<Or,Expr1,Expr2> getObj()  const
 	{ return p1.getObj() or p2.getObj(); }
+
+	RefView<bool,Expr1>	p1;
+	RefView<bool,Expr2>	p2;
+};
+
+/**
+ * 	RefView over disjunction.
+ * 	\ingroup Views
+ **/
+template<class Expr1,class Expr2>
+struct RefView2<XOr,bool,Expr1,bool,Expr2,bool> : IRef<bool>
+{
+	RefView2(State& state,const Expr1& p1, const Expr2& p2) :
+		p1(state,p1),p2(state,p2) 	{}
+	bool value() const { return p1.value() xor p2.value(); }
+
+	Rel2<Or,Expr1,Expr2> getObj()  const
+	{ return p1.getObj() xor p2.getObj(); }
 
 	RefView<bool,Expr1>	p1;
 	RefView<bool,Expr2>	p2;
@@ -426,6 +439,42 @@ struct RefView2<Mul,Eval,Expr1,Eval,Expr2,Eval> : IRef<Eval>
 
 	Rel2<Mul,Expr1,Expr2> getObj()  const
 	{ return p1.getObj()*p2.getObj(); }
+
+	RefView<Eval,Expr1>	p1;
+	RefView<Eval,Expr2>	p2;
+};
+
+/**
+ * 	RefView over division.
+ * 	\ingroup Views
+ **/
+template<class Expr1,class Expr2,class Eval>
+struct RefView2<Div,Eval,Expr1,Eval,Expr2,Eval> : IRef<Eval>
+{
+	RefView2(State& state, const Expr1& p1, const Expr2& p2) :
+		p1(state,p1),p2(state,p2) {}
+	Eval value() const { return p1.value() / p2.value(); }
+
+	Rel2<Div,Expr1,Expr2> getObj()  const
+	{ return p1.getObj()/p2.getObj(); }
+
+	RefView<Eval,Expr1>	p1;
+	RefView<Eval,Expr2>	p2;
+};
+
+/**
+ * 	RefView over mod.
+ * 	\ingroup Views
+ **/
+template<class Expr1,class Expr2,class Eval>
+struct RefView2<Mod,Eval,Expr1,Eval,Expr2,Eval> : IRef<Eval>
+{
+	RefView2(State& state, const Expr1& p1, const Expr2& p2) :
+		p1(state,p1),p2(state,p2) {}
+	Eval value() const { return p1.value() % p2.value(); }
+
+	Rel2<Mod,Expr1,Expr2> getObj()  const
+	{ return p1.getObj() % p2.getObj(); }
 
 	RefView<Eval,Expr1>	p1;
 	RefView<Eval,Expr2>	p2;
@@ -810,7 +859,42 @@ struct RefView3<Min,int,Ref<int>,Seq<int>,Set,Eval,Expr,Eval> :
 		Super(state,v,s,true,e) {}
 };
 
-// FIXME: Attach is not correct, must fix when RefArray is ready
+/**
+ * 	RefView over binary minimum.
+ * 	\ingroup Views
+ **/
+template<class Expr1,class Expr2,class Eval>
+struct RefView2<Min,Eval,Expr1,Eval,Expr2,Eval> : IRef<Eval>
+{
+	RefView2(State& state, const Expr1& p1, const Expr2& p2) :
+		p1(state,p1),p2(state,p2) {}
+	Eval value() const { return std::min(p1.value(),p2.value()); }
+
+	Rel2<Min,Expr1,Expr2> getObj()  const
+	{ return min(p1.getObj(),p2.getObj()); }
+
+	RefView<Eval,Expr1>	p1;
+	RefView<Eval,Expr2>	p2;
+};
+
+/**
+ * 	RefView over binary maximum.
+ * 	\ingroup Views
+ **/
+template<class Expr1,class Expr2,class Eval>
+struct RefView2<Max,Eval,Expr1,Eval,Expr2,Eval> : IRef<Eval>
+{
+	RefView2(State& state, const Expr1& p1, const Expr2& p2) :
+		p1(state,p1),p2(state,p2) {}
+	Eval value() const { return std::max(p1.value(),p2.value()); }
+
+	Rel2<Max,Expr1,Expr2> getObj()  const
+	{ return max(p1.getObj(),p2.getObj()); }
+
+	RefView<Eval,Expr1>	p1;
+	RefView<Eval,Expr2>	p2;
+};
+
 template<class Set, class Expr,class Eval>
 struct RefView3<MaxDiff,int,Ref<int>,Seq<int>,Set,Eval,Expr,Eval> : IRef<Eval>
 {
@@ -915,6 +999,24 @@ struct RefView3<IfThenElse,bool,Cond,Eval,IfTrue,Eval,IfFalse,Eval> : IRef<Eval>
 	RefView<bool,Cond> c;
 	RefView<Eval,IfTrue>  t;
 	RefView<Eval,IfFalse> f;
+};
+
+// Disabled for now since Ref<Set> is not defined yet
+
+template<class Eval,class Expr1,class Expr2>
+struct RefView2<Equal,Set<Eval>,Expr1,Set<Eval>,Expr2,bool> :
+	NoRefView<bool,Rel2<Equal,Expr1,Expr2> >
+{
+	RefView2(State& state, const Expr1& p1, const Expr2& p2) :
+		NoRefView<bool,Rel2<Equal,Expr1,Expr2> >(state,rel<Equal>(p1,p2)) {}
+};
+
+template<class Eval,class Expr1,class Expr2>
+struct RefView2<Distinct,Set<Eval>,Expr1,Set<Eval>,Expr2,bool> :
+	NoRefView<bool,Rel2<Distinct,Expr1,Expr2> >
+{
+	RefView2(State& state, const Expr1& p1, const Expr2& p2) :
+		NoRefView<bool,Rel2<Distinct,Expr1,Expr2> >(state,rel<Distinct>(p1,p2)) {}
 };
 
 };

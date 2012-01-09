@@ -1,0 +1,15 @@
+<installerInformation>
+    <versionId>10000</versionId>
+    <version>1.0.0</version>
+    <platformFileList>
+        <platformFile>
+            <filename>casper-1.0-linux-installer.run</filename>
+            <platform>linux</platform>
+        </platformFile>
+    </platformFileList>
+    <downloadLocationList>
+        <downloadLocation>
+	    <url>http://proteina.di.fct.unl.pt/pycasper/updates/</url>
+        </downloadLocation>
+    </downloadLocationList>
+</installerInformation>

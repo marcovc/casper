@@ -163,6 +163,9 @@ struct SetFD
 		/// Returns the store& object associated with this SetFD.
 		Store&	getStore() const {	return store; }
 
+		/// Returns the state manager for this object.
+		State& getState() const {	return inSetSize.getState();	}
+
 		/// \a True if the set is instantiated. O(1).
 		bool 	ground() const { return possSet.empty(); }
 

@@ -36,7 +36,6 @@ class _BlockFunHandler:
 			self.signatures = [sig[1:] for sig in self.signatures if sig[0].block >= self.curBlock and not sig[0].kw]
 
 		if any([len(sig)==0 for sig in self.signatures]):
-			print "1",self.args
 			return self.func(*self.args)
 
 		nextsigs = []
@@ -71,7 +70,6 @@ class _BlockFunHandler:
 		if len(self.signatures)==0:
 			raise TypeError("unmatched signature for function "+str(self.func))			
 		if any([len(sig)==0 for sig in self.signatures]):
-			print "3",self.args
 			return self.func(*self.args)
 		self.curBlock+=1
 		return self

@@ -258,8 +258,28 @@ struct GetTermElem<std::initializer_list<T> >
 
 #endif
 
-}
-}
+} // Traits
+
+
+template<class> struct Expr;
+
+namespace Traits {
+
+template<class Eval>
+struct GetEval<Expr<Eval> >
+{	typedef Eval	Type;	};
+
+template<class T>
+struct GetTermElem<Expr<Seq<T> > >
+{	typedef Expr<T> Type;	};
+
+template<class T>
+struct GetElem<Expr<Seq<T> > >
+{	typedef Expr<T> Type;	};
+
+} // Traits
+
+} // Casper
 
 #ifndef SWIG
 template<class Eval,class... Args>

@@ -28,6 +28,10 @@
 
 #include <iostream>
 
+//#ifdef CASPER_PRECOMPILED
+//#include <casper/cp/int/spexpr/explicit_postdom.h>
+//#endif
+
 namespace Casper {
 namespace CP {
 

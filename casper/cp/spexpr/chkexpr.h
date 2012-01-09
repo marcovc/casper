@@ -29,9 +29,16 @@ namespace Detail {
 template<class T>
 struct Create<T,CP::ChkExpr>
 {
-	CP::ChkExpr operator()(CP::Store& store, const T& t)
-	{	return CP::ChkExpr(store,t);	}
+	CP::ChkExpr operator()(CP::Store& store, const T& t);
 };
+
+template<class T>
+CP::ChkExpr Create<T,CP::ChkExpr>::operator()(CP::Store& store, const T& t)
+{	return CP::ChkExpr(store,t);	}
+
+//template<class T>
+//CP::ChkExpr ExprWrapper<bool,T>::toChkExpr(CP::Store& store) const
+//{	return Create<T,CP::ChkExpr>()(store,t);	}
 
 } // Detail
 

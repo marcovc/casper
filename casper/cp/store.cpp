@@ -130,6 +130,7 @@ Store::operator const State&() const { return env.getState(); }
 Store::operator Util::IHeap&() { return env.getState().getHeap(); }
 Store::operator const Util::IHeap&() const { return env.getState().getHeap(); }
 
+
 } // CP
 } // Casper
 

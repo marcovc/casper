@@ -52,6 +52,7 @@ class ActionMap:
 		return cover
 
 objs = set()
+
 seqTypes = ["Casper::BoolSeq", "Casper::IntSeq", "Casper::BoolSetSeq", "Casper::IntSetSeq"]
 setTypes = ["Casper::IntSet","Casper::BoolSet"]
 
@@ -101,6 +102,8 @@ for f in ["Distinct","Equal"]:
 # boolean binary operations between heterogeneous types
 objs.add(Rule(type="tRel",func="SumEqual",ev="bool",nArgs=2,arg1Eval="Casper::IntSeq",arg2Eval="int"))
 objs.add(Rule(type="tRel",func="Member",ev="bool",nArgs=2,arg1Eval="int",arg2Eval="Casper::IntSet"))
+objs.add(Rule(type="tRel",func="Member",ev="bool",nArgs=2,arg1Eval="bool",arg2Eval="Casper::BoolSet"))
+objs.add(Rule(type="tRel",func="NotMember",ev="bool",nArgs=2,arg1Eval="int",arg2Eval="Casper::IntSet"))
 objs.add(Rule(type="tRel",func="NotMember",ev="bool",nArgs=2,arg1Eval="bool",arg2Eval="Casper::BoolSet"))
 objs.add(Rule(type="tRel",func="Element",ev="bool",nArgs=2,arg1Eval="Casper::BoolSeq",arg2Eval="int"))
 objs.add(Rule(type="tRel",func="InTable",ev="bool",nArgs=2,arg1Eval="Casper::IntSeq",arg2Eval="Casper::IntSeq"))
@@ -142,24 +145,25 @@ objs.add(Rule(type="tRel",func="Element",ev="int",nArgs=2,arg1Eval="Casper::IntS
 
 ## Goals ##
 for t in ["bool","int"]:
-	objs.add(Rule(type="tRel",func="Assign",ev="bool",nArgs=2,arg1Eval=t,arg2Eval=t))
+	objs.add(Rule(type="tRel",func="Assign",ev="bool",nArgs=2,arg1Eval=t,arg1="Casper::Ref<"+t+">",arg2Eval=t))
 objs.add(Rule(type="tRel",func="WhileDo",ev="bool",nArgs=2,arg1Eval="bool",arg2Eval="bool"))
 
-objs.add(Rule(type="tRel",func="ForAll",ev="bool",nArgs=3,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool"))
-objs.add(Rule(type="tRel",func="ForAll",ev="bool",nArgs=4,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval="bool"))
+objs.add(Rule(type="tRel",func="ForAll",ev="bool",nArgs=3,arg1Eval="int",arg1="Casper::Ref<int>",arg2Eval="Casper::IntSeq",arg3Eval="bool"))
+objs.add(Rule(type="tRel",func="ForAll",ev="bool",nArgs=4,arg1Eval="int",arg1="Casper::Ref<int>",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval="bool"))
 
-objs.add(Rule(type="tRel",func="TryAll",ev="bool",nArgs=3,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool"))
-objs.add(Rule(type="tRel",func="TryAll",ev="bool",nArgs=4,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval="bool"))
+objs.add(Rule(type="tRel",func="TryAll",ev="bool",nArgs=3,arg1Eval="int",arg1="Casper::Ref<int>",arg2Eval="Casper::IntSeq",arg3Eval="bool"))
+objs.add(Rule(type="tRel",func="TryAll",ev="bool",nArgs=4,arg1Eval="int",arg1="Casper::Ref<int>",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval="bool"))
 
 for t in ["int"]:
-	objs.add(Rule(type="tRel",func="ForAll",ev="bool",nArgs=5,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t,arg5Eval="bool"))
-	objs.add(Rule(type="tRel",func="TryAll",ev="bool",nArgs=5,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t,arg5Eval="bool"))
+	objs.add(Rule(type="tRel",func="ForAll",ev="bool",nArgs=5,arg1Eval="int",arg1="Casper::Ref<int>",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t,arg5Eval="bool"))
+	objs.add(Rule(type="tRel",func="TryAll",ev="bool",nArgs=5,arg1Eval="int",arg1="Casper::Ref<int>",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t,arg5Eval="bool"))
 #	objs.add(Rule(type="tRel",func="SelectMin",ev="bool",nArgs=4,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t))
 #	objs.add(Rule(type="tRel",func="SelectMin",ev="bool",nArgs=3,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval=t))
 #	objs.add(Rule(type="tRel",func="SelectMax",ev="bool",nArgs=4,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t))
 #	objs.add(Rule(type="tRel",func="SelectMax",ev="bool",nArgs=3,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval=t))
 #objs.add(Rule(type="tRel",func="SelectRand",ev="bool",nArgs=3,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool"))
 #objs.add(Rule(type="tRel",func="SelectRand",ev="bool",nArgs=2,arg1Eval="int",arg2Eval="Casper::IntSeq"))
+
 
 ## Ref expressions
 for f in ["bool","int","Casper::IntSet","Casper::BoolSet","Casper::IntSeq","Casper::BoolSeq","Casper::BoolSetSeq","Casper::IntSetSeq"]:
@@ -170,11 +174,19 @@ objs.add(Rule(type="tRel",cl="CP",func="Domain",ev="Casper::IntSeq",nArgs=1,arg1
 objs.add(Rule(type="tRel",cl="CP",func="Domain",ev="Casper::BoolSeq",nArgs=1,arg1Eval="bool"))
 
 for t in ["bool","int","float","Casper::IntSeq","Casper::BoolSeq","Casper::FloatSeq"]:
-	objs.add(Rule(type="tRel",func="ArgMax",ev="int",nArgs=3,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval=t))
-	objs.add(Rule(type="tRel",func="ArgMax",ev="int",nArgs=4,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t))
-	objs.add(Rule(type="tRel",func="ArgMin",ev="int",nArgs=3,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval=t))
-	objs.add(Rule(type="tRel",func="ArgMin",ev="int",nArgs=4,arg1Eval="int",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t))
+	objs.add(Rule(type="tRel",func="ArgMax",ev="int",nArgs=3,arg1Eval="int",arg1="Casper::Ref<int>",arg2Eval="Casper::IntSeq",arg3Eval=t))
+	objs.add(Rule(type="tRel",func="ArgMax",ev="int",nArgs=4,arg1Eval="int",arg1="Casper::Ref<int>",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t))
+	objs.add(Rule(type="tRel",func="ArgMin",ev="int",nArgs=3,arg1Eval="int",arg1="Casper::Ref<int>",arg2Eval="Casper::IntSeq",arg3Eval=t))
+	objs.add(Rule(type="tRel",func="ArgMin",ev="int",nArgs=4,arg1Eval="int",arg1="Casper::Ref<int>",arg2Eval="Casper::IntSeq",arg3Eval="bool",arg4Eval=t))
 
+instobjs=set()
+for f in ["Min","Max"]:
+	for ev in ["int","bool","Seq<int>","Seq<bool>"]:
+		instobjs.add(Rule(ev="bool",func="Rel2<Assign,Ref<int>,Rel4<Arg"+f+",Ref<int>,Expr<Seq<int> >,Expr<bool>,Expr<"+ev+"> > >")) 
+		instobjs.add(Rule(ev="bool",func="Rel2<Assign,Ref<int>,Rel3<Arg"+f+",Ref<int>,Expr<Seq<int> >,Expr<"+ev+"> > >")) 		
+
+instobjs.add(Rule(ev="bool",func="Rel2<Assign,Ref<int>,Rel3<ArgMin,Ref<int>,Expr<Seq<int> >,Casper::Rel2<RandInRange,double,double> > >"))
+instobjs.add(Rule(ev="bool",func="Rel2<Assign,Ref<int>,Rel4<ArgMin,Ref<int>,Expr<Seq<int> >,Expr<bool>,Casper::Rel2<RandInRange,double,double> > >"))
 
 # TODO later
 #				"fIfThen","fIfThenElse","fInRange",
@@ -203,41 +215,6 @@ for i in range(1,6):
 				lambda r,i=i: "Rel"+str(i)+"<"+r.properties["func"][1:]+
 					"".join([","+cppEval[r.properties["arg"+str(j)+"Eval"]] for j in range(1,i+1)])
 					+">")
- #			
-#intBndExpr = ActionMap()
-#
-#def printTest(rule):
-#	strs = []
-#	for attr in attrsPriority:
-#		if attr in rule.properties.keys():
-#			value = rule.properties[attr]
-#			if attr in cppAttrPrefix.keys():
-#				value = cppAttrPrefix[attr]+str(value)
-#			s = (cppTest[attr]+"=="+str(value))
-#			strs += [s]
-#	print "if (",strs[0],
-#	for i in range(1,len(strs)):
-#		print "and",strs[i],
-#	print ")"
-#
-#def printAction(rule,target):
-#	sources = cppObjType.getCoveredBySet(rule)
-#	if len(sources)==0:
-#		print "\tthrow NotImplemented();"
-#		return 
-#	assert(len(sources)==1)
-#	source = sources[0][1](rule)
-#	print "\treturn Create<"+source+","+target+">()(store,obj);"
-#		
-#def printIntBndExpr(rule):
-#	printTest(rule)
-#	printAction(rule,"CP::IntBndExpr")
-#		
-#for r in objs:
-#	if r.properties["ev"]=="int": 
-#		intBndExpr.add(r,printIntBndExpr)
-#
-#intBndExpr.runAll()
 
 #python unary and binary operators
 casperOp2PythonOp = {
@@ -311,9 +288,9 @@ def printVarOperators(arg1,ev1):
 		if r.properties["type"]=="tRel" and \
 			(r.properties["func"], r.properties["nArgs"]) in casperOp2PythonOp.keys() and \
 			r.properties["arg1Eval"]==ev1:
-			if r.properties["nArgs"]==1:
+			if r.properties["nArgs"]==1 and ("arg1" not in r.properties or r.properties["arg1"]==arg1):
 				printUnaryOperator(r.properties["func"],r.properties["ev"],arg1)
-			if r.properties["nArgs"]==2:
+			if r.properties["nArgs"]==2 and ("arg1" not in r.properties or r.properties["arg1"]==arg1):
 				ev2 = r.properties["arg2Eval"]
 				# self with expression
 				arg2 = "Casper::Expr<"+ev2+">"
@@ -326,32 +303,31 @@ def printExprOperators(arg1,ev1):
 		if r.properties["type"]=="tRel" and \
 			(r.properties["func"], r.properties["nArgs"]) in casperOp2PythonOp.keys() and \
 			r.properties["arg1Eval"]==ev1:
-			if r.properties["nArgs"]==1:
+			if r.properties["nArgs"]==1 and ("arg1" not in r.properties or r.properties["arg1"]==arg1):
 				printUnaryOperator(r.properties["func"],r.properties["ev"],arg1)
-			if r.properties["nArgs"]==2:
+			if r.properties["nArgs"]==2 and ("arg1" not in r.properties or r.properties["arg1"]==arg1):
 				ev2 = r.properties["arg2Eval"]
 				# expr with expr	
 				arg2 = "Casper::Expr<"+ev2+">"
 				printBinaryOperator(r.properties["func"],r.properties["ev"],arg1,arg2)
 
 
-def printPredicate(func,ev,argevs):
-
-#	print "%template("+casperFn2PythonFn(func)+") Casper::"+func[0].lower()+func[1:]+"<",
-#	print "Casper::Expr<"+argevs[0]+">",
-#	for i in range(1,len(argevs)):
-#		print  ",Casper::Expr<"+argevs[i]+">",
-#	print ">;"
-	
+def printPredicate(r,func,ev,argevs):	
 	print "Casper::Expr<"+ev+">"
-	print casperFn2PythonFn(func)+"(Casper::Expr<"+argevs[0]+"> const& a0",
+	if "arg1" in r.properties:
+		print casperFn2PythonFn(func)+"("+r.properties["arg1"]+" const& a1",
+	else:
+		print casperFn2PythonFn(func)+"(Casper::Expr<"+argevs[0]+"> const& a1",
 	for i in range(1,len(argevs)):
-		print  ",Casper::Expr<"+argevs[i]+"> const& a"+str(i),
+		if "arg"+str(i+1) in r.properties:
+			print  ","+r.properties["arg"+str(i+1)]+" const& a"+str(i+1),
+		else:
+			print  ",Casper::Expr<"+argevs[i]+"> const& a"+str(i+1),
 	print ")"
 	print "{"
-	print "\treturn Casper::rel<Casper::"+func+">(a0",
+	print "\treturn Casper::rel<Casper::"+func+">(a1",
 	for i in range(1,len(argevs)):
-		print ",a"+str(i),
+		print ",a"+str(i+1),
 	print ");"	
 	print "}" 
 
@@ -360,7 +336,7 @@ def printExprPredicates():
 		if r.properties["type"]=="tRel" and \
 			(r.properties["func"], r.properties["nArgs"]) not in casperOp2PythonOp.keys():			
 			argevs = [r.properties["arg"+str(i)+"Eval"] for i in range(1,r.properties["nArgs"]+1)]
-			printPredicate(r.properties["func"],r.properties["ev"],argevs)
+			printPredicate(r,r.properties["func"],r.properties["ev"],argevs)
 	
 def getCPModule(r):
 	if r.properties["type"]=="tRel":
@@ -387,17 +363,18 @@ def getCPModule(r):
 
 def forAllRelOper(fn,argfn):
 	for r in objs:
-		if r.properties["type"]=="tRel":			
+		if r.properties["type"]=="tRel" and \
+			(r.properties["func"], r.properties["nArgs"]) in casperOp2PythonOp.keys():			
 			argevs = [r.properties["arg"+str(i)+"Eval"] for i in range(1,r.properties["nArgs"]+1)]
 			func = r.properties["func"]
-			if len(argevs)==1 and argfn(argevs[0])!=None:
+			if len(argevs)==1 and argfn(argevs[0])!=None and ("arg1" not in r.properties or r.properties["arg1"]==argfn(argevs[0])):
 				fn(r,"Rel1<Casper::"+func+","+argfn(argevs[0])+" >")
 			elif len(argevs)==2:	
-				if argfn(argevs[0])!=None:
-					if argfn(argevs[1])!=None:
+				if argfn(argevs[0])!=None and ("arg1" not in r.properties or r.properties["arg1"]==argfn(argevs[0])):
+					if argfn(argevs[1])!=None and ("arg2" not in r.properties or r.properties["arg2"]==argfn(argevs[1])):
 						fn(r,"Rel2<Casper::"+func+","+argfn(argevs[0])+","+argfn(argevs[1])+" >")
 					fn(r,"Rel2<Casper::"+func+","+argfn(argevs[0])+",Expr<"+argevs[1]+"> >")
-				if argfn(argevs[1])!=None:
+				if argfn(argevs[1])!=None and ("arg2" not in r.properties or r.properties["arg2"]==argfn(argevs[1])):
 					fn(r,"Rel2<Casper::"+func+",Expr<"+argevs[0]+">,"+argfn(argevs[1])+" >")
 
 def forAllRelPred(fn):
@@ -406,24 +383,32 @@ def forAllRelPred(fn):
 			argevs = [r.properties["arg"+str(i)+"Eval"] for i in range(1,r.properties["nArgs"]+1)]
 			func = r.properties["func"]
 			s = "Rel"+str(len(argevs))+"<Casper::"+func
-			for ev in argevs:
-				s += ",Expr<"+ev+">"
+			for i in range(len(argevs)):
+				if "arg"+str(i+1) in r.properties:
+					s += ","+r.properties["arg"+str(i+1)]
+				else:
+					s += ",Expr<"+argevs[i]+">"
 			s += ">"
 			fn(r,s)
 
+def forAllInstObjs(fn):
+	for r in instobjs:
+		fn(r,r.properties["func"])
+		
 def forAllRelOperList(fn,argfn):
 	for r in objs:
-		if r.properties["type"]=="tRel":			
+		if r.properties["type"]=="tRel" and \
+			(r.properties["func"], r.properties["nArgs"]) in casperOp2PythonOp.keys():			
 			argevs = [r.properties["arg"+str(i)+"Eval"] for i in range(1,r.properties["nArgs"]+1)]
 			func = r.properties["func"]
-			if len(argevs)==1 and argfn(argevs[0])!=None:
+			if len(argevs)==1 and argfn(argevs[0])!=None and ("arg1" not in r.properties or r.properties["arg1"]==argfn(argevs[0])):
 				fn(r,func,[argfn(argevs[0])],argevs)
 			elif len(argevs)==2:	
-				if argfn(argevs[0])!=None:
-					if argfn(argevs[1])!=None:
+				if argfn(argevs[0])!=None and ("arg1" not in r.properties or r.properties["arg1"]==argfn(argevs[0])):
+					if argfn(argevs[1])!=None and ("arg2" not in r.properties or r.properties["arg2"]==argfn(argevs[1])):
 						fn(r,func,[argfn(argevs[0]),argfn(argevs[1])],argevs)
 					fn(r,func,[argfn(argevs[0]),"Expr<"+argevs[1]+">"],argevs)
-				if argfn(argevs[1])!=None:
+				if argfn(argevs[1])!=None and ("arg2" not in r.properties or r.properties["arg2"]==argfn(argevs[1])):
 					fn(r,func,["Expr<"+argevs[0]+">",argfn(argevs[1])],argevs)
 
 def forAllRelPredList(fn):
@@ -432,20 +417,23 @@ def forAllRelPredList(fn):
 			argevs = [r.properties["arg"+str(i)+"Eval"] for i in range(1,r.properties["nArgs"]+1)]
 			func = r.properties["func"]
 			s = []
-			for ev in argevs:
-				s.append("Expr<"+ev+">")
+			for i in range(len(argevs)):
+				if "arg"+str(i+1) in r.properties:
+					s.append(r.properties["arg"+str(i+1)])
+				else:
+					s.append("Expr<"+argevs[i]+">")
 			fn(r,func,s,argevs)
 
-def args(ev):
-	s = []
-	if ev=="bool":
-		s.append('Goal')
-	if ev not in seqTypes:
-		s.append('CP::Var<'+ev+'>')
-	if ev not in seqTypes and ev not in setTypes:	
-		s.append("Ref<"+ev+">")
-	s.append("Expr<"+ev+">")
-	return s 
+#def args(ev):
+#	s = []
+#	if ev=="bool":
+#		s.append('Goal')
+#	if ev not in seqTypes:
+#		s.append('CP::Var<'+ev+'>')
+#	if ev not in seqTypes and ev not in setTypes:	
+#		s.append("Ref<"+ev+">")
+#	s.append("Expr<"+ev+">")
+#	return s 
 
 	# CP::Var<->Expr
 	# CP::Ref<->Expr

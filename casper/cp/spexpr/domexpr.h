@@ -29,17 +29,27 @@ namespace Detail {
 template<class T,class Eval>
 struct Create<T,CP::DomExpr<Eval> >
 {
-	CP::DomExpr<Eval> operator()(CP::Store& store, const T& t)
-	{	return CP::DomExpr<Eval>(store,t);	}
+	CP::DomExpr<Eval> operator()(CP::Store& store, const T& t);
 };
 
+template<class T,class Eval>
+CP::DomExpr<Eval> Create<T,CP::DomExpr<Eval> >::operator()(CP::Store& store, const T& t)
+{	return CP::DomExpr<Eval>(store,t);	}
 
-template<class Eval>
-struct Create<Goal,CP::DomExpr<Eval> >
+template<>
+struct Create<Goal,CP::DomExpr<bool> >
 {
-	CP::DomExpr<Eval> operator()(CP::Store& store, const Goal& t)
-	{	throw Casper::Exception::TypeCoercion("Goal",typeid(CP::DomExpr<Eval>).name()); }
+	CP::DomExpr<bool> operator()(CP::Store& store, const Goal& t)
+	{	throw Casper::Exception::TypeCoercion("Goal",typeid(CP::DomExpr<bool>).name()); }
 };
+
+//template<class Eval,class T>
+//CP::DomExpr<Eval> ExprWrapper<Eval,T>::toCPDomExpr(CP::Store& store) const
+//{	return Create<T,CP::DomExpr<Eval> >()(store,t);	}
+//
+//template<class T>
+//CP::DomExpr<bool> ExprWrapper<bool,T>::toCPDomExpr(CP::Store& store) const
+//{	return Create<T,CP::DomExpr<bool> >()(store,t);	}
 
 } // Detail
 
