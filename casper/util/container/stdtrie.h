@@ -175,16 +175,16 @@ std::ostream& operator<<(std::ostream& o, const Casper::Util::StdTrie<T>& s)
 	for (typename Tr::PNode p = s.levels[0]; p != NULL; p = p->pRSibling)
 		if (!s.isDelim(p))
 		{
-			o << (uint)p << " [label="
+			o << (unsigned int)p << " [label="
 			  << static_cast<typename Tr::Node*>(p)->value << "]\n";
-			o << "root -> " << (uint)p << std::endl;
+			o << "root -> " << (unsigned int)p << std::endl;
 		}
-	for (uint i = 1; i < s.levels.size(); i++)
+	for (unsigned int i = 1; i < s.levels.size(); i++)
 		for (typename Tr::PNode p = s.levels[i]; p != NULL; p = p->pRSibling)
 			if (!s.isDelim(p))
 			{
-				o << (uint)p->pParent << " -> " << (uint)p << std::endl;
-				o << (uint)p << " [label="
+				o << (unsigned int)p->pParent << " -> " << (unsigned int)p << std::endl;
+				o << (unsigned int)p << " [label="
 				  << static_cast<typename Tr::Node*>(p)->value << "]\n";
 			}
 	o << "}" << std::endl;

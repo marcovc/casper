@@ -69,8 +69,8 @@
 }
 
 %extend Casper::CP::VarArray<int,2,Casper::CP::Traits::GetDefaultDom<int>::Type> {
-	%template(IntVarArray2) VarArray<uint,int>;
-	%template(IntVarArray2) VarArray<uint,int,int>;
+	%template(IntVarArray2) VarArray<unsigned int,int>;
+	%template(IntVarArray2) VarArray<unsigned int,int,int>;
 	
 	Casper::CP::VarArray<int,1,Casper::CP::Traits::GetDefaultDom<int>::Type> 
 	getitem(int i) const 
@@ -90,8 +90,8 @@
 	
 }
 %extend Casper::CP::VarArray<bool,2,Casper::CP::Traits::GetDefaultDom<bool>::Type> {
-	%template(BoolVarArray2) VarArray<uint,bool>;
-	%template(BoolVarArray2) VarArray<uint,bool,bool>;
+	%template(BoolVarArray2) VarArray<unsigned int,bool>;
+	%template(BoolVarArray2) VarArray<unsigned int,bool,bool>;
 	
 	Casper::CP::VarArray<bool,1,Casper::CP::Traits::GetDefaultDom<bool>::Type> 
 	getitem(int i) const 

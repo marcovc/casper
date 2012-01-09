@@ -1093,13 +1093,13 @@ def build_egg(source,target,env):
 pycasper_egg = env.Command(File('dist/PyCasper-'+casper_version+'-py2.7.egg'),pycasper_bindist,[build_egg])
 Alias('pycasper-package-egg',pycasper_egg)
 	
-
+print env['installbuilder_path']
 Alias('package-bin',[library_bindist,pycasper_egg,
 					env.Command(target=['casper-'+casper_version+'-linux-installer.run',
 										'casper-'+casper_version+'-windows-installer.exe',
 										'casper-'+casper_version+'-osx-installer.app'],
 							    source='dist/casper-proj.xml',
-								action=env['installbuilder_path']+"/bin/builder build $SOURCE --setvars project.version="+casper_version)])
+								action='open "'+env['installbuilder_path']+'"/bin/Builder.app --args build $SOURCE --setvars project.version='+casper_version)])
 	
 '''
 package_libsrc_dist = env.Package( 

@@ -26,11 +26,11 @@
 	Casper::CP::VarArray 
 	__getslice__(int i,int j) const 
 	{
-		const uint mi = std::max(0,i);
-		const uint ma = std::min(static_cast<int>($self->size()),j)-1;
-		const uint nelems = ma-mi+1;
+		const unsigned int mi = std::max(0,i);
+		const unsigned int ma = std::min(static_cast<int>($self->size()),j)-1;
+		const unsigned int nelems = ma-mi+1;
 		Casper::CP::VarArray<T,dims,Dom1> r($self->getStore(),nelems);
-		for (uint i = 0; i < nelems; ++i)
+		for (unsigned int i = 0; i < nelems; ++i)
 			r[i] = $self->operator[](i+mi);
 		return r; 
 	}
