@@ -31,7 +31,7 @@ struct Create<T,CP::ChkExpr>
 {
 	CP::ChkExpr operator()(CP::Store& store, const T& t);
 };
-
+ 
 template<class T>
 CP::ChkExpr Create<T,CP::ChkExpr>::operator()(CP::Store& store, const T& t)
 {	return CP::ChkExpr(store,t);	}

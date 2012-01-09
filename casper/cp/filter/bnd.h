@@ -271,7 +271,7 @@ struct PostD1BndFilter
 };
 
 extern PostD1BndFilter postD1BndFilter;
-
+ 
 // happens for example when the negation for a relation is not defined
 template<>
 struct BndFilterView<Rel0<UnknownRel> > : UndefinedFilter

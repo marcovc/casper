@@ -33,7 +33,7 @@ def printViews(h):
 		ViewCreator("CP::DomExpr<Casper::IntSet>").print1(arg)
 	for arg in ["CP::Var<Casper::BoolSet>"]:
 		ViewCreator("CP::DomExpr<Casper::BoolSet>").print1(arg)
-		
+	
 	for arg in [varArg]:
 		objdb.forAllRelOper(ViewCreator("CP::DomExpr<Casper::IntSet>","Casper::IntSet","set"),arg)
 		objdb.forAllRelOper(ViewCreator("CP::DomExpr<Casper::BoolSet>","Casper::BoolSet","set"),arg)
