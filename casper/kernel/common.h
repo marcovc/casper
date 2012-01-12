@@ -66,13 +66,12 @@
 #define force_inline inline __attribute__ ((always_inline))
 #endif
 
+#if defined(__APPLE__) | defined(_MSC_VER) | defined(SWIG)
+typedef unsigned int uint;
+#endif
 
 /// Global namespace for the CaSPER library
 namespace Casper {
-
-#if defined(__APPLE__) | defined(_MSC_VER)
-typedef unsigned int uint;
-#endif
 
 /// \name Datatypes aliases
 //@{

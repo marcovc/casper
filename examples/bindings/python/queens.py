@@ -5,7 +5,6 @@ from casper.cp import *
 n = 4
 
 solver = Solver()
-
 vars = IntVarArray(solver,n,1,n)
 
 solver.post(distinct(vars))

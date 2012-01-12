@@ -425,9 +425,6 @@ def getBuildFlags(env,debug_level,optimize_level):
 			link_flags += ['-static']
 		if env['cpp0x']:
 			build_flags += ['-std=gnu++0x']
-		if platform.system()=="Darwin":
-			build_flags +=	['-Wc,"-arch i386" -Wc,"-arch x86_64"']
-			link_flags += ['-arch ppc64 -arch i386 -arch x86_64']
 		#build_flags += ['-Wfatal-errors']
 		#build_flags += ['-fPIC']
 		#build_flags += ['-ffast-math']

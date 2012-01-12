@@ -36,6 +36,8 @@ Casper::Detail::CreateFromPyObject<Casper::Seq<Eval> >::isCPVarArray1 =
 		$descriptor(Casper::CP::VarArray<Eval,1,Casper::CP::Traits::GetDefaultDom<Eval>::Type >*);
 Casper::Detail::CreateFromPyObject<Casper::Seq<Eval> >::isCPVarArray2 = 
 		$descriptor(Casper::CP::VarArray<Eval,2,Casper::CP::Traits::GetDefaultDom<Eval>::Type >*);
+Casper::Detail::CreateFromPyObject<Casper::Seq<Eval> >::isCPVarArray3 = 
+		$descriptor(Casper::CP::VarArray<Eval,3,Casper::CP::Traits::GetDefaultDom<Eval>::Type >*);
 SET_EXPR_SWIG_TYPE_DESCR(Eval)
 %enddef
 	
@@ -197,13 +199,23 @@ def abs(arg):
 		return _abs(arg)
 
 def sum(*args,**kwargs):
+	import numbers
+	if len(kwargs.keys())>0 or \
+	 	all([isinstance(arg,numbers.Number) for arg in args]):
+		import __builtin__
+		return __builtin__.sum(*args,**kwargs)
+	else:
+		return _sum(*args,**kwargs)
+
+'''
 	import collections
-	if len(kargs.keys())>0 or \
+	if len(kwargs.keys())>0 or \
 		isinstance(args[0],collections.Iterable):
 		import __builtin__
-		return __builtin__.sum(*args,**kargs)
+		return __builtin__.sum(*args,**kwargs)
 	else:
-		return _sum(*args,**kargs)
+		return _sum(*args,**kwargs)
+'''
 	
 def pow(*args):
 	import numbers

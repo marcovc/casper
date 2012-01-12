@@ -337,6 +337,7 @@ struct CreateFromPyObject<Seq<Eval> >
 {
 	static swig_type_info * isCPVarArray1;
 	static swig_type_info * isCPVarArray2;
+	static swig_type_info * isCPVarArray3;
 	static swig_type_info * isSeqExpr;
 
 	CreateFromPyObject()
@@ -352,6 +353,13 @@ struct CreateFromPyObject<Seq<Eval> >
 						(std::string("Casper::CP::VarArray<")+
 						Detail::EvalStr<Eval>()()+
 						std::string(",2,Casper::CP::Traits::GetDefaultDom<")+
+						Detail::EvalStr<Eval>()()+
+						std::string(">::Type>*")).c_str());
+		isCPVarArray3 =
+				SWIG_TypeQuery(
+						(std::string("Casper::CP::VarArray<")+
+						Detail::EvalStr<Eval>()()+
+						std::string(",3,Casper::CP::Traits::GetDefaultDom<")+
 						Detail::EvalStr<Eval>()()+
 						std::string(">::Type>*")).c_str());
 		isSeqExpr =
@@ -370,6 +378,9 @@ struct CreateFromPyObject<Seq<Eval> >
 		else
 		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVarArray2, 0)))
 			return new Casper::Expr<Seq<Eval> >(*static_cast<Casper::CP::VarArray<Eval,2>*>(argp));
+		else
+		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVarArray3, 0)))
+			return new Casper::Expr<Seq<Eval> >(*static_cast<Casper::CP::VarArray<Eval,3>*>(argp));
 		else
 		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isSeqExpr, 0)))
 			return new Casper::Expr<Seq<Eval> >(*static_cast<Casper::Expr<Seq<Eval> >*>(argp));
@@ -402,6 +413,7 @@ struct CreateFromPyObject<Seq<Eval> >
 
 		return 	SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVarArray1, 0)) or
 				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVarArray2, 0)) or
+				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVarArray3, 0)) or
 				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isSeqExpr, 0)) or
 				PySequence_Check(pObj);
 	}
@@ -409,6 +421,7 @@ struct CreateFromPyObject<Seq<Eval> >
 
 template<class T> swig_type_info * CreateFromPyObject<Seq<T> >::isCPVarArray1 = NULL;
 template<class T> swig_type_info * CreateFromPyObject<Seq<T> >::isCPVarArray2 = NULL;
+template<class T> swig_type_info * CreateFromPyObject<Seq<T> >::isCPVarArray3 = NULL;
 template<class T> swig_type_info * CreateFromPyObject<Seq<T> >::isSeqExpr = NULL;
 
 

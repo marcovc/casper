@@ -27,11 +27,11 @@
 #include <iterator>
 #include <casper/util/io.h>
 
-namespace Casper {
-
-#if defined(_MSC_VER) | defined(__APPLE__)
+#if defined(_MSC_VER) | defined(__APPLE__) | defined(SWIG)
 typedef unsigned int uint;
 #endif
+
+namespace Casper {
 
 namespace Util {
 

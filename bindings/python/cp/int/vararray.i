@@ -54,15 +54,21 @@
 	%template(BoolVarArray) VarArray<bool,bool>;
 	
 	const Casper::CP::Var<bool,Casper::CP::Traits::GetDefaultDom<bool>::Type>& 
-	getitem(int i) const { return $self->operator[](i); }
+	getitemi(int i) const { return $self->operator[](i); }
+
+	Casper::Expr<bool>
+	getiteme(const Casper::Expr<bool>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
 		def __getitem__(self,i):
-			if i>=self.size() or i<0:
+			import numbers
+			if not isinstance(i,numbers.Number):
+				return self.getiteme(i)
+			elif i>=self.size() or i<0:
 				raise IndexError
 			else:
-				return self.getitem(i)
+				return self.getitemi(i)
 	}
 	
 	void 
@@ -71,41 +77,60 @@
 }
 
 %extend Casper::CP::VarArray<int,2,Casper::CP::Traits::GetDefaultDom<int>::Type> {
-	%template(IntVarArray2) VarArray<unsigned int,int>;
-	%template(IntVarArray2) VarArray<unsigned int,int,int>;
-	
+	%template(IntVarArray2) VarArray<uint,int>;
+	%template(IntVarArray2) VarArray<uint,int,int>;
+
 	Casper::CP::VarArray<int,1,Casper::CP::Traits::GetDefaultDom<int>::Type> 
-	getitem(int i) const 
-	{ return Casper::CP::VarArray<int,1,Casper::CP::Traits::GetDefaultDom<int>::Type>($self->getStore(),$self->operator[](i)); }
+	getitemi(int i) const 
+	{ 
+		Casper::CP::VarArray<int,1,Casper::CP::Traits::GetDefaultDom<int>::Type> r($self->getStore(),$self->operator[](i));
+		return r; 
+	}
+
+	Casper::Expr<Casper::Seq<int> >
+	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
 		def __getitem__(self,i):
-			if i>=self.size() or i<0:
+			import numbers
+			if not isinstance(i,numbers.Number):
+				return self.getiteme(i)
+			elif i>=self.size() or i<0:
 				raise IndexError
 			else:
-				return self.getitem(i)
+				return self.getitemi(i)
 	}
+
 	void 
 	__setitem__(int i,const Casper::CP::VarArray<int,1,Casper::CP::Traits::GetDefaultDom<int>::Type>& v) 
 	{ $self->operator[](i) = v; }
 	
 }
 %extend Casper::CP::VarArray<bool,2,Casper::CP::Traits::GetDefaultDom<bool>::Type> {
-	%template(BoolVarArray2) VarArray<unsigned int,bool>;
-	%template(BoolVarArray2) VarArray<unsigned int,bool,bool>;
+	%template(BoolVarArray2) VarArray<uint,bool>;
+	%template(BoolVarArray2) VarArray<uint,bool,bool>;
 	
 	Casper::CP::VarArray<bool,1,Casper::CP::Traits::GetDefaultDom<bool>::Type> 
-	getitem(int i) const 
-	{ return Casper::CP::VarArray<bool,1,Casper::CP::Traits::GetDefaultDom<bool>::Type>($self->getStore(),$self->operator[](i)); }
+	getitemi(int i) const 
+	{ 
+		Casper::CP::VarArray<bool,1,Casper::CP::Traits::GetDefaultDom<bool>::Type> r($self->getStore(),$self->operator[](i));
+		return r; 
+	}
+
+	Casper::Expr<Casper::Seq<bool> >
+	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
 		def __getitem__(self,i):
-			if i>=self.size() or i<0:
+			import numbers
+			if not isinstance(i,numbers.Number):
+				return self.getiteme(i)
+			elif i>=self.size() or i<0:
 				raise IndexError
 			else:
-				return self.getitem(i)
+				return self.getitemi(i)
 	}
 	
 	void 
@@ -115,41 +140,60 @@
 }
 
 %extend Casper::CP::VarArray<int,3,Casper::CP::Traits::GetDefaultDom<int>::Type> {
-	%template(IntVarArray3) VarArray<unsigned int,unsigned int,int>;
-	%template(IntVarArray3) VarArray<unsigned int,unsigned int,int,int>;
+	%template(IntVarArray3) VarArray<uint,uint,int>;
+	%template(IntVarArray3) VarArray<uint,uint,int,int>;
 	
 	Casper::CP::VarArray<int,2,Casper::CP::Traits::GetDefaultDom<int>::Type> 
-	getitem(int i) const 
-	{ return Casper::CP::VarArray<int,2,Casper::CP::Traits::GetDefaultDom<int>::Type>($self->getStore(),$self->operator[](i)); }
+	getitemi(int i) const 
+	{ 
+		Casper::CP::VarArray<int,2,Casper::CP::Traits::GetDefaultDom<int>::Type> r($self->getStore(),$self->operator[](i));
+		return r; 
+	}
+
+	Casper::Expr<Casper::Seq<int> >
+	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
 		def __getitem__(self,i):
-			if i>=self.size() or i<0:
+			import numbers
+			if not isinstance(i,numbers.Number):
+				return self.getiteme(i)
+			elif i>=self.size() or i<0:
 				raise IndexError
 			else:
-				return self.getitem(i)
+				return self.getitemi(i)
 	}
+
 	void 
 	__setitem__(int i,const Casper::CP::VarArray<int,2,Casper::CP::Traits::GetDefaultDom<int>::Type>& v) 
 	{ $self->operator[](i) = v; }
 	
 }
 %extend Casper::CP::VarArray<bool,3,Casper::CP::Traits::GetDefaultDom<bool>::Type> {
-	%template(BoolVarArray3) VarArray<unsigned int,unsigned int,bool>;
-	%template(BoolVarArray3) VarArray<unsigned int,unsigned int,bool,bool>;
+	%template(BoolVarArray3) VarArray<uint,uint,bool>;
+	%template(BoolVarArray3) VarArray<uint,uint,bool,bool>;
 	
 	Casper::CP::VarArray<bool,2,Casper::CP::Traits::GetDefaultDom<bool>::Type> 
-	getitem(int i) const 
-	{ return Casper::CP::VarArray<bool,2,Casper::CP::Traits::GetDefaultDom<bool>::Type>($self->getStore(),$self->operator[](i)); }
+	getitemi(int i) const 
+	{ 
+		Casper::CP::VarArray<bool,2,Casper::CP::Traits::GetDefaultDom<bool>::Type> r($self->getStore(),$self->operator[](i));
+		return r; 
+	}
+
+	Casper::Expr<Casper::Seq<bool> >
+	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
 		def __getitem__(self,i):
-			if i>=self.size() or i<0:
+			import numbers
+			if not isinstance(i,numbers.Number):
+				return self.getiteme(i)
+			elif i>=self.size() or i<0:
 				raise IndexError
 			else:
-				return self.getitem(i)
+				return self.getitemi(i)
 	}
 	
 	void 
