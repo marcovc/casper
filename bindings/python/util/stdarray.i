@@ -30,4 +30,6 @@ COUTWRAPPER(Casper::Util::StdArray)
 %template() Casper::Util::StdArray< Casper::CP::Var< bool,Casper::CP::Traits::GetDefaultDom< bool >::Type >,1 >;
 %template() Casper::Util::StdArray< Casper::CP::Var< int,Casper::CP::Traits::GetDefaultDom< int >::Type >,2 >;
 %template() Casper::Util::StdArray< Casper::CP::Var< bool,Casper::CP::Traits::GetDefaultDom< bool >::Type >,2 >;
+%template() Casper::Util::StdArray< Casper::CP::Var< int,Casper::CP::Traits::GetDefaultDom< int >::Type >,3 >;
+%template() Casper::Util::StdArray< Casper::CP::Var< bool,Casper::CP::Traits::GetDefaultDom< bool >::Type >,3 >;
 

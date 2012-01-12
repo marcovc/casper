@@ -281,6 +281,8 @@ AddOption('--notes',
 ############ support for building on multiple platforms ############
 
 import sys
+import platform
+platform_info = platform.uname()
 
 # user defined environment
 env = Environment(ENV=os.environ,
@@ -389,7 +391,7 @@ if env['subpoly_rels']:
 
 if env['precompile']:
 	defined_macros += ['CASPER_PRECOMPILED']
-	
+
 env.Append(CPPDEFINES = defined_macros)
 
 
@@ -423,6 +425,9 @@ def getBuildFlags(env,debug_level,optimize_level):
 			link_flags += ['-static']
 		if env['cpp0x']:
 			build_flags += ['-std=gnu++0x']
+		if platform.system()=="Darwin":
+			build_flags +=	['-Wc,"-arch i386" -Wc,"-arch x86_64"']
+			link_flags += ['-arch ppc64 -arch i386 -arch x86_64']
 		#build_flags += ['-Wfatal-errors']
 		#build_flags += ['-fPIC']
 		#build_flags += ['-ffast-math']
@@ -904,8 +909,6 @@ Alias('pycasper',pycasper_target)
 #							LIBPATH=[env['PREFIX']+'/casper'],
 #							LIBS=example_libs+['boost_filesystem'])
 
-import platform
-platform_info = platform.uname()
 SYSFLAGS = '-DBUILD_FLAGS=\'\"'+str(build_flags)+'\"\' \
 			-DCASPER_REVISION='+str(casper_revision)
 

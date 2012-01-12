@@ -114,13 +114,8 @@
             <postInstallationActionList>
                 <runProgram>
                     <explanation>Registering PyCaSPER as a new python extension</explanation>
-<<<<<<< HEAD
                     <program>python</program>
                     <programArguments>-m easy_install PyCasper-${project.version}-py2.7.egg</programArguments>
-=======
-                    <program>easy_install</program>
-                    <programArguments>PyCasper-${project.version}-py2.7.egg</programArguments>
->>>>>>> 6b983e31575ff2bdfcb1d29848aae08fbf626368
                     <progressText>Registering PyCaSPER as a new python extension</progressText>
                     <workingDirectory>${system_temp_directory}</workingDirectory>
                     <ruleList>

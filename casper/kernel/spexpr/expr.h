@@ -28,9 +28,6 @@
 #include <iostream>
 #include <casper/fwddecl.h>
 
-
-//#include <casper/cp/spexpr/post.h>
-
 namespace Casper {
 
 namespace Detail {
@@ -234,9 +231,9 @@ template<class T>
 std::ostream& operator<<(std::ostream& os,const Casper::Expr<T>& expr)
 {	return expr.getImpl().print(os); }
 
-#ifndef CASPER_PRECOMPILE
-#include <casper/cp/spexpr/expr.h>
-#endif
+
+#include <casper/kernel/spexpr/expr_wrapper.h>
+
 
 #endif /* CASPER_KERNEL_OBJ_EXPR_H_ */
 

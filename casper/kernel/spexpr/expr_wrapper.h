@@ -39,28 +39,6 @@ struct Create;
 //
 //};
 
-#ifndef SWIG
-template<class Obj>
-struct PostFilter
-{
-	static bool dom(CP::Store& store, const Obj& obj);
-	static bool bnd(CP::Store& store, const Obj& obj);
-	static bool val(CP::Store& store, const Obj& obj);
-};
-
-template<class Obj>
-bool PostFilter<Obj>::dom(CP::Store& store, const Obj& obj)
-{	return Casper::CP::postDomFilter(store,obj);	}
-
-template<class Obj>
-bool PostFilter<Obj>::bnd(CP::Store& store, const Obj& obj)
-{	return Casper::CP::postBndFilter(store,obj);	}
-
-template<class Obj>
-bool PostFilter<Obj>::val(CP::Store& store, const Obj& obj)
-{	return Casper::CP::postValFilter(store,obj);	}
-#endif
-
 template<class Source,class Target>
 struct CreateLiteral
 {
@@ -72,6 +50,8 @@ struct CreateLiteral
 } // Casper
 
 
+#include <casper/kernel/spexpr/ref.h>
+#include <casper/kernel/spexpr/goal.h>
 
 
 namespace Casper {
@@ -173,9 +153,6 @@ Expr<Casper::Seq<Eval> >::Expr(const T& t) : Super(new Detail::ExprWrapper<Caspe
 } // Casper
 
 
-#include <casper/kernel/spexpr/ref.h>
-#include <casper/kernel/spexpr/goal.h>
-
 #ifdef CASPER_PRECOMPILED
 #include <casper/kernel/spexpr/explicit.h>
 //#include <casper/cp/spexpr/wrapper.h>
@@ -192,9 +169,32 @@ Expr<Casper::Seq<Eval> >::Expr(const T& t) : Super(new Detail::ExprWrapper<Caspe
 #include <casper/kernel/spexpr/iteration.h>
 #include <casper/kernel/spexpr/literal.h>
 #include <casper/kernel/spexpr/variable.h>
+#include <casper/cp/spexpr/expr.h>
 
 namespace Casper {
 namespace Detail {
+
+#ifndef SWIG
+template<class Obj>
+struct PostFilter
+{
+	static bool dom(CP::Store& store, const Obj& obj);
+	static bool bnd(CP::Store& store, const Obj& obj);
+	static bool val(CP::Store& store, const Obj& obj);
+};
+
+template<class Obj>
+bool PostFilter<Obj>::dom(CP::Store& store, const Obj& obj)
+{	return Casper::CP::postDomFilter(store,obj);	}
+
+template<class Obj>
+bool PostFilter<Obj>::bnd(CP::Store& store, const Obj& obj)
+{	return Casper::CP::postBndFilter(store,obj);	}
+
+template<class Obj>
+bool PostFilter<Obj>::val(CP::Store& store, const Obj& obj)
+{	return Casper::CP::postValFilter(store,obj);	}
+#endif
 
 template<class Eval,class T>
 CP::DomExpr<Eval> ExprWrapper<Eval,T>::toCPDomExpr(CP::Store& store) const

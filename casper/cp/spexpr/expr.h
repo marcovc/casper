@@ -27,33 +27,6 @@
 #include <casper/cp/spexpr/valexpr.h>
 #include <casper/cp/spexpr/chkexpr.h>
 
-namespace Casper {
-namespace Detail {
-
-//
-//template<class Eval,class T>
-//Ref<CP::Var<Eval> >	ExprWrapper<Eval,T>::toCPVarRef(State& state) const
-//{	return Create<T,Ref<CP::Var<Eval> > >()(state,t);	}
-//
-//template<class T>
-//Ref<CP::Var<bool> >	ExprWrapper<bool,T>::toCPVarRef(State& state) const
-//{	return Create<T,Ref<CP::Var<bool> > >()(state,t);	}
-//
-//template<class T>
-//bool	ExprWrapper<bool,T>::postDomFilter(CP::Store& store) const
-//{	return PostFilter<T>::dom(store,t);	}
-//
-//template<class T>
-//bool	ExprWrapper<bool,T>::postBndFilter(CP::Store& store) const
-//{	return PostFilter<T>::bnd(store,t);	}
-//
-//template<class T>
-//bool	ExprWrapper<bool,T>::postValFilter(CP::Store& store) const
-//{	return PostFilter<T>::val(store,t);	}
-
-}
-}
-
 #ifdef CASPER_PRECOMPILE
 #include <casper/cp/int/spexpr/explicit.h>
 #include <casper/cp/set/spexpr/explicit.h>

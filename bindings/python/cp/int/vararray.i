@@ -17,6 +17,8 @@
 %template(BoolVarArray) Casper::CP::VarArray<bool,1,Casper::CP::Traits::GetDefaultDom<bool>::Type>;
 %template(IntVarArray2) Casper::CP::VarArray<int,2,Casper::CP::Traits::GetDefaultDom<int>::Type>;
 %template(BoolVarArray2) Casper::CP::VarArray<bool,2,Casper::CP::Traits::GetDefaultDom<bool>::Type>;
+%template(IntVarArray3) Casper::CP::VarArray<int,3,Casper::CP::Traits::GetDefaultDom<int>::Type>;
+%template(BoolVarArray3) Casper::CP::VarArray<bool,3,Casper::CP::Traits::GetDefaultDom<bool>::Type>;
 
 
 %extend Casper::CP::VarArray<int,1,Casper::CP::Traits::GetDefaultDom<int>::Type> {
@@ -108,6 +110,50 @@
 	
 	void 
 	__setitem__(int i,const Casper::CP::VarArray<bool,1,Casper::CP::Traits::GetDefaultDom<bool>::Type>& v) 
+	{ $self->operator[](i) = v; }
+	
+}
+
+%extend Casper::CP::VarArray<int,3,Casper::CP::Traits::GetDefaultDom<int>::Type> {
+	%template(IntVarArray3) VarArray<unsigned int,unsigned int,int>;
+	%template(IntVarArray3) VarArray<unsigned int,unsigned int,int,int>;
+	
+	Casper::CP::VarArray<int,2,Casper::CP::Traits::GetDefaultDom<int>::Type> 
+	getitem(int i) const 
+	{ return Casper::CP::VarArray<int,2,Casper::CP::Traits::GetDefaultDom<int>::Type>($self->getStore(),$self->operator[](i)); }
+	
+	%pythoncode
+	{
+		def __getitem__(self,i):
+			if i>=self.size() or i<0:
+				raise IndexError
+			else:
+				return self.getitem(i)
+	}
+	void 
+	__setitem__(int i,const Casper::CP::VarArray<int,2,Casper::CP::Traits::GetDefaultDom<int>::Type>& v) 
+	{ $self->operator[](i) = v; }
+	
+}
+%extend Casper::CP::VarArray<bool,3,Casper::CP::Traits::GetDefaultDom<bool>::Type> {
+	%template(BoolVarArray3) VarArray<unsigned int,unsigned int,bool>;
+	%template(BoolVarArray3) VarArray<unsigned int,unsigned int,bool,bool>;
+	
+	Casper::CP::VarArray<bool,2,Casper::CP::Traits::GetDefaultDom<bool>::Type> 
+	getitem(int i) const 
+	{ return Casper::CP::VarArray<bool,2,Casper::CP::Traits::GetDefaultDom<bool>::Type>($self->getStore(),$self->operator[](i)); }
+	
+	%pythoncode
+	{
+		def __getitem__(self,i):
+			if i>=self.size() or i<0:
+				raise IndexError
+			else:
+				return self.getitem(i)
+	}
+	
+	void 
+	__setitem__(int i,const Casper::CP::VarArray<bool,2,Casper::CP::Traits::GetDefaultDom<bool>::Type>& v) 
 	{ $self->operator[](i) = v; }
 	
 }
