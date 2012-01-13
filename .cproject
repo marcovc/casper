@@ -20,6 +20,11 @@
 			<path value=""/>
 		</doc-comment-owner>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.pathentry">
+		<pathentry excluding="mip/" kind="src" path=""/>
+		<pathentry kind="out" path=""/>
+		<pathentry include="/usr/include" kind="inc" path="" system="true"/>
+	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
 			<target name="int-debug-d" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
@@ -152,6 +157,7 @@
 			</target>
 			<target name="gcc-version" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>gcc</buildCommand>
+				<buildArguments/>
 				<buildTarget>--version</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -168,16 +174,11 @@
 			<target name="bindings-python" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>scons</buildCommand>
 				<buildArguments>-j 8 debug_level=3</buildArguments>
-				<buildTarget>casper_python</buildTarget>
+				<buildTarget>pycasper</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 		</buildTargets>
-	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.core.pathentry">
-		<pathentry excluding="mip/|select.cpp/" kind="src" path=""/>
-		<pathentry kind="out" path=""/>
-		<pathentry include="/usr/include" kind="inc" path="" system="true"/>
 	</storageModule>
 </cproject>

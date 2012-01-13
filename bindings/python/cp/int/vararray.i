@@ -87,8 +87,8 @@
 		return r; 
 	}
 
-	Casper::Expr<Casper::Seq<int> >
-	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
+//	Casper::Expr<Casper::Seq<int> >
+//	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
@@ -118,8 +118,8 @@
 		return r; 
 	}
 
-	Casper::Expr<Casper::Seq<bool> >
-	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
+//	Casper::Expr<Casper::Seq<bool> >
+//	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
@@ -150,8 +150,8 @@
 		return r; 
 	}
 
-	Casper::Expr<Casper::Seq<int> >
-	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
+//	Casper::Expr<Casper::Seq<int> >
+//	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
@@ -181,8 +181,8 @@
 		return r; 
 	}
 
-	Casper::Expr<Casper::Seq<bool> >
-	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
+//	Casper::Expr<Casper::Seq<bool> >
+//	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
