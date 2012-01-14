@@ -215,7 +215,7 @@ template<class T,
 		 int dims = 1>
 struct StdArray
 {
-	typedef StdArray<T,dims>										Self;
+	typedef StdArray<T,dims>									Self;
 	typedef typename Detail::ArrayTraits<T,dims-1>::Type		Elem;
 	typedef typename Detail::ArrayTraits<T,dims-1>::TermType	TermElem;
 	typedef StdVector<Elem> 									Data;
@@ -401,12 +401,21 @@ struct StdArray
 	const Elem& operator[](uint i) const
 	{	assert(i < size()); return pData->operator[](i); }
 
-	// FIXME: dangerous, T1 is too general...
 	/** Returns an Element relation involving the array, and the index value
 		\a t*/
 	template<class T1>
 	Rel2<Element,Self,T1>	operator[](const T1& t) const
 	{	return	Rel2<Element,Self,T1>(*this,t);	}
+
+/*
+#if defined(SWIG) | defined(SWIG_BUILD)
+	Elem getElemInt(int t) const
+	{	return operator[](t);	}
+	template<class T1>
+	Rel2<Element,Self,Casper::Expr<int> >	getElemExpr(const Casper::Expr<int>& t) const
+	{	return	Rel2<Element,Self,Casper::Expr<int> >(*this,t);	}
+#endif
+*/
 
 	///	Returns \a true if the size of the array is 0.
 	bool empty() const {	return pData->empty();	}
@@ -512,6 +521,22 @@ typedef StdArray<string>	StdStringArray;
 
 } // Util
 
+// specialization for multidimesional (domvar)arrays
+// note: IterationView over an Array2<T> provides access to the terminal T, not Array1<T>
+template<class T,int dims>
+struct IterationView<Util::StdArray<T,dims> >
+{
+	typedef IterationView<Util::StdArray<T,dims> >	Self;
+	IterationView(const Util::StdArray<T,dims>& v) : idx(0),v(v),max(v.count()) {}
+	IterationView(const Util::StdArray<T,dims>& v,uint idx) : idx(idx),v(v),max(v.count()) {}
+	IterationView(const IterationView& s) : idx(s.idx),v(s.v),max(s.max) {}
+	void		iterate()	{	assert(valid()); ++idx;	}
+	const T& 	value() const 	{	assert(valid()); return v(idx);	}
+	bool		valid() const 	{	return idx < max;	}
+	uint						idx;
+	const Util::StdArray<T,dims>&		v;
+	const uint					max;
+};
 
 } // Casper
 

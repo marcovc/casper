@@ -21,6 +21,7 @@
 %include <cp/label.i>
 %include <cp/goal.i>
 
+/*
 %{
 namespace Casper {
 namespace CP {
@@ -29,6 +30,7 @@ bool Store::post(const Casper::Expr<bool>& expr,
 {
 	switch (consistency)
 	{
+        std::cout << "posting\n";
 		case Casper::CP::Domain:
 			return expr.postDomFilter(*this);
 		case Casper::CP::Bounds:
@@ -42,3 +44,4 @@ bool Store::post(const Casper::Expr<bool>& expr,
 }
 }
 %}
+*/

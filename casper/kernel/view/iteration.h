@@ -21,6 +21,7 @@
 
 #include <casper/kernel/traits.h>
 #include <casper/util/container/common.h>
+#include <casper/kernel/rel/rel.h>
 
 namespace Casper {
 
@@ -39,6 +40,36 @@ struct IterationView
 	bool		valid() const 	{	return b!=e;	}
 	Iterator	b;
 	Iterator	e;
+};
+
+template<class ArrayT>
+struct IterationView<Rel2<Element,ArrayT,Ref<int> > > :
+	IterationView<typename ArrayT::Elem>
+{
+	typedef IterationView<typename ArrayT::Elem> Super;
+	typedef Rel2<Element,ArrayT,Ref<int> > RelT;
+	IterationView(const RelT& v) : Super(v.p1[v.p2.value()]) {}
+};
+
+// TODO: implement - this is a legal IterationView
+template<class ArrayT,class IndexT>
+struct IterationView<Rel2<Element,ArrayT,IndexT> >
+{
+	typedef typename Traits::GetTermElem<ArrayT>::Type	Elem;
+	typedef Rel2<Element,ArrayT,IndexT> RelT;
+	IterationView(const RelT& r)
+	{
+		std::ostringstream os;
+		os << r;
+		throw Casper::Exception::UndefinedView(os.str().c_str(),"IterationView");
+	}
+	IterationView(const IterationView& r)
+	{
+		throw 0;
+	}
+	void		iterate()	{	throw 0; }
+	const Elem& 	value() const 	{	throw 0;	}
+	bool		valid() const 	{	throw 0;	}
 };
 
 #ifndef _MSC_VER
@@ -550,25 +581,6 @@ void print(InputIterator b,InputIterator e)
 }
 
 } // Detail
-
-
-// specialization for multidimensional arrays
-template<class> struct IterationView;
-template<class T,int dims>
-struct IterationView<Util::StdArray<T,dims> >
-{
-	typedef IterationView<Util::StdArray<T,dims> >	Self;
-	IterationView(const Util::StdArray<T,dims>& v) : idx(0),v(v),max(v.count()) {}
-	IterationView(const Util::StdArray<T,dims>& v,uint idx) : idx(idx),v(v),max(v.count()) {}
-	IterationView(const IterationView& s) : idx(s.idx),v(s.v),max(s.max) {}
-	void		iterate()	{	assert(valid()); ++idx;	}
-	const T& 	value() const 	{	assert(valid()); return v(idx);	}
-	bool		valid() const 	{	return idx < max;	}
-//	Self		copy() const {	return Self(*this); }
-	uint						idx;
-	const Util::StdArray<T,dims>&		v;
-	const uint					max;
-};
 
 } // Casper
 

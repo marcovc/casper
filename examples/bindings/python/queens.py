@@ -1,4 +1,5 @@
 
+import casper
 from casper import *
 from casper.cp import *
 
@@ -7,18 +8,19 @@ n = 4
 solver = Solver()
 vars = IntVarArray(solver,n,1,n)
 
+print distinct(vars)
 solver.post(distinct(vars))
-solver.post(distinct([vars[i]+i for i in range(n)]))
-solver.post(distinct([vars[i]-i for i in range(n)]))
+#solver.post(distinct([vars[i]+i for i in range(n)]))
+#solver.post(distinct([vars[i]-i for i in range(n)]))
 		
-idx = IntRef(solver)
-v = IntRef(solver)
+#idx = IntRef(solver)
+#v = IntRef(solver)
 
-search = whileDo(~ground(vars)) (
-					selectMin(idx,range(n),cond=~ground(vars[idx])) ([domainSize(vars[idx]),abs(idx-n/2)]) &
-					selectRand(v,domain(vars[idx])) &
-					(post(solver,vars[idx]==v) | post(solver,vars[idx]!=v))
-				)
+#search = whileDo(~ground(vars)) (
+#					selectMin(idx,range(n),cond=~ground(vars[idx])) ([domainSize(vars[idx]),abs(idx-n/2)]) &
+#					selectRand(v,domain(vars[idx])) &
+#					(post(solver,vars[idx]==v) | post(solver,vars[idx]!=v))
+#				)
 
 #search = \
 #whileDo(~vars.ground()) (
@@ -28,7 +30,8 @@ search = whileDo(~ground(vars)) (
 #	(solver.post(vars[idx]==v) | solver.post(vars[idx]!=v))
 #)
 						
-found = solver.solve(search)
+#found = solver.solve(search)
+found=solver.solve(label(solver,vars))
 if found:
     print vars
 else:

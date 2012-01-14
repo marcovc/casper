@@ -23,6 +23,8 @@
 #include <casper/cp/filter/weightedfilter.h>
 #include <casper/cp/filter/bnd.h>
 
+#include <casper/kernel/spexpr/expr.h>
+
 using namespace std;
 
 #define CASPER_SHEAP_INIT_SIZE		static_cast<uint>(1024)
@@ -129,6 +131,23 @@ Store::operator const State&() const { return env.getState(); }
 
 Store::operator Util::IHeap&() { return env.getState().getHeap(); }
 Store::operator const Util::IHeap&() const { return env.getState().getHeap(); }
+
+bool Store::post(const Casper::Expr<bool>& expr,
+		  Casper::CP::Consistency consistency)
+{
+    std::cout << "posting\n";
+	switch (consistency)
+	{
+		case Casper::CP::Domain:
+			return expr.postDomFilter(*this);
+		case Casper::CP::Bounds:
+			return expr.postBndFilter(*this);
+		case Casper::CP::Value:
+			return expr.postValFilter(*this);
+		default:
+			throw Casper::Exception::InvalidOperation("invalid value for consistency parameter");
+	}
+}
 
 
 } // CP

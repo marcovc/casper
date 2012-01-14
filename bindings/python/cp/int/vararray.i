@@ -13,6 +13,14 @@
 
 %import <util/stdarray.i>
 
+/*
+%template()	Casper::Rel2<Casper::Element,Casper::Util::StdArray<Casper::CP::Var<int,Casper::CP::Traits::GetDefaultDom<int>::Type>,3>,Casper::Expr<int> >;
+%extend Casper::Rel2<Casper::Element,Casper::Util::StdArray<Casper::CP::Var<int,Casper::CP::Traits::GetDefaultDom<int>::Type>,3>,Casper::Expr<int> >
+{
+	%rename(__getitem__) operator[](const Casper::Expr<int>&);
+}
+*/
+
 %template(IntVarArray) Casper::CP::VarArray<int,1,Casper::CP::Traits::GetDefaultDom<int>::Type>;
 %template(BoolVarArray) Casper::CP::VarArray<bool,1,Casper::CP::Traits::GetDefaultDom<bool>::Type>;
 %template(IntVarArray2) Casper::CP::VarArray<int,2,Casper::CP::Traits::GetDefaultDom<int>::Type>;
@@ -24,7 +32,7 @@
 %extend Casper::CP::VarArray<int,1,Casper::CP::Traits::GetDefaultDom<int>::Type> {
 	%template(IntVarArray) VarArray<int>;
 	%template(IntVarArray) VarArray<int,int>;
-	
+/*	
 	const Casper::CP::Var<int,Casper::CP::Traits::GetDefaultDom<int>::Type>& 
 	getitemi(int i) const { return $self->operator[](i); }
 
@@ -42,13 +50,15 @@
 			else:
 				return self.getitemi(i)
 	}
-		
+*/		
 	void 
 	__setitem__(int i,const Casper::CP::Var<int,Casper::CP::Traits::GetDefaultDom<int>::Type>& v) 
 	{ $self->operator[](i) = v; }
 	
 	
 }
+
+
 %extend Casper::CP::VarArray<bool,1,Casper::CP::Traits::GetDefaultDom<bool>::Type> {
 	%template(BoolVarArray) VarArray<bool>;
 	%template(BoolVarArray) VarArray<bool,bool>;
@@ -57,7 +67,7 @@
 	getitemi(int i) const { return $self->operator[](i); }
 
 	Casper::Expr<bool>
-	getiteme(const Casper::Expr<bool>& e) const { return $self->operator[](e); }
+	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
@@ -87,8 +97,8 @@
 		return r; 
 	}
 
-//	Casper::Expr<Casper::Seq<int> >
-//	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
+	Casper::Expr<Casper::Seq<int> >
+	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
@@ -118,8 +128,8 @@
 		return r; 
 	}
 
-//	Casper::Expr<Casper::Seq<bool> >
-//	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
+	Casper::Expr<Casper::Seq<bool> >
+	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
@@ -150,8 +160,11 @@
 		return r; 
 	}
 
-//	Casper::Expr<Casper::Seq<int> >
-//	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
+	Casper::Expr<Casper::Seq<int> >
+	getiteme(const Casper::Expr<int>& e) const 
+	{ 
+		return $self->operator[](e); 
+	}
 	
 	%pythoncode
 	{
@@ -181,8 +194,8 @@
 		return r; 
 	}
 
-//	Casper::Expr<Casper::Seq<bool> >
-//	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
+	Casper::Expr<Casper::Seq<bool> >
+	getiteme(const Casper::Expr<int>& e) const { return $self->operator[](e); }
 	
 	%pythoncode
 	{
@@ -201,3 +214,4 @@
 	{ $self->operator[](i) = v; }
 	
 }
+
