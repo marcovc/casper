@@ -169,11 +169,49 @@ typedef Seq<IntSet>	IntSetSeq;
 ///	Sequence of sets of booleans. \ingroup Kernel
 typedef Seq<BoolSet>	BoolSetSeq;
 
-///	Sequence of integers. \ingroup Kernel
+///	Sequence of sequence of floats. \ingroup Kernel
 typedef Seq<float>	FloatSeq;
 
-///	Sequence of booleans. \ingroup Kernel
+///	Sequence of doubles. \ingroup Kernel
 typedef Seq<double>	DoubleSeq;
+
+#if 0
+///	Sequence of sequences of integers. \ingroup Kernel
+typedef Seq<Seq<int> >	IntSeq2;
+
+///	Sequence of sequences of booleans. \ingroup Kernel
+typedef Seq<Seq<bool> >	BoolSeq2;
+
+///	Sequence of sequences of sets of integers. \ingroup Kernel
+typedef Seq<Seq<IntSet> >	IntSetSeq2;
+
+///	Sequence of sequences of sets of booleans. \ingroup Kernel
+typedef Seq<Seq<BoolSet> >	BoolSetSeq2;
+
+///	Sequence of sequences of floats. \ingroup Kernel
+typedef Seq<Seq<float> >	FloatSeq2;
+
+///	Sequence of sequences of doubles. \ingroup Kernel
+typedef Seq<Seq<double> >	DoubleSeq2;
+
+///	Sequence of sequences of sequences of integers. \ingroup Kernel
+typedef Seq<Seq<Seq<int> >	> IntSeq3;
+
+///	Sequence of sequences of booleans. \ingroup Kernel
+typedef Seq<Seq<Seq<bool> >	> BoolSeq3;
+
+///	Sequence of sequences of sets of integers. \ingroup Kernel
+typedef Seq<Seq<Seq<IntSet> > >	IntSetSeq3;
+
+///	Sequence of sequences of sets of booleans. \ingroup Kernel
+typedef Seq<Seq<Seq<BoolSet> > >	BoolSetSeq3;
+
+///	Sequence of sequences of floats. \ingroup Kernel
+typedef Seq<Seq<Seq<float> > >	FloatSeq3;
+
+///	Sequence of sequences of doubles. \ingroup Kernel
+typedef Seq<Seq<Seq<double> > >	DoubleSeq3;
+#endif
 
 //msvc defines these as macros
 #undef min

@@ -182,7 +182,6 @@ struct IterationView<CP::VarArray<Eval,dims,Dom> >
 	void		iterate()	{	assert(valid()); ++idx;	}
 	const CP::Var<Eval,Dom>& 	value() const 	{	assert(valid()); return v(idx);	}
 	bool		valid() const 	{	return idx < max;	}
-	//Self		copy() const {	return Self(v,idx); }
 	uint						idx;
 	CP::VarArray<Eval,dims,Dom>	v;
 	const uint					max;
@@ -196,10 +195,6 @@ struct GetPState<CP::VarArray<T,Dims,Dom> >
 
 namespace Traits {
 
-template<class T, int Dims, class Dom>
-struct GetEval<CP::VarArray<T,Dims,Dom> >
-{	typedef Seq<T>	Type;	};
-
 template<class T,int Dims,class Dom>
 struct GetElem<CP::VarArray<T,Dims,Dom> >
 {	typedef typename CP::VarArray<T,Dims,Dom>::Elem	Type;	};
@@ -208,6 +203,16 @@ struct GetElem<CP::VarArray<T,Dims,Dom> >
 template<class T,int Dims,class Dom>
 struct GetTermElem<CP::VarArray<T,Dims,Dom> >
 {	typedef CP::Var<T,Dom>	Type;	};
+
+#if 1
+template<class T, int Dims, class Dom>
+struct GetEval<CP::VarArray<T,Dims,Dom> >
+{	typedef Seq<T>	Type;	};
+#else
+template<class T, int Dims, class Dom>
+struct GetEval<CP::VarArray<T,Dims,Dom> >
+{	typedef Seq<typename GetEval<typename GetElem<CP::VarArray<T,Dims,Dom> >::Type>::Type>	Type;	};
+#endif
 
 } // Traits
 

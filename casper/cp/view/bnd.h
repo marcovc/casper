@@ -25,6 +25,7 @@
 #include <casper/util/io.h>
 #include <casper/util/assertions.h>
 #include <cmath>
+#include <casper/cp/fwddecl.h>
 
 namespace Casper {
 

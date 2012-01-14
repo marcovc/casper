@@ -740,15 +740,6 @@ struct GetPState<Rel5<Func,T1,T2,T3,T4,T5> >
 	{	return getPState(r.p1,r.p2,r.p3,r.p4,r.p5);}
 };
 
-template<class ArrayT,class IndexT>
-struct IterationView<Rel2<Element,ArrayT,IndexT> > :
-	IterationView<typename ArrayT::Elem>
-{
-	typedef IterationView<typename ArrayT::Elem> Super;
-	typedef Rel2<Element,ArrayT,IndexT> RelT;
-	IterationView(const RelT& v) : Super(v.p1[v.p2.value()]) {}
-};
-
 };
 
 template<class F>
