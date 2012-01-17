@@ -128,6 +128,11 @@ struct ExprWrapper<Seq<Eval>,T> : IExpr<Seq<Eval> >
 	{	return Create<T,Util::StdArray<Expr<Eval> > >()(t);	}
 	IterationExpr<Expr<Eval> > toIterationExpr() const
 	{	return Create<T,IterationExpr<Expr<Eval> > >()(t);	}
+	ElementExpr<Expr<Eval> > toElementExpr() const
+	{	return Create<T,ElementExpr<Expr<Eval> > >()(t);	}
+	ElementExpr<Expr<Seq<Eval> > > toElementSeqExpr() const
+	{	return Create<T,ElementExpr<Expr<Seq<Eval> > > >()(t);	}
+
 	State* const getPState() const
 	{	return GetPState<T>()(t);	}
 	std::ostream& print(std::ostream& os) const
@@ -167,6 +172,7 @@ Expr<Casper::Seq<Eval> >::Expr(const T& t) : Super(new Detail::ExprWrapper<Caspe
 #include <casper/kernel/spexpr/array.h>
 #include <casper/kernel/spexpr/list.h>
 #include <casper/kernel/spexpr/iteration.h>
+#include <casper/kernel/spexpr/element.h>
 #include <casper/kernel/spexpr/literal.h>
 #include <casper/kernel/spexpr/variable.h>
 #include <casper/cp/spexpr/expr.h>

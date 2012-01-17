@@ -22,6 +22,7 @@
 #include <casper/kernel/traits.h>
 #include <casper/util/container/common.h>
 #include <casper/kernel/rel/rel.h>
+#include <casper/kernel/ref/ref.h>
 
 namespace Casper {
 
@@ -51,26 +52,6 @@ struct IterationView<Rel2<Element,ArrayT,Ref<int> > > :
 	IterationView(const RelT& v) : Super(v.p1[v.p2.value()]) {}
 };
 
-// TODO: implement - this is a legal IterationView
-template<class ArrayT,class IndexT>
-struct IterationView<Rel2<Element,ArrayT,IndexT> >
-{
-	typedef typename Traits::GetTermElem<ArrayT>::Type	Elem;
-	typedef Rel2<Element,ArrayT,IndexT> RelT;
-	IterationView(const RelT& r)
-	{
-		std::ostringstream os;
-		os << r;
-		throw Casper::Exception::UndefinedView(os.str().c_str(),"IterationView");
-	}
-	IterationView(const IterationView& r)
-	{
-		throw 0;
-	}
-	void		iterate()	{	throw 0; }
-	const Elem& 	value() const 	{	throw 0;	}
-	bool		valid() const 	{	throw 0;	}
-};
 
 #ifndef _MSC_VER
 // iteration view over an std::initializer_list

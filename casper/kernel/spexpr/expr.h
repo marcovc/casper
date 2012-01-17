@@ -72,6 +72,8 @@ struct IExpr<Seq<Eval> >
 	virtual Util::StdArray<Eval,2> toLitStdArray2() const = 0;
 	virtual Util::StdArray<Expr<Eval> > toStdArray() const = 0;
 	virtual IterationExpr<Expr<Eval> > toIterationExpr() const = 0;
+	virtual ElementExpr<Expr<Eval> > toElementExpr() const = 0;
+	virtual ElementExpr<Expr<Seq<Eval> > > toElementSeqExpr() const = 0;
 	virtual State* const getPState() const = 0;
 	virtual std::ostream& print(std::ostream& os) const = 0;
 };
@@ -185,6 +187,12 @@ struct Expr<Casper::Seq<Eval> > : Casper::Util::SPImplIdiom<Detail::IExpr<Casper
 
 	IterationExpr<Expr<Eval> > toIterationExpr() const
 	{	return this->getImpl().toIterationExpr();	}
+
+	ElementExpr<Expr<Eval> > toElementExpr() const
+	{	return this->getImpl().toElementExpr();	}
+
+	ElementExpr<Expr<Seq<Eval> > > toElementSeqExpr() const
+	{	return this->getImpl().toElementSeqExpr();	}
 
 //	operator const Util::StdArray<Eval,1>&() const
 //	{	return toStdArray(); }

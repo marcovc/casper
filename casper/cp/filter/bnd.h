@@ -27,6 +27,7 @@
 #include <casper/util/safeop.h>
 //#include <casper/kernel/expression.h>
 #include <casper/kernel/rel/rel.h>
+#include <casper/kernel/view/element.h>
 #include <casper/util/assertions.h>
 
 #include <casper/cp/store.h>
@@ -1213,17 +1214,12 @@ struct BndViewRel2<Element,Expr1,Expr2,Eval> :
 	{
 		if (ValView<int,Expr2>(s,p2).ground())
 		{
-			int val = ValView<int,Expr2>(s,p2).value();
+			int idx = ValView<int,Expr2>(s,p2).value();
 
 			typedef typename Casper::Traits::GetElem<Expr1>::Type EElem;
-			IterationView<Expr1>	it(p1);
-			for (;  it.valid() and val > 0; it.iterate())
-				--val;
+			ElementView<Expr1> elem(p1);
 
-			if (!it.valid() or val<0)
-				throw Exception::IndexOutOfBounds();
-
-			return Super(s,Helper<EElem,Elem>()(s,it.value()));
+			return Super(s,Helper<EElem,Elem>()(s,elem.get(idx)));
 		}
 
 		Elem v(s,Detail::VarDomCreator<typename Elem::Dom>().unionOf(s,p1));

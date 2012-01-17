@@ -21,6 +21,7 @@
 #define _H_CASPER_KERNEL_EXPRESSION
 
 #include <casper/kernel/view/iteration.h>
+#include <casper/kernel/view/element.h>
 #include <casper/kernel/traits.h>
 
 
@@ -28,6 +29,9 @@ namespace Casper {
 
 template<class Elem> struct IterationExpr;
 template<class> struct IterationView;
+
+template<class Elem> struct ElementExpr;
+template<class,class> struct ElementView;
 
 namespace Detail {
 
@@ -58,6 +62,29 @@ struct IterationExprWrapper : IIterationExpr<Elem>
 	{	return static_cast<IIterationExpr<Elem>*>(new IterationView<View>(v)); }
 
 	IterationView<View>	v;
+};
+
+template<class Elem>
+struct IElementExpr
+{
+	/// Returns the ith element
+	virtual Elem 		get(uint i) const 	= 0;
+	/// Returns a copy of *this
+	virtual ElementExpr<Elem>		copy() const = 0;
+};
+
+// wrappers
+template<class Elem,class View>
+struct ElementExprWrapper : IElementExpr<Elem>
+{
+	ElementExprWrapper(const View& v) :
+		v(v) {}
+
+	Elem	 	get(uint i) const 	{	return v.get(i); }
+	ElementExpr<Elem>		copy() const
+	{	return static_cast<IElementExpr<Elem>*>(new ElementView<View,Elem>(v)); }
+
+	ElementView<View,Elem>	v;
 };
 
 
@@ -116,10 +143,57 @@ IterationExpr<Elem>::IterationExpr(const T1& t) :
 
 
 
+/********************
+ *  Element Expression
+ *********************/
+
+/**
+ * An ElementExrpression provides a way to access an element of a generic indexable
+ * expression.
+ *
+ * \ingroup Views
+ */
+template<class Elem>
+struct ElementExpr : Util::SPImplIdiom<Detail::IElementExpr<Elem> >
+{
+	typedef ElementExpr<Elem>	Self;
+	typedef Util::SPImplIdiom<Detail::IElementExpr<Elem> > Super;
+
+	/// Creates an element expression which references an existing implementation.
+	ElementExpr(Detail::IElementExpr<Elem>* pImpl) : Super(pImpl) {}
+
+	/// Creates a new element expression from a generic type \p T1.
+	template<class T1>
+	ElementExpr(const T1& t);
+
+	/// Copy constructor. \note The ElementView protocol does not allow shallow copies.
+	ElementExpr(const ElementExpr<Elem>& t) : Super(t.copy()) {}
+
+	/// Replaces the referenced bounded expression with a new expression.
+	const ElementExpr<Elem>& operator=(ElementExpr<Elem> s)
+	{
+		((Super&)*this) = s;
+		return *this;
+	}
+
+	/// Returns element at position i
+	Elem 		get(uint i) const 	{	return Super::getImpl().get(i); }
+	/// Returns a copy of *this
+	Self		copy() const {	return Super::getImpl().copy(); }
+
+};
+
+/// Creates a new iteration expression from a generic type \p T1.
+template<class Elem>
+template<class T1>
+ElementExpr<Elem>::ElementExpr(const T1& t) :
+	Super(new Detail::ElementExprWrapper<Elem,T1>(t)) {}
+
+
 namespace Traits {
 
 template<class Elem>
-struct GetEval<IterationExpr<Elem> >
+struct GetEval<ElementExpr<Elem> >
 {	typedef typename GetEval<Elem>::Type	Type;	};
 
 }
@@ -127,9 +201,9 @@ struct GetEval<IterationExpr<Elem> >
 } // Casper
 
 template<class T>
-std::ostream& operator<<(std::ostream& os, const Casper::IterationExpr<T>& f)
+std::ostream& operator<<(std::ostream& os, const Casper::ElementExpr<T>& f)
 {
-	os << f.value();
+	os << "[ElementExpr]";
 	return os;
 };
 

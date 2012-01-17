@@ -25,24 +25,6 @@
 
 namespace Casper {
 
-struct Goal;
-
-// forward declarations of classes defined in /util
-namespace Util {
-template<class,int> struct StdArray;
-template<class> struct StdVector;
-template<class> struct StdList;
-template<class> struct StdSList;
-template<class> struct StdRange;
-}
-
-template<class> struct IterationView;
-template<class,class> struct PredItView;
-template<class,class> struct UnionItView;
-template<class,class> struct InterItView;
-template<class,class> struct DiffItView;
-template<class,class> struct SymDiffItView;
-
 namespace Traits {
 
 template<class T>
@@ -56,6 +38,30 @@ struct GetTermElem;
 
 template<class T>
 struct GetState;
+
+}
+
+struct Goal;
+
+// forward declarations of classes defined in /util
+namespace Util {
+template<class,int> struct StdArray;
+template<class> struct StdVector;
+template<class> struct StdList;
+template<class> struct StdSList;
+template<class> struct StdRange;
+}
+
+template<class> struct IterationView;
+//template<class SeqT,class Elem = typename Traits::GetElem<SeqT>::Type> struct ElementView;
+template<class,class> struct ElementView;
+template<class,class> struct PredItView;
+template<class,class> struct UnionItView;
+template<class,class> struct InterItView;
+template<class,class> struct DiffItView;
+template<class,class> struct SymDiffItView;
+
+namespace Traits {
 
 // IsIntegral
 
@@ -126,6 +132,10 @@ template<class View>
 struct GetEval<IterationView<View> >
 {	typedef Seq<typename Traits::GetElem<View>::Type>	Type;	};
 
+template<class View,class Elem>
+struct GetEval<ElementView<View,Elem> >
+{	typedef typename Traits::GetEval<Elem>::Type	Type;	};
+
 #ifdef CASPER_CPP0X
 template<class Eval,class... Args>
 struct GetEval<std::function<Eval(Args...)> >
@@ -167,6 +177,10 @@ struct GetElem<Util::StdRange<T> >
 template<class T>
 struct GetElem<IterationView<T> >
 {	typedef typename Traits::GetElem<T>::Type	Type; };
+
+template<class View,class Elem>
+struct GetElem<ElementView<View,Elem> >
+{	typedef Elem	Type;	};
 
 template<class T1,class T2>
 struct GetElem<PredItView<T1,T2> >
@@ -227,6 +241,10 @@ struct GetTermElem<Util::StdRange<T> >
 template<class T>
 struct GetTermElem<IterationView<T> >
 {	typedef typename Traits::GetTermElem<T>::Type	Type; };
+
+template<class View,class Elem>
+struct GetTermElem<ElementView<View,Elem> >
+{	typedef typename Traits::GetTermElem<Elem>::Type	Type;	};
 
 template<class T1,class T2>
 struct GetTermElem<PredItView<T1,T2> >

@@ -28,13 +28,14 @@
 COUTWRAPPER(Casper::Util::StdArray)
 
 %define WRAP_STDARRAY_INDEX_OP(T,Dims,Elem)
+%template() Casper::Rel2<Casper::Element,Casper::Util::StdArray<T,Dims>,Casper::Expr<int> >;
 %extend Casper::Util::StdArray<T,Dims>
 {
 	Elem getElemInt(int i) const
 	{	return $self->operator[](i);	}
 
-	Rel2<Element,Self,Casper::Expr<int> >	getElemExpr(const Casper::Expr<int>& t) const
-	{	return	Rel2<Element,Self,Casper::Expr<int> >(*this,t);	}
+	Casper::Rel2<Casper::Element,Casper::Util::StdArray<T,Dims>,Casper::Expr<int> >	getElemExpr(const Casper::Expr<int>& t) const
+	{	return	Casper::Rel2<Casper::Element,Casper::Util::StdArray<T,Dims>,Casper::Expr<int> >(*$self,t);	}
 	
 	%pythoncode
 	{
@@ -42,15 +43,14 @@ COUTWRAPPER(Casper::Util::StdArray)
 			import numbers
 			if not isinstance(i,numbers.Number):
 				return self.getElemExpr(i)
-			elif i>=self.size() or i<0:
+			elif i>=self.__len__() or i<0:
 				raise IndexError
 			else:
 				return self.getElemInt(i)
 	}
-//	void 
-//	__setitem__(int i,const T& v) 
-//	{ $self->operator[](i) = v; }
-		
+	
+	void __setitem__(int i,const T& v) 
+	{ $self->operator[](i) = v; }		
 }
 %enddef
 
@@ -72,5 +72,5 @@ COUTWRAPPER(Casper::Util::StdArray)
 %template(BoolArray2) Casper::Util::StdArray<bool,2>;
 %template(BoolArray3) Casper::Util::StdArray<bool,3>;
 
-WRAP_STDARRAY_INDEX_OP(int,1,int)
+//WRAP_STDARRAY_INDEX_OP(int,1,int)
 

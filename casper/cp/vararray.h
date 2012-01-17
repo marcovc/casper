@@ -187,6 +187,7 @@ struct IterationView<CP::VarArray<Eval,dims,Dom> >
 	const uint					max;
 };
 
+
 template<class T,int Dims,class Dom>
 struct GetPState<CP::VarArray<T,Dims,Dom> >
 {	State* operator()(const CP::VarArray<T,Dims,Dom>& v)
