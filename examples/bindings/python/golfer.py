@@ -7,7 +7,7 @@ g = 4
 s = 4
 n = g*s
 
-heuristic = 1
+heuristic = 0
 
 solver = Solver()
 
