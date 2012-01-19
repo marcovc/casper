@@ -25,7 +25,7 @@
 #include <sstream>
 
 namespace Casper {
-
+ 
 struct Goal;
 
 // forward declarations of classes defined in /util

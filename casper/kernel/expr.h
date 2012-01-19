@@ -30,7 +30,7 @@ template<class Elem> struct IterationExpr;
 template<class> struct IterationView;
 
 namespace Detail {
-
+ 
 template<class Elem>
 struct IIterationExpr
 {

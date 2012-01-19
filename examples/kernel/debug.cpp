@@ -28,7 +28,7 @@
 using namespace Casper;
 using namespace Casper::CP;
 using namespace std;
-
+ 
 void test1()
 {
 	Solver solver;

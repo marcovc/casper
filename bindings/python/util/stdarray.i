@@ -24,7 +24,7 @@
 
 COUTWRAPPER(Casper::Util::StdArray)
 
-
+ 
 // base classes, not explicitely instantiated, but methods must be known to derived classes
 %ignore Casper::Util::StdArray< Casper::CP::Var< int,Casper::CP::Traits::GetDefaultDom< int >::Type >,1 >::operator==;
 %template() Casper::Util::StdArray< Casper::CP::Var< int,Casper::CP::Traits::GetDefaultDom< int >::Type >,1 >;

@@ -26,7 +26,7 @@ namespace Casper {
 namespace Detail {
 
 
-
+ 
 // 1. General case. Fails since SourceElemEval must equal TargetElemEval
 template<class T,class SourceElemEval,class TargetElemEval>
 struct GetElementHelper
