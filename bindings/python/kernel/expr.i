@@ -9,6 +9,8 @@
 #include <bindings/python/kernel/expr.h>
 %}
 
+%import <std_string.i>
+
 //%import <cp/view.i>
 
 // Expr
@@ -140,6 +142,8 @@ struct Expr<Eval> : Casper::Util::SPImplIdiom<Detail::IExpr<Eval> >
 {
 	typedef Casper::Util::SPImplIdiom<Detail::IExpr<Eval> > Super;
 	Expr(const Expr& expr) : Super(expr) {}
+	std::string getTypeStr() const
+	{	return this->getImpl().getTypeStr();	}
 };
 %enddef
 
@@ -149,6 +153,10 @@ struct Expr<Casper::Seq<Eval> > : Casper::Util::SPImplIdiom<Detail::IExpr<Casper
 {
 	typedef Casper::Util::SPImplIdiom<Detail::IExpr<Casper::Seq<Eval> > > Super;
 	Expr(const Expr& expr) : Super(expr) {}
+	std::string getTypeStr() const
+	{	return this->getImpl().getTypeStr();	}
+	bool hasSeqElement() const
+	{	return this->getImpl().hasSeqElement();	}	
 };
 %enddef
 namespace Casper {
@@ -157,11 +165,48 @@ DEFINE_SEQEXPR(int)
 DEFINE_SEQEXPR(bool)
 }
 
+
 %template(IntExpr) Casper::Expr<int>;
 %template(BoolExpr) Casper::Expr<bool>;
 %template(IntSeqExpr) Casper::Expr<Casper::Seq<int> >;
 %template(BoolSeqExpr) Casper::Expr<Casper::Seq<bool> >;
  
+COUTWRAPPER(Casper::Expr<int>)
+COUTWRAPPER(Casper::Expr<bool>)
+COUTWRAPPER(Casper::Expr<Casper::Seq<int> >)
+COUTWRAPPER(Casper::Expr<Casper::Seq<bool> >)
+
+%define EXTEND_SEQ_EXPR(Eval)
+%extend Casper::Expr<Casper::Seq<Eval> > 
+{
+	Casper::Expr<Eval> getItem1(int i) const { return $self->getElement(i); }
+	Casper::Expr<Casper::Seq<Eval> > getItem2(int i) const { return $self->getSeqElement(i); }
+	Casper::Expr<Casper::Seq<Eval> > getElem2(const Casper::Expr<int>& i) const { return Casper::rel<Casper::Element>(*$self,i); }
+	
+	%pythoncode
+	{
+		def __getitem__(self,i):
+			import numbers
+			if not isinstance(i,numbers.Number):
+				if self.hasSeqElement():
+					return self.getElem2(i)
+				else:
+					return element(self,i)		
+			elif i>=self.size() or i<0:
+				raise IndexError
+			elif self.hasSeqElement():
+				return self.getItem2(i)
+			else:
+				return self.getItem1(i)		
+	}
+		
+//	void 
+//	__setitem__(int i,const Casper::CP::Var<int,Casper::CP::Traits::GetDefaultDom<int>::Type>& v) 
+//	{ $self->operator[](i) = v; }		
+}
+%enddef
+
+EXTEND_SEQ_EXPR(int)
 
 %include <kernel/boolexpr_operators.i>
 %include <kernel/intexpr_operators.i>

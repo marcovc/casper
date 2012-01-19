@@ -21,6 +21,7 @@
 #define CASPER_CP_REF_REF_H_
 
 #include <casper/kernel/ref/view.h>
+#include <casper/kernel/view/element.h>
 #include <casper/cp/view/val.h>
 
 namespace Casper {
@@ -88,12 +89,17 @@ struct IterationView<Rel1<Domain,RefExpr> >
 	void		iterate()	{	assert(valid()); ++it;	}
 	Eval		value() const 	{	assert(valid()); return *it;	}
 	bool		valid() const 	{	return it != var.domain().end();	}
-	//Self		copy() const {	return Self(r,it); }
 	//RefView<CP::Var<Eval>,RefExpr> v;
 	CP::Var<Eval> var;
 	Iterator it;
 };
 
+template<class RefExpr,class Elem>
+struct ElementView<Rel1<Domain,RefExpr>,Elem> : NoElementView<Rel1<Domain,RefExpr>,Elem >
+{
+	ElementView(const Rel1<Domain,RefExpr>& r) :
+		NoElementView<Rel1<Domain,RefExpr>,Elem>(r) {}
+};
 
 /**
  * 	RefView over groundness testing over a sequence type.

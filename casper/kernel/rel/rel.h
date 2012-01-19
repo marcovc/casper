@@ -292,7 +292,7 @@ struct FuncToStr;
 #define FUNC2STR(FunName,ObjName) \
 template<> \
 struct FuncToStr<ObjName> \
-{	const char* operator()() const { return # FunName; } };
+{	const char* operator()() const { return # ObjName; } };
 
 #define NEW_REL_0(FunName,ObjName) \
 struct ObjName; \
@@ -445,28 +445,28 @@ template<>
 struct FuncToStr<Cast<int> >
 {
 	const char* operator()() const
-	{	return "int" ;}
+	{	return "Cast<int>" ;}
 };
 
 template<>
 struct FuncToStr<Cast<bool> >
 {
 	const char* operator()() const
-	{	return "bool" ;}
+	{	return "Cast<bool>" ;}
 };
 
 template<>
 struct FuncToStr<Cast<double> >
 {
 	const char* operator()() const
-	{	return "double" ;}
+	{	return "Cast<double>" ;}
 };
 
 template<>
 struct FuncToStr<Cast<float> >
 {
 	const char* operator()() const
-	{	return "float" ;}
+	{	return "Cast<float>" ;}
 };
 
 struct UnknownRel;
@@ -740,40 +740,97 @@ struct GetPState<Rel5<Func,T1,T2,T3,T4,T5> >
 	{	return getPState(r.p1,r.p2,r.p3,r.p4,r.p5);}
 };
 
+namespace Traits {
+
+template<class F>
+struct GetTypeStr<Rel0<F> >	{
+	std::string operator()()
+	{	return std::string("Casper::Rel0<Casper::")+FuncToStr<F>()()+">";	}
 };
+
+template<class F,class T1>
+struct GetTypeStr<Rel1<F,T1> > {
+	std::string operator()()
+	{	return std::string("Casper::Rel1<Casper::")+FuncToStr<F>()()+","+getTypeStr<T1>()+">"; }
+};
+
+template<class F,class T1,class T2>
+struct GetTypeStr<Rel2<F,T1,T2> >	{
+	std::string operator()()
+	{	return	std::string("Casper::Rel2<Casper::")+FuncToStr<F>()()+","+
+			getTypeStr<T1>()+","+getTypeStr<T2>()+">";	}
+};
+
+template<class F,class T1,class T2,class T3>
+struct GetTypeStr<Rel3<F,T1,T2,T3> >	{
+	std::string operator()()
+	{	return std::string("Casper::Rel3<Casper::")+FuncToStr<F>()()+","+getTypeStr<T1>()+","+
+			getTypeStr<T2>()+","+getTypeStr<T3>()+">";	}
+};
+
+template<class F,class T1,class T2,class T3,class T4>
+struct GetTypeStr<Rel4<F,T1,T2,T3,T4> >
+{
+	std::string operator()()
+	{	return std::string("Casper::Rel4<Casper::")+FuncToStr<F>()()+","+getTypeStr<T1>()+","+
+			getTypeStr<T2>()+","+getTypeStr<T3>()+","+getTypeStr<T4>()+">";	}
+};
+
+template<class F,class T1,class T2,class T3,class T4,class T5>
+struct GetTypeStr<Rel5<F,T1,T2,T3,T4,T5> >
+{
+	std::string operator()()
+	{	return std::string("Casper::Rel5<Casper::")+FuncToStr<F>()()+","+getTypeStr<T1>()+","+
+			getTypeStr<T2>()+","+getTypeStr<T3>()+","+getTypeStr<T4>()+","+getTypeStr<T5>()+">"; }
+};
+
+} // Traits
+
+namespace Detail {
+
+template<class F>
+static std::string getFuncName()
+{
+	std::string s = Casper::FuncToStr<F>()();
+	s[0] = tolower(s[0]);
+	return std::string("Casper::") + s;
+}
+
+}; // Detail
+}; // Casper
 
 template<class F>
 std::ostream& operator<<(std::ostream& os, const Casper::Rel0<F>& r)
 {
-	os << Casper::FuncToStr<F>()();
+	os << Casper::Detail::getFuncName<F>();
 	return os;
 }
 
 template<class F,class T1>
 std::ostream& operator<<(std::ostream& os, const Casper::Rel1<F,T1>& r)
 {
-	os << Casper::FuncToStr<F>()() << "(" << r.p1 << ")";
+	os << Casper::Detail::getFuncName<F>() << "(" << r.p1 << ")";
 	return os;
 }
 
 template<class F,class T1,class T2>
 std::ostream& operator<<(std::ostream& os, const Casper::Rel2<F,T1,T2>& r)
 {
-	os << Casper::FuncToStr<F>()() << "(" << r.p1 << "," << r.p2 << ")";
+	os << Casper::Detail::getFuncName<F>() << "(" << r.p1 << "," << r.p2 << ")";
 	return os;
 }
 
 template<class F,class T1,class T2,class T3>
 std::ostream& operator<<(std::ostream& os, const Casper::Rel3<F,T1,T2,T3>& r)
 {
-	os << Casper::FuncToStr<F>()() << "(" << r.p1 << "," << r.p2 << "," << r.p3 << ")";
+	os << Casper::Detail::getFuncName<F>() << "(" << r.p1 << "," << r.p2 << "," << r.p3 << ")";
 	return os;
 }
 
 template<class F,class T1,class T2,class T3,class T4>
 std::ostream& operator<<(std::ostream& os, const Casper::Rel4<F,T1,T2,T3,T4>& r)
 {
-	os << Casper::FuncToStr<F>()() << "(" << r.p1 << "," << r.p2
+	os << Casper::Detail::getFuncName<F>() << "(" << r.p1 << "," << r.p2
 	   << "," << r.p3 << "," << r.p4 << ")";
 	return os;
 }
@@ -781,7 +838,7 @@ std::ostream& operator<<(std::ostream& os, const Casper::Rel4<F,T1,T2,T3,T4>& r)
 template<class F,class T1,class T2,class T3,class T4,class T5>
 std::ostream& operator<<(std::ostream& os, const Casper::Rel5<F,T1,T2,T3,T4,T5>& r)
 {
-	os << Casper::FuncToStr<F>()() << "(" << r.p1 << "," << r.p2
+	os << Casper::Detail::getFuncName<F>() << "(" << r.p1 << "," << r.p2
 	   << "," << r.p3 << "," << r.p4 << "," << r.p5 << ")";
 	return os;
 }

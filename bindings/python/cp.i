@@ -21,11 +21,11 @@
 %include <cp/label.i>
 %include <cp/goal.i>
 
-/*
+
 %{
 namespace Casper {
 namespace CP {
-bool Store::post(const Casper::Expr<bool>& expr,
+bool Store::postExpr(const Casper::Expr<bool>& expr,
 		  Casper::CP::Consistency consistency)
 {
 	switch (consistency)
@@ -42,6 +42,25 @@ bool Store::post(const Casper::Expr<bool>& expr,
 	}
 }
 }
+namespace Detail {
+    template<class Store,class T>
+    struct Post<Store,Casper::Expr<T> > : IGoal
+    {
+        Post(Store& store,const Casper::Expr<T>& p, bool validate) :
+		store(store),p(p),validate(validate) {}
+        Goal execute()
+        {
+            if (store.postExpr(p))
+			return Goal(!validate or store.valid());
+            else
+			return fail();
+        }
+        Store&	store;
+        const Expr<T>	p;
+        const bool	validate;
+    };
+
+}
 }
 %}
-*/
+

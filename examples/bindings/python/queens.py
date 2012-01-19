@@ -1,5 +1,4 @@
 
-import casper
 from casper import *
 from casper.cp import *
 
@@ -8,8 +7,7 @@ n = 4
 solver = Solver()
 vars = IntVarArray(solver,n,1,n)
 
-print distinct(vars)
-solver.post(distinct(vars))
+solver.postExpr(distinct(vars))
 #solver.post(distinct([vars[i]+i for i in range(n)]))
 #solver.post(distinct([vars[i]-i for i in range(n)]))
 		

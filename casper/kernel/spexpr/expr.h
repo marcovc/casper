@@ -44,6 +44,7 @@ struct IExpr
 	virtual Ref<CP::Var<Eval> >	toCPVarRef(State& state) const = 0;
 	virtual State* const getPState() const = 0;
 	virtual std::ostream& print(std::ostream& os) const = 0;
+	virtual std::string getTypeStr() const = 0;
 };
  
 template<>
@@ -63,6 +64,7 @@ struct IExpr<bool>
 	virtual bool	postValFilter(CP::Store& store) const = 0;
 	virtual State* const getPState() const = 0;
 	virtual std::ostream& print(std::ostream& os) const = 0;
+	virtual std::string getTypeStr() const = 0;
 };
 
 template<class Eval>
@@ -72,8 +74,12 @@ struct IExpr<Seq<Eval> >
 	virtual Util::StdArray<Eval,2> toLitStdArray2() const = 0;
 	virtual Util::StdArray<Expr<Eval> > toStdArray() const = 0;
 	virtual IterationExpr<Expr<Eval> > toIterationExpr() const = 0;
+	virtual Expr<Eval> getElement(uint idx) const = 0;
+	virtual Expr<Seq<Eval> > getSeqElement(uint idx) const = 0;
+	virtual bool hasSeqElement() const = 0;
 	virtual State* const getPState() const = 0;
 	virtual std::ostream& print(std::ostream& os) const = 0;
+	virtual std::string getTypeStr() const = 0;
 };
 
 
@@ -110,6 +116,8 @@ struct Expr : Casper::Util::SPImplIdiom<Detail::IExpr<Eval> >
 	{	return this->getImpl().getPState();	}
 
 #endif
+	std::string getTypeStr() const
+	{	return this->getImpl().getTypeStr();	}
 
 	// SWIG needs this
 	~Expr() {}
@@ -158,6 +166,9 @@ struct Expr<bool> : Casper::Util::SPImplIdiom<Detail::IExpr<bool> >
 
 #endif
 
+	std::string getTypeStr() const
+	{	return this->getImpl().getTypeStr();	}
+
 	// SWIG needs this
 	~Expr() {}
 };
@@ -183,8 +194,16 @@ struct Expr<Casper::Seq<Eval> > : Casper::Util::SPImplIdiom<Detail::IExpr<Casper
 	Util::StdArray<Expr<Eval> > toStdArray() const
 	{	return this->getImpl().toStdArray();	}
 
+	// \note Make sure *this is alive while using the returned IterationExpr
 	IterationExpr<Expr<Eval> > toIterationExpr() const
 	{	return this->getImpl().toIterationExpr();	}
+
+	// \note Make sure *this is alive while using the returned ElementExpr
+	Expr<Eval> getElement(uint i) const
+	{	return this->getImpl().getElement(i);	}
+
+	Expr<Seq<Eval> > getSeqElement(uint i) const
+	{	return this->getImpl().getSeqElement(i);	}
 
 //	operator const Util::StdArray<Eval,1>&() const
 //	{	return toStdArray(); }
@@ -195,6 +214,12 @@ struct Expr<Casper::Seq<Eval> > : Casper::Util::SPImplIdiom<Detail::IExpr<Casper
 	{	return this->getImpl().getPState();	}
 
 #endif
+
+	bool hasSeqElement() const
+	{	return this->getImpl().hasSeqElement();	}
+
+	std::string getTypeStr() const
+	{	return this->getImpl().getTypeStr();	}
 
 	// SWIG needs this
 	~Expr() {}

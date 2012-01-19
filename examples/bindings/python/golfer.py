@@ -20,6 +20,8 @@ for wi in range(w):
 			for gj in range(g):
 				solver.post(sum([asInt(vars[wi][gi][i]==vars[wj][gj][j]) 
 								for i in range(s) for j in range(s)])<=1)
+#solver.post(some([vars[wi][gi][i]==vars[wj][gj][j]) 
+#				for i in range(s) for j in range(s)])
 
 # all different in each week
 for wi in range(w):

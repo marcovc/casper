@@ -22,6 +22,7 @@
 
 #include <functional>
 #include <casper/kernel/common.h>
+#include <sstream>
 
 namespace Casper {
 
@@ -37,6 +38,7 @@ template<class> struct StdRange;
 }
 
 template<class> struct IterationView;
+template<class,class> struct ElementView;
 template<class,class> struct PredItView;
 template<class,class> struct UnionItView;
 template<class,class> struct InterItView;
@@ -56,6 +58,13 @@ struct GetTermElem;
 
 template<class T>
 struct GetState;
+
+template<class T>
+struct GetTypeStr;
+
+template<class T>
+std::string getTypeStr()
+{	return GetTypeStr<T>()(); }
 
 // IsIntegral
 
@@ -126,6 +135,10 @@ template<class View>
 struct GetEval<IterationView<View> >
 {	typedef Seq<typename Traits::GetElem<View>::Type>	Type;	};
 
+template<class View,class Elem>
+struct GetEval<ElementView<View,Elem> >
+{	typedef typename Traits::GetEval<Elem>::Type	Type;	};
+
 #ifdef CASPER_CPP0X
 template<class Eval,class... Args>
 struct GetEval<std::function<Eval(Args...)> >
@@ -167,6 +180,10 @@ struct GetElem<Util::StdRange<T> >
 template<class T>
 struct GetElem<IterationView<T> >
 {	typedef typename Traits::GetElem<T>::Type	Type; };
+
+template<class View,class Elem>
+struct GetElem<ElementView<View,Elem> >
+{	typedef Elem	Type;	};
 
 template<class T1,class T2>
 struct GetElem<PredItView<T1,T2> >
@@ -228,6 +245,10 @@ template<class T>
 struct GetTermElem<IterationView<T> >
 {	typedef typename Traits::GetTermElem<T>::Type	Type; };
 
+template<class View,class Elem>
+struct GetTermElem<ElementView<View,Elem> >
+{	typedef typename Traits::GetTermElem<Elem>::Type	Type;	};
+
 template<class T1,class T2>
 struct GetTermElem<PredItView<T1,T2> >
 { typedef typename Traits::GetTermElem<T1>::Type	Type; };
@@ -254,6 +275,109 @@ struct GetTermElem<SymDiffItView<T1,T2> >
 template<class T>
 struct GetTermElem<std::initializer_list<T> >
 {	typedef typename GetTermElem<T>::Type	Type;	};
+#endif
+
+#endif
+
+template<>
+struct GetTypeStr<int>	{
+	std::string operator()()
+	{ 	return	"int";	}
+};
+
+template<>
+struct GetTypeStr<bool>	{
+	std::string operator()()
+	{ 	return	"bool";	}
+};
+
+template<>
+struct GetTypeStr<double>	{
+	std::string operator()()
+	{ 	return	"double";	}
+};
+
+template<>
+struct GetTypeStr<float>	{
+	std::string operator()()
+	{ 	return	"float";	}
+};
+
+template<>
+struct GetTypeStr<uint>	{
+	std::string operator()()
+	{ 	return	"uint";	}
+};
+
+template<>
+struct GetTypeStr<short>	{
+	std::string operator()()
+	{ 	return	"short";	}
+};
+
+template<>
+struct GetTypeStr<long>	{
+	std::string operator()()
+	{ 	return	"long";	}
+};
+
+template<class T>
+struct GetTypeStr<Seq<T> >	{
+	std::string operator()()
+	{ 	return	std::string("Casper::Seq<")+getTypeStr<T>()+">";	}
+};
+
+template<class T>
+struct GetTypeStr<Set<T> >	{
+	std::string operator()()
+	{ 	return	std::string("Casper::Set<")+getTypeStr<T>()+">";	}
+};
+
+template<class T, int dims>
+struct GetTypeStr<Util::StdArray<T,dims> >	{
+	std::string operator()()
+	{
+		std::stringstream ss;
+		ss << dims;
+		return std::string("Casper::Util::StdArray<")+getTypeStr<T>()+","+ss.str()+">";
+	}
+};
+
+template<class T>
+struct GetTypeStr<Util::StdVector<T> >	{
+	std::string operator()()
+	{ 	return	std::string("Casper::Util::StdVector<")+getTypeStr<T>()+">";	}
+};
+
+template<class T>
+struct GetTypeStr<Util::StdSList<T> >{
+	std::string operator()()
+	{ 	return	std::string("Casper::Util::StdSList<")+getTypeStr<T>()+">";	}
+};
+
+template<class T>
+struct GetTypeStr<Util::StdList<T> >{
+	std::string operator()()
+	{ 	return	std::string("Casper::Util::StdList<")+getTypeStr<T>()+">";	}
+};
+
+template<class T>
+struct GetTypeStr<Util::StdRange<T> >{
+	std::string operator()()
+	{ 	return	std::string("Casper::Util::StdRange<")+getTypeStr<T>()+">";	}
+};
+
+#ifdef CASPER_CPP0X
+//template<class Eval,class... Args>
+//struct GetTypeStr<std::function<Eval(Args...)> >
+//{	typedef typename GetTypeStr<Eval>::Type Type;	};
+
+#ifndef _MSC_VER
+template<class T>
+struct GetTypeStr<std::initializer_list<T> >{
+	std::string operator()()
+	{ 	return	std::string("std::initializer_list<")+getTypeStr<T>()+">";	}
+};
 #endif
 
 #endif

@@ -149,6 +149,14 @@ template<class T>
 struct GetEval<Ref<T> >
 {	typedef	T	Type;	};
 
+template<class T>
+struct GetTypeStr<Ref<T> >
+{
+	std::string operator()()
+	{
+		return std::string("Casper::Ref<")+getTypeStr<T>()+">";
+	}
+};
 
 } // Traits
 

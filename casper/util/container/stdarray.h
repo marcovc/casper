@@ -521,6 +521,8 @@ typedef StdArray<string>	StdStringArray;
 
 } // Util
 
+template<class> struct IterationView;
+
 // specialization for multidimesional (domvar)arrays
 // note: IterationView over an Array2<T> provides access to the terminal T, not Array1<T>
 template<class T,int dims>

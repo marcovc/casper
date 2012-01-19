@@ -118,9 +118,9 @@ struct IFilterSched;
 template<class> struct BndExpr;
 template<class,class> struct Var;
 
-//#if defined(SWIG) | defined(SWIG_BUILD)
+#if defined(SWIG) | defined(SWIG_BUILD)
 enum Consistency { Domain, Bounds, Value };
-//#endif
+#endif
 
 
 /**
@@ -155,10 +155,10 @@ struct Store : INotifiable
 	bool post(const BndExpr<bool>& b);
 #endif
 
-//#if defined(SWIG) | defined(SWIG_BUILD)
-	bool post(const Casper::Expr<bool>& expr,
+#if defined(SWIG) | defined(SWIG_BUILD)
+	inline bool postExpr(const Casper::Expr<bool>& expr,
 			  Casper::CP::Consistency consistency = Casper::CP::Bounds);
-//#endif
+#endif
 
 #ifndef _MSC_VER
 

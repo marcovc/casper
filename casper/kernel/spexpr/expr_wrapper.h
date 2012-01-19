@@ -52,7 +52,7 @@ struct CreateLiteral
 
 #include <casper/kernel/spexpr/ref.h>
 #include <casper/kernel/spexpr/goal.h>
-
+#include <casper/kernel/spexpr/element.h>
 
 namespace Casper {
 namespace Detail {
@@ -63,18 +63,22 @@ struct ExprWrapper : IExpr<Eval>
 	ExprWrapper(const T& t) : t(t) {}
 	Eval toLiteral() const
 	{	return CreateLiteral<T,Eval>()(t);	}
-	CP::DomExpr<Eval> toCPDomExpr(CP::Store& store) const;
-	//{	return Create<T,CP::DomExpr<Eval> >()(store,t);	}
-	CP::BndExpr<Eval> toCPBndExpr(CP::Store& store) const;
-	//{	return Create<T,CP::BndExpr<Eval> >()(store,t);	}
-	CP::ValExpr<Eval> toCPValExpr(CP::Store& store) const;
-	//{	return Create<T,CP::ValExpr<Eval> >()(store,t);	}
+	CP::DomExpr<Eval> toCPDomExpr(CP::Store& store) const
+	{	return Create<T,CP::DomExpr<Eval> >()(store,t);	}
+	CP::BndExpr<Eval> toCPBndExpr(CP::Store& store) const
+	{	return Create<T,CP::BndExpr<Eval> >()(store,t);	}
+	CP::ValExpr<Eval> toCPValExpr(CP::Store& store) const
+	{	return Create<T,CP::ValExpr<Eval> >()(store,t);	}
+
 	Ref<Eval>	toRef(State& state) const
 	{	return Create<T,Ref<Eval> >()(state,t);	}
-	Ref<CP::Var<Eval> >	toCPVarRef(State& state) const;
-	//{	return Create<T,Ref<CP::Var<Eval> > >()(state,t);	}
+	Ref<CP::Var<Eval> >	toCPVarRef(State& state) const
+	{	return Create<T,Ref<CP::Var<Eval> > >()(state,t);	}
 	State* const getPState() const
 	{	return GetPState<T>()(t);	}
+
+	std::string getTypeStr() const
+	{	return Casper::Traits::getTypeStr<T>();	}
 
 	std::ostream& print(std::ostream& os) const
 	{	return os << t; }
@@ -87,30 +91,32 @@ struct ExprWrapper<bool,T> : IExpr<bool>
 	ExprWrapper(const T& t) : t(t) {}
 	bool toLiteral() const
 	{	return CreateLiteral<T,bool>()(t);	}
-	CP::DomExpr<bool> toCPDomExpr(CP::Store& store) const;
-	//{	return Create<T,CP::DomExpr<bool> >()(store,t);	}
-	CP::BndExpr<bool> toCPBndExpr(CP::Store& store) const;
-	//{	return Create<T,CP::BndExpr<bool> >()(store,t);	}
-	CP::ValExpr<bool> toCPValExpr(CP::Store& store) const;
-	//{	return Create<T,CP::ValExpr<bool> >()(store,t);	}
-	CP::ChkExpr toChkExpr(CP::Store& store) const;
-	//{	return Create<T,CP::ChkExpr>()(store,t);	}
+	CP::DomExpr<bool> toCPDomExpr(CP::Store& store) const
+	{	return Create<T,CP::DomExpr<bool> >()(store,t);	}
+	CP::BndExpr<bool> toCPBndExpr(CP::Store& store) const
+	{	return Create<T,CP::BndExpr<bool> >()(store,t);	}
+	CP::ValExpr<bool> toCPValExpr(CP::Store& store) const
+	{	return Create<T,CP::ValExpr<bool> >()(store,t);	}
+	CP::ChkExpr toChkExpr(CP::Store& store) const
+	{	return Create<T,CP::ChkExpr>()(store,t);	}
 	Ref<bool>	toRef(State& state) const
 	{	return Create<T,Ref<bool> >()(state,t);	}
-	Ref<CP::Var<bool> >	toCPVarRef(State& state) const;
-	//{	return Create<T,Ref<CP::Var<bool> > >()(state,t);	}
+	Ref<CP::Var<bool> >	toCPVarRef(State& state) const
+	{	return Create<T,Ref<CP::Var<bool> > >()(state,t);	}
 	Goal	toGoal(State& state) const
 	{	return Create<T,Goal>()(state,t);	}
 
-	bool	postDomFilter(CP::Store& store) const;
-	//{	return PostFilter<T>::dom(store,t);	}
-	bool	postBndFilter(CP::Store& store) const;
-	//{	return PostFilter<T>::bnd(store,t);	}
-	bool	postValFilter(CP::Store& store) const;
-	//{	return PostFilter<T>::val(store,t);	}
+	bool	postDomFilter(CP::Store& store) const
+	{	return Casper::CP::postDomFilter(store,t);	}
+	bool	postBndFilter(CP::Store& store) const
+	{	return Casper::CP::postBndFilter(store,t);	}
+	bool	postValFilter(CP::Store& store) const
+	{	return Casper::CP::postValFilter(store,t);	}
 
 	State* const getPState() const
 	{	return GetPState<T>()(t);	}
+	std::string getTypeStr() const
+	{	return Casper::Traits::getTypeStr<T>();	}
 	std::ostream& print(std::ostream& os) const
 	{	return os << t; }
 	T t;
@@ -128,8 +134,17 @@ struct ExprWrapper<Seq<Eval>,T> : IExpr<Seq<Eval> >
 	{	return Create<T,Util::StdArray<Expr<Eval> > >()(t);	}
 	IterationExpr<Expr<Eval> > toIterationExpr() const
 	{	return Create<T,IterationExpr<Expr<Eval> > >()(t);	}
+	Expr<Eval> getElement(uint idx) const
+	{	return GetElement<T,Eval>()(t,idx);	}
+	Expr<Seq<Eval> > getSeqElement(uint idx) const
+	{	return GetElement<T,Seq<Eval> >()(t,idx);}
+	bool hasSeqElement() const
+	{	return HasSeqElement<T>()(t);	}
+
 	State* const getPState() const
 	{	return GetPState<T>()(t);	}
+	std::string getTypeStr() const
+	{	return Casper::Traits::getTypeStr<T>();	}
 	std::ostream& print(std::ostream& os) const
 	{	return ::operator<<(os,t); }
 	T t;
@@ -149,6 +164,15 @@ template<class Eval>
 template<class T>
 Expr<Casper::Seq<Eval> >::Expr(const T& t) : Super(new Detail::ExprWrapper<Casper::Seq<Eval>,T>(t)) {}
 
+namespace Traits {
+
+template<class T>
+struct GetTypeStr<Casper::Expr<T> >	{
+	std::string operator()()
+	{	return std::string("Casper::Expr<")+getTypeStr<T>()+">";	}
+};
+
+} // Traits
 
 } // Casper
 
@@ -167,86 +191,10 @@ Expr<Casper::Seq<Eval> >::Expr(const T& t) : Super(new Detail::ExprWrapper<Caspe
 #include <casper/kernel/spexpr/array.h>
 #include <casper/kernel/spexpr/list.h>
 #include <casper/kernel/spexpr/iteration.h>
+#include <casper/kernel/spexpr/element.h>
 #include <casper/kernel/spexpr/literal.h>
 #include <casper/kernel/spexpr/variable.h>
 #include <casper/cp/spexpr/expr.h>
-
-namespace Casper {
-namespace Detail {
-
-#ifndef SWIG
-template<class Obj>
-struct PostFilter
-{
-	static bool dom(CP::Store& store, const Obj& obj);
-	static bool bnd(CP::Store& store, const Obj& obj);
-	static bool val(CP::Store& store, const Obj& obj);
-};
-
-template<class Obj>
-bool PostFilter<Obj>::dom(CP::Store& store, const Obj& obj)
-{	return Casper::CP::postDomFilter(store,obj);	}
-
-template<class Obj>
-bool PostFilter<Obj>::bnd(CP::Store& store, const Obj& obj)
-{	return Casper::CP::postBndFilter(store,obj);	}
-
-template<class Obj>
-bool PostFilter<Obj>::val(CP::Store& store, const Obj& obj)
-{	return Casper::CP::postValFilter(store,obj);	}
-#endif
-
-template<class Eval,class T>
-CP::DomExpr<Eval> ExprWrapper<Eval,T>::toCPDomExpr(CP::Store& store) const
-{	return Create<T,CP::DomExpr<Eval> >()(store,t);	}
-
-template<class Eval,class T>
-CP::BndExpr<Eval> ExprWrapper<Eval,T>::toCPBndExpr(CP::Store& store) const
-{	return Create<T,CP::BndExpr<Eval> >()(store,t);	}
-
-template<class Eval,class T>
-CP::ValExpr<Eval> ExprWrapper<Eval,T>::toCPValExpr(CP::Store& store) const
-{	return Create<T,CP::ValExpr<Eval> >()(store,t);	}
-
-template<class Eval,class T>
-Ref<CP::Var<Eval> >	ExprWrapper<Eval,T>::toCPVarRef(State& state) const
-{	return Create<T,Ref<CP::Var<Eval> > >()(state,t);	}
-
-template<class T>
-CP::DomExpr<bool> ExprWrapper<bool,T>::toCPDomExpr(CP::Store& store) const
-{	return Create<T,CP::DomExpr<bool> >()(store,t);	}
-
-template<class T>
-CP::BndExpr<bool> ExprWrapper<bool,T>::toCPBndExpr(CP::Store& store) const
-{	return Create<T,CP::BndExpr<bool> >()(store,t);	}
-
-template<class T>
-CP::ValExpr<bool> ExprWrapper<bool,T>::toCPValExpr(CP::Store& store) const
-{	return Create<T,CP::ValExpr<bool> >()(store,t);	}
-
-template<class T>
-CP::ChkExpr ExprWrapper<bool,T>::toChkExpr(CP::Store& store) const
-{	return Create<T,CP::ChkExpr>()(store,t);	}
-
-template<class T>
-Ref<CP::Var<bool> >	ExprWrapper<bool,T>::toCPVarRef(State& state) const
-{	return Create<T,Ref<CP::Var<bool> > >()(state,t);	}
-
-template<class T>
-bool	ExprWrapper<bool,T>::postDomFilter(CP::Store& store) const
-{	return PostFilter<T>::dom(store,t);	}
-
-template<class T>
-bool	ExprWrapper<bool,T>::postBndFilter(CP::Store& store) const
-{	return PostFilter<T>::bnd(store,t);	}
-
-template<class T>
-bool	ExprWrapper<bool,T>::postValFilter(CP::Store& store) const
-{	return PostFilter<T>::val(store,t);	}
-
-}
-
-}
 
 
 

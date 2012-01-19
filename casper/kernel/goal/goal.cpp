@@ -34,7 +34,7 @@ struct StdFunctionAsGoal : IGoal
 	std::function<Goal()> fn;
 };
 
-}
+} // Detail
 
 Goal::Goal(State& s, const std::function<Goal()>& fn) :
 	Super(new (s) Casper::Detail::StdFunctionAsGoal(s,fn)) {}

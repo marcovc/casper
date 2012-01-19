@@ -13,13 +13,6 @@
 
 %import <util/stdarray.i>
 
-/*
-%template()	Casper::Rel2<Casper::Element,Casper::Util::StdArray<Casper::CP::Var<int,Casper::CP::Traits::GetDefaultDom<int>::Type>,3>,Casper::Expr<int> >;
-%extend Casper::Rel2<Casper::Element,Casper::Util::StdArray<Casper::CP::Var<int,Casper::CP::Traits::GetDefaultDom<int>::Type>,3>,Casper::Expr<int> >
-{
-	%rename(__getitem__) operator[](const Casper::Expr<int>&);
-}
-*/
 
 %template(IntVarArray) Casper::CP::VarArray<int,1,Casper::CP::Traits::GetDefaultDom<int>::Type>;
 %template(BoolVarArray) Casper::CP::VarArray<bool,1,Casper::CP::Traits::GetDefaultDom<bool>::Type>;
@@ -32,7 +25,7 @@
 %extend Casper::CP::VarArray<int,1,Casper::CP::Traits::GetDefaultDom<int>::Type> {
 	%template(IntVarArray) VarArray<int>;
 	%template(IntVarArray) VarArray<int,int>;
-/*	
+
 	const Casper::CP::Var<int,Casper::CP::Traits::GetDefaultDom<int>::Type>& 
 	getitemi(int i) const { return $self->operator[](i); }
 
@@ -50,7 +43,7 @@
 			else:
 				return self.getitemi(i)
 	}
-*/		
+		
 	void 
 	__setitem__(int i,const Casper::CP::Var<int,Casper::CP::Traits::GetDefaultDom<int>::Type>& v) 
 	{ $self->operator[](i) = v; }

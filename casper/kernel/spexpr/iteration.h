@@ -45,6 +45,7 @@ struct ExprIterationAdaptor : IIterationExpr<Expr<ToEval> >
 	IterationView<FromObj>	it;
 };
 
+
 template<class T,class Eval>
 struct Create<T,IterationExpr<Expr<Eval> > >
 {
@@ -62,6 +63,22 @@ struct IterationView<Expr<Seq<Eval> > > : IterationExpr<Expr<Eval> >
 		IterationExpr<Expr<Eval> >(e.toIterationExpr()) {}
 };
 
+template<class Eval>
+struct IterationView<Rel2<Element,Expr<Seq<Eval> >,Expr<int> > >
+{
+	IterationView(const Rel2<Element,Expr<Seq<Eval> >,Expr<int> >& e) :
+		expr(e.p1.getSeqElement(e.p2.toRef(getState(e)).value())),
+		it(expr.toIterationExpr()) {}
+
+	IterationView(const IterationView& s) : expr(s.expr),it(s.it) {}
+
+	void				iterate()			{	it.iterate(); }
+	Expr<Eval> 			value() const 	{	return it.value();  }
+	bool				valid() const 		{	return it.valid(); }
+
+	Expr<Seq<Eval> > expr;	// required to make sure expr does not get deleted while using iteration
+	IterationExpr<Expr<Eval> > it;
+};
 
 }
 

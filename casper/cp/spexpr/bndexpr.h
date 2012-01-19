@@ -56,6 +56,42 @@ struct BndView<Eval,Expr<Eval> > : BndExpr<Eval>
 	Expr<Eval> expr;
 };
 
+// element among Expr<Seq<Eval> >
+template<class Eval>
+struct BndViewRel2<Element,Expr<Seq<Eval> >,Expr<int>,Eval> :
+		BndView<Eval,Expr<Eval> >
+{
+	CASPER_ASSERT_BNDVIEW_EVAL(Eval)
+
+	typedef BndView<Eval,Expr<Eval> >	Super;
+	typedef Var<Eval,typename Traits::GetDefaultDom<Eval>::Type> Elem;
+	static Super getSuper(Store& s,const Expr<Seq<Eval> >& p1,const Expr<int>& p2)
+	{
+		if (ValView<int,Expr<int> >(s,p2).ground())
+		{
+			int idx = ValView<int,Expr<int> >(s,p2).value();
+
+			ElementView<Expr<Seq<Eval> > > elem(p1);
+			return Super(s,elem.get(idx));
+		}
+
+		Elem v(s,Detail::VarDomCreator<typename Elem::Dom>().unionOf(s,p1));
+		s.post(elementEqual(p1,p2,v));
+		return Super(s,v);
+	}
+
+	Rel2<Element,Expr<Seq<Eval> >,Expr<int> > getObj() const
+	{	return Rel2<Element,Expr<Seq<Eval> >,Expr<int> >(v1,v2); }
+
+	BndViewRel2(Store& store,const Expr<Seq<Eval> >& p1, const Expr<int>& p2) :
+		Super(getSuper(store,p1,p2)),
+		v1(p1),v2(p2)
+	{}
+
+	Expr<Seq<Eval> > v1;
+	Expr<int> v2;
+};
+
 } // CP
 
 }

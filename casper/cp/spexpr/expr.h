@@ -22,14 +22,23 @@
 
 #include <casper/kernel/spexpr/expr_wrapper.h>
 
-#include <casper/cp/spexpr/domexpr.h>
-#include <casper/cp/spexpr/bndexpr.h>
 #include <casper/cp/spexpr/valexpr.h>
+#include <casper/cp/spexpr/bndexpr.h>
+#include <casper/cp/spexpr/domexpr.h>
 #include <casper/cp/spexpr/chkexpr.h>
 
 #ifdef CASPER_PRECOMPILE
 #include <casper/cp/int/spexpr/explicit.h>
 #include <casper/cp/set/spexpr/explicit.h>
 #endif
+
+namespace Casper {
+namespace CP {
+
+#if defined(SWIG) | defined(SWIG_BUILD)
+
+#endif
+}
+}
 
 #endif /* CASPER_CP_SPEXPR_EXPR_H_ */

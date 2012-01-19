@@ -22,8 +22,18 @@
 #include <casper/kernel/traits.h>
 #include <casper/util/container/common.h>
 #include <casper/kernel/rel/rel.h>
+#include <casper/kernel/ref/ref.h>
 
 namespace Casper {
+
+namespace Traits {
+template<class Eval,class Index>
+struct GetElem<Rel2<Element,Expr<Seq<Eval> >,Index> >
+{	typedef Expr<Eval>	Type;	};
+template<class Eval,class Index>
+struct GetTermElem<Rel2<Element,Expr<Seq<Eval> >,Index> >
+{	typedef Expr<Eval>	Type;	};
+}
 
 /// \warning Make sure the view used for initializing this class is not
 /// destroyed before b reaches e.
@@ -42,35 +52,16 @@ struct IterationView
 	Iterator	e;
 };
 
-template<class ArrayT>
-struct IterationView<Rel2<Element,ArrayT,Ref<int> > > :
-	IterationView<typename ArrayT::Elem>
+template<class ArrayT,class IndexT>
+struct IterationView<Rel2<Element,ArrayT,IndexT> > :
+	IterationView<typename Traits::GetElem<ArrayT>::Type>
 {
-	typedef IterationView<typename ArrayT::Elem> Super;
-	typedef Rel2<Element,ArrayT,Ref<int> > RelT;
-	IterationView(const RelT& v) : Super(v.p1[v.p2.value()]) {}
+	typedef typename Traits::GetElem<ArrayT>::Type Elem;
+	typedef IterationView<Elem> Super;
+	typedef Rel2<Element,ArrayT,IndexT> RelT;
+	IterationView(const RelT& v) : Super(v.p1[Ref<int>(getState(v),v.p2).value()]) {}
 };
 
-// TODO: implement - this is a legal IterationView
-template<class ArrayT,class IndexT>
-struct IterationView<Rel2<Element,ArrayT,IndexT> >
-{
-	typedef typename Traits::GetTermElem<ArrayT>::Type	Elem;
-	typedef Rel2<Element,ArrayT,IndexT> RelT;
-	IterationView(const RelT& r)
-	{
-		std::ostringstream os;
-		os << r;
-		throw Casper::Exception::UndefinedView(os.str().c_str(),"IterationView");
-	}
-	IterationView(const IterationView& r)
-	{
-		throw 0;
-	}
-	void		iterate()	{	throw 0; }
-	const Elem& 	value() const 	{	throw 0;	}
-	bool		valid() const 	{	throw 0;	}
-};
 
 #ifndef _MSC_VER
 // iteration view over an std::initializer_list

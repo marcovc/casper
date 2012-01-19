@@ -195,6 +195,14 @@ namespace Traits {
 template<class T,class D>
 struct GetEval<CP::Var<T,D> >
 {	typedef	T	Type;	};
+
+template<class T,class D>
+struct GetTypeStr<CP::Var<T,D> >
+{
+	std::string operator()()
+	{	return std::string("Casper::CP::Var<")+getTypeStr<T>()+">"; }
+};
+
 } // Traits
 
 template<class> struct GetPState;

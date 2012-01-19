@@ -187,6 +187,7 @@ struct IterationView<CP::VarArray<Eval,dims,Dom> >
 	const uint					max;
 };
 
+
 template<class T,int Dims,class Dom>
 struct GetPState<CP::VarArray<T,Dims,Dom> >
 {	State* operator()(const CP::VarArray<T,Dims,Dom>& v)
@@ -204,15 +205,20 @@ template<class T,int Dims,class Dom>
 struct GetTermElem<CP::VarArray<T,Dims,Dom> >
 {	typedef CP::Var<T,Dom>	Type;	};
 
-#if 1
 template<class T, int Dims, class Dom>
 struct GetEval<CP::VarArray<T,Dims,Dom> >
 {	typedef Seq<T>	Type;	};
-#else
-template<class T, int Dims, class Dom>
-struct GetEval<CP::VarArray<T,Dims,Dom> >
-{	typedef Seq<typename GetEval<typename GetElem<CP::VarArray<T,Dims,Dom> >::Type>::Type>	Type;	};
-#endif
+
+template<class T,int dims,class D>
+struct GetTypeStr<CP::VarArray<T,dims,D> >
+{
+	std::string operator()()
+	{
+		std::stringstream ss;
+		ss << dims;
+		return std::string("Casper::CP::VarArray<")+getTypeStr<T>()+","+ss.str()+">";
+	}
+};
 
 } // Traits
 

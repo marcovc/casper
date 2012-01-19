@@ -50,12 +50,14 @@ struct IterationExprWrapper : IIterationExpr<Elem>
 {
 	IterationExprWrapper(const View& v) :
 		v(v) {}
+	IterationExprWrapper(const IterationView<View>& v) :
+		v(v) {}
 
 	void		iterate()	{	v.iterate(); }
 	Elem	 	value() const 	{	return v.value(); }
 	bool		valid() const 	{	return v.valid(); }
 	IterationExpr<Elem>		copy() const
-	{	return static_cast<IIterationExpr<Elem>*>(new IterationView<View>(v)); }
+	{	return static_cast<IIterationExpr<Elem>*>(new IterationExprWrapper(v)); }
 
 	IterationView<View>	v;
 };
@@ -115,14 +117,6 @@ IterationExpr<Elem>::IterationExpr(const T1& t) :
 	Super(new Detail::IterationExprWrapper<Elem,T1>(t)) {}
 
 
-
-namespace Traits {
-
-template<class Elem>
-struct GetEval<IterationExpr<Elem> >
-{	typedef typename GetEval<Elem>::Type	Type;	};
-
-}
 
 } // Casper
 

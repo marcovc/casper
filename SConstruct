@@ -96,6 +96,7 @@ for k,v in extra_example_libs.iteritems():
 ##################
 
 casper_kernel=[]
+casper_kernel+=['traits.cpp']
 casper_kernel+=['goal/goal.cpp']
 casper_kernel+=['goal/explorer.cpp']
 casper_kernel+=['goal/terminal.cpp']
@@ -425,7 +426,7 @@ def getBuildFlags(env,debug_level,optimize_level):
 			link_flags += ['-static']
 		if env['cpp0x']:
 			build_flags += ['-std=gnu++0x']
-		#build_flags += ['-Wfatal-errors']
+		build_flags += ['-Wfatal-errors']
 		#build_flags += ['-fPIC']
 		#build_flags += ['-ffast-math']
 		#link_flags += ['-ffast-math']	
@@ -889,7 +890,8 @@ for src in ['cp/int/intvar_operators.i','cp/int/boolvar_operators.i',
 			'kernel/expr_predicates.i','kernel/goal_operators.i']:
 	py_gen_scripts.append(env.Command(pref+src,['pyutils/objdb.py',pref+src+'.py'],'python '+pref+src+'.py'+' > $TARGET'))
 
-copy_init = [Command(env['PREFIX']+"/bindings/python/casper/__init__.py", "build/"+MODE+"/bindings/python/casper/kernel.py", Copy("$TARGET", env['PREFIX']+"/bindings/python/casper/kernel.py"))]
+copy_init = [Command(env['PREFIX']+"/bindings/python/casper/__init__.py", env['PREFIX']+"/bindings/python/casper/kernel.py", Copy("$TARGET", env['PREFIX']+"/bindings/python/casper/kernel.py"))]
+Depends(copy_init,env['PREFIX']+"/bindings/python/casper/kernel.py")
 pycasper_target = py_gen_scripts+pycasper_libs+copy_init
 Alias('pycasper',pycasper_target)
 	

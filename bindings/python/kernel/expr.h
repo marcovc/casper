@@ -129,6 +129,8 @@ struct ExprFromCallable : IExpr<Eval>
 	{	return Ref<CP::Var<Eval> >(state,static_cast<IRef<CP::Var<Eval> >*>(new (state) CallableRef<CP::Var<Eval> >(state,pFunction)));	}
 	std::ostream& print(std::ostream& os) const
 	{	return os << "<python callable>"; }
+	std::string getTypeStr() const
+	{	return "<Python Callable>";	}
 
 	Eval toLiteral() const
 	{	throw Casper::Exception::TypeCoercion("<python callable>","Eval");	}
@@ -166,6 +168,8 @@ struct ExprFromCallable<bool> : IExpr<bool>
 	{	return new (state) CallableGoal(state,pFunction);	}
 	std::ostream& print(std::ostream& os) const
 	{	return os << "<python callable>"; }
+	std::string getTypeStr() const
+	{	return "<Python Callable>";	}
 
 	bool toLiteral() const
 	{	throw Casper::Exception::TypeCoercion("<python callable>","bool");	}
@@ -237,10 +241,8 @@ struct CreateFromPyObject
 		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isExpr, 0)))
 			return new Casper::Expr<Eval>(*static_cast<Casper::Expr<Eval>*>(argp));
 		else
-		{
-			std::cout << "unkown conversion in typemap\n";
-			assert(0);
-		}
+			throw Casper::Exception::TypeCoercion("<Python Object>",
+												 Casper::Traits::getTypeStr<Casper::Expr<Eval> >());
 	}
 
 	static bool	check(PyObject* pObj)
@@ -304,10 +306,7 @@ struct CreateFromPyObject<bool>
 		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isExpr, 0)))
 			return new Casper::Expr<bool>(*static_cast<Casper::Expr<bool>*>(argp));
 		else
-		{
-			std::cout << "unkown conversion in typemap\n";
-			assert(0);
-		}
+			throw Casper::Exception::TypeCoercion("<Python Object>","Casper::Expr<bool>");
 	}
 
 	static bool	check(PyObject* pObj)
@@ -400,10 +399,8 @@ struct CreateFromPyObject<Seq<Eval> >
 			return new Casper::Expr<Seq<Eval> >(l);
 		}
 		else
-		{
-			std::cout << "unkown conversion in typemap" << std::endl;
-			assert(0);
-		}
+			throw Casper::Exception::TypeCoercion("<Python Object>",
+												 Casper::Traits::getTypeStr<Casper::Expr<Seq<Eval> > >());
 	}
 
 	static bool	check(PyObject* pObj)

@@ -172,6 +172,17 @@ template<class T,int Dims>
 struct GetTermElem<RefArray<T,Dims> >
 {	typedef Ref<T>	Type;	};
 
+template<class T,int Dims>
+struct GetTypeStr<RefArray<T,Dims> >
+{
+	std::string operator()()
+	{
+		std::stringstream ss;
+		ss << Dims;
+		return std::string("Casper::RefArray<")+getTypeStr<T>()+","+ss.str()+">";
+	}
+};
+
 } // Traits
 
 

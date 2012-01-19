@@ -158,6 +158,14 @@ namespace Traits {
 template<>
 struct GetEval<Goal>
 {	typedef bool	Type;	};
+
+template<>
+struct GetTypeStr<Goal>
+{
+	std::string operator()()
+	{	return "Casper::Goal"; }
+};
+
 } // Traits
 
 struct OK;
