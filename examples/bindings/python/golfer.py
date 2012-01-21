@@ -2,7 +2,7 @@
 from casper import *
 from casper.cp import *
 
-w = 4
+w = 5
 g = 4
 s = 4
 n = g*s

@@ -32,7 +32,9 @@ bool PostBndFilter::operator()(Store& s,const BndExpr<bool>& v) const
 }
 
 bool PostBndFilter::operator()(Store& store, const Casper::Expr<bool>& expr) const
-{	return expr.postBndFilter(store);	}
+{
+	std::cout << __FILE__ << " : " << __LINE__ << std::endl;
+	return expr.postBndFilter(store);	}
 
 /*
 Filter::Filter(CPSolver& s,BndExpr<bool> b) :

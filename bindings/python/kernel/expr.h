@@ -23,7 +23,34 @@
 #include <casper/kernel/spexpr/expr.h>
 #include <string>
 
+#include <bindings/python/swigtypes.h>
+
 namespace Casper {
+
+
+template<class Eval>
+bool isCasperObj(PyObject* pObj)
+{
+	return (getPSWIGKernelTypeInfo<Eval>()!=NULL and
+			getPSWIGKernelTypeInfo<Eval>()->belongs(pObj)) or
+		   (getPSWIGCPTypeInfo<Eval>()!=NULL and
+			getPSWIGCPTypeInfo<Eval>()->belongs(pObj));
+}
+
+template<class Eval>
+Casper::Expr<Eval>* toCasperExpr(PyObject* pObj)
+{
+	Casper::Expr<Eval>* r = NULL;
+	if (getPSWIGCPTypeInfo<Eval>() != NULL and
+		(r = getPSWIGCPTypeInfo<Eval>()->toExpr(pObj)) != NULL)
+		return r;
+	if (getPSWIGKernelTypeInfo<Eval>() != NULL and
+		(r = getPSWIGKernelTypeInfo<Eval>()->toExpr(pObj)) != NULL)
+		return r;
+	return r;
+}
+
+
 
 namespace Exception {
 struct PyCodeException : std::runtime_error
@@ -33,21 +60,6 @@ struct PyCodeException : std::runtime_error
 };
 
 namespace Detail {
-
-template<class>
-struct EvalStr;
-
-template<>
-struct EvalStr<int>
-{	std::string operator()() { return "int"; }};
-
-template<>
-struct EvalStr<bool>
-{	std::string operator()() { return "bool"; }};
-
-template<class T>
-struct EvalStr<Seq<T> >
-{	std::string operator()() { return "Casper::Seq<" + EvalStr<T>()() + ">"; }};
 
 struct DecPyRef : ITrailAgent
 {
@@ -202,131 +214,31 @@ struct ExprFromCallable<bool> : IExpr<bool>
 template<class Eval>
 struct CreateFromPyObject
 {
-	static swig_type_info * isCPVar;
-	static swig_type_info * isRef;
-	static swig_type_info * isExpr;
-
-	CreateFromPyObject()
-	{
-		isCPVar =  SWIG_TypeQuery((std::string("Casper::CP::Var<")+
-								   Detail::EvalStr<Eval>()()+
-								   std::string(">*")).c_str());
-		isRef =	SWIG_TypeQuery((std::string("Casper::Ref<")+
-								 Detail::EvalStr<Eval>()()+
-								 std::string(">*")).c_str());
-		isExpr = SWIG_TypeQuery((std::string("Casper::Expr<")+
-								Detail::EvalStr<Eval>()()+
-								std::string(">*")).c_str());
-
-	}
 	static Casper::Expr<Eval>*	create(PyObject* pObj)
 	{
-		void * argp = NULL;
-
 		if (PyBool_Check(pObj))
 			return new Casper::Expr<Eval>(static_cast<Eval>(PyInt_AsLong(pObj)));
-		else
 		if (PyInt_Check(pObj))
-			return new Casper::Expr<Eval>(static_cast<Eval>(PyInt_AsLong(pObj)));
-		else
+			return  new Casper::Expr<Eval>(static_cast<Eval>(PyInt_AsLong(pObj)));
 		if (PyCallable_Check(pObj))
-			return new Casper::Expr<Eval>(static_cast<Detail::IExpr<Eval>*>(new ExprFromCallable<Eval>(pObj)));
-		else
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVar, 0)))
-			return new Casper::Expr<Eval>(*static_cast<Casper::CP::Var<Eval,typename Casper::CP::Traits::GetDefaultDom<Eval>::Type>*>(argp));
-		else
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isRef, 0)))
-			return new Casper::Expr<Eval>(*static_cast<Casper::Ref<Eval>*>(argp));
-		else
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isExpr, 0)))
-			return new Casper::Expr<Eval>(*static_cast<Casper::Expr<Eval>*>(argp));
-		else
-			throw Casper::Exception::TypeCoercion("<Python Object>",
-												 Casper::Traits::getTypeStr<Casper::Expr<Eval> >());
+			return  new Casper::Expr<Eval>(static_cast<Detail::IExpr<Eval>*>(new ExprFromCallable<Eval>(pObj)));
+		Casper::Expr<Eval>* r;
+		if ((r = toCasperExpr<Eval>(pObj)) != NULL)
+			return r;
+		throw Casper::Exception::TypeCoercion("<Python Object>",
+											 Casper::Traits::getTypeStr<Casper::Expr<Eval> >());
 	}
 
 	static bool	check(PyObject* pObj)
 	{
-		void * argp = NULL;
-
-		return 	SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVar, 0)) or
-				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isRef, 0)) or
-				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isExpr, 0)) or
+		return	PyBool_Check(pObj) or
+				PyInt_Check(pObj) or
 				PyCallable_Check(pObj) or
-				PyBool_Check(pObj) or
-				PyInt_Check(pObj);
+				isCasperObj<Eval>(pObj);
 	}
 };
 
-template<class T> swig_type_info * CreateFromPyObject<T>::isCPVar = NULL;
-template<class T> swig_type_info * CreateFromPyObject<T>::isRef = NULL;
-template<class T> swig_type_info * CreateFromPyObject<T>::isExpr = NULL;
 
-/*
- *	Creates from python literals, CP::Var, and Expr<Eval>.
- */
-template<>
-struct CreateFromPyObject<bool>
-{
-	static swig_type_info * isCPVar;
-	static swig_type_info * isRef;
-	static swig_type_info * isExpr;
-	static swig_type_info * isGoal;
-
-	CreateFromPyObject()
-	{
-		isCPVar =  SWIG_TypeQuery("Casper::CP::Var<bool>*");
-		isRef =	SWIG_TypeQuery("Casper::Ref<bool>*");
-		isExpr = SWIG_TypeQuery("Casper::Expr<bool>*");
-		isGoal = SWIG_TypeQuery("Casper::Goal*");
-
-	}
-	static Casper::Expr<bool>*	create(PyObject* pObj)
-	{
-		void * argp = NULL;
-
-		if (PyBool_Check(pObj))
-			return new Casper::Expr<bool>(static_cast<bool>(PyInt_AsLong(pObj)));
-		else
-		if (PyInt_Check(pObj))
-			return new Casper::Expr<bool>(static_cast<bool>(PyInt_AsLong(pObj)));
-		else
-		if (PyCallable_Check(pObj))
-			return new Casper::Expr<bool>(static_cast<Detail::IExpr<bool>*>(new ExprFromCallable<bool>(pObj)));
-		else
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVar, 0)))
-			return new Casper::Expr<bool>(*static_cast<Casper::CP::Var<bool,typename Casper::CP::Traits::GetDefaultDom<bool>::Type>*>(argp));
-		else
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isRef, 0)))
-			return new Casper::Expr<bool>(*static_cast<Casper::Ref<bool>*>(argp));
-		else
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isGoal, 0)))
-			return new Casper::Expr<bool>(*static_cast<Casper::Goal*>(argp));
-		else
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isExpr, 0)))
-			return new Casper::Expr<bool>(*static_cast<Casper::Expr<bool>*>(argp));
-		else
-			throw Casper::Exception::TypeCoercion("<Python Object>","Casper::Expr<bool>");
-	}
-
-	static bool	check(PyObject* pObj)
-	{
-		void * argp = NULL;
-
-		return 	SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVar, 0)) or
-				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isRef, 0)) or
-				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isExpr, 0)) or
-				(SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isGoal, 0))) or
-				PyCallable_Check(pObj) or
-				PyBool_Check(pObj) or
-				PyInt_Check(pObj);
-	}
-};
-
-swig_type_info * CreateFromPyObject<bool>::isCPVar = NULL;
-swig_type_info * CreateFromPyObject<bool>::isRef = NULL;
-swig_type_info * CreateFromPyObject<bool>::isExpr = NULL;
-swig_type_info * CreateFromPyObject<bool>::isGoal = NULL;
 
 /*
  *	Creates from python sequence types, CP::VarArray, and Expr<Eval>.
@@ -334,56 +246,12 @@ swig_type_info * CreateFromPyObject<bool>::isGoal = NULL;
 template<class Eval>
 struct CreateFromPyObject<Seq<Eval> >
 {
-	static swig_type_info * isCPVarArray1;
-	static swig_type_info * isCPVarArray2;
-	static swig_type_info * isCPVarArray3;
-	static swig_type_info * isSeqExpr;
-
-	CreateFromPyObject()
-	{
-		isCPVarArray1 =
-				SWIG_TypeQuery(
-						(std::string("Casper::CP::VarArray<")+Detail::EvalStr<Eval>()()+
-						std::string(",1,Casper::CP::Traits::GetDefaultDom<")+
-						Detail::EvalStr<Eval>()()+
-						std::string(">::Type>*")).c_str());
-		isCPVarArray2 =
-				SWIG_TypeQuery(
-						(std::string("Casper::CP::VarArray<")+
-						Detail::EvalStr<Eval>()()+
-						std::string(",2,Casper::CP::Traits::GetDefaultDom<")+
-						Detail::EvalStr<Eval>()()+
-						std::string(">::Type>*")).c_str());
-		isCPVarArray3 =
-				SWIG_TypeQuery(
-						(std::string("Casper::CP::VarArray<")+
-						Detail::EvalStr<Eval>()()+
-						std::string(",3,Casper::CP::Traits::GetDefaultDom<")+
-						Detail::EvalStr<Eval>()()+
-						std::string(">::Type>*")).c_str());
-		isSeqExpr =
-				SWIG_TypeQuery(
-						(std::string("Casper::Expr<")+
-						Detail::EvalStr<Eval>()()+
-						std::string(">*")).c_str());
-
-	}
 	static Casper::Expr<Seq<Eval> >*	create(PyObject* pObj)
 	{
-		void * argp = NULL;
+		Casper::Expr<Seq<Eval> >* r;
+		if ((r = toCasperExpr<Seq<Eval> >(pObj)) != NULL)
+			return r;
 
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVarArray1, 0)))
-			return new Casper::Expr<Seq<Eval> >(*static_cast<Casper::CP::VarArray<Eval,1>*>(argp));
-		else
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVarArray2, 0)))
-			return new Casper::Expr<Seq<Eval> >(*static_cast<Casper::CP::VarArray<Eval,2>*>(argp));
-		else
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVarArray3, 0)))
-			return new Casper::Expr<Seq<Eval> >(*static_cast<Casper::CP::VarArray<Eval,3>*>(argp));
-		else
-		if (SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isSeqExpr, 0)))
-			return new Casper::Expr<Seq<Eval> >(*static_cast<Casper::Expr<Seq<Eval> >*>(argp));
-		else
 		if (PySequence_Check(pObj))
 		{
 			int size = PySequence_Size(pObj);
@@ -398,29 +266,17 @@ struct CreateFromPyObject<Seq<Eval> >
 			}
 			return new Casper::Expr<Seq<Eval> >(l);
 		}
-		else
-			throw Casper::Exception::TypeCoercion("<Python Object>",
+
+		throw Casper::Exception::TypeCoercion("<Python Object>",
 												 Casper::Traits::getTypeStr<Casper::Expr<Seq<Eval> > >());
 	}
 
 	static bool	check(PyObject* pObj)
 	{
-
-		void * argp = NULL;
-
-		return 	SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVarArray1, 0)) or
-				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVarArray2, 0)) or
-				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isCPVarArray3, 0)) or
-				SWIG_IsOK(SWIG_ConvertPtr(pObj, &argp, isSeqExpr, 0)) or
+		return 	isCasperObj<Seq<Eval> >(pObj) or
 				PySequence_Check(pObj);
 	}
 };
-
-template<class T> swig_type_info * CreateFromPyObject<Seq<T> >::isCPVarArray1 = NULL;
-template<class T> swig_type_info * CreateFromPyObject<Seq<T> >::isCPVarArray2 = NULL;
-template<class T> swig_type_info * CreateFromPyObject<Seq<T> >::isCPVarArray3 = NULL;
-template<class T> swig_type_info * CreateFromPyObject<Seq<T> >::isSeqExpr = NULL;
-
 
 Goal CallableGoal::execute()
 {

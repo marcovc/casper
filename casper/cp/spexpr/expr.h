@@ -32,13 +32,6 @@
 #include <casper/cp/set/spexpr/explicit.h>
 #endif
 
-namespace Casper {
-namespace CP {
 
-#if defined(SWIG) | defined(SWIG_BUILD)
-
-#endif
-}
-}
 
 #endif /* CASPER_CP_SPEXPR_EXPR_H_ */

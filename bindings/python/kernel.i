@@ -5,6 +5,7 @@
 %feature("autodoc", "1");
 %{
 #include <casper/kernel.h>
+#include <bindings/python/kernel/swigtypes.h>
 %}
 
 // global definitions to remain hidden [hidden]
@@ -19,3 +20,17 @@
 %include <kernel/explorer.i>
 %include <kernel/ref.i>
 
+%{
+    #include <casper/version.h>
+%}
+
+%include <casper/version.h>
+
+
+
+%init %{
+Casper::pIntSWIGKernelTypeInfo = new Casper::SWIGKernelTypeInfo<int>();
+Casper::pBoolSWIGKernelTypeInfo  = new Casper::SWIGKernelTypeInfo<bool>();;
+Casper::pIntSeqSWIGKernelTypeInfo = new Casper::SWIGKernelTypeInfo<Casper::Seq<int> >();
+Casper::pBoolSeqSWIGKernelTypeInfo = new Casper::SWIGKernelTypeInfo<Casper::Seq<bool> >();
+%}

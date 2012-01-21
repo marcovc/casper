@@ -90,12 +90,12 @@ struct Expr : Casper::Util::SPImplIdiom<Detail::IExpr<Eval> >
 {
 	typedef Casper::Util::SPImplIdiom<Detail::IExpr<Eval> > Super;
 
+	Expr(const Expr<Eval>& expr) : Super(expr) {}
+
 	template<class T>
 	Expr(const T& t);
 
 	Expr(Detail::IExpr<Eval>* t) : Super(t)	{}
-
-	Expr(const Expr& expr) : Super(expr) {}
 
 #ifndef SWIG
 
@@ -128,10 +128,10 @@ struct Expr<bool> : Casper::Util::SPImplIdiom<Detail::IExpr<bool> >
 {
 	typedef Casper::Util::SPImplIdiom<Detail::IExpr<bool> > Super;
 
+	Expr(const Expr<bool>& expr) : Super(expr) {}
+
 	template<class T>
 	Expr(const T& t);
-
-	Expr(const Expr& expr) : Super(expr) {}
 
 	Expr(Detail::IExpr<bool>* t) : Super(t)	{}
 
@@ -178,10 +178,10 @@ struct Expr<Casper::Seq<Eval> > : Casper::Util::SPImplIdiom<Detail::IExpr<Casper
 {
 	typedef Casper::Util::SPImplIdiom<Detail::IExpr<Casper::Seq<Eval> > > Super;
 
+	Expr(const Expr<Casper::Seq<Eval> >& expr) : Super(expr) {}
+
 	template<class T>
 	Expr(const T& t);
-
-	Expr(const Expr& expr) : Super(expr) {}
 
 #ifndef SWIG
 

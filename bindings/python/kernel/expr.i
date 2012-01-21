@@ -9,6 +9,7 @@
 #include <bindings/python/kernel/expr.h>
 %}
 
+
 %import <std_string.i>
 
 //%import <cp/view.i>
@@ -17,51 +18,16 @@
 
 // typemaps
 
-%define SET_EXPR_SWIG_TYPE_DESCR(Eval)
-Casper::Detail::CreateFromPyObject<Eval>::isExpr = $descriptor(Casper::Expr<Eval>*);
-Casper::Detail::CreateFromPyObject<Eval>::isCPVar = 
-			$descriptor(Casper::CP::Var<Eval,Casper::CP::Traits::GetDefaultDom<Eval>::Type >*);
-Casper::Detail::CreateFromPyObject<Eval>::isRef = $descriptor(Casper::Ref<Eval>*);
-%enddef
-
-%define SET_EXPR_SWIG_TYPE_DESCR_BOOL()
-Casper::Detail::CreateFromPyObject<bool>::isExpr = $descriptor(Casper::Expr<bool>*);
-Casper::Detail::CreateFromPyObject<bool>::isCPVar = 
-			$descriptor(Casper::CP::Var<bool,Casper::CP::Traits::GetDefaultDom<bool>::Type >*);
-Casper::Detail::CreateFromPyObject<bool>::isRef = $descriptor(Casper::Ref<bool>*);
-Casper::Detail::CreateFromPyObject<bool>::isGoal = $descriptor(Casper::Goal*);				
-%enddef
-
-%define SET_SEQEXPR_SWIG_TYPE_DESCR(Eval)
-Casper::Detail::CreateFromPyObject<Casper::Seq<Eval> >::isSeqExpr = $descriptor(Casper::Expr<Casper::Seq<Eval> >*);
-Casper::Detail::CreateFromPyObject<Casper::Seq<Eval> >::isCPVarArray1 = 
-		$descriptor(Casper::CP::VarArray<Eval,1,Casper::CP::Traits::GetDefaultDom<Eval>::Type >*);
-Casper::Detail::CreateFromPyObject<Casper::Seq<Eval> >::isCPVarArray2 = 
-		$descriptor(Casper::CP::VarArray<Eval,2,Casper::CP::Traits::GetDefaultDom<Eval>::Type >*);
-Casper::Detail::CreateFromPyObject<Casper::Seq<Eval> >::isCPVarArray3 = 
-		$descriptor(Casper::CP::VarArray<Eval,3,Casper::CP::Traits::GetDefaultDom<Eval>::Type >*);
-SET_EXPR_SWIG_TYPE_DESCR(Eval)
-%enddef
-	
-
 // int
 
 
 %typemap(in) Casper::Expr<int> const&
 {
-	//std::cout << "in Expr<int> typemap\n";
-	
-	SET_EXPR_SWIG_TYPE_DESCR(int)	
-		
 	$1 = Casper::Detail::CreateFromPyObject<int>::create($input);
 };
 
 %typemap(typecheck,precedence=0) Casper::Expr<int> const&
 {
-	//std::cout << "in Expr<int> typecheck\n";
-	
-	SET_EXPR_SWIG_TYPE_DESCR(int)
-		
 	$1 = Casper::Detail::CreateFromPyObject<int>::check($input);
 };
 
@@ -69,19 +35,11 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 
 %typemap(in) Casper::Expr<bool> const&
 {
-	//std::cout << "in Expr<bool> typemap\n";
-	
-	SET_EXPR_SWIG_TYPE_DESCR_BOOL()
-	
 	$1 = Casper::Detail::CreateFromPyObject<bool>::create($input);
 };
 
 %typemap(typecheck,precedence=0) Casper::Expr<bool> const&
 {
-	//std::cout << "in Expr<bool> typecheck\n";
-
-	SET_EXPR_SWIG_TYPE_DESCR_BOOL()
-
 	$1 = Casper::Detail::CreateFromPyObject<bool>::check($input);
 };
 
@@ -89,19 +47,11 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 
 %typemap(in) Casper::Expr<Casper::Seq<int> > const&
 {
-	//std::cout << "in Expr<Seq<int> > typemap\n";
-	
-	SET_SEQEXPR_SWIG_TYPE_DESCR(int)
-	
 	$1 = Casper::Detail::CreateFromPyObject<Casper::Seq<int> >::create($input);
 };
 
 %typemap(typecheck,precedence=0) Casper::Expr<Casper::Seq<int> > const&
 {
-	//std::cout << "in Expr<Seq<int> > typecheck\n";
-
-	SET_SEQEXPR_SWIG_TYPE_DESCR(int)
-	
 	$1 = Casper::Detail::CreateFromPyObject<Casper::Seq<int> >::check($input);
 };
 
@@ -109,19 +59,11 @@ SET_EXPR_SWIG_TYPE_DESCR(Eval)
 
 %typemap(in) Casper::Expr<Casper::Seq<bool> > const&
 {
-	//std::cout << "in Expr<Seq<bool> > typemap\n";
-	
-	SET_SEQEXPR_SWIG_TYPE_DESCR(bool)
-	
 	$1 = Casper::Detail::CreateFromPyObject<Casper::Seq<bool> >::create($input);
 };
 
 %typemap(typecheck,precedence=0) Casper::Expr<Casper::Seq<bool> > const&
 {
-	//std::cout << "in Expr<Seq<bool> > typecheck\n";
-
-	SET_SEQEXPR_SWIG_TYPE_DESCR(bool)
-	
 	$1 = Casper::Detail::CreateFromPyObject<Casper::Seq<bool> >::check($input);
 };
 

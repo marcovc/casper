@@ -6,6 +6,7 @@
 #include <casper/kernel.h>
 #include <casper/cp.h>
 #include <casper/cp/spexpr/expr.h>
+#include <bindings/python/cp/swigtypes.h>
 %}
 
 %import <swigutil.i>
@@ -22,3 +23,9 @@
 %include <cp/goal.i>
 
 
+%init %{
+Casper::pIntSWIGCPTypeInfo = new Casper::SWIGCPTypeInfo<int>();
+Casper::pBoolSWIGCPTypeInfo  = new Casper::SWIGCPTypeInfo<bool>();;
+Casper::pIntSeqSWIGCPTypeInfo = new Casper::SWIGCPTypeInfo<Casper::Seq<int> >();
+Casper::pBoolSeqSWIGCPTypeInfo = new Casper::SWIGCPTypeInfo<Casper::Seq<bool> >();
+%}

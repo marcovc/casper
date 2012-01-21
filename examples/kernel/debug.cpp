@@ -33,7 +33,7 @@ void test1()
 {
 	Solver solver;
 
-	IntVarArray y(solver,2,0,3);
+/*	IntVarArray y(solver,2,0,3);
 	IntVarArray3 x(solver,3,3,4,1,3);
 
 	Expr<int> i(0);
@@ -46,6 +46,8 @@ void test1()
 	Expr<Seq<int> > r2(rel<Element>(r,i));
 
 	cout << r2 << endl;
+	*/
+
 	//for (auto it = r.toIterationExpr(); it.valid(); it.iterate())
 	//	cout << it.value() << endl;
 
