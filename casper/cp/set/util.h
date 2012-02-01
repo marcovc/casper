@@ -113,11 +113,11 @@ void debugRange(InputIterator b, InputIterator e)
 
 
 template<class Dom>
-void setLUB(const Dom& d,Util::StdVector<typename Dom::Value>& lub)
+void setLUB(const Dom& d,Util::StdVector<typename Dom::Elem>& lub)
 {
 	Casper::Util::setUnion(d.beginIn(),d.endIn(),
 					 d.beginPoss(),d.endPoss(),
-					 Casper::Util::VectorInserter<typename Dom::Value>(lub));
+					 Casper::Util::VectorInserter<typename Dom::Elem>(lub));
 }
 
 

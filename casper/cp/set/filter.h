@@ -87,6 +87,7 @@ struct BndView<int,Rel1<Cardinal,View> >
 	DomView<Set<Elem>,View> v;
 };
 
+
 /**
  * 	DomView over the cardinality of a set expression.
  * 	\ingroup SetViews
@@ -190,8 +191,155 @@ struct BndFilterView2<NotMember,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 };
 
 /**
+ * 	Enforces the set maximum constraint.
+ *  \note Requires an extra member constraint (see Post method)
+ *  \ingroup SetFilters
+ */
+template<class Expr1,class Eval,class Expr2>
+struct BndFilterView2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2> : IFilter
+{
+	typedef typename DomView<Set<Eval>,Expr1>::Dom::IIterator IIterator;
+	typedef typename DomView<Set<Eval>,Expr1>::Dom::PIterator PIterator;
+
+	BndFilterView2(Store& s,const Expr1& set, const Expr2& m) :
+		IFilter(s),set(s,set),m(s,m) {}
+
+	bool execute()
+	{
+		// Set -> Max
+		Eval mi,ma;
+		if (set->inSize()==0)
+			if (set->possSize()==0)
+				return false;
+			else
+			{
+				mi = set->poss().min();
+				ma = set->poss().max();
+			}
+		else
+			if (set->possSize()==0)
+				mi = ma = set->in().max();
+			else
+			{
+				mi = set->in().max();
+				ma = std::max(set->in().max(),set->poss().max());
+			}
+
+		if (!m.updateRange(mi,ma))
+			return false;
+
+		// Max -> Set
+		mi = std::max(mi,m.min());
+		ma = std::min(ma,m.max());
+
+		if (set->possSize()>0)
+		{
+			auto it = set->poss().upperBound(ma);
+			if (it != set->poss().end() and  !set->erase(it,set->endPoss()))
+				return false;
+		}
+		return true;
+	}
+
+	void attach(INotifiable* s)
+	{	set->attachOnDomain(s);	m.attach(s); }
+	void detach(INotifiable* s)
+	{	set->detachOnDomain(s); m.detach(s); }
+
+	DomView<Set<Eval>,Expr1>	set;
+	BndView<Eval,Expr2>			m;
+};
+
+/**
+ * 	Enforces the set maximum constraint.
+ *  \ingroup SetFilters
+ */
+template<class Eval,class Expr1,class Expr2>
+struct PostBndFilter2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2>
+{
+	static bool post(Store& s, const Expr1& v1, const Expr2& v2)
+	{
+		return postBndFilter(s,member(v2,v1)) and
+			   s.post(new (s) BndFilterView2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2>(s,v1,v2));
+	}
+};
+
+/**
+ * 	Enforces the set minimum constraint.
+ *  \note Requires an extra member constraint (see Post method)
+ *  \ingroup SetFilters
+ */
+template<class Expr1,class Eval,class Expr2>
+struct BndFilterView2<MinEqual,Set<Eval>,Expr1,Eval,Expr2> : IFilter
+{
+	typedef typename DomView<Set<Eval>,Expr1>::Dom::IIterator IIterator;
+	typedef typename DomView<Set<Eval>,Expr1>::Dom::PIterator PIterator;
+
+	BndFilterView2(Store& s,const Expr1& set, const Expr2& m) :
+		IFilter(s),set(s,set),m(s,m) {}
+
+	bool execute()
+	{
+		// Set -> Min
+		Eval mi,ma;
+		if (set->inSize()==0)
+			if (set->possSize()==0)
+				return false;
+			else
+			{
+				mi = set->poss().min();
+				ma = set->poss().max();
+			}
+		else
+			if (set->possSize()==0)
+				mi = ma = set->in().min();
+			else
+			{
+				mi = std::min(set->in().min(),set->poss().min());
+				ma = set->in().min();
+			}
+
+		if (!m.updateRange(mi,ma))
+			return false;
+
+		// Min -> Set
+		mi = std::max(mi,m.min());
+		ma = std::min(ma,m.max());
+
+		if (set->possSize()>0)
+		{
+			auto it = set->poss().lowerBound(mi);
+			if (it != set->poss().begin() and  !set->erase(set->beginPoss(),it))
+				return false;
+		}
+		return true;
+	}
+
+	void attach(INotifiable* s)
+	{	set->attachOnDomain(s);	m.attach(s); }
+	void detach(INotifiable* s)
+	{	set->detachOnDomain(s); m.detach(s); }
+
+	DomView<Set<Eval>,Expr1>	set;
+	BndView<Eval,Expr2>			m;
+};
+
+/**
+ * 	Enforces the set maximum constraint.
+ *  \ingroup SetFilters
+ */
+template<class Eval,class Expr1,class Expr2>
+struct PostBndFilter2<MinEqual,Set<Eval>,Expr1,Eval,Expr2>
+{
+	static bool post(Store& s, const Expr1& v1, const Expr2& v2)
+	{
+		return postBndFilter(s,member(v2,v1)) and
+			   s.post(new (s) BndFilterView2<MinEqual,Set<Eval>,Expr1,Eval,Expr2>(s,v1,v2));
+	}
+};
+
+/**
  * 	Enforces the containment constraint between two set expressions.
- *  \todo Propagation in the Set->FD direction is missing.
  *  \ingroup SetFilters
  */
 template<class Elem,class Expr1,class Expr2>
@@ -228,19 +376,15 @@ struct BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 			return true;
 		}
 
-		//countDelta[curFilter]+= x->glbDeltas().beginFrom(xGLBDeltasIt) != x->glbDeltas().end();
 		for (xGLBDeltasIt = x->glbDeltas().beginFrom(xGLBDeltasIt);
 				xGLBDeltasIt != x->glbDeltas().end(); ++xGLBDeltasIt)
 		{
-		//	++sumDelta[curFilter];
 			if (!Detail::setSafeInsertRange(*y,makeIt(*xGLBDeltasIt)))
 				return false;
 		}
-		//countDelta[curFilter]+= y->lubDeltas().beginFrom(yLUBDeltasIt) != y->lubDeltas().end();
 		for (yLUBDeltasIt = y->lubDeltas().beginFrom(yLUBDeltasIt);
 				yLUBDeltasIt != y->lubDeltas().end(); ++yLUBDeltasIt)
 		{
-		//	++sumDelta[curFilter];
 			if (!Detail::setEraseRange(*x,makeIt(*yLUBDeltasIt)))
 				return false;
 		}
@@ -274,6 +418,7 @@ struct BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 	Reversible<bool>					first;
 	INotifiable*	pOwner;
 };
+
 
 /**
  * 	Enforces the equality constraint between two set expressions.
@@ -366,8 +511,8 @@ struct BACDisjointCard : IFilter
 {
 	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
 	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
-	typedef typename DomX::Value	ValX;
-	typedef typename DomY::Value	ValY;
+	typedef typename DomX::Elem	ValX;
+	typedef typename DomY::Elem	ValY;
 
 	BACDisjointCard(Store& store,
 					const Expr1& v1,const Expr2& v2) :
@@ -585,9 +730,9 @@ struct BACIntersectCard2 : IFilter
 	typedef typename DomView<Set<Elem>,Expr1>::Dom	DomX;
 	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
 	typedef typename DomView<Set<Elem>,Expr3>::Dom	DomZ;
-	typedef typename DomX::Value	ValX;
-	typedef typename DomY::Value	ValY;
-	typedef typename DomZ::Value	ValZ;
+	typedef typename DomX::Elem	ValX;
+	typedef typename DomY::Elem	ValY;
+	typedef typename DomZ::Elem	ValZ;
 
 	BACIntersectCard2(Store& store,
 					  const Expr1& v1,const Expr2& v2,const Expr3& v3) :
@@ -781,11 +926,11 @@ struct DomView<Set<Elem>,Rel2<Intersect,Expr1,Expr2>,Dom> //: IDomExpr<Dom>
 	typedef typename DomView<Set<Elem>,Expr1>::Dom	Dom1;
 	typedef typename DomView<Set<Elem>,Expr2>::Dom	Dom2;
 	typedef Dom	Dom3;
-	typedef typename Dom1::Value	Val1;
-	typedef typename Dom2::Value	Val2;
-	typedef typename Dom3::Value	Val3;
+	typedef typename Dom1::Elem	Val1;
+	typedef typename Dom2::Elem	Val2;
+	typedef typename Dom3::Elem	Val3;
 
-	DomView(Store& s, const Rel2<Intersect,Expr1,Expr2>& r) //:	IDomExpr<Dom>(s)
+	DomView(Store& s, const Rel2<Intersect,Expr1,Expr2>& r) :	r(r)
 	{
 		// FIXME: rewrite using new iteration views
 		DomView<Set<Elem>,Expr1>	v1(s,r.p1);
@@ -813,6 +958,11 @@ struct DomView<Set<Elem>,Rel2<Intersect,Expr1,Expr2>,Dom> //: IDomExpr<Dom>
 	{	auxD->attachOnDomain(n);	}
 	void detach(INotifiable* n)
 	{	auxD->detachOnDomain(n);	}
+
+	Rel2<Intersect,Expr1,Expr2> getObj() const
+	{	return r; }
+
+	Rel2<Intersect,Expr1,Expr2> r;
 	Dom*			   auxD;
 };
 
@@ -1002,7 +1152,7 @@ struct BndFilterView1<Partition,Seq<Set<Elem> >,Expr1> : IFilter
 	typedef typename Casper::Traits::GetElem<Expr1>::Type	SeqElem;
 	typedef typename Traits::GetDom<SeqElem>::Type		Dom;
 	//typedef typename DomView<Set<Elem>,Expr1>::Dom	Dom;
-	typedef typename Dom::Value	Val;
+	typedef typename Dom::Elem	Val;
 	typedef Util::StdPair<uint,typename Dom::PIterator>	P;
 
 	struct LessFirst
@@ -1187,7 +1337,7 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2> : IFilte
 {
 	typedef typename DomView<Set<Elem>,Expr1>::Dom	Dom1;
 	typedef typename DomView<Set<Elem>,Expr2>::Dom	Dom2;
-	typedef typename Dom1::Value	Val;
+	typedef typename Dom1::Elem	Val;
 
 	typedef SUList<uint>	PossList;
 	typedef PossList* PPossList;

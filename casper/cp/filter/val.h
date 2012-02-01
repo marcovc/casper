@@ -122,9 +122,11 @@ struct PostValFilter1
 	{
 		std::ostringstream os;
 		::operator<<(os,rel<Func>(v1));
-		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Value>");
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"Value",
+				Casper::Traits::getTypeStr<Rel1<Func,Expr1> >());
 	}
 };
+
 
 template<class Func,class Eval1,class Expr1,class Eval2,class Expr2>
 struct PostValFilter2
@@ -133,7 +135,8 @@ struct PostValFilter2
 	{
 		std::ostringstream os;
 		::operator<<(os,rel<Func>(v1,v2));
-		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Value>");
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"Value",
+				Casper::Traits::getTypeStr<Rel2<Func,Expr1,Expr2> >());
 	}
 };
 
@@ -145,7 +148,8 @@ struct PostValFilter3
 	{
 		std::ostringstream os;
 		::operator<<(os,rel<Func>(v1,v2,v3));
-		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Value>");
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"Value",
+				Casper::Traits::getTypeStr<Rel3<Func,Expr1,Expr2,Expr3> >());
 	}
 };
 
@@ -157,7 +161,8 @@ struct PostValFilter4
 	{
 		std::ostringstream os;
 		::operator<<(os,rel<Func>(v1,v2,v3,v4));
-		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Value>");
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"Value",
+				Casper::Traits::getTypeStr<Rel4<Func,Expr1,Expr2,Expr3,Expr4> >());
 	}
 };
 
@@ -170,7 +175,8 @@ struct PostValFilter5
 	{
 		std::ostringstream os;
 		::operator<<(os,rel<Func>(v1,v2,v3,v4,v5));
-		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Value>");
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"Value",
+				Casper::Traits::getTypeStr<Rel5<Func,Expr1,Expr2,Expr3,Expr4,Expr5> >());
 	}
 };
 

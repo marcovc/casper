@@ -125,11 +125,11 @@ struct SizeTermCond
 
 namespace Detail {
 
-template<class Obj> struct SelectValsMin;
-template<class Obj> struct SelectValsMax;
-template<class Obj> struct SelectValsRand;
-template<class Obj> struct SelectValMin;
-template<class Obj> struct SelectValMax;
+template<class Eval,class Obj> struct SelectValsMin;
+template<class Eval,class Obj> struct SelectValsMax;
+template<class Eval,class Obj> struct SelectValsRand;
+template<class Eval,class Obj> struct SelectValMin;
+template<class Eval,class Obj> struct SelectValMax;
 
 // selects the variable which minimizes Evaluator from all possible variables
 template<class Obj,class TermCond,class Evaluator>
@@ -558,7 +558,7 @@ struct SelectHalfMax : IValSelector
  **/
 template<class Obj>
 ValSelector selectValsMin(Store& s,const Obj& obj)
-{return new (s) Detail::SelectValsMin<Obj>(s,obj);}
+{return new (s) Detail::SelectValsMin<typename Casper::Traits::GetEval<Obj>::Type,Obj>(s,obj);}
 
 /**
  * 	For a given variable \f$ x \f$ returns the goal
@@ -566,7 +566,7 @@ ValSelector selectValsMin(Store& s,const Obj& obj)
  **/
 template<class Obj>
 ValSelector selectValsMax(Store& s,const Obj& obj)
-{return new (s) Detail::SelectValsMax<Obj>(s,obj);}
+{return new (s) Detail::SelectValsMax<typename Casper::Traits::GetEval<Obj>::Type,Obj>(s,obj);}
 
 /**
  * 	For a given variable \f$ x \f$ returns the goal
@@ -575,7 +575,7 @@ ValSelector selectValsMax(Store& s,const Obj& obj)
  **/
 template<class Obj>
 ValSelector selectValsRand(Store& s,const Obj& obj)
-{return new (s) Detail::SelectValsRand<Obj>(s,obj);}
+{return new (s) Detail::SelectValsRand<typename Casper::Traits::GetEval<Obj>::Type,Obj>(s,obj);}
 
 /**
  * 	For a given variable \f$ x \f$ returns the goal
@@ -583,7 +583,7 @@ ValSelector selectValsRand(Store& s,const Obj& obj)
  **/
 template<class Obj>
 ValSelector selectValMin(Store& s,const Obj& obj)
-{return new (s) Detail::SelectValMin<Obj>(s,obj);}
+{return new (s) Detail::SelectValMin<typename Casper::Traits::GetEval<Obj>::Type,Obj>(s,obj);}
 
 /**
  * 	For a given variable \f$ x \f$ returns the goal
@@ -591,7 +591,7 @@ ValSelector selectValMin(Store& s,const Obj& obj)
  **/
 template<class Obj>
 ValSelector selectValMax(Store& s,const Obj& obj)
-{return new (s) Detail::SelectValMax<Obj>(s,obj);}
+{return new (s) Detail::SelectValMax<typename Casper::Traits::GetEval<Obj>::Type,Obj>(s,obj);}
 
 /**
  * 	For a given variable \f$ x \f$ returns the goal

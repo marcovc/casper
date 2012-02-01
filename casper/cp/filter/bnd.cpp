@@ -28,13 +28,11 @@ PostD1BndFilter postD1BndFilter;
 
 bool PostBndFilter::operator()(Store& s,const BndExpr<bool>& v) const
 {
-	return new (s) BndFilterView<BndExpr<bool> >(s,v);
+	return s.post(new (s) BndFilterView<BndExpr<bool> >(s,v));
 }
 
 bool PostBndFilter::operator()(Store& store, const Casper::Expr<bool>& expr) const
-{
-	std::cout << __FILE__ << " : " << __LINE__ << std::endl;
-	return expr.postBndFilter(store);	}
+{	return expr.postBndFilter(store);	}
 
 /*
 Filter::Filter(CPSolver& s,BndExpr<bool> b) :

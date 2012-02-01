@@ -1,6 +1,6 @@
-<project> 
+<project>
     <shortName>casper</shortName>
-    <fullName>CaSPER libraries</fullName>
+    <fullName>CaSPER Solver</fullName>
     <version>1.0.0rc1</version>
     <readmeFile>../README</readmeFile>
     <licenseFile>../LICENSE</licenseFile>
@@ -19,20 +19,6 @@
                     <destination>${installdir}</destination>
                     <name>programfiles</name>
                     <platforms>all</platforms>
-                    <distributionFileList>
-                        <distributionDirectory>
-                            <origin>casper/bin</origin>
-                        </distributionDirectory>
-                        <distributionDirectory>
-                            <origin>casper/include</origin>
-                        </distributionDirectory>
-                        <distributionDirectory>
-                            <origin>casper/lib</origin>
-                        </distributionDirectory>
-                        <distributionDirectory>
-                            <origin>casper/share</origin>
-                        </distributionDirectory>
-                    </distributionFileList>
                     <shortcutList>
                         <shortcut>
                             <comment>Uninstall</comment>
@@ -67,6 +53,17 @@
                     <destination>${installdir}</destination>
                     <name>programfilesosx</name>
                     <platforms>osx</platforms>
+                </folder>
+                <folder>
+                    <description>Frameworks</description>
+                    <destination>/Library/Frameworks</destination>
+                    <name>frameworks</name>
+                    <platforms>osx</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>casper/Casper.framework</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
                 </folder>
             </folderList>
             <startMenuShortcutList>
@@ -148,6 +145,12 @@
             </preUninstallationActionList>
         </component>
     </componentList>
+    <postInstallationActionList>
+        <createSymLink>
+            <linkName>${installdir}/Resources</linkName>
+            <target>/Library/Frameworks/Casper.framework/Resources</target>
+        </createSymLink>
+    </postInstallationActionList>
     <allowAddRemoveComponents>1</allowAddRemoveComponents>
     <allowComponentSelection>1</allowComponentSelection>
     <defaultInstallationMode>qt</defaultInstallationMode>
@@ -165,11 +168,10 @@
             <description>Installer.Parameter.installdir.description</description>
             <explanation>Installer.Parameter.installdir.explanation</explanation>
             <value></value>
-            <default>${platform_install_prefix}/${product_shortname}-${product_version}</default>
+            <default>${platform_install_prefix}/${product_shortname}</default>
             <allowEmptyValue>0</allowEmptyValue>
-            <ask>yes</ask>
             <cliOptionName>prefix</cliOptionName>
-            <mustBeWritable>yes</mustBeWritable>
+            <mustBeWritable>1</mustBeWritable>
             <mustExist>0</mustExist>
             <width>30</width>
         </directoryParameter>

@@ -26,10 +26,10 @@ namespace CP {
 
 namespace Detail {
 
-template<class View>
-struct SelectValsMin : IValSelector
+template<class Eval,class View>
+struct SelectValsMin<Seq<Eval>,View> : IValSelector
 {
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
+//	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
 	SelectValsMin(Store& store,const View& vars) : store(store),doms(store,vars) {}
 
 	Goal select(uint idx)
@@ -45,10 +45,10 @@ struct SelectValsMin : IValSelector
 	DomArrayView<Eval,View> doms;
 };
 
-template<class View>
-struct SelectValsMax : IValSelector
+template<class Eval,class View>
+struct SelectValsMax<Seq<Eval>,View> : IValSelector
 {
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
+//	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
 	SelectValsMax(Store& store,const View& vars) : store(store),doms(store,vars) {}
 
 	Goal select(uint idx)
@@ -65,10 +65,10 @@ struct SelectValsMax : IValSelector
 	DomArrayView<Eval,View> doms;
 };
 
-template<class View>
-struct SelectValsRand : IValSelector
+template<class Eval,class View>
+struct SelectValsRand<Seq<Eval>,View> : IValSelector
 {
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
+	//typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
 	typedef typename CP::Traits::GetDom<typename Casper::Traits::GetTermElem<View>::Type>::Type D;
 	SelectValsRand(Store& store,const View& vars) :
 		store(store),doms(store,vars) {}
@@ -90,10 +90,10 @@ struct SelectValsRand : IValSelector
 	DomArrayView<Eval,View> doms;
 };
 
-template<class View>
-struct SelectValMin : IValSelector
+template<class Eval,class View>
+struct SelectValMin<Seq<Eval>,View> : IValSelector
 {
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
+	//typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
 	SelectValMin(Store& store,const View& vars) : store(store),doms(store,vars) {}
 
 	Goal select(uint idx)
@@ -109,10 +109,10 @@ struct SelectValMin : IValSelector
 	DomArrayView<Eval,View> doms;
 };
 
-template<class View>
-struct SelectValMax : IValSelector
+template<class Eval,class View>
+struct SelectValMax<Seq<Eval>,View> : IValSelector
 {
-	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
+	//typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<View>::Type>::Type Eval;
 	SelectValMax(Store& store,const View& vars) : store(store),doms(store,vars) {}
 
 	Goal select(uint idx)

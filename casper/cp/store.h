@@ -172,9 +172,7 @@ struct Store : INotifiable
 	/// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class PostFilter = PostBndFilter>
 	bool post(const Rel1<Op,T1>& r, const PostFilter& f = PostFilter())
-	{
-		std::cout << __FILE__ << " : " << __LINE__ << std::endl;
-		return f(*this,r);	}
+	{	return f(*this,r);	}
 
 	/// Adds a new constraint to the constraint store, enforced by the filter created by f
 	template<class Op,class T1,class T2,class PostFilter = PostBndFilter>

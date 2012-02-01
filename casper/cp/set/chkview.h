@@ -111,18 +111,9 @@ struct ChkViewRel2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2>
 	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
 			store(store),x(store,p1),y(store,p2) {}
 	bool isTrue() const	// when lub(x) C glb(y)
-	{
-		return x->minCard() <= y->maxCard() and
-			   Casper::Util::contained(x->beginIn(),x->endIn(),
-								 y->beginIn(),y->endIn()) and
-			   Casper::Util::contained(x->beginPoss(),x->endPoss(),
-								 y->beginIn(),y->endIn());
-	}
+	{	return !makeDiffIt(makeLUBIt(*x),makeInIt(*y)).valid();	}
 	bool canBeTrue() const 	// when glb(x) C lub(y)
-	{
-		return x->minCard() <= y->maxCard() and
-				!makeDiffIt(makeInIt(*x),makeLUBIt(*y)).valid();
-	}
+	{	return !makeDiffIt(makeInIt(*x),makeLUBIt(*y)).valid();	}
 	bool setToTrue()
 	{
 		detach(pOwner);
@@ -131,7 +122,7 @@ struct ChkViewRel2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2>
 	bool setToFalse()
 	{
 		detach(pOwner);
-		throw Exception::UndefinedFilter("not contained(set,set)");
+		return postBndFilter(store,cardinal(intersect(x.getObj(),y.getObj()))<cardinal(x.getObj()));
 	}
 
 	void attach(INotifiable* f)
@@ -149,7 +140,6 @@ struct ChkViewRel2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2>
 };
 
 
-// FIXME: not tested at all
 template<class Elem,class Expr1,class Expr2>
 struct ChkViewRel2<Equal,Set<Elem>,Expr1,Set<Elem>,Expr2>
 {
@@ -157,15 +147,18 @@ struct ChkViewRel2<Equal,Set<Elem>,Expr1,Set<Elem>,Expr2>
 	typedef typename DomView<Set<Elem>,Expr2>::Dom	DomY;
 
 	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
-			store(store),x(store,p1),y(store,p2),xCy(store,p1,p2),yCx(store,p2,p1) {}
+			store(store),x(store,p1),y(store,p2) {}
 	bool isTrue() const	// when lub(x) = lub(y)
 	{
 		return x->ground() and y->ground() and
 			   Util::equal(x->beginIn(),x->endIn(),
 							 y->beginIn(),y->endIn());
 	}
-	bool canBeTrue() const 	// when glb(x) C lub(y) and glb(y) C lub(x)
-	{	return xCy.canBeTrue() and yCx.canBeTrue();	}
+	bool canBeTrue() const
+	{
+		return !makeDiffIt(makeInIt(*x),makeLUBIt(*y)).valid() and
+			   !makeDiffIt(makeInIt(*y),makeLUBIt(*x)).valid();
+	}
 	bool setToTrue()
 	{
 		detach(pOwner);
@@ -189,8 +182,6 @@ struct ChkViewRel2<Equal,Set<Elem>,Expr1,Set<Elem>,Expr2>
 	DomView<Set<Elem>,Expr1>	x;
 	DomView<Set<Elem>,Expr2>	y;
 	INotifiable*	pOwner;
-	ChkViewRel2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2>	xCy;
-	ChkViewRel2<Contained,Set<Elem>,Expr2,Set<Elem>,Expr1>	yCx;
 };
 
 

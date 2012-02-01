@@ -133,70 +133,70 @@ namespace Detail {
  *	Goal for selecting a set variable. Attempts to assign a value 
  *  to the variable trying all possible values in ascending order on backtracking.   
  */
-template<class T,int I,class D>
-struct SelectValsMin<VarArray<Set<T>,I,D> > : IValSelector
+template<class Eval,class Obj>
+struct SelectValsMin<Seq<Set<Eval> >,Obj> : IValSelector
 {
-	SelectValsMin(Store& store,VarArray<Set<T>,I,D> vars) : store(store),vars(vars) {}
+	SelectValsMin(Store& store, const Obj& obj) : store(store),doms(store,obj) {}
 
 	Goal select(uint idx) 
 	{
-		if (vars(idx).domain().ground())
+		if (doms[idx]->ground())
 			return succeed();
 		return Goal(store,
-				(insertElem<T>(store,vars(idx),vars(idx).domain().beginPoss()) or
-				 eraseElem<T>(store,vars(idx),vars(idx).domain().beginPoss()))
+				(insertElem<Eval>(store,doms[idx].getObj(),doms[idx]->beginPoss()) or
+				 eraseElem<Eval>(store,doms[idx].getObj(),doms[idx]->beginPoss()))
 			    and callValSelector(store,this,idx));
 	}
 	Store& store;
-	VarArray<Set<T>,I,D> vars;
+	DomArrayView<Set<Eval>,Obj>	doms;
 };
 
 /**
  *	Goal for selecting a set variable. Attempts to assign a value 
  *  to the variable trying all possible values in random order on backtracking.   
  */
-template<class T,int I,class D>
-struct SelectValsRand<VarArray<Set<T>,I,D> > : IValSelector
+template<class Eval,class Obj>
+struct SelectValsRand<Seq<Set<Eval> >,Obj> : IValSelector
 {
-	SelectValsRand(Store& store,VarArray<Set<T>,I,D> vars) : store(store),vars(vars) {}
+	SelectValsRand(Store& store,const Obj& obj) : store(store),doms(store,obj) {}
 
 	Goal select(uint idx) 
 	{
-		if (vars(idx).domain().ground())
+		if (doms[idx]->ground())
 			return succeed();
-		uint r = static_cast<uint>(rand()/(double)RAND_MAX * vars(idx).domain().possSize());
-		typename D::PIterator it = vars(idx).domain().beginPoss();
+		uint r = static_cast<uint>(rand()/(double)RAND_MAX * doms[idx]->possSize());
+		auto it = doms[idx]->beginPoss();
 		while (r-- > 0)
 			++it;
 		return Goal(store,
-				(insertElem<T>(store,vars(idx),it) or
-			   eraseElem<T>(store,vars(idx),it))
+				(insertElem<Eval>(store,doms[idx].getObj(),it) or
+			   eraseElem<Eval>(store,doms[idx].getObj(),it))
 			    and callValSelector(store,this,idx));
 	}
 
 	Store& store;
-	VarArray<Set<T>,I,D> vars;
+	DomArrayView<Set<Eval>,Obj>	doms;
 };
 
 /**
  *	Goal for bisecting a set variable. Attempts to assign a value 
  *  to the variable trying all possible values in ascending order on backtracking.   
  */
-template<class T,int I,class D>
-struct SelectValMin<VarArray<Set<T>,I,D> > : IValSelector
+template<class Eval, class Obj>
+struct SelectValMin<Seq<Set<Eval> >,Obj > : IValSelector
 {
-	SelectValMin(Store& store,VarArray<Set<T>,I,D> vars) : store(store),vars(vars) {}
+	SelectValMin(Store& store, const Obj& obj) : store(store),doms(store,obj) {}
 
 	Goal select(uint idx) 
 	{
-		if (vars(idx).domain().ground())
+		if (doms[idx]->ground())
 			return succeed();
 		return Goal(store,
-				insertElem<T>(store,vars(idx),vars(idx).domain().beginPoss()) or
-			   eraseElem<T>(store,vars(idx),vars(idx).domain().beginPoss()));
+				insertElem<Eval>(store,doms[idx].getObj(),doms[idx]->beginPoss()) or
+			   eraseElem<Eval>(store,doms[idx].getObj(),doms[idx]->beginPoss()));
 	}
 	Store&	store;
-	VarArray<Set<T>,I,D> vars;
+	DomArrayView<Set<Eval>,Obj>	doms;
 };
 };
 

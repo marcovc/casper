@@ -120,7 +120,7 @@ struct PostDomFilterGen
 	{
 		std::ostringstream os;
 		os << v1;
-		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"Domain",Casper::Traits::getTypeStr<Expr1>());
 	}
 };
 
@@ -131,7 +131,8 @@ struct PostDomFilter1
 	{
 		std::ostringstream os;
 		::operator<<(os,rel<Func>(v1));
-		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"Domain",
+				Casper::Traits::getTypeStr<Rel1<Func,Expr1> >());
 	}
 };
 
@@ -142,7 +143,8 @@ struct PostDomFilter2
 	{
 		std::ostringstream os;
 		::operator<<(os,rel<Func>(v1,v2));
-		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"Domain",
+				Casper::Traits::getTypeStr<Rel2<Func,Expr1,Expr2> >());
 	}
 };
 
@@ -154,7 +156,8 @@ struct PostDomFilter3
 	{
 		std::ostringstream os;
 		::operator<<(os,rel<Func>(v1,v2,v3));
-		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+		throw Casper::Exception::UndefinedFilter(os.str().c_str()
+				,"Domain",Casper::Traits::getTypeStr<Rel3<Func,Expr1,Expr2,Expr3> >());
 	}
 };
 
@@ -166,7 +169,8 @@ struct PostDomFilter4
 	{
 		std::ostringstream os;
 		::operator<<(os,rel<Func>(v1,v2,v3,v4));
-		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"Domain",
+				Casper::Traits::getTypeStr<Rel4<Func,Expr1,Expr2,Expr3,Expr4> >());
 	}
 };
 
@@ -179,7 +183,8 @@ struct PostDomFilter5
 	{
 		std::ostringstream os;
 		::operator<<(os,rel<Func>(v1,v2,v3,v4,v5));
-		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"CP::Filter<Domain>");
+		throw Casper::Exception::UndefinedFilter(os.str().c_str(),"Domain",
+				Casper::Traits::getTypeStr<Rel5<Func,Expr1,Expr2,Expr3,Expr4,Expr5> >());
 	}
 };
 

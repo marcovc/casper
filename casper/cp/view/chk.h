@@ -34,7 +34,7 @@ struct NoChkView
 	{
 		std::ostringstream os;
 		os << r;
-		throw Casper::Exception::UndefinedView(os.str().c_str(),"CP::ChkView");
+		throw Casper::Exception::UndefinedView(os.str().c_str(),"Casper::CP::ChkView",Casper::Traits::getTypeStr<R>());
 	}
 	bool isTrue() const
 	{	throw 0;	}
@@ -277,6 +277,31 @@ struct ChkView<BndExpr<Eval> >
 	{ 	return v;	}
 
 	BndExpr<Eval>	v;
+};
+
+// chkview over chkexpr
+template<>
+struct ChkView<ChkExpr>
+{
+	ChkView(Store& store, const ChkExpr& p1) :
+			v(p1) {}
+	bool isTrue() const	// is it true?
+	{	return v.isTrue();	}
+	bool canBeTrue() const 	// can it still be true?
+	{	return v.canBeTrue();	}
+	bool setToTrue()
+	{	return v.setToTrue();	}
+	bool setToFalse()
+	{	return v.setToFalse();	}
+//	Store& store() const {	return v.store();	}
+
+	void attach(INotifiable* f) { 	v.attach(f);}
+	void detach(INotifiable* f) {	v.detach(f);}
+
+	ChkExpr getObj()  const
+	{ 	return v;	}
+
+	ChkExpr	v;
 };
 
 /**

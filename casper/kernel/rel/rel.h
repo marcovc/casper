@@ -368,6 +368,9 @@ NEW_REL_1(max,Max)
 NEW_FN_2(min,Min)
 NEW_FN_2(max,Max)
 
+NEW_REL_2(minEqual,MinEqual)
+NEW_REL_2(maxEqual,MaxEqual)
+
 NEW_REL_2(mod,Mod)
 
 NEW_REL_3(sumProductEqual,SumProductEqual)
@@ -563,9 +566,17 @@ template<class T1>
 struct GetEval<Rel1<Max,T1> >
 {	typedef typename Traits::GetSetElem<typename Traits::GetEval<typename Traits::GetTermElem<T1>::Type>::Type>::Type 	Type;	};
 
+template<class T1,class T2>
+struct GetEval<Rel2<MaxEqual,T1,T2> >
+{	typedef bool 	Type;	};
+
 template<class T1>
 struct GetEval<Rel1<Min,T1> >
 {	typedef typename Traits::GetSetElem<typename Traits::GetEval<typename Traits::GetTermElem<T1>::Type>::Type>::Type 	Type;	};
+
+template<class T1,class T2>
+struct GetEval<Rel2<MinEqual,T1,T2> >
+{	typedef bool 	Type;	};
 
 template<class T1,class T2>
 struct GetEval<Rel2<SumEqual,T1,T2> >

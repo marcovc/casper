@@ -84,14 +84,17 @@ struct SetFD
 
 	public:
 		/// The set element type (same as \p T)
-		typedef		T				Value;
+		typedef		T				Elem;
 		/// The implementation type for the \p in set
-		typedef		SUList<Value>	In;
+		typedef		SUList<Elem>	In;
 		/// The implementation type for the \p poss set
-		typedef		SUList<Value>	Poss;
+		typedef		SUList<Elem>	Poss;
 
 		///	The implementation type for the \p card finite domain
 		typedef		CurSetFDCard	Card;
+
+		/// The type of the value of an instantiated set
+		typedef 	In				Value;
 
 		/// Iterator for the \p in set
 		typedef		typename In::Iterator IIterator;
@@ -109,12 +112,12 @@ struct SetFD
 		/**
 		 *  Creates a SetFD with possible values from the sorted range \a rPoss
 		 **/
-				SetFD(Store& store, const Util::StdRange<Value>& rPoss);
+				SetFD(Store& store, const Util::StdRange<Elem>& rPoss);
 
 		/**
 		 *  Creates a SetFD with possible values from the sorted list \a rPoss
 		 **/
-				SetFD(Store& store, const Util::StdList<Value>& rPoss);
+				SetFD(Store& store, const Util::StdList<Elem>& rPoss);
 
 		/**
 		 *  Creates a SetFD with possible values from the sorted range
@@ -134,8 +137,8 @@ struct SetFD
 		 *  elements in the sorted range \a rIn .
 		 *  \pre These two sets must be disjoint.
 		 **/
-				SetFD(Store& store, const Util::StdRange<Value>& rIn,
-								const Util::StdRange<Value>& rPoss);
+				SetFD(Store& store, const Util::StdRange<Elem>& rIn,
+								const Util::StdRange<Elem>& rPoss);
 
 		/**
 		 *  Creates a SetFD with possible values from the sorted list
@@ -143,8 +146,8 @@ struct SetFD
 		 *  elements in the sorted list \a rIn .
 		 *  \pre These two sets must be disjoint.
 		 **/
-				SetFD(Store& store, const Util::StdList<Value>& rIn,
-								const Util::StdList<Value>& rPoss);
+				SetFD(Store& store, const Util::StdList<Elem>& rIn,
+								const Util::StdList<Elem>& rPoss);
 
 		///	Copy constructor
 				SetFD(const SetFD& s) :
@@ -197,6 +200,9 @@ struct SetFD
 		/// Direct (ro) access to the \a poss set.
 		const Poss& poss() const { return possSet;	}
 
+		/// Direct (ro) access to the value (i.e. a set) of a ground \a set variable.
+		const Value& value() const 	{ return inSet; }
+
 		/**
 		 * 	Direct (rw) access to the \a card set. Direct updates
 		 *  on this set are safe.
@@ -220,18 +226,18 @@ struct SetFD
 		/// Returns an IIterator pointing to the end of the in set.
 		IIterator endIn() const  { return inSet.end(); }
 
-		IIterator findInIn(const Value& v) const { return inSet.find(v);	}
-		PIterator findInPoss(const Value& v) const { return possSet.find(v);	}
+		IIterator findInIn(const Elem& v) const { return inSet.find(v);	}
+		PIterator findInPoss(const Elem& v) const { return possSet.find(v);	}
 
 		bool clearPoss();
 
-		bool erase(const Value& k);
-		bool safeErase(const Value& k);
+		bool erase(const Elem& k);
+		bool safeErase(const Elem& k);
 		bool erase(PIterator p);
 		bool erase(PIterator p, PIterator q);
 
-		bool insert(const Value& k);
-		bool safeInsert(const Value& k);
+		bool insert(const Elem& k);
+		bool safeInsert(const Elem& k);
 		bool insert(PIterator p);
 		bool insert(PIterator p, PIterator q);
 
@@ -410,7 +416,7 @@ bool SetFD<T>::clearPoss()
  *  O(n)
  **/
 template<class T>
-bool SetFD<T>::erase(const Value& k)
+bool SetFD<T>::erase(const Elem& k)
 {
 	assert(this->findInIn(k) == this->endIn());
 
@@ -431,7 +437,7 @@ bool SetFD<T>::erase(const Value& k)
  *  O(2n)
  **/
 template<class T>
-bool SetFD<T>::safeErase(const Value& k)
+bool SetFD<T>::safeErase(const Elem& k)
 {
 	PIterator p = possSet.find(k);
 	if (p != endPoss())
@@ -482,7 +488,7 @@ bool SetFD<T>::erase(PIterator p, PIterator q)
  *  O(n)
  **/
 template<class T>
-bool SetFD<T>::insert(const Value& k)
+bool SetFD<T>::insert(const Elem& k)
 {
 	PIterator it = possSet.find(k);
 	if (it == possSet.end())
@@ -497,7 +503,7 @@ bool SetFD<T>::insert(const Value& k)
  *  O(2n)
  **/
 template<class T>
-bool SetFD<T>::safeInsert(const Value& k)
+bool SetFD<T>::safeInsert(const Elem& k)
 {
 	PIterator it = possSet.find(k);
 	if (it == possSet.end())

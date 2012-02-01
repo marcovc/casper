@@ -49,6 +49,9 @@ struct VarDomCreator<FD<FD_TP_LIST(1)> >
 								  InputIterator min,
 								  InputIterator max);
 
+	FD<FD_TP_LIST(1)>* operator()(Store& store,const Util::StdRange<T1>& l)
+	{	return operator()(store,l.lb,l.ub); }
+
 	FD<FD_TP_LIST(1)>* operator()(Store& store,const Util::StdList<Util::StdRange<T1> >& l);
 
 	FD<FD_TP_LIST(1)>* operator()(Store& store,std::initializer_list<T1>& l)

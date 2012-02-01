@@ -46,7 +46,7 @@ extra_example_libs['examples/cp/real/inverse.cpp']=['gsl']
 
 cp_examples+=['set/steiner.cpp']
 cp_examples+=['set/golfer.cpp']
-#cp_examples+=['set/debug.cpp']
+cp_examples+=['set/debug.cpp']
 #cp_examples+=['set/covering.cpp']
 #cp_examples+=['set/packing.cpp']
 #cp_examples+=['set/test.cpp']
@@ -258,11 +258,11 @@ vars.Add(BoolVariable('cpp0x', 'enable c++0x extensions', True))
 vars.Add(BoolVariable('subpoly_rels', 'enable subtype polymorphic relations', True))
 vars.Add(BoolVariable('lp', 'builds interface to glpk (requires preinstalled glpk library)', True))
 vars.Add(PathVariable('install_prefix', 'installation prefix', '.'))
+vars.Add(PathVariable('hardcoded_install_prefix', 'installation prefix hardcoded in each library', None))
 vars.Add(PathVariable('boost_path','path where boost libraries are installed',None))
-vars.Add(PathVariable('gmp_path','path where gmp library is installed',None))
 vars.Add(PathVariable('mpfr_path','path where mpfr library is installed',None))
 vars.Add(PathVariable('installbuilder_path','path to installbuilder tool','.'))
-
+vars.Add(BoolVariable('sandbox','wrap all thirdparty libraries in casper_thirdparty and link against it',False))
 
 compiler = ARGUMENTS.get('tool', 'default')   #allows user defined compiler
 
@@ -284,14 +284,17 @@ AddOption('--notes',
 import sys
 import platform
 platform_info = platform.uname()
+ # FIXME: use linkage field when it is implemented in python (python Issue 10735)
+binary_format = platform.system()+"_"+platform.architecture()[0]
 
 # user defined environment
 env = Environment(ENV=os.environ,
                   variables = vars,
-				  CPPPATH=['#','#thirdparty/include'],
-				  LIBPATH=['#thirdparty/lib'],
+				  CPPPATH=['#'],
+				  LIBPATH=[],
+				  LIBS=[],
 				  CPPDEFINES = defined_macros,				  
-				  CXXFILESUFFIX='.cpp',
+				  CXXFILESUFFIX='.cpp',				  
 				  tools=['default','PackageMaker']
 				 )
 
@@ -305,22 +308,14 @@ env.EnsureSConsVersion(1, 2, 0)
 # env['CPPPATH'] += ['/usr/x86_64-pc-linux-gnu/usr/include/','/usr/include']
 # env['LIBPATH'] += ['/usr/x86_64-pc-linux-gnu/usr/lib/','/usr/x86_64-pc-linux-gnu/lib/']
 
-if env.has_key('boost_path'):
-	env['CPPPATH'] += [env['boost_path']]
-	env['LIBPATH'] += [env['boost_path']+'/lib/']
-if env.has_key('gmp_path'):	
-	env['CPPPATH'] += [env['gmp_path']+"/lib/"]	
-	env['LIBPATH'] += [env['gmp_path']+"/lib/"]
-if env.has_key('mpfr_path'):	
-	env['CPPPATH'] += [env['mpfr_path']+"/lib/"]
-	env['LIBPATH'] += [env['mpfr_path']+"/lib/"]
- 
-if compiler!='default':
-	Tool(compiler)(env)
 
-Tool('packaging')(env)
+############ with 'sandbox' enabled all libraries link against casper_thirdparty ############
 
-
+if env['sandbox']:
+	env['LIBPATH'] += ["#thirdparty/lib/"+binary_format]
+	env['LINKFLAGS'] += ['-nodefaultlibs']
+	env['LINKFLAGS'] += ['-Wl,-rpath,'+env['hardcoded_install_prefix']]
+	env['LIBS'] += ['gcc_s.1','stdc++','c']
 ############ generate the help message ############
 
 Help("""
@@ -341,31 +336,31 @@ options:
 Help(vars.GenerateHelpText(env))
 
 # common configure tests
+
+	
 confCommonEnv = env.Clone()
 confCommon = Configure( confCommonEnv ) 
+
 if not confCommon.CheckLib( library='rt', symbol='clock_gettime',autoadd=1):
 	confCommon.env.Append(CPPDEFINES = ['CASPER_NO_RT'])
-if not env['safe_rounding'] or \
-	not confCommon.CheckLib( library='mpfr', autoadd=1) or \
-	not confCommon.CheckLib( library='gmp', autoadd=1):
-	confCommon.env.Append(CPPDEFINES = ['CASPER_UNSAFE_ROUNDING'])
 if env['profile']:
-	env['profile'] = confCommon.CheckLib( library='gcov', autoadd=1)	
+	env['profile'] = confCommon.CheckLib( library='gcov', libpath=env['LIBPATH'], autoadd=1)	
 	if not env['profile']:
 		print "Warning: gcov library not found. No code coverage available."
 if not confCommon.CheckLib( library='glpk', autoadd=0):
 	env['lp'] = False
-if not confCommon.CheckLib(library='boost_program_options',language='C++', autoadd=1):
-	print "Error: library boost_program_options is required for building casper, but was not found (set boost_path option?)."
-	Exit(1)
-if not confCommon.CheckLib( library='rt', symbol='clock_gettime',autoadd=1):
-	confCommon.env.Append(CPPDEFINES = ['CASPER_NO_RT'])
 for (k,v) in examples_for_extra_lib.iteritems():
 	if not confCommon.CheckLib( library=k, autoadd=0):
 		print "Warning: library "+k+" not found. The following examples will not be built:"
 		for i in v:
 			print "\t\t"+i
 			example_srcs.remove(i)
+if not env['safe_rounding'] or \
+	not confCommon.CheckLib( library='mpfr', autoadd=1):
+	confCommon.env.Append(CPPDEFINES = ['CASPER_UNSAFE_ROUNDING'])
+if not confCommon.CheckLib(library='boost_program_options',language='C++', autoadd=1):
+	print "Error: library boost_program_options is required for building casper, but was not found (set boost_path option?)."
+	Exit(1)
 confCommon.Finish();
 
 if not env['lp']:
@@ -426,7 +421,7 @@ def getBuildFlags(env,debug_level,optimize_level):
 			link_flags += ['-static']
 		if env['cpp0x']:
 			build_flags += ['-std=gnu++0x']
-		build_flags += ['-Wfatal-errors']
+		#build_flags += ['-Wfatal-errors']
 		#build_flags += ['-fPIC']
 		#build_flags += ['-ffast-math']
 		#link_flags += ['-ffast-math']	
@@ -449,16 +444,16 @@ env.Append(CCFLAGS = build_flags)
 env.Append(LINKFLAGS = link_flags)
 
 # environment with full debug (for msvs)
-denv = env.Clone()
-(dbuild_flags,dlink_flags)=getBuildFlags(denv,3,0)
-denv.Append(CCFLAGS = dbuild_flags)
-denv.Append(LINKFLAGS = dlink_flags)
+#denv = env.Clone()
+#(dbuild_flags,dlink_flags)=getBuildFlags(denv,3,0)
+#denv.Append(CCFLAGS = dbuild_flags)
+#denv.Append(LINKFLAGS = dlink_flags)
 
 # environment with full optimizations (for msvs)
-renv = env.Clone()
-(rbuild_flags,rlink_flags)=getBuildFlags(renv,0,3)
-renv.Append(CCFLAGS = rbuild_flags)
-renv.Append(LINKFLAGS = rlink_flags)
+#renv = env.Clone()
+#(rbuild_flags,rlink_flags)=getBuildFlags(renv,0,3)
+#renv.Append(CCFLAGS = rbuild_flags)
+#renv.Append(LINKFLAGS = rlink_flags)
 
 import commands
 import time
@@ -494,10 +489,50 @@ version_macros = defined_macros+\
 				#[("CASPER_BUILDDATE",time.asctime())]
 
 
+############ support for debug/release variant builds ############
+
+SUFFIX=""
+if env['debug_level'] > 0:
+	MODE="debug/"
+else:
+	MODE="release/"
+
+Export("env")
+
+env['PREFIX']='build/'+MODE
+env['ID'] = 0
+env.VariantDir(env['PREFIX'], '.', duplicate=0)
+
+'''
+denv['PREFIX']='msvs-ide/build/debug/'
+denv['ID'] = 1
+denv.VariantDir(denv['PREFIX'], '.', duplicate=0)
+renv['PREFIX']='msvs-ide/build/release/'
+renv['ID'] = 2
+renv.VariantDir(renv['PREFIX'], '.', duplicate=0)
+'''
+
+if env.has_key('boost_path'):
+	env['CPPPATH'] += [env['boost_path']]
+	if not env['sandbox']:
+		env['LIBPATH'] += [env['boost_path']+'/lib/']
+if env.has_key('mpfr_path'):	
+	env['CPPPATH'] += [env['mpfr_path']+"/lib/"]
+	if not env['sandbox']:
+		env['LIBPATH'] += [env['mpfr_path']+"/lib/"]
+ 	
+if compiler!='default':
+	Tool(compiler)(env)
+
+Tool('packaging')(env)
+
 ########### updates CHANGES file from git information ###########
 
 env.Command("CHANGES",".git/HEAD",
 			["echo CHANGELOG > $TARGET; echo \"---------\" >> $TARGET; echo >> $TARGET; echo >> $TARGET; git log --pretty=format:\"Date: %cd%n  %s%n\" >> $TARGET"]),
+
+
+      
 
        
 ############ support for preprocessing macro headers ############
@@ -574,36 +609,30 @@ for i in RecursiveGlob(".","*.h.py"):
 #	env.cppSrcBuilder(source=File(i),target=File(i[:-3]))
 
 
-############ support for debug/release variant builds ############
 
-SUFFIX=""
-if env['debug_level'] > 0:
-	MODE="debug/"
-else:
-	MODE="release/"
+############ support for building casper_thirdparty library ############
 
-Export("env")
-
-env['PREFIX']='build/'+MODE
-env['ID'] = 0
-env.VariantDir(env['PREFIX'], '.', duplicate=0)
-
-denv['PREFIX']='msvs-ide/build/debug/'
-denv['ID'] = 1
-denv.VariantDir(denv['PREFIX'], '.', duplicate=0)
-renv['PREFIX']='msvs-ide/build/release/'
-renv['ID'] = 2
-renv.VariantDir(renv['PREFIX'], '.', duplicate=0)
+#import glob
+#casper_thirdparty_libs = [i[len(env['LIBPREFIX']):] for i in os.listdir("thirdparty/lib/"+binary_format)]
+#casper_thirdparty = SharedLibrary(env['PREFIX']+'/thirdparty/casper_thirdparty',
+#								source=[glob.glob("thirdparty/lib/"+binary_format+"/*")],
+								 #LIBPATH=["thirdparty/lib/"+binary_format],
+								 #LIBS=casper_thirdparty_libs)
+#								 )
+#Alias('casper_thirdparty',casper_thirdparty)	
 
 ############ support for building library ############
 
 def defineVersionObj(env):
 	return env.Object(env['PREFIX']+"/casper/version.cpp",CPPDEFINES=version_macros)  
+
+def defineVersionShObj(env):
+	return env.SharedObject(env['PREFIX']+"/casper/version.cpp",CPPDEFINES=version_macros)  
 	
 versionObjs = {}
 versionObjs[env['ID']] = defineVersionObj(env)
-versionObjs[renv['ID']] = defineVersionObj(renv)
-versionObjs[denv['ID']] = defineVersionObj(denv)
+#versionObjs[renv['ID']] = defineVersionObj(renv)
+#versionObjs[denv['ID']] = defineVersionObj(denv)
 
 casper_srcs=[]
 for i in casper_kernel:
@@ -626,7 +655,7 @@ def defineLibrary(env):
 	casper_objs=[]
 
 	casper_objs += versionObjs[env['ID']]
-	
+
 	for i in casper_srcs:
 		casper_objs+=env.Object(env['PREFIX']+"/"+i)
 
@@ -635,6 +664,7 @@ def defineLibrary(env):
 libcasper=defineLibrary(env)	
 Alias('library',libcasper)
 
+'''	
 if env['debug_level']==0 and env['optimize_level']==3:
 	rlibcasper=libcasper
 else:
@@ -644,6 +674,7 @@ if env['debug_level']==3 and env['optimize_level']==0:
 	dlibcasper=libcasper
 else:
 	dlibcasper=defineLibrary(denv)
+'''
 
 ############ support for building modular library ############
 
@@ -726,10 +757,9 @@ Alias('library_modular',library_modules)
 
 ############ support for building examples ############
 
-example_libs=['casper']
+example_libs=['casper']+confCommonEnv['LIBS']
 libpath = '/casper'
 	
-example_libs+=confCommonEnv['LIBS']
 	
 def defineExamples(env):
 	example_targets=[]
@@ -745,8 +775,8 @@ def defineExamples(env):
 example_targets=defineExamples(env)	
 Alias('examples',example_targets)
 
-dexample_targets = defineExamples(denv)
-rexample_targets = defineExamples(renv)
+#dexample_targets = defineExamples(denv)
+#rexample_targets = defineExamples(renv)
 
 
 gen_casper_preds = env.Command('bindings/cpp/casperpreds.h',None,'python bindings/cpp/genpreds.py > $TARGET')
@@ -862,7 +892,7 @@ def compile_wrapper(iface,pycasper_obj):
 								   LDMODULEPREFIX='_',
 								   LDMODULESUFFIX='.so',
 								   LIBS=iface_libs[iface],
-								   FRAMEWORKSFLAGS='-flat_namespace -undefined dynamic_lookup')
+								   FRAMEWORKSFLAGS='-undefined dynamic_lookup')
 
 	
 pycasper_modules=['kernel','cp','util']
@@ -978,7 +1008,7 @@ testing_target = Alias("test",testCmd)
 
 ############ support for creating msvc solution ############
 
-
+'''
 def defineMSVSLibProject(env,prefix):
 	return env.MSVSProject(target = prefix+'library' + env['MSVSPROJECTSUFFIX'],
 	                          srcs = msvcproj_lib_srcs,
@@ -1021,25 +1051,41 @@ if env.has_key('MSVSPROJECTCOM'):
 					variant = ['Release','Debug']) 
 									
 	Alias("msvcsolution",[msvcproj_lib_target_prefix,msvcproj_example_targets_prefix,msvcsolution_target])
+'''
 
 ### installing ###
 
-
+# needed since scons Install builder ignores symlinks
+def copytree(target,source,env):
+	import shutil
+#	print env.GetBuildPath(source[0]),env.GetBuildPath(target[0])
+	shutil.copytree(env.GetBuildPath(source[0]),env.GetBuildPath(target[0]),symlinks=True)
+	
 def createLibInstallTarget(env):
 	common_install_target = []
+	
+	# install sources
 	for i in dist_sources:
-		common_install_target.append(env.InstallAs(target=env['install_prefix']+'/share/casper/'+i,source = i))
+		common_install_target.append(env.InstallAs(target=env['install_prefix']+'/Casper.framework/Resources/'+i,source = i))
 	
 	lib_install_target = []
 	lib_install_target += common_install_target
 	for i in library_headers:
-		lib_install_target.append(env.InstallAs(target = env['install_prefix']+'/include/'+i,source = i))
-	lib_install_target.append(env.Install(target=env['install_prefix']+'/lib/',source = libcasper))
-	
+		lib_install_target.append(env.InstallAs(target = env['install_prefix']+'/Casper.framework/Headers/'+i,source = i))
+		
+	if env['sandbox']:
+		target1 = env.Command(env['install_prefix']+'/Casper.framework/Libraries', "thirdparty/lib/"+binary_format, copytree)
+		lib_install_target.append(target1)
+	#lib_install_target.append(env.Install(target=env['install_prefix']+'/Casper.framework/Libraries/',source = libcasper))
+				
 	for i in Flatten(example_targets):
-		(dir1,filename) = os.path.split(str(i))
-		(dir2,eval) = os.path.split(dir1)
-		lib_install_target.append(env.InstallAs(target=env['install_prefix']+'/bin/casper-'+eval+"-"+filename,source = i))
+		ii = str(i).replace(env['PREFIX']+'examples/','')
+		ii = ii.replace('/','-')
+		
+#		(dir1,filename) = os.path.split(str(i))
+#		(dir2,eval) = os.path.split(dir1)
+#		(dir3,module) = os.path.split(dir2)
+		lib_install_target.append(env.InstallAs(target=env['install_prefix']+'/Casper.framework/Examples/'+ii,source = i))
 	return lib_install_target
 	
 lib_install_target = createLibInstallTarget(env)
@@ -1054,7 +1100,7 @@ env.Clean(library_bindist,"dist/casper/")
 Alias('library-bindist',library_bindist)	
 
 
-pycasper_bindist = [env.Install(target="dist/pycasper/casper/",source=pycasper_target), #Dir(env["PREFIX"]+"/bindings/python/casper")
+pycasper_bindist = [env.Install(target="dist/pycasper/",source = Dir(env["PREFIX"]+"/bindings/python/casper")),
 				 	env.Install(target="dist/pycasper/data/",source = extra_files_info)]
 env.Clean(pycasper_bindist,"dist/pycasper/")
 Alias('pycasper-bindist',pycasper_bindist)

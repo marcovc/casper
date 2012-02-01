@@ -10,7 +10,8 @@
     	{
     		std::ostringstream s;
         	s << *$self;
-        	static char* ret = new char[s.rdbuf()->str().size()];
+        	//static char* ret = new char[s.rdbuf()->str().size()];
+        	char* ret = new char[s.str().size()+1];
         	strcpy(ret,s.str().c_str());
         	return ret;
     	}

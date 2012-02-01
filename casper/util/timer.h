@@ -40,9 +40,8 @@ struct ITimer
 	virtual void resume() = 0;
 	virtual bool running() const = 0;
 	double getSecs() const { return secs;	}
-	virtual void print(std::ostream& os) const = 0;
+	//virtual void print(std::ostream& os) const = 0;
 	virtual ~ITimer() {}
-protected:
 	std::string name;
 	double secs;
 };
@@ -73,7 +72,7 @@ struct WallTimer : ITimer
 		tic = clock();
 	}
 	bool running() const {	return isRunning;	}
-	void print(std::ostream& os) const;
+	//void print(std::ostream& os) const;
 };
 
 #endif
@@ -85,10 +84,6 @@ struct WallTimer : ITimer
 
 #include <mach/mach_time.h>
 #include <sys/time.h>
-
-namespace Casper {
-namespace Util {
-
 
 #define CLOCK_MONOTONIC 1
 #define CLOCK_PROCESS_CPUTIME_ID 1
@@ -117,8 +112,6 @@ static inline int clock_gettime(int, struct timespec *tp)
 
 	return 0;
 }
-} // Util
-} // Casper
 
 #endif
 
@@ -153,7 +146,7 @@ struct CPUTimer : ITimer
 		QueryPerformanceCounter(&tic);
 	}
 	bool running() const {	return isRunning;	}
-	void print(std::ostream& os) const;
+	//void print(std::ostream& os) const;
 protected:
 	LARGE_INTEGER tic,tac,freq;
 	bool isRunning;
@@ -183,7 +176,7 @@ struct WallTimer : ITimer
 		QueryPerformanceCounter(&tic);
 	}
 	bool running() const {	return isRunning;	}
-	void print(std::ostream& os) const;
+	//void print(std::ostream& os) const;
 protected:
 	LARGE_INTEGER tic,tac,freq;
 	bool isRunning;
@@ -203,7 +196,7 @@ struct CPUTimer : ITimer
 	{ reset(); if (running) resume(); }
 	CPUTimer(const CPUTimer& s) : ITimer(s),tic(s.tic),tac(s.tac),
 								isRunning(s.isRunning) {}
-
+	virtual ~CPUTimer() {}
 	void reset()
 	{	isRunning = false;	secs = 0; }
 	void pause()
@@ -219,7 +212,7 @@ struct CPUTimer : ITimer
 		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &tic);
 	}
 	bool running() const {	return isRunning;	}
-	void print(std::ostream& os) const;
+	//void print(std::ostream& os) const;
 
 protected:
 	struct timespec tic,tac;	// could be local to 'pause()' ...
@@ -232,7 +225,7 @@ struct WallTimer : ITimer
 	{ reset(); if (running) resume(); }
 	WallTimer(const WallTimer& s) : ITimer(s),tic(s.tic),tac(s.tac),
 								isRunning(s.isRunning) {}
-
+	virtual ~WallTimer() {}
 	void reset()
 	{	isRunning = false;	secs = 0; }
 	void pause()
@@ -248,7 +241,7 @@ struct WallTimer : ITimer
 		clock_gettime(CLOCK_MONOTONIC, &tic);
 	}
 	bool running() const {	return isRunning;	}
-	void print(std::ostream& os) const;
+	//void print(std::ostream& os) const;
 protected:
 	struct timespec tic,tac;	// could be local to 'pause()' ...
 	bool isRunning;
@@ -307,6 +300,8 @@ struct Timers
 } // Util
 } // Casper
 
-std::ostream& operator<<(std::ostream& os, const Casper::Util::ITimer& t);
+//std::ostream& operator<<(std::ostream& os, const Casper::Util::ITimer& t);
+std::ostream& operator<<(std::ostream& os, const Casper::Util::CPUTimer& t);
+std::ostream& operator<<(std::ostream& os, const Casper::Util::WallTimer& t);
 
 #endif /*_H_CASPER_KERNEL_TIMER*/

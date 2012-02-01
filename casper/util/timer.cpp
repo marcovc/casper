@@ -18,28 +18,21 @@
 
 #include <casper/util/timer.h>
 
-namespace Casper {
-namespace Util {
 
-void WallTimer::print(std::ostream& os) const
+std::ostream& operator<<(std::ostream& os, const Casper::Util::CPUTimer& s)
 {
-	WallTimer t(*this);
+	Casper::Util::CPUTimer t(s);
 	t.pause();
 	os << std::left << std::setw (30) << t.name << ":" << std::setw(10) << std::right
 	   << std::setprecision (3) << t.secs;
+	return os;
 }
 
-void CPUTimer::print(std::ostream& os) const
+std::ostream& operator<<(std::ostream& os, const Casper::Util::WallTimer& s)
 {
-	CPUTimer t(*this);
-	t.pause();
+	Casper::Util::WallTimer t(s);
 	os << std::left << std::setw (30) << t.name << ":" << std::setw(10) << std::right
 	   << std::setprecision (3) << t.secs;
+	return os;
 }
 
-} // Util
-} // Casper
-
-
-std::ostream& operator<<(std::ostream& os, const Casper::Util::ITimer& t)
-{	t.print(os); return os;	}

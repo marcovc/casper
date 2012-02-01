@@ -66,6 +66,10 @@ struct UndefinedFilter: std::runtime_error
 			std::string("no ")+obj+
 			std::string(" object defined for constraint: ")+c)
 	{}
+	UndefinedFilter(std::string data,std::string obj,std::string type) : std::runtime_error(
+			std::string("undefined ")+obj+
+			" filter over expression of type "+type+" (instance is "+data+")")
+	{}
 };
 
 struct UndefinedView: std::runtime_error
@@ -76,6 +80,10 @@ struct UndefinedView: std::runtime_error
 	UndefinedView(std::string c,std::string obj) : std::runtime_error(
 			std::string("no ")+obj+
 			std::string(" object defined for expression: ")+c)
+	{}
+	UndefinedView(std::string data,std::string obj,std::string type) : std::runtime_error(
+			std::string("undefined ")+obj+
+			" view over expression of type "+type+" (instance is "+data+")")
 	{}
 };
 

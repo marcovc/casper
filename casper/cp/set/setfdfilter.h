@@ -110,7 +110,7 @@ struct SetFDCard3 : IFilter
 // SetFD constructors
 
 template<class T>
-SetFD<T>::SetFD(Store& store, const Util::StdRange<Value>& rPoss) :
+SetFD<T>::SetFD(Store& store, const Util::StdRange<Elem>& rPoss) :
 					store(store),
 					mGLBDeltas(store),
 					mLUBDeltas(store),
@@ -131,8 +131,8 @@ SetFD<T>::SetFD(Store& store, const Util::StdRange<Value>& rPoss) :
 }	
 
 template<class T>
-SetFD<T>::SetFD(Store& store, const Util::StdRange<Value>& rIn,
-							   const Util::StdRange<Value>& rPoss)  :
+SetFD<T>::SetFD(Store& store, const Util::StdRange<Elem>& rIn,
+							   const Util::StdRange<Elem>& rPoss)  :
 					store(store),
 					mGLBDeltas(store),
 					mLUBDeltas(store),
@@ -153,7 +153,7 @@ SetFD<T>::SetFD(Store& store, const Util::StdRange<Value>& rIn,
 }		
 			
 template<class T>
-SetFD<T>::SetFD(Store& store, const Util::StdList<Value>& rPoss) :
+SetFD<T>::SetFD(Store& store, const Util::StdList<Elem>& rPoss) :
 					store(store),
 					mGLBDeltas(store),
 					mLUBDeltas(store),
@@ -174,8 +174,8 @@ SetFD<T>::SetFD(Store& store, const Util::StdList<Value>& rPoss) :
 }	
 
 template<class T>
-SetFD<T>::SetFD(Store& store, const Util::StdList<Value>& rIn,
-							   const Util::StdList<Value>& rPoss)  : 
+SetFD<T>::SetFD(Store& store, const Util::StdList<Elem>& rIn,
+							   const Util::StdList<Elem>& rPoss)  :
 					store(store),
 					mGLBDeltas(store),
 					mLUBDeltas(store),
