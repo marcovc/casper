@@ -232,7 +232,7 @@ struct MetaDomView<Eval,Rel2<Func,Obj1,Obj2> >
 	BndExpr<bool> 	contains(const Value& s) const
 	{
 		BndExpr<bool> posRet(solver,false);
-
+		std::cout << "contains(" << s << ")\n";
 		Solver posSolver;
 		Var<Eval> s1(posSolver,v1.getUniverse());
 		Var<Eval> s2(posSolver,v2.getUniverse());
@@ -240,6 +240,7 @@ struct MetaDomView<Eval,Rel2<Func,Obj1,Obj2> >
 		found &= posSolver.solve(label(posSolver,{s1,s2}));
 		while (found)
 		{
+			std::cout << "found " << s1.domain().value() << "+" << s2.domain().value() << std::endl;
 			posRet = posRet or (v1.contains(s1.domain().value()) and v2.contains(s2.domain().value()));
 			found = posSolver.next();
 		}
@@ -252,7 +253,7 @@ struct MetaDomView<Eval,Rel2<Func,Obj1,Obj2> >
 		Solver posSolver;
 		Var<Eval> s1(posSolver,v1.getUniverse());
 		Var<Eval> s2(posSolver,v2.getUniverse());
-		Var<Eval> aux(solver,getUniverse());
+		Var<Eval> aux(posSolver,getUniverse());
 
 		bool found = posSolver.post(rel<Func>(s1,s2)==aux);
 		found &= posSolver.solve(label(posSolver,{s1,s2,aux}));
@@ -325,25 +326,28 @@ struct MetaFilterDD
 		MetaDomView<Eval1,Obj1> in1(solver,in.p1);
 		MetaDomView<Eval2,Obj2> in2(solver,in.p2);
 
-		BndExpr<bool> posRet(solver,false);
-//		BndExpr<bool> inDom1(solver,false);
-//		BndExpr<bool> inDom2(solver,false);
+		BndExpr<bool> ret(solver,true);
 
-		Solver posSolver;
-		Var<Eval1> s1(posSolver,in1.getUniverse());
-		Var<Eval2> s2(posSolver,in2.getUniverse());
-
-		bool found = posSolver.post(rel<Func>(s1,s2));
-		found &= posSolver.solve(label(posSolver,{s1,s2}));
-		while (found)
+		Solver solver1;
+		Var<Eval1> s1(solver1,in1.getUniverse());
+		bool found1 = solver1.solve(label(solver1,{s1}));
+		while (found1)
 		{
-			posRet = posRet or (in1.contains(s1.domain().value()) and in2.contains(s2.domain().value()));
-	//		inDom1 = inDom1 or (in1.equals(s1.domain().value()));
-	//		inDom2 = inDom2 or (in2.equals(s2.domain().value()));
-			found = posSolver.next();
+			Var<Eval2> support(solver,in2.getUniverse());
+			ret = ret and (in1.contains(s1.domain().value()) <= (in2.contains(support) and rel<Func>(s1.domain().value(),support)));
+			found1 = solver1.next();
 		}
 
-		return BndExpr<bool>(solver,posRet /*and inDom1 and inDom2*/);
+		Solver solver2;
+		Var<Eval1> s2(solver2,in2.getUniverse());
+		bool found2 = solver2.solve(label(solver2,{s2}));
+		while (found2)
+		{
+			Var<Eval1> support(solver,in1.getUniverse());
+			ret = ret and (in2.contains(s2.domain().value()) <= (in1.contains(support) and rel<Func>(support,s2.domain().value())));
+			found2 = solver2.next();
+		}
+		return ret;
 	}
 };
 
@@ -398,23 +402,23 @@ std::ostream& operator<<(std::ostream& os, const Casper::CP::MetaVar<Set<T> >& v
 
 void test()
 {
-	Util::StdRange<int> universe(0,3);
+	Util::StdRange<int> universe(1,3);
 	Solver solver;
 	Goal labeling(succeed());
 	MetaVar<int> xi(solver,universe,labeling);
 	MetaVar<int> yi(solver,universe,labeling);
-	//MetaVar<int> zi(solver,universe,labeling);
+	MetaVar<int> zi(solver,universe,labeling);
 	//MetaVar<int> xo(solver,universe,labeling);
 	//MetaVar<int> yo(solver,universe,labeling);
 
-	//auto c1 = rel<Equal>(rel<Add>(xi,yi),zi);
-	auto c1 = rel<Equal>(xi,yi);
+	auto c1 = rel<Equal>(rel<Add>(xi,yi),zi);
+	//auto c1 = rel<Equal>(xi,yi);
 
 	bool found = true;
 
 	found &= solver.post(MetaFilterDD()(solver,c1));
 
-	//MetaDomView<int,Rel2<Add,MetaVar<int>,MetaVar<int> > > v(solver,rel<Add>(xi,yi));
+
 
 	//found &= solver.post(xi.equals(IntSetVar(solver,list(1,2),list<int>())));
 	//found &= solver.post(yi.equals(IntSetVar(solver,list(1),list(2))));
@@ -428,7 +432,7 @@ void test()
 	while (found)
 	{
 		std::cout << c1 << std::endl;
-		//std::cout << xi << " " << yi << " : " << xo << " " << yo << std::endl;
+		//std::cout << xi << " " << yi <<  " " << zi << " [" << xysup << "||" << zisup << "]" << std::endl;
 		found = solver.next();
 	}
 	std::cout << solver.getStats() << std::endl;
