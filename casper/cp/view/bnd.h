@@ -327,9 +327,9 @@ struct BndViewRel1<Cast<Eval>,View,Eval>
 	Eval min() const { return Util::convLb<Eval>(v.min()); }
 	Eval max() const { return Util::convUb<Eval>(v.max()); }
 	bool updateMin(const Eval& val)
-	{ return v.updateMin(Util::convLb<EvalFrom>(val));	}
+	{ return val<=limits<EvalFrom>::max() and v.updateMin(Util::convLb<EvalFrom>(val));	}
 	bool updateMax(const Eval& val)
-	{ return v.updateMax(Util::convUb<EvalFrom>(val));	}
+	{ return val>=limits<EvalFrom>::min() and v.updateMax(Util::convUb<EvalFrom>(val));	}
 	void range(Eval& v1,Eval& v2) const
 	{ v1 = min(); v2=max(); }
 	bool updateRange(const Eval& v1, const Eval& v2)

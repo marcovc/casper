@@ -279,6 +279,8 @@ struct ChkView<BndExpr<Eval> >
 	BndExpr<Eval>	v;
 };
 
+struct ChkExpr;
+/*
 // chkview over chkexpr
 template<>
 struct ChkView<ChkExpr>
@@ -302,7 +304,7 @@ struct ChkView<ChkExpr>
 	{ 	return v;	}
 
 	ChkExpr	v;
-};
+};*/
 
 /**
  * 	ChkView over a Boolean CP variable.

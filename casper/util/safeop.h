@@ -323,9 +323,9 @@ template<>
 struct Convert<bool,int>
 {
 	static bool down(const int& from)
-	{	return from > 0 ; }
+	{	return from != 0 ; }
 	static bool up(const int& from)
-	{	return from > 0; }
+	{	return from != 0; }
 };
 
 template<class Eval, class T1>

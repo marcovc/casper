@@ -252,6 +252,7 @@ struct ValViewRel1<Cast<Eval>,View,Eval>
 	bool ground() const { return v.ground(); }
 	void attach(INotifiable* n) {	v.attach(n);	}
 	void detach(INotifiable* n) {	v.detach(n);	}
+	Rel1<Cast<Eval>,View> getObj()  const { return rel<Cast<Eval> >(v.getObj()); }
 	ValView<EvalFrom,View>	v;
 };
 

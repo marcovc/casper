@@ -100,6 +100,97 @@ struct ChkViewRel2<NotMember,Elem,Expr1,Set<Elem>,Expr2>
 	INotifiable*	pOwner;
 };
 
+// FIXME: not tested
+template<class Elem,class Expr1,class Expr2>
+struct ChkViewRel2<MinEqual,Set<Elem>,Expr1,Elem,Expr2>
+{
+	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
+			store(store),set(store,p1),elem(store,p2) {}
+	bool isTrue() const	// is it true?
+	{	return elem.ground() and
+			   set->ground() and
+			   !set->empty() and
+			   *set->beginIn() == elem.value();	}
+	bool canBeTrue() const 	// can it still be true?
+	{
+		if (!elem.ground())
+			return true;
+		if (set->ground())
+			return !set->empty() and *set->beginIn() == elem.value();
+		return set->empty() or *set->beginIn() >= elem.value();
+	}
+	bool setToTrue()
+	{
+		detach(pOwner);
+		return store.post(minEqual(set.getObj(),elem.getObj()));
+	}
+	bool setToFalse()
+	{
+		detach(pOwner);
+		std::set<Elem> lub(set->beginIn(),set->endIn());
+		lub.insert(set->beginPoss(),set->endPoss());
+		Var<Elem> v(store,lub.begin(),lub.end());
+		return store.post(minEqual(set.getObj(),v)) and
+			   store.post(v!=elem.getObj());
+	}
+
+	void attach(INotifiable* f) { 	pOwner=f; elem.attach(f); set->attachOnDomain(f);}
+	void detach(INotifiable* f) {	elem.detach(f); set->detachOnDomain(f);}
+
+	Rel2<MinEqual,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<MinEqual,Expr1,Expr2>(set.getObj(),elem.getObj());	}
+
+	Store&						store;
+	DomView<Set<Elem>,Expr1>	set;
+	ValView<Elem,Expr2>			elem;
+	INotifiable*				pOwner;
+};
+
+// FIXME: not tested
+template<class Elem,class Expr1,class Expr2>
+struct ChkViewRel2<MaxEqual,Set<Elem>,Expr1,Elem,Expr2>
+{
+	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
+			store(store),set(store,p1),elem(store,p2) {}
+	bool isTrue() const	// is it true?
+	{	return elem.ground() and
+			   set->ground() and
+			   !set->empty() and
+			   *--set->endIn() == elem.value();	}
+	bool canBeTrue() const 	// can it still be true?
+	{
+		if (!elem.ground())
+			return true;
+		if (set->ground())
+			return !set->empty() and *--set->endIn() == elem.value();
+		return set->empty() or *--set->endIn() <= elem.value();
+	}
+	bool setToTrue()
+	{
+		detach(pOwner);
+		return store.post(maxEqual(set.getObj(),elem.getObj()));
+	}
+	bool setToFalse()
+	{
+		detach(pOwner);
+		std::set<Elem> lub(set->beginIn(),set->endIn());
+		lub.insert(set->beginPoss(),set->endPoss());
+		Var<Elem> v(store,lub.begin(),lub.end());
+		return store.post(maxEqual(set.getObj(),v)) and
+			   store.post(v!=elem.getObj());
+	}
+
+	void attach(INotifiable* f) { 	pOwner=f; elem.attach(f); set->attachOnDomain(f);}
+	void detach(INotifiable* f) {	elem.detach(f); set->detachOnDomain(f);}
+
+	Rel2<MaxEqual,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<MaxEqual,Expr1,Expr2>(set.getObj(),elem.getObj());	}
+
+	Store&						store;
+	DomView<Set<Elem>,Expr1>	set;
+	ValView<Elem,Expr2>			elem;
+	INotifiable*				pOwner;
+};
 
 // FIXME: not tested at all
 template<class Elem,class Expr1,class Expr2>
