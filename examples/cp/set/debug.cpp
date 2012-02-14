@@ -19,6 +19,32 @@ using namespace Casper;
 using namespace Casper::CP;
 
 namespace Casper {
+
+// Succeeds if g succeeds, fails otherwise. Does not backtrack on g after it
+// succeeds.
+struct Succeeds : IGoal
+{
+	Succeeds(State& state, const Goal& g) : explorer(state),state(state),g(g) {}
+	Goal execute()
+	{
+		//DFSExplorer explorer(state);
+		if (explorer.explore(g))
+		{
+			explorer.restart();
+			return succeed();
+		}
+		explorer.restart();
+		return fail();
+		//return explorer.explore(g)?succeed():fail();
+	}
+	DFSExplorer explorer;
+	State&	state;
+	Goal g;
+};
+
+Goal succeeds(State& state, const Goal& g)
+{	return new (state) Succeeds(state,g);	}
+
 namespace CP {
 
 template<class Eval>
@@ -29,24 +55,48 @@ struct MetaVar<int>
 {
 	typedef Util::StdRange<int>	Universe;
 
-	MetaVar(Solver& solver, const Universe& universe, Goal& eqvLabel) :
-		solver(solver),universe(universe),dom(solver,universe)
+	MetaVar(Solver& solver, const Universe& universe) :
+		solver(solver),universe(universe),dom(solver,universe),
+		ma(solver,universe.lb,universe.ub),mi(solver,universe.lb,universe.ub)
 	{
 		solver.post(cardinal(dom)>0);
-		eqvLabel = Goal(solver,eqvLabel and label(solver,{dom}));
+		solver.post(maxEqual(dom,ma));
+		solver.post(minEqual(dom,mi));
+	}
+
+	const MetaVar& operator=(const MetaVar& m)
+	{
+		dom = m.dom;
+		ma = m.ma;
+		mi = m.mi;
+		return *this;
 	}
 
 	Universe getUniverse() const
 	{	return universe;	}
 
-	BndExpr<bool> isContained(const MetaVar<int >& v) const
-	{	return BndExpr<bool>(solver,contained(dom,v.dom)); }
-
 	BndExpr<bool> rangeContains(const int& s) const
 	{
-		Var<int> ma(solver,universe.lb,universe.ub);
-		Var<int> mi(solver,universe.lb,universe.ub);
-		return BndExpr<bool>(solver, maxEqual(dom,ma) and minEqual(dom,mi) and s>=mi and s<=ma);
+		return BndExpr<bool>(solver, s>=mi and s<=ma);
+	}
+
+	BndExpr<bool> 	rangeContains(const Var<int>& s) const
+	{
+		return BndExpr<bool>(solver, s>=mi and s<=ma);
+	}
+
+	BndExpr<bool> 	rangeContains(const MetaVar<int>& s) const
+	{
+		return BndExpr<bool>(solver, s.mi>=mi and s.ma<=ma);
+	}
+	Var<int> min() const
+	{
+		return mi;
+	}
+
+	Var<int> max() const
+	{
+		return ma;
 	}
 
 	BndExpr<bool> contains(const int& s) const
@@ -54,6 +104,9 @@ struct MetaVar<int>
 
 	BndExpr<bool> 	contains(const Var<int>& s) const
 	{	return BndExpr<bool>(solver,member(s,dom)); }
+
+	BndExpr<bool> contains(const MetaVar<int >& v) const
+	{	return BndExpr<bool>(solver,contained(v.dom,dom) and v.ma<=ma and v.mi>=mi); }
 
 	BndExpr<bool> equals(const int& s) const
 	{
@@ -72,6 +125,8 @@ struct MetaVar<int>
 	Solver& solver;
 	const Util::StdRange<int> universe;
 	Var<Set<int> > dom;
+	Var<int> ma;
+	Var<int> mi;
 };
 
 template<class Eval>
@@ -124,7 +179,122 @@ struct MetaVar<Set<Eval> >
 	Var<Set<Eval> > lub;
 };
 
+
+
+template<class T, int dims = 1>
+struct MetaVarArray : Util::StdArray<MetaVar<T>,dims>
+{
+	private:
+	typedef MetaVarArray<T,dims>					Self;
+
+	public:
+	typedef Util::StdArray<MetaVar<T>,dims>		Super;
+
+	/// Type of element stated in the array.
+	typedef  typename Super::Elem		Elem;
+
+	/// Element iterator.
+	typedef typename Super::Iterator	Iterator;
+
+	/// Creates a new MetaVarArray pointing to an existing MetaVarArray \p s.
+	MetaVarArray(const MetaVarArray& s) : Super(s) { }
+
+	/// Creates a new MetaVarArray pointing to an existing MetaVarArray \p s.
+	MetaVarArray(Solver& solver, const Super& s) : Super(solver,s) {}
+
+	/** Creates a new MetaVarArray with a copy of variables in the given
+	 	range [\p b, \p e[.	*/
+	MetaVarArray(Solver& solver, Iterator b, Iterator e) :
+			Super(solver,b,e) {}
+
+	/// Creates a new MetaVarArray with \p p1 variables.
+	MetaVarArray(Solver& solver,uint p1) :
+		Super(Util::Detail::ArrayDataTraits<Self,dims>::initData(solver,p1,solver))
+		{}
+
+	MetaVarArray(Solver& solver,const Expr<Seq<T> >& expr);
+
+	/** Creates a new MetaVarArray with \p p1 variables, and initializes each
+		with the remaining parameter.	*/
+	template<class T2>
+	MetaVarArray(Solver& solver,uint p1,const T2& p2) :
+		Super(Util::Detail::ArrayDataTraits<Self,dims>::initData(solver,p1,p2,solver))
+		{}
+
+	/** Creates a new MetaVarArray with \p p1 variables, and initializes each
+		with the remaining parameters.	*/
+	template<class T2,class T3>
+	MetaVarArray(Solver& solver,uint p1,const T2& p2,const T3& p3) :
+		Super(Util::Detail::ArrayDataTraits<Self,dims>::initData(solver,p1,p2,p3,solver))
+		{}
+
+	/** Creates a new MetaVarArray with \p p1 variables, and initializes each
+		with the remaining parameters.	*/
+	template<class T2,class T3,class T4>
+	MetaVarArray(Solver& solver,uint p1,const T2& p2,const T3& p3,const T4& p4) :
+		Super(Util::Detail::ArrayDataTraits<Self,dims>::initData(solver,p1,p2,p3,p4,solver))
+		{}
+
+	/** Creates a new MetaVarArray with \p p1 variables, and initializes each
+		with the remaining parameters.	*/
+	template<class T2,class T3,class T4,class T5>
+	MetaVarArray(Solver& solver,uint p1,const T2& p2,const T3& p3,const T4& p4,const T5& p5) :
+		Super(Util::Detail::ArrayDataTraits<Self,dims>::initData(solver,p1,p2,p3,p4,p5,solver))
+		{}
+
+	/// Returns the Store object associated with this array.
+	Store& getStore() const {	return this->operator[](0).solver;	}
+
+	private:
+
+	typedef typename Super::Data		Data;
+
+	static void initCell(MetaVar<T>* mem, Solver& solver)
+	{	::new(mem) MetaVar<T>(solver); }
+
+	template<class T1>
+	static void initCell(MetaVar<T>* mem, const T1& p1, Solver& solver)
+	{	::new(mem) MetaVar<T>(solver,p1); }
+
+	template<class T1,class T2>
+	static void initCell(MetaVar<T>* mem, const T1& p1, const T2& p2, Solver& solver)
+	{	::new(mem) MetaVar<T>(solver,p1,p2);	}
+
+	template<class T1,class T2,class T3>
+	static void initCell(MetaVar<T>* mem, const T1& p1, const T2& p2, const T3& p3, Solver& solver)
+	{	::new(mem) MetaVar<T>(solver,p1,p2,p3);	}
+
+	template<class T1,class T2,class T3,class T4>
+	static void initCell(MetaVar<T>* mem, const T1& p1, const T2& p2, const T3& p3, const T4& p4, Solver& solver)
+	{	::new(mem) MetaVar<T>(solver,p1,p2,p3,p4);	}
+
+	friend class Util::Detail::ArrayTraits<T,dims-1>;
+	friend class Util::Detail::ArrayDataTraits<Self,dims>;
+
+	//Solver& solver;
+};
+
 } // CP
+
+namespace Util {
+
+template<>
+struct Hash<CP::MetaVar<int> >
+{
+	size_t operator()(const CP::MetaVar<int>& t) const
+	{	return reinterpret_cast<size_t>(&t.dom.domain().in()) +
+			   reinterpret_cast<size_t>(&t.dom.domain().poss());	}
+};
+
+template<>
+struct UseEqualOp<CP::MetaVar<int> >
+{
+	bool operator()(const CP::MetaVar<int>& f,const CP::MetaVar<int>& t) const
+	{	return &f.dom.domain().in() == &t.dom.domain().in() and
+			   &f.dom.domain().poss() == &t.dom.domain().poss();	}
+};
+
+} // Util
 
 namespace Traits {
 
@@ -132,9 +302,28 @@ template<class Eval>
 struct GetEval<CP::MetaVar<Eval> >
 {	typedef Eval	Type;	};
 
+template<class Eval,int dims>
+struct GetEval<CP::MetaVarArray<Eval,dims> >
+{	typedef Seq<Eval>	Type;	};
+
+
 } // Traits
 
 namespace CP {
+
+Goal label(Store& store,const MetaVarArray<int>& x)
+{
+	VarArray<int> mima(store,x.size()*2);
+	VarArray<IntSet> doms(store,x.size());
+	for (uint i = 0; i < x.size(); ++i)
+	{
+		mima[i*2] = x[i].mi;
+		mima[i*2+1] = x[i].ma;
+		doms[i] = x[i].dom;
+	}
+	return Goal(store,label(store,doms,selectVarMinDom(store,doms)) );
+}
+
 template<class,class> struct MetaDomView;
 
 template<class Eval>
@@ -191,6 +380,123 @@ struct ComputeUniverse<Seq<Eval>,Util::StdRange<Eval>,Rel2<Func,Obj1,Obj2> >
 		return obj.p1.getUniverse(); // hummm
 	}
 };
+
+// ---
+
+template<class Obj,class ToExtract,class Equal>
+struct ExtractFromObj;
+
+template<class Obj,class Equal>
+struct ExtractFromObj<Obj,Obj,Equal>
+{
+	void operator()(const Obj& v, Util::StdList<Obj>& l) const
+	{
+		for (auto it = l.begin(); it != l.end(); ++it)
+			if (Equal()(*it,v))
+				return;
+		l.pushBack(v);
+	}
+};
+
+template<class Func,class Obj1,class ToExtract,class Equal>
+struct ExtractFromObj<Rel1<Func,Obj1>,ToExtract,Equal>
+{
+	void operator()(const Rel1<Func,Obj1>& r, Util::StdList<ToExtract>& l) const
+	{	ExtractFromObj<Obj1,ToExtract,Equal>()(r.p1,l);	}
+};
+
+template<class Func,class Obj1,class Obj2,class ToExtract,class Equal>
+struct ExtractFromObj<Rel2<Func,Obj1,Obj2>,ToExtract,Equal>
+{
+	void operator()(const Rel2<Func,Obj1,Obj2>& r, Util::StdList<ToExtract>& l) const
+	{
+		ExtractFromObj<Obj1,ToExtract,Equal>()(r.p1,l);
+		ExtractFromObj<Obj2,ToExtract,Equal>()(r.p2,l);
+	}
+};
+
+template<class Eval,class Equal>
+struct ExtractFromObj<MetaVarArray<Eval>,MetaVar<Eval>,Equal>
+{
+	void operator()(const MetaVarArray<Eval>& v, Util::StdList<MetaVar<Eval> >& l) const
+	{
+		for (uint i = 0; i < v.size(); ++i)
+		{
+			auto it = l.begin();
+			for ( ; it != l.end(); ++it)
+				if (Equal()(*it,v[i]))
+					break;
+			if (it == l.end())
+				l.pushBack(v[i]);
+		}
+	}
+};
+
+// ---
+
+template<class Obj,class From, class To>
+struct ReplaceInObj
+{
+	typedef Obj	RetType;
+	RetType operator()(const Obj& obj, const Util::StdHashMap<From,To>& m)
+	{	return obj;	}
+};
+
+template<class From,class To>
+struct ReplaceInObj<From,From,To>
+{
+	typedef To	RetType;
+	RetType operator()(const From& from, const Util::StdHashMap<From,To>& m)
+	{
+		auto it = m.find(from);
+		assert(it != m.end());
+		return it->second;
+	}
+};
+
+template<class Func,class Obj1,class From,class To>
+struct ReplaceInObj<Rel1<Func,Obj1>,From,To>
+{
+	typedef Rel1<Func,typename ReplaceInObj<Obj1,From,To>::RetType> RetType;
+	RetType operator()(const Rel1<Func,Obj1>& r, const Util::StdHashMap<From,To>& m)
+	{
+		ReplaceInObj<Obj1,From,To> rp1;
+		return rel<Func>(rp1(r.p1,m));
+	}
+};
+
+template<class Func,class Obj1,class Obj2,class From,class To>
+struct ReplaceInObj<Rel2<Func,Obj1,Obj2>,From,To>
+{
+	typedef Rel2<Func,typename ReplaceInObj<Obj1,From,To>::RetType,
+					  typename ReplaceInObj<Obj2,From,To>::RetType> RetType;
+	RetType operator()(const Rel2<Func,Obj1,Obj2>& r, const Util::StdHashMap<From,To>& m)
+	{
+		ReplaceInObj<Obj1,From,To> rp1;
+		ReplaceInObj<Obj2,From,To> rp2;
+		return rel<Func>(rp1(r.p1,m),rp2(r.p2,m));
+	}
+};
+
+template<class Eval>
+struct ReplaceInObj<MetaVarArray<Eval>,MetaVar<Eval>,Var<Eval> >
+{
+	typedef VarArray<Eval>	RetType;
+	RetType operator()(const MetaVarArray<Eval>& x, const Util::StdHashMap<MetaVar<Eval>,Var<Eval> >& m)
+	{
+		RetType r(x.getStore(),x.size());
+		for (uint i = 0; i < x.size(); ++i)
+		{
+			auto it = m.find(x[i]);
+			assert(it != m.end());
+			r[i] = it->second;
+		}
+		return r;
+	}
+};
+
+// ---
+
 
 template<class Eval,class Func,class Obj1,class Obj2>
 struct MetaDomView<Eval,Rel2<Func,Obj1,Obj2> >
@@ -274,115 +580,291 @@ struct MetaDomView<Eval,Rel2<Func,Obj1,Obj2> >
 	mutable Util::StdList<Var<Eval> >	labelVars;
 };
 
-
 struct MetaFilterDD
 {
-	template<class Func,class Obj1,class Obj2>
-	BndExpr<bool> operator()(Solver& solver, const Rel2<Func,Obj1,Obj2>& in,
-							const Rel2<Func,Obj1,Obj2>& out, Goal& labeling)
+
+	template<class Obj>
+	BndExpr<bool> entailed(Solver& solver, const Obj& in)
 	{
-		typedef typename Casper::Traits::GetEval<Obj1>::Type	Eval1;
-		typedef typename Casper::Traits::GetEval<Obj2>::Type	Eval2;
+		Util::StdList<MetaVar<int> >	intMetaVarList;
 
-		MetaDomView<Eval1,Obj1> in1(solver,in.p1);
-		MetaDomView<Eval2,Obj2> in2(solver,in.p2);
-
-		MetaDomView<Eval1,Obj1> out1(solver,out.p1);
-		MetaDomView<Eval2,Obj2> out2(solver,out.p2);
-
-		// contraction
-		BndExpr<bool> ret(solver,out1.isContained(in1.getObj()) and out2.isContained(in2.getObj()));
-
-		Solver posSolver;
-		Var<Eval1> s1(posSolver,in1.getUniverse());
-		Var<Eval2> s2(posSolver,in2.getUniverse());
-
-		ChkExpr r(posSolver,rel<Func>(s1,s2));
-		bool found = posSolver.solve(label(posSolver,{s1,s2}));
-		while (found)
-		{
-			if (r.isTrue())
-				ret = ret and ( (in1.contains(s1.domain().value()) and in2.contains(s2.domain().value())) ==
-								(out1.contains(s1.domain().value()) and out2.contains(s2.domain().value()) ));
-			else
-			if (!r.canBeTrue())
-				ret = ret and (not (out1.contains(s1.domain().value()) and out2.contains(s2.domain().value()) ));
-			else
-				assert(0);
-			found = posSolver.next();
-		}
-
-		labeling = Goal(solver,labeling and in1.getLabelGoal() and
-				in2.getLabelGoal() and out1.getLabelGoal() and out2.getLabelGoal());
-		return ret;
-	}
-
-	template<class Func,class Obj1,class Obj2>
-	BndExpr<bool> operator()(Solver& solver, const Rel2<Func,Obj1,Obj2>& in)
-	{
-		typedef typename Casper::Traits::GetEval<Obj1>::Type	Eval1;
-		typedef typename Casper::Traits::GetEval<Obj2>::Type	Eval2;
-
-		MetaDomView<Eval1,Obj1> in1(solver,in.p1);
-		MetaDomView<Eval2,Obj2> in2(solver,in.p2);
+		ExtractFromObj<Obj,MetaVar<int>,Casper::Util::UseEqualOp<MetaVar<int> > >()(in,intMetaVarList);
 
 		BndExpr<bool> ret(solver,true);
 
 		Solver solver1;
-		Var<Eval1> s1(solver1,in1.getUniverse());
-		bool found1 = solver1.solve(label(solver1,{s1}));
+		VarArray<int> ivars = getSupports(solver1,intMetaVarList);
+		Util::StdHashMap<MetaVar<int>,Var<int> > m;
+		Util::StdArray<MetaVar<int>* > minv(ivars.size());
+		uint c = 0;
+		for (auto it = intMetaVarList.begin(); it != intMetaVarList.end(); ++it,++c)
+		{
+			m.insert(*it,ivars[c]);
+			minv[c] = &*it;
+		}
+		ReplaceInObj<Obj,MetaVar<int>,Var<int> > rr;
+		solver1.post(not rr(in,m));
+		bool found1 = solver1.solve(label(solver1,ivars));
 		while (found1)
 		{
-			Var<Eval2> support(solver,in2.getUniverse());
-			ret = ret and (in1.contains(s1.domain().value()) <= (in2.contains(support) and rel<Func>(s1.domain().value(),support)));
+			BndExpr<bool> ored(solver,false);
+			for (uint i = 0; i < ivars.size(); ++i)
+			{
+				ored = ored or (not minv[i]->contains(ivars[i].domain().value()));
+			}
+			ret = ret and ored;
 			found1 = solver1.next();
 		}
-
-		Solver solver2;
-		Var<Eval1> s2(solver2,in2.getUniverse());
-		bool found2 = solver2.solve(label(solver2,{s2}));
-		while (found2)
-		{
-			Var<Eval1> support(solver,in1.getUniverse());
-			ret = ret and (in2.contains(s2.domain().value()) <= (in1.contains(support) and rel<Func>(support,s2.domain().value())));
-			found2 = solver2.next();
-		}
 		return ret;
 	}
+
+	template<class Eval>
+	VarArray<Eval> getSupports(Solver& solver, const Util::StdList<MetaVar<Eval> >& v)
+	{
+		VarArray<Eval> r(solver,v.size());
+		uint c = 0;
+		for (auto it = v.begin(); it != v.end(); ++it, ++c)
+			r[c] = Var<Eval>(solver,it->getUniverse());
+		return r;
+	}
+
+	// O(dn^2) variables (supports)
+	template<class Obj>
+	BndExpr<bool> operator()(Solver& solver, const Obj& in, Util::StdList<Var<int> >& labeling)
+	{
+		Util::StdList<MetaVar<int> >	intMetaVarList;
+
+		ExtractFromObj<Obj,MetaVar<int>,Casper::Util::UseEqualOp<MetaVar<int> > >()(in,intMetaVarList);
+
+		BndExpr<bool> ret(solver,true);
+
+		uint c = 0;
+		for (auto it = intMetaVarList.begin(); it != intMetaVarList.end(); ++it, ++c)
+		{
+			Solver solver1;
+			Var<int> intVar(solver1,it->getUniverse());
+			bool found1 = solver1.solve(label(solver1,list(intVar)));
+			while (found1)
+			{
+				VarArray<int> supports = getSupports(solver,intMetaVarList);
+				supports[c] = Var<int>(solver,intVar.domain().value());
+
+				BndExpr<bool> isSupported(solver,true);
+				Util::StdHashMap<MetaVar<int>,Var<int> > m;
+				uint c2 = 0;
+				for (auto it2 = intMetaVarList.begin(); it2 != intMetaVarList.end(); ++it2,++c2)
+				{
+					m.insert(*it2,supports[c2]);
+					if (c!=c2)
+						isSupported = isSupported and it2->contains(supports[c2]);
+						//solver.post(it2->contains(supports[c2]));
+				}
+				ReplaceInObj<Obj,MetaVar<int>,Var<int> > rr;
+				if (ChkExpr(solver,rr(in,m)).canBeTrue())
+				{
+					solver.post(rr(in,m));
+					//isSupported = isSupported and rr(in,m);
+					ret = ret and (it->contains(intVar.domain().value())<=isSupported);
+					labeling.insert(labeling.end(),supports.begin(),supports.end());
+				}
+				else
+					ret = ret and (!it->contains(intVar.domain().value()));
+				found1 = solver1.next();
+			}
+		}
+
+		return ret;
+	}
+
+	// O(dn^2) variables (supports)
+	template<class Obj>
+	BndExpr<bool> operator()(Solver& solver, const Obj& in, const Obj& out, Util::StdList<Var<int> >& labeling)
+	{
+		solver.post(this->operator()(solver,out,labeling));
+
+		Util::StdList<MetaVar<int> >	intInMetaVarList;
+		Util::StdList<MetaVar<int> >	intOutMetaVarList;
+
+		ExtractFromObj<Obj,MetaVar<int>,Casper::Util::UseEqualOp<MetaVar<int> >  >()(in,intInMetaVarList);
+		ExtractFromObj<Obj,MetaVar<int>,Casper::Util::UseEqualOp<MetaVar<int> >  >()(out,intOutMetaVarList);
+
+		auto itin = intInMetaVarList.begin();
+		auto itout = intOutMetaVarList.begin();
+
+		for ( ; itin != intInMetaVarList.end() and itout != intOutMetaVarList.end(); ++itin,++itout)
+			solver.post(itin->contains(*itout));
+
+		BndExpr<bool> ret(solver,true);
+
+		uint c = 0;
+		for (auto it = intOutMetaVarList.begin(); it != intOutMetaVarList.end(); ++it, ++c)
+		{
+			Solver solver1;
+			Var<int> intVar(solver1,it->getUniverse());
+			bool found1 = solver1.solve(label(solver1,list(intVar)));
+			while (found1)
+			{
+				VarArray<int> supports = getSupports(solver,intInMetaVarList);
+				supports[c] = Var<int>(solver,intVar.domain().value());
+
+				BndExpr<bool> isSupported(solver,true);
+				Util::StdHashMap<MetaVar<int>,Var<int> > m;
+				uint c2 = 0;
+				for (auto it2 = intInMetaVarList.begin(); it2 != intInMetaVarList.end(); ++it2,++c2)
+				{
+					m.insert(*it2,supports[c2]);
+					if (c!=c2)
+						isSupported = isSupported and it2->contains(supports[c2]);
+						//solver.post(it2->contains(supports[c2]));
+				}
+				ReplaceInObj<Obj,MetaVar<int>,Var<int> > rr;
+				if (ChkExpr(solver,rr(in,m)).canBeTrue())
+				{
+					std::cout << rr(in,m) << std::endl;
+					solver.post(rr(in,m));
+					//isSupported = isSupported and rr(in,m);
+					auto it2 = intInMetaVarList.begin();
+					for (uint c3 = 0; c3 < c; ++c3)
+						++it2;
+					ret = ret and (it->contains(intVar.domain().value())>=(it2->contains(intVar.domain().value()) and isSupported));
+					//ret = ret and ((it2->contains(intVar.domain().value()) and
+					//				isSupported)<=it->contains(intVar.domain().value()));
+					labeling.insert(labeling.end(),supports.begin(),supports.end());
+				}
+				else
+					ret = ret and (!it->contains(intVar.domain().value()));
+				found1 = solver1.next();
+			}
+		}
+
+		return ret;
+	}
+
 };
 
-/*
-template<class Func,class Eval1,class Eval2>
-struct MetaFilterBB2
-{
-	BndExpr<bool> operator()(Solver& solver, const MetaVar<Eval1>& in1, const MetaVar<Eval2>& in2,
-				const MetaVar<Eval1>& out1, const MetaVar<Eval2>& out2)
-	{
-		// contraction
-		BndExpr<bool> ret(solver,out1.isContained(in1) and out2.isContained(in2));
 
-		Solver posSolver;
-		Var<Eval1> s1(in1.inUniverse(posSolver));
-		Var<Eval2> s2(in2.inUniverse(posSolver));
-		ChkExpr r(posSolver,rel<Func>(s1,s2));
-		bool found = posSolver.solve(label(posSolver,{s1,s2}));
-		while (found)
+struct MetaFilterBB
+{
+	template<class Eval>
+	VarArray<Eval> getSupports(Solver& solver, const Util::StdList<MetaVar<Eval> >& v)
+	{
+		VarArray<Eval> r(solver,v.size());
+		uint c = 0;
+		for (auto it = v.begin(); it != v.end(); ++it, ++c)
+			r[c] = Var<Eval>(solver,it->getUniverse());
+		return r;
+	}
+
+	// O(2n^2) variables (supports)
+	template<class Obj>
+	BndExpr<bool> operator()(Solver& solver, const Obj& in, Goal& labeling)
+	{
+		Util::StdList<MetaVar<int> >	intMetaVarList;
+
+		ExtractFromObj<Obj,MetaVar<int>,Casper::Util::UseEqualOp<MetaVar<int> >  >()(in,intMetaVarList);
+
+		BndExpr<bool> ret(solver,true);
+
+		uint c = 0;
+		for (auto it = intMetaVarList.begin(); it != intMetaVarList.end(); ++it, ++c)
 		{
-			if (r.isTrue())
-				ret = ret and ( (in1.rangeContains(s1.domain().value()) and in2.rangeContains(s2.domain().value())) <=
-								(out1.rangeContains(s1.domain().value()) and out2.rangeContains(s2.domain().value()) ));
-			else
-			if (!r.canBeTrue())
-				ret = ret and ( (in1.rangeContains(s1.domain().value()) and in2.rangeContains(s2.domain().value())) >=
-								(out1.rangeContains(s1.domain().value()) and out2.rangeContains(s2.domain().value()) ));
-			else
-				assert(0);
-			found = posSolver.next();
+			VarArray<int> ubSupports = getSupports(solver,intMetaVarList);
+			VarArray<int> lbSupports = getSupports(solver,intMetaVarList);
+
+			ubSupports[c] = it->min();
+			lbSupports[c] = it->max();
+
+			BndExpr<bool> ubIsSupported(solver,true);
+			BndExpr<bool> lbIsSupported(solver,true);
+			Util::StdHashMap<MetaVar<int>,Var<int> > ubM;
+			Util::StdHashMap<MetaVar<int>,Var<int> > lbM;
+			uint c2 = 0;
+			for (auto it2 = intMetaVarList.begin(); it2 != intMetaVarList.end(); ++it2,++c2)
+			{
+				ubM.insert(*it2,ubSupports[c2]);
+				lbM.insert(*it2,lbSupports[c2]);
+				if (c!=c2)
+				{
+					//ubIsSupported = ubIsSupported and it2->rangeContains(ubSupports[c2]);
+					//lbIsSupported = lbIsSupported and it2->rangeContains(lbSupports[c2]);
+					solver.post(it2->rangeContains(ubSupports[c2]));
+					solver.post(it2->rangeContains(lbSupports[c2]));
+				}
+			}
+			ReplaceInObj<Obj,MetaVar<int>,Var<int> > rr;
+			ubIsSupported = ubIsSupported and rr(in,ubM);
+			lbIsSupported = lbIsSupported and rr(in,lbM);
+			ret = ret and lbIsSupported;
+			ret = ret and ubIsSupported;
+			labeling = Goal(solver,labeling and label(solver,lbSupports) and
+												label(solver,ubSupports));
 		}
 
 		return ret;
 	}
-};*/
+
+	// O(dn^2) variables (supports)
+	template<class Obj>
+	BndExpr<bool> operator()(Solver& solver, const Obj& in, const Obj& out, Goal& labeling)
+	{
+		solver.post(this->operator()(solver,out,labeling));
+
+		Util::StdList<MetaVar<int> >	intInMetaVarList;
+		Util::StdList<MetaVar<int> >	intOutMetaVarList;
+
+		ExtractFromObj<Obj,MetaVar<int>,Casper::Util::UseEqualOp<MetaVar<int> >  >()(in,intInMetaVarList);
+		ExtractFromObj<Obj,MetaVar<int>,Casper::Util::UseEqualOp<MetaVar<int> >  >()(out,intOutMetaVarList);
+
+		auto itin = intInMetaVarList.begin();
+		auto itout = intOutMetaVarList.begin();
+
+		for ( ; itin != intInMetaVarList.end() and itout != intOutMetaVarList.end(); ++itin,++itout)
+			solver.post(itin->contains(*itout));
+
+		BndExpr<bool> ret(solver,true);
+
+		uint c = 0;
+		for (auto it = intOutMetaVarList.begin(); it != intOutMetaVarList.end(); ++it, ++c)
+		{
+			Solver solver1;
+			Var<int> intVar(solver1,it->getUniverse());
+			bool found1 = solver1.solve(label(solver1,list(intVar)));
+			while (found1)
+			{
+				VarArray<int> supports = getSupports(solver,intInMetaVarList);
+				supports[c] = Var<int>(solver,intVar.domain().value());
+
+				BndExpr<bool> isSupported(solver,true);
+				Util::StdHashMap<MetaVar<int>,Var<int> > m;
+				uint c2 = 0;
+				for (auto it2 = intInMetaVarList.begin(); it2 != intInMetaVarList.end(); ++it2,++c2)
+				{
+					m.insert(*it2,supports[c2]);
+					if (c!=c2)
+						isSupported = isSupported and it2->rangeContains(supports[c2]);
+				}
+				ReplaceInObj<Obj,MetaVar<int>,Var<int> > rr;
+				if (ChkExpr(solver,rr(in,m)).canBeTrue())
+				{
+					solver.post(rr(in,m));
+					ret = ret and (it->rangeContains(intVar.domain().value())<=isSupported);
+					auto it2 = intInMetaVarList.begin();
+					for (uint c3 = 0; c3 < c; ++c3)
+						++it2;
+					ret = ret and ((it2->contains(intVar.domain().value()) and
+									isSupported)<=it->contains(intVar.domain().value()));
+					labeling = Goal(solver,labeling and label(solver,supports));
+				}
+				else
+					ret = ret and (!it->contains(intVar.domain().value()));
+				found1 = solver1.next();
+			}
+		}
+
+		return ret;
+	}
+
+};
 
 } // CP
 } // Casper
@@ -400,39 +882,158 @@ std::ostream& operator<<(std::ostream& os, const Casper::CP::MetaVar<Set<T> >& v
 	return os;
 }
 
-void test()
+BndExpr<bool> strictlyContains(Solver& solver, const MetaVarArray<int>& x1, const MetaVarArray<int>& x2)
 {
-	Util::StdRange<int> universe(1,3);
+	BndExpr<bool> ret(solver,true);
+	assert(x1.size()==x2.size());
+	// contains
+	for (uint i = 0; i < x1.size(); ++i)
+		ret = ret and x1[i].contains(x2[i]);
+	// strictly contains
+	BndExpr<bool> ored(solver,false);
+	for (uint i = 0; i < x1.size(); ++i)
+		ored = ored or (not x2[i].contains(x1[i]));
+	return BndExpr<bool>(solver,ret and ored);
+}
+
+BndExpr<bool> strictlyRangeContains(Solver& solver, const MetaVarArray<int>& x1, const MetaVarArray<int>& x2)
+{
+	BndExpr<bool> ret(solver,true);
+	assert(x1.size()==x2.size());
+	// contains
+	for (uint i = 0; i < x1.size(); ++i)
+		ret = ret and x1[i].contains(x2[i]);
+	// strictly contains
+	BndExpr<bool> ored(solver,false);
+	for (uint i = 0; i < x1.size(); ++i)
+		ored = ored or (not x2[i].rangeContains(x1[i]));
+	return BndExpr<bool>(solver,ret and ored);
+}
+
+#if 0
+void golomb()
+{
+	const int nMarks = 4;
+	const int maxRulerSize = 6;
+
+	const int nDiffVars = nMarks*(nMarks-1)/2;
+
+	Util::StdRange<int> universe(0,maxRulerSize);
 	Solver solver;
 	Goal labeling(succeed());
-	MetaVar<int> xi(solver,universe,labeling);
-	MetaVar<int> yi(solver,universe,labeling);
-	MetaVar<int> zi(solver,universe,labeling);
-	//MetaVar<int> xo(solver,universe,labeling);
-	//MetaVar<int> yo(solver,universe,labeling);
 
-	auto c1 = rel<Equal>(rel<Add>(xi,yi),zi);
-	//auto c1 = rel<Equal>(xi,yi);
+	MetaVarArray<int> xi(solver,nMarks,universe);
+	MetaVarArray<int> xo(solver,nMarks,universe);
+	MetaVarArray<int> xo2(solver,nMarks,universe);
+	MetaVarArray<int> ddo(solver,nDiffVars,universe);
+
+	Goal supLabeling(succeed());
+	bool found = true;
+
+	// Good is entailed
+
+	auto cGood = rel<Greater>(ddo[nDiffVars-2],ddo[nDiffVars-1]);
+	found &= solver.post(MetaFilterDD().entailed(solver,cGood));
+
+	// Propagating Good is effective
+
+	auto cGoodIn = rel<Greater>(ddo2[nDiffVars-2],ddo2[nDiffVars-1]);
+	found &= solver.post(MetaFilterBB()(solver,xo,xo2,supLabeling));
+	found &= solver.post(strictlyContains(solver,xo,xo2));
+
+	// Problem model
+
+	auto c1i = rel<Distinct>(xi);
+	auto c1o = rel<Distinct>(xo);
+
+	found &= solver.post(MetaFilterBB()(solver,c1i,c1o,supLabeling));
+
+	auto c2o = rel<Distinct>(ddo);
+
+	found &= solver.post(MetaFilterBB()(solver,c2o,supLabeling));
+
+	uint cc = 0;
+	for (uint i = 0; i < nMarks; ++i)
+		for (uint j = i+1; j < nMarks; ++j)
+		{
+			auto co = rel<Equal>(rel<Sub>(xo[j],xo[i]),ddo[cc]);
+			found &= solver.post(MetaFilterBB()(solver,co,supLabeling));
+			++cc;
+		}
+
+	for (uint i = 1; i < nMarks; ++i)
+	{
+		auto ci = rel<Less>(xi[i-1],xi[i]);
+		auto co = rel<Less>(xo[i-1],xo[i]);
+		found &= solver.post(MetaFilterBB()(solver,ci,co,supLabeling));
+	}
+
+	std::cout << "solving\n";
+	found &= solver.solve(label(solver,xi) and label(solver,xo) and
+							label(solver,xo2) and
+							label(solver,ddo) and
+							succeeds(solver,supLabeling));
+	while (found)
+	{
+		//std::cout << c1 << " " << c21 << " " << c22 << std::endl;
+		std::cout << xi << " --> " << xo << std::endl;
+		std::cout << xi << " [/\\Good] --> " << xo2 << std::endl;
+		//std::cout << " >> " << ddo << std::endl;
+		//std::cout << xi << " " << yi <<  " " << zi << " [" << xysup << "||" << zisup << "]" << std::endl;
+		found = solver.next();
+	}
+	std::cout << solver.getStats() << std::endl;
+
+}
+#endif
+
+void test()
+{
+	Util::StdRange<int> universe(0,1);
+	Solver solver;
+	Util::StdList<Var<int> > labeling;
+
+	MetaVarArray<int> xi(solver,3,universe);
+	MetaVarArray<int> xoT(solver,3,universe);
+//	MetaVarArray<int> xoL(solver,3,universe);
 
 	bool found = true;
 
-	found &= solver.post(MetaFilterDD()(solver,c1));
+	auto ciT = rel<Equal>(rel<Mul>(xi[0],xi[1]),xi[2]); /* and
+				rel<Distinct>(xi);*/
 
+	auto coT = rel<Equal>(rel<Mul>(xoT[0],xoT[1]),xoT[2]);/* and
+			  rel<Distinct>(xoT);*/
 
+	found &= solver.post(MetaFilterDD()(solver,ciT,coT,labeling));
 
-	//found &= solver.post(xi.equals(IntSetVar(solver,list(1,2),list<int>())));
-	//found &= solver.post(yi.equals(IntSetVar(solver,list(1),list(2))));
-	//auto setOne = IntSetVar(solver,list(1),list<int>());
-	//found &= solver.post(yo.equals(IntSetVar(solver,list(1),list(2))));
+/*	auto ci1 = rel<Equal>(rel<Mul>(xi[0],xi[1]),xi[2]);
+	auto ci2 = rel<Distinct>(xi);
 
-	//found &= solver.post(not yo.contains(setOne));
+	auto co1 = rel<Equal>(rel<Mul>(xoL[0],xoL[1]),xoL[2]);
+	auto co2 = rel<Distinct>(xoL);
 
+	found &= solver.post(MetaFilterDD()(solver,ci1,co1,labeling));
+	found &= solver.post(MetaFilterDD()(solver,ci2,co2,labeling));
+
+	found &= solver.post(strictlyRangeContains(solver,xoL,xoT));
+*/
 	std::cout << "solving\n";
-	found &= solver.solve(labeling);
+	MetaVarArray<int> toLabel(solver,6,universe);
+	for (uint i = 0; i < 3; ++i)
+	{
+		toLabel[i*2] = xi[i];
+		toLabel[i*2+1] = xoT[i];
+//		toLabel[i*3+2] = xoL[i];
+	}
+
+	found &= solver.solve(label(solver,toLabel) and
+						succeeds(solver,label(solver,labeling)));
 	while (found)
 	{
-		std::cout << c1 << std::endl;
-		//std::cout << xi << " " << yi <<  " " << zi << " [" << xysup << "||" << zisup << "]" << std::endl;
+		//std::cout << xi << " " << xoT << " " << xoL << std::endl;
+		std::cout << xi << " " << xoT << std::endl;
+
 		found = solver.next();
 	}
 	std::cout << solver.getStats() << std::endl;
@@ -441,5 +1042,6 @@ void test()
 int main()
 {
 	test();
+	//golomb();
 	return 0;
 }

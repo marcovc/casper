@@ -582,6 +582,8 @@ struct ChkViewRel2<Greater,Eval,Expr1,Eval,Expr2> :
 
 };
 
+template<class,class> struct BndArrayView;
+
 // FIXME: rewrite the following checkers
 /**
  * 	ChkView over the n-ary distinct constraint.
@@ -590,29 +592,49 @@ struct ChkViewRel2<Greater,Eval,Expr1,Eval,Expr2> :
 template<class Eval,class Expr1>
 struct ChkViewRel1<Distinct,Seq<Eval>,Expr1>
 {
-	ChkViewRel1(Store& store, const Expr1& p1) : store(store),p1(p1) {}
+	ChkViewRel1(Store& store, const Expr1& p1) : store(store),doms(store,p1) {}
 	bool isTrue() const	// is it true?
-	{	return false; }
+	{
+		for (uint i = 0; i < doms.size(); ++i)
+			for (uint j = i+1; j < doms.size(); ++j)
+				if (doms[i].max()>=doms[j].min() and
+					doms[i].min()<=doms[j].max())
+					return false;
+		return true;
+	}
 	bool canBeTrue() const 	// can it still be true?
-	{	return true; }
+	{
+		for (uint i = 0; i < doms.size(); ++i)
+			if (doms[i].min()==doms[i].max())
+				for (uint j = i+1; j < doms.size(); ++j)
+					if (doms[j].min()==doms[j].max() and
+							doms[i].min()==doms[j].max())
+						return false;
+		return true;
+	}
 	bool setToTrue()
 	{
-		return store.post(rel<Distinct>(p1));
+		return store.post(rel<Distinct>(doms.getObj()));
 	}
 	bool setToFalse()
 	{
-		assert(0); return false;
+		BndExpr<bool> ret(store,false);
+		for (uint i = 0; i < doms.size(); ++i)
+			for (uint j = i+1; j < doms.size(); ++j)
+				ret = ret or doms[i].getObj()==doms[j].getObj();
+		return store.post(ret);
 	}
+
 //	Store& store() const {	return getState(p1);	}
 
 	void attach(INotifiable* f) { 	}
 	void detach(INotifiable* f) {	}
 
 	Rel1<Distinct,Expr1> getObj()  const
-	{ 	return Rel1<Distinct,Expr1>(p1);	}
+	{ 	return Rel1<Distinct,Expr1>(doms.getObj());	}
 
 	Store&	store;
-	Expr1 p1;
+	BndArrayView<Eval,Expr1> doms;
 };
 
 /**
