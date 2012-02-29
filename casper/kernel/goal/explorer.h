@@ -63,13 +63,13 @@ struct ExplorerStats
 	{	return countCPRestores;	}
 
 	counter getNbChoicePoints() const
-	{	return countCPs;	}
+	{	return countCPs-1;	}
 
 	counter getMaxDepth() const
-	{	return maxDepth;	}
+	{	return maxDepth-1;	}
 
 	counter getCurDepth() const
-	{	return curDepth;	}
+	{	return curDepth-1;	}
 
 	counter getNbSolutions() const
 	{	return countSolutions;	}
@@ -104,6 +104,7 @@ struct IExplorer
 	bool explore(Goal g)
     {
     	state.insertCP();	// everything is undone if the solver fails
+    	stats.signalCPCreate();
     	pCurGoal = g.getPImpl();
 		return executeLoop();
 	}
@@ -115,13 +116,18 @@ struct IExplorer
 	/// Resumes search from the point where the last call to explore has exited.
 	bool resume();
 
-	/// Resets the search. \todo Change name to reset()
-	void restart()
+	/// Resets the search.
+	void reset()
 	{
+		//while (pCurGoal!=NULL)
+		//	branch();
 		while (pCurGoal!=NULL)
-			branch();
+		{
+			state.restoreCP();
+			state.removeCP();
+		}
+		goals.clear();
 		mValid = true;
-		//solver().removeCP();
 	}
 
 	void pushAnd(Goal g)
