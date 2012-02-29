@@ -98,6 +98,10 @@ struct StdRange
 	typedef RangeIterator<Value>	Iterator;
 	Iterator begin() const {	return Iterator(lb);	}
 	Iterator end() const	 {	return Iterator(ub+1);	}
+	bool operator==(const StdRange& s) const
+	{	return lb == s.lb and ub == s.ub;	}
+	bool operator!=(const StdRange& s) const
+	{	return lb != s.lb or ub != s.ub;	}
 };
 
 } // Util

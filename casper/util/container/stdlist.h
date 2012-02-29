@@ -127,6 +127,7 @@ struct StdList
 	StdList(const StdList&);
 	virtual ~StdList();
 	const StdList& operator=(const StdList& s);
+	bool operator==(const StdList& s) const;
 
 	Iterator begin() const;
 	Iterator end() const;
@@ -237,6 +238,19 @@ typename StdList<T>::Size StdList<T>::size() const
 						it != end(); ++it)
 		ret++;
 	return ret;
+}
+
+template<class T>
+bool StdList<T>::operator==(const StdList& s) const
+{
+	if (size()!=s.size())
+		return false;
+	auto it1 = begin();
+	auto it2 = s.begin();
+	for ( ; it1 != end(); ++it1,++it2)
+		if (*it1 != *it2)
+			return false;
+	return true;
 }
 
 template<class T>

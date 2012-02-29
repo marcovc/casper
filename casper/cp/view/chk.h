@@ -279,33 +279,6 @@ struct ChkView<BndExpr<Eval> >
 	BndExpr<Eval>	v;
 };
 
-struct ChkExpr;
-/*
-// chkview over chkexpr
-template<>
-struct ChkView<ChkExpr>
-{
-	ChkView(Store& store, const ChkExpr& p1) :
-			v(p1) {}
-	bool isTrue() const	// is it true?
-	{	return v.isTrue();	}
-	bool canBeTrue() const 	// can it still be true?
-	{	return v.canBeTrue();	}
-	bool setToTrue()
-	{	return v.setToTrue();	}
-	bool setToFalse()
-	{	return v.setToFalse();	}
-//	Store& store() const {	return v.store();	}
-
-	void attach(INotifiable* f) { 	v.attach(f);}
-	void detach(INotifiable* f) {	v.detach(f);}
-
-	ChkExpr getObj()  const
-	{ 	return v;	}
-
-	ChkExpr	v;
-};*/
-
 /**
  * 	ChkView over a Boolean CP variable.
  * 	\ingroup ChkViews
