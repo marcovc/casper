@@ -86,5 +86,25 @@ struct QuickHashMap : StdHashMap<KeyT,DataT,EqualKey,Hasher>
 } // Util
 } // Casper
 
+/**
+	Writes the contents of the StdHashMap to an ostream.
+*/
+template<class KeyT,class DataT,class EqualT,class Hasher>
+std::ostream& operator<<(std::ostream& o,
+						const Casper::Util::StdHashMap<KeyT,DataT,EqualT,Hasher>& a)
+{
+	o << "{ ";
+	auto it = a.begin();
+	if (it != a.end())
+	{
+		o << it->first << " -> " << it->second;
+		++it;
+		for ( ; it != a.end(); ++it)
+			o << ", " << it->first << " -> " << it->second;
+	}
+	o << "}";
+	return o;
+}
+
 
 #endif /*CASPER_KERNEL_CONTAINER_HASHMAP_H_*/
