@@ -19,7 +19,7 @@ def compare(file1,file2):
 
   secs1=getTestsField(file1,"secs")
   secs2=getTestsField(file2,"secs")
-  
+
   tgavg=1.0
   countPositive = 0
   countFaster = 0
@@ -27,7 +27,7 @@ def compare(file1,file2):
     if  float(secs1[i])>0 and float(secs2[i])>0:
       countPositive+=1
       tgavg *= float(secs2[i])/float(secs1[i])
-      if float(secs2[i])>float(secs1[i]):
+      if float(secs2[i])<float(secs1[i]):
           countFaster += 1
 
   tgavg=pow(tgavg,1.0/countPositive)
@@ -36,9 +36,13 @@ def compare(file1,file2):
   kbs2=getTestsField(file2,"kb")
 
   mgavg=1.0
+  c = 0.0
   for i in kbs1.keys():
-    mgavg *= float(kbs2[i])/float(kbs1[i])
-  mgavg=pow(mgavg,1.0/len(kbs1.keys()))
+    if float(kbs1[i])>0:
+        c+=1
+        mgavg *= float(kbs2[i])/float(kbs1[i])
+  if c > 0:
+    mgavg=pow(mgavg,1.0/c)
   
   return (couteq,cerreq,tgavg,mgavg,float(countFaster)/float(countPositive))
 

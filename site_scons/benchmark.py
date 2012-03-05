@@ -23,6 +23,7 @@
 import subprocess
 from multiprocessing import Pool
 from multiprocessing import Condition
+from multiprocessing import Manager
 from multiprocessing import cpu_count
 import sys
 import time
@@ -144,10 +145,8 @@ class Benchmark:
             thread.join()
             
         if thread.is_alive():
-            self.process.terminate()
             thread.join()
             return (self.cout,self.cerr,True,self.err,self.stats)
-        
         return (self.cout,self.cerr,False,self.err,self.stats)
         
     def store_results(self,(cout,cerr,timedout,exc,stats)):
@@ -251,21 +250,18 @@ class RunQueue:
         self.exectimes += [stats.secs]
         self.displayProgress()
         self.lock.release()
-        print self.nbCompleted,self.progressBar.count
+        #print self.nbCompleted,self.progressBar.count
         
     def add(self,benchmark,endTaskHandler,maxtime=None,maxmem=None):
-        self.pool.apply_async(func=benchmark,args=[maxtime,maxmem],callback=endTaskHandler)
         self.nbTasks += 1
         self.progressBar.setTaskCount(self.nbTasks)        
+        self.pool.apply_async(func=benchmark,args=[maxtime,maxmem],callback=endTaskHandler)
         
     def wait(self):          
         self.pool.close()
-        print "passed close"
         self.pool.join()
-        print "passed join"
         sys.stdout.write("\n")
         sys.stdout.flush()
-        print "passed wait"
 
 class EndTaskHandler:
     def __init__(self,benchmark,runqueue,samplecount):
@@ -274,8 +270,12 @@ class EndTaskHandler:
         self.samplecount = samplecount
         self.besttime = -1
         self.lock = Condition()
+        #print "handler: creating ",id(self)
+    #def __del__(self):
+        #print "handler: destroying",id(self)
         
     def __call__(self,(cout,cerr,timedout,exc,stats)):
+        #print "handler: calling",id(self)
         self.lock.acquire()
         if self.besttime == -1 or (stats.secs<self.besttime and exc==None):
             self.benchmark.store_results((cout,cerr,timedout,exc,stats))
@@ -286,8 +286,8 @@ class BenchmarkFile:
     def __init__(self,path):
         f = open(path,"r")
         comment = re.compile("^#.*$")
-        testsuite_info = re.compile("^#testsuite\\(([^,]*),([^,]*)((?:,[^,]+)*)\\).*$")
-        test_info = re.compile("^#test\\(([^,]*),([^,]*)((?:,[^,]+)*)\\).*$")
+        testsuite_info = re.compile(r"^#testsuite\(([^,]*),([^,]*)((?:,[^,]+)*)\).*$")
+        test_info = re.compile(r"^#test\(([^,]+),([^,]+)((?:,[^,]+)*)\).*$")
         self.benchmarks = []
         has_test_info = False
         for line in f.readlines():
@@ -308,9 +308,9 @@ class BenchmarkFile:
                         test_categories = match_test_info.group(3)[1:-1].split(",")
                     else:
                         test_categories = None
-                elif match_comment == None:
+                elif match_comment == None: # data
                     args = line.split()
-                    if has_test_info:
+                    if not has_test_info:
                         self.benchmarks.append(Benchmark(command=args[0],args=args[1:]))
                     else:
                         self.benchmarks.append(Benchmark(command=args[0],args=args[1:],\
