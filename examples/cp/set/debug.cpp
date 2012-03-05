@@ -31,10 +31,10 @@ struct Succeeds : IGoal
 		//DFSExplorer explorer(state);
 		if (explorer.explore(g))
 		{
-			explorer.restart();
+			explorer.reset();
 			return succeed();
 		}
-		explorer.restart();
+		explorer.reset();
 		return fail();
 		//return explorer.explore(g)?succeed():fail();
 	}
@@ -1386,6 +1386,61 @@ bool postImplies(Solver& solver,  const BndExpr<bool>& cond, const BndExpr<bool>
 					const Util::StdArray<int,2>& boundsCond, const Util::StdArray<int,2>& boundsImpl)
 {	return solver.post(new (solver) Implies(solver,cond,impl,marks,diffs,boundsCond,boundsImpl));	}
 
+struct SumDiff : IFilter
+{
+	SumDiff(Store& store, const IntVar& x1, const IntVar& x2, const IntVar& x3) :
+		IFilter(store),v1(store,x1),v2(store,x2),v3(store,x3) {}
+	bool execute()
+	{
+		if (v1.min()==v2.min())
+			if (!v3.updateMin(v1.min()+v2.min()+1))
+				return false;
+		if (v1.max()==v2.max())
+			if (!v3.updateMax(v1.max()+v2.max()-1))
+				return false;
+		if (v1.max()==v2.min())
+		{
+			if (v1.max()+v2.min()==v3.max())
+			{
+				if (!v1.updateMax(v1.max()-1))
+					return false;
+			}
+			else
+			if (v1.max()+v2.min()==v3.min())
+			{
+				if (!v2.updateMin(v2.min()+1))
+					return false;
+			}
+		}
+		if (v1.min()==v2.max())
+		{
+			if (v2.max()+v1.min()==v3.max())
+			{
+				if (!v2.updateMax(v2.max()-1))
+					return false;
+			}
+			else
+			if (v2.max()+v1.min()==v3.min())
+			{
+				if (!v1.updateMin(v1.min()+1))
+					return false;
+			}
+		}
+		return true;
+	}
+	void attach(INotifiable* f)
+	{	v1.attach(f); v2.attach(f); v3.attach(f);	}
+	void detach(INotifiable* f)
+	{	v1.detach(f); v2.detach(f); v3.detach(f);	}
+
+	BndView<int,IntVar> v1;
+	BndView<int,IntVar> v2;
+	BndView<int,IntVar> v3;
+};
+
+Filter sumDiff(Store& store,const IntVar& x1, const IntVar& x2, const IntVar& x3)
+{	return new (store) SumDiff(store,x1,x2,x3); }
+
 void golombInt(uint n,uint m)
 {
 	using namespace std;
@@ -1411,6 +1466,14 @@ void golombInt(uint n,uint m)
     	solver.post(marks[i] < marks[i+1]);
 
     marks[0].domain() = 0;
+
+    // redundant
+    for (uint i = 0; i < n-2; i++)
+    {
+    	solver.post(diffs[markDiffs[i+2][i]]==diffs[markDiffs[i+1][i]]+diffs[markDiffs[i+2][i+1]]);
+    	solver.post(diffs[markDiffs[i+2][i]]>2);
+    	solver.post(sumDiff(solver,diffs[markDiffs[i+1][i]],diffs[markDiffs[i+2][i+1]],diffs[markDiffs[i+2][i]]));
+    }
 
 #if 0
 	// load rules
@@ -1469,14 +1532,14 @@ void golombInt(uint n,uint m)
 #endif
 	bool found = solver.valid();
 	std::cout << marks << std::endl << diffs << std::endl;
-	solver.setExplorer(bbMinimize(solver,marks[n-1]));
-	//marks[n-1].domain() = m;
-	found &= solver.solve(label(solver,marks,selectVarMinDom(solver,marks)));
+	//solver.setExplorer(bbMinimize(solver,marks[n-1]));
+	marks[n-1].domain() = m;
+	found &= solver.solve(label(solver,marks));
 	uint nbSolutions = 0;
 	while (found)
 	{
 		cout << "solution " << ++nbSolutions << " : " << marks << endl;
-		//break;
+		break;
 		found = solver.next();
 	}
 	cout << solver.getStats() << endl;
@@ -1487,6 +1550,6 @@ int main()
 {
 	//distinctMult();
 	//golomb();
-	golombInt(8,100);
+	golombInt(11,72);
 	return 0;
 }
