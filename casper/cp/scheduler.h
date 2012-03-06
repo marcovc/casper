@@ -43,7 +43,7 @@ struct IFilterSched : IFilter
 	virtual bool post(Filter)	=	0;
 	void attach(INotifiable* f)
 	{ /*assert(pParent==NULL);*/ pParent = f; }
-	void detach(INotifiable*)
+	void detach()
 	{ pParent = NULL; }
 	virtual IFilter*	getPActiveFilter()	= 0;
 
@@ -146,7 +146,7 @@ struct GreedyLIFOFilterSched : IFilterSched
 	{	return false;	}
 
 	void attach(INotifiable*) {}
-	void detach(INotifiable*) {}
+	void detach() {}
 
 	Store&	store;
 	FilterDemon* pCurFilterDemon;

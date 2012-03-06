@@ -44,7 +44,7 @@ struct BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2> : IFilter
 
  	bool					execute();
 	void 					attach(INotifiable* pParent);
-	void 					detach(INotifiable* pParent);
+	void 					detach();
 	Cost 					cost() const {	return linearLo; }
 
 
@@ -95,13 +95,13 @@ void BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::attach(INotifiable* pP
 }
 
 template<class Expr1,class Expr2>
-void BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::detach(INotifiable* pParent)
+void BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::detach()
 {
 	//this->pParent = NULL;
 	//toRevise.clear(); // because some schedulers may have copies
 				  	  // of this filter on queue
-	dx.detach(this);
-	dy.detach(this);
+	dx.detach();
+	dy.detach();
 }
 /*
 template<class Expr1,class Expr2>
@@ -148,7 +148,7 @@ BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::automatonProcess(uint i)
 	}
 	if (i == n || x[i].max() < y[i].min())
 	{
-		detach(pParent);
+		detach();
 		return succeed;
 	}
 	if (!x[i].updateMax(y[i].max()) || !y[i].updateMin(x[i].min()))
@@ -161,13 +161,13 @@ BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::automatonProcess(uint i)
 		r = i = i+1;
 	if (i == n || x[i].max() < y[i].min())	// T3
 	{
-		detach(pParent);
+		detach();
 		return (AutomatonState)store.post(x[q].getObj() <= y[q].getObj());
 	}
 	else
 	if (x[i].min() > y[i].max())
 	{
-		detach(pParent);
+		detach();
 		return (AutomatonState)store.post(x[q].getObj() < y[q].getObj());
 	}
 	else
@@ -190,7 +190,7 @@ BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::automatonProcess(uint i)
 		s = i = i+1;
 	if (i == n || x[i].max() < y[i].min())
 	{
-		detach(pParent);
+		detach();
 		return (AutomatonState)store.post(x[q].getObj() <= y[q].getObj());
 	}
 	u = 3;
@@ -201,7 +201,7 @@ BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::automatonProcess(uint i)
 		s = i = i+1;
 	if (i < n && x[i].min() > y[i].max())
 	{
-		detach(pParent);
+		detach();
 		return (AutomatonState)store.post(x[q].getObj() < y[q].getObj());
 	}
 	u = 4;

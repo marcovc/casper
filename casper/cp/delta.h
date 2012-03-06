@@ -125,7 +125,7 @@ struct IdxDeltaStack : DeltaStack<uint>
 		for (uint i = 0; i < doms.size(); i++)
 			demons[i] = new (store) IdxDeltaDemon(this,i);
 	}
-	void detach(INotifiable* p)
+	void detach()
 	{
 		for (uint i = 0; i < doms.size(); i++)
 			demons[i]->detach();
@@ -164,7 +164,7 @@ struct IdxGroundDeltaStack : DeltaStack<uint>
 		for (uint i = 0; i < doms.size(); i++)
 			demons[i] = new (store) IdxGroundDeltaDemon(this,i);
 	}
-	void detach(INotifiable* p)
+	void detach()
 	{
 		for (uint i = 0; i < doms.size(); i++)
 			demons[i]->detach();
@@ -187,7 +187,7 @@ struct IdxBoundsDeltaStack : DeltaStack<uint>
 		bool notify()
 		{	rOwner.push(idx); return rOwner.pOwner->notify();	}
 		void detach()
-		{	rOwner.bnds[idx].detach(this);	}
+		{	rOwner.bnds[idx].detach();	}
 		IdxBoundsDeltaStack&	rOwner;
 		uint					idx;
 	};
@@ -203,7 +203,7 @@ struct IdxBoundsDeltaStack : DeltaStack<uint>
 		for (uint i = 0; i < bnds.size(); i++)
 			demons[i] = new (store) IdxBoundsDeltaDemon(this,i);
 	}
-	void detach(INotifiable* p)
+	void detach()
 	{
 		for (uint i = 0; i < bnds.size(); i++)
 			demons[i]->detach();
@@ -258,7 +258,7 @@ struct IdxDomDeltaStack :
 		for (uint i = 0; i < array.size(); i++)
 			demons[i] = new (this->store) IdxDomDeltaDemon(this,i,p);
 	}
-	void detach(INotifiable* p)
+	void detach()
 	{
 		for (uint i = 0; i < array.size(); i++)
 			demons[i]->detach();

@@ -31,7 +31,7 @@ template<class S,class E,class T,class Eval>
 struct BndView<Eval,Var<Eval,FD<S,E,T> > >
 {
 	BndView(Store& store, const Var<Eval,FD<S,E,T> >& v) :
-		store(store),d(v.domain()) {}
+		store(store),d(v.domain()),pOwner(NULL) {}
 	Eval min() const { return d.min(); }
 	Eval max() const { return d.max(); }
 	bool updateMin(const Eval& val)
@@ -43,23 +43,30 @@ struct BndView<Eval,Var<Eval,FD<S,E,T> > >
 	void range(Eval& lb, Eval& ub) const
 	{ lb = d.min(); ub = d.max();	}
 
-	void attach(INotifiable* f) { 	d.attachOnBounds(f); }
-	void detach(INotifiable* f) {	d.detachOnBounds(f); }
+	void attach(INotifiable* f)
+	{
+		assert(pOwner==f or pOwner==NULL);
+		pOwner = f;
+		d.attachOnBounds(pOwner);
+	}
+	void detach()
+	{	d.detachOnBounds(pOwner); }
 
 	// temp
 	typedef Var<Eval,FD<S,E,T> > Viewed;
 	Var<Eval,FD<S,E,T> > getObj()  const
 	{	return Var<Eval,FD<S,E,T> >(store,&d); }
 
-	Store&	store;
-	FD<S,E,T>&	d;
+	Store&			store;
+	FD<S,E,T>&		d;
+	INotifiable*	pOwner;
 };
 
 template<class Eval,class S,class E,class T>
 struct ValView<Eval,Var<Eval,FD<S,E,T> > >
 {
 	ValView(Store& store, const Var<Eval,FD<S,E,T> >& v) :
-		store(store),d(v.domain()) {}
+		store(store),d(v.domain()),pOwner(NULL) {}
 
 	Eval value() const { return d.min(); }
 	bool setValue(const Eval& val)
@@ -67,14 +74,21 @@ struct ValView<Eval,Var<Eval,FD<S,E,T> > >
 
 	bool ground() const { return d.singleton(); }
 
-	void attach(INotifiable* f) { 	d.attachOnGround(f); }
-	void detach(INotifiable* f) {	d.detachOnGround(f); }
+	void attach(INotifiable* f)
+	{
+		assert(pOwner==f or pOwner==NULL);
+		pOwner = f;
+		d.attachOnGround(pOwner);
+	}
+	void detach()
+	{	d.detachOnGround(pOwner); }
 
 	Var<Eval,FD<S,E,T> > getObj()  const
 	{ return Var<Eval,FD<S,E,T> >(store,&d); }
 
 	Store&	store;
 	FD<S,E,T>&	d;
+	INotifiable*	pOwner;
 };
 
 
@@ -99,7 +113,7 @@ struct BndViewRel2<Div,Expr1,Expr2,int>
 	bool updateRange(const int& min, const int& max);
 
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
+	void detach() {	p1.detach(); p2.detach();	}
 
 	Rel2<Div,Expr1,Expr2> getObj()  const
 	{ 	return rel<Div>(p1.getObj(),p2.getObj());	}
@@ -372,7 +386,7 @@ struct ValViewRel2<Div,Expr1,Expr2,Eval>
 		return true;
 	}
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
+	void detach()	{	p1.detach(); p2.detach();	}
 	Rel2<Div,Expr1,Expr2>	getObj() const
 	{	return Rel2<Div,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 

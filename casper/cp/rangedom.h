@@ -333,7 +333,7 @@ struct BndView<Eval1,Util::StdRange<Eval2> >
 	bool updateRange(const Eval2& lb,const Eval2& ub)
 	{ return ub >= max() and lb <= min();	}
 	void attach(INotifiable* f) { 	}
-	void detach(INotifiable* f) {	}
+	void detach() {	}
 	Util::StdRange<Eval2> getObj() const	{ return v;	}
 
 	Util::StdRange<Eval2> v;
@@ -343,7 +343,7 @@ template<class Eval1,class Eval2>
 struct BndView<Eval1,Var<Eval2,RangeDom<Eval2> > >
 {
 	BndView(Store& store, const Var<Eval2,RangeDom<Eval2> >& v) :
-		v(v) {}
+		v(v),pOwner(NULL) {}
 	Eval1 min() const { return Util::convLb<Eval1>(v.domain().min()); }
 	Eval1 max() const { return Util::convUb<Eval1>(v.domain().max()); }
 	void range(Eval2& lb,Eval2& ub) const
@@ -355,11 +355,17 @@ struct BndView<Eval1,Var<Eval2,RangeDom<Eval2> > >
 	bool updateRange(const Eval2& lb,const Eval2& ub)
 	{ return v.domain().updateRange(lb,ub);	}
 
-	void attach(INotifiable* f) { 	v.domain().attachOnBounds(f); }
-	void detach(INotifiable* f) {	v.domain().detachOnBounds(f); }
+	void attach(INotifiable* f)
+	{
+		assert(pOwner==NULL or pOwner==f);
+		pOwner = f;
+		v.domain().attachOnBounds(pOwner);
+	}
+	void detach() {	v.domain().detachOnBounds(pOwner); }
 	Var<Eval2,RangeDom<Eval2> >  getObj() const	{ return v;	}
 
 	Var<Eval2,RangeDom<Eval2> >	v;
+	INotifiable*	pOwner;
 };
 
 } // CP

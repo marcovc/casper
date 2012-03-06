@@ -55,7 +55,7 @@ struct UndefinedFilter : IFilter
 		return false;
 	}
 	void attach(INotifiable* pParent)	{ }
-	void detach(INotifiable* pParent)	{ }
+	void detach()	{ }
 };
 
 template<class Cond,class Func>
@@ -70,24 +70,18 @@ struct When : IFilter
 			return true;
 		if (cond.value() and !func())
 			return false;
-		detach(f);
+		detach();
 		return true;
 	}
 	void attach(INotifiable* f)
-	{
-		this->f = f;
-		cond.attach(f);
-	}
-	void detach(INotifiable* f)
-	{
-		cond.detach(f);
-	}
+	{	cond.attach(f);	}
+	void detach()
+	{	cond.detach();	}
 	Cost cost() const
 	{	return constantLo;	}
 
 	ValView<bool,Cond> cond;
 	Func func;
-	INotifiable* f;
 };
 
 template<class Cond,class Func>

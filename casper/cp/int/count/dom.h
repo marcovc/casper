@@ -152,7 +152,7 @@ struct DomFilterView3<CountEqual,int,NbOcc,Seq<int>,Array,int, int> : IFilter
 		nocc.attach(n);
 	}
 
-	void detach(INotifiable* n)
+	void detach()
 	{}
 
 	Store& store;

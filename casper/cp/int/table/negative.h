@@ -52,15 +52,15 @@ struct GACSchemaNeg : IFilter
 	bool firstExecute();
 
 	void attach(INotifiable* s) { erased.attach(s); }
-	void detach(INotifiable* s) { erased.detach(s); }
+	void detach() { erased.detach(); }
 	Cost cost() const {	return exponentialLo;}
 	//void printSupports();
 	private:
 
-	Util::StdArray<T,2>							ss;
+	Util::StdArray<T,2>					ss;
 	DomArrayView<T,View>				doms;
-	Util::StdArray<Util::StdPair<WL> >					wlsRow;
-	Util::StdArray<WLs>							wlsCol;
+	Util::StdArray<Util::StdPair<WL> >	wlsRow;
+	Util::StdArray<WLs>					wlsCol;
 	Reversible<bool>					firstExecution;
 	Detail::IdxGroundDeltaStack<View>	erased;
 };

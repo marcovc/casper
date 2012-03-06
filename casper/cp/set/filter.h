@@ -43,18 +43,23 @@ struct ValView<int,Rel1<Cardinal,View> >
 {
 	typedef typename Casper::Traits::GetEval<View>::Type::Elem	Elem;
 	ValView(Store& store, const Rel1<Cardinal,View>& v) :
-		v(store,v.p1) {}
+		v(store,v.p1),pOwner(NULL) {}
 	bool ground() const { return v->card().ground(); 	}
 	int value() const { return v->card().value();	}
 	bool setValue(const int& val) { return v->card()=val;	}
 	void attach(INotifiable* n)
-	{	v->card().attachOnGround(n);	}
-	void detach(INotifiable* n)
-	{	v->card().detachOnGround(n);	}
+	{
+		assert(pOwner==NULL or pOwner==n);
+		pOwner = n;
+		v->card().attachOnGround(pOwner);
+	}
+	void detach()
+	{	v->card().detachOnGround(pOwner);	}
 	Rel1<Cardinal,View>	getObj() const
 	{	return cardinal(v.getObj());	}
 
 	DomView<Set<Elem>,View> v;
+	INotifiable*	pOwner;
 };
 
 /**
@@ -66,7 +71,7 @@ struct BndView<int,Rel1<Cardinal,View> >
 {
 	typedef typename Casper::Traits::GetEval<View>::Type::Elem	Elem;
 	BndView(Store& store, const Rel1<Cardinal,View>& v) :
-		v(store,v.p1) {}
+		v(store,v.p1),pOwner(NULL) {}
 	int min() const { return v->card().min(); 	}
 	int max() const { return v->card().max();	}
 	bool updateMin(const int& val)
@@ -78,13 +83,18 @@ struct BndView<int,Rel1<Cardinal,View> >
 	void range(int& lb, int& ub) const
 	{	lb = min(); ub = max();	}
 	void attach(INotifiable* n)
-	{	v->card().attachOnBounds(n);	}
-	void detach(INotifiable* n)
-	{	v->card().detachOnBounds(n);	}
+	{
+		assert(pOwner==NULL or pOwner==n);
+		pOwner = n;
+		v->card().attachOnBounds(pOwner);
+	}
+	void detach()
+	{	v->card().detachOnBounds(pOwner);	}
 	Rel1<Cardinal,View>	getObj() const
 	{	return cardinal(v.getObj());	}
 
 	DomView<Set<Elem>,View> v;
+	INotifiable*	pOwner;
 };
 
 
@@ -97,21 +107,26 @@ struct DomView<int,Rel1<Cardinal,View>,Dom>
 {
 	typedef typename Casper::Traits::GetEval<View>::Type::Elem	Elem;
 	DomView(Store& store, const Rel1<Cardinal,View>& v) :
-		v(store,v.p1) {}
+		v(store,v.p1),pOwner(NULL) {}
 	Dom*	operator->()		{	return &v->card();	}
 	Dom*	operator->() const	{	return const_cast<Dom*>(&v->card());}
 	Dom&	operator*()			{	return v->card();	}
 	Dom&	operator*() const	{	return const_cast<Dom&>(v->card());}
 
 	void attach(INotifiable* n)
-	{	v->card().attachOnDomain(n);	}
-	void detach(INotifiable* n)
-	{	v->card().detachOnDomain(n);	}
+	{
+		assert(pOwner==NULL or pOwner==n);
+		pOwner = n;
+		v->card().attachOnDomain(pOwner);
+	}
+	void detach()
+	{	v->card().detachOnDomain(pOwner);	}
 
 	Rel1<Cardinal,View>	getObj() const
 	{	return cardinal(v.getObj());	}
 
 	DomView<Set<Elem>,View> v;
+	INotifiable*	pOwner;
 };
 
 /**
@@ -132,7 +147,7 @@ struct BndFilterView2<Member,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 	{
 		if (!elem.ground())	// first time or never
 			return true;
-		detach(pOwner);
+		detach();
 		IIterator iIt = set->findInIn(elem.value());
 		if (iIt != set->endIn())
 			return true;	// already in 'in'
@@ -144,8 +159,8 @@ struct BndFilterView2<Member,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 
 	void attach(INotifiable* s)
 	{	pOwner = s; elem.attach(s);	}
-	void detach(INotifiable* s)
-	{	elem.detach(s); }
+	void detach()
+	{	elem.detach(); }
 
 	ValView<Elem,Expr1>	elem;
 	DomView<Set<Elem>,Expr2>	set;
@@ -173,7 +188,7 @@ struct BndFilterView2<NotMember,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 		IIterator iIt = set->findInIn(elem.value());
 		if (iIt != set->endIn())
 			return false;	// already in 'in'
-		detach(pOwner);
+		detach();
 		PIterator pIt = set->findInPoss(elem.value());
 		if (pIt != set->endPoss())	// in 'poss'
 			return set->erase(pIt);
@@ -182,8 +197,8 @@ struct BndFilterView2<NotMember,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 
 	void attach(INotifiable* s)
 	{	pOwner = s; elem.attach(s);	 }
-	void detach(INotifiable* s)
-	{	elem.detach(s); }
+	void detach()
+	{	elem.detach(); }
 
 	ValView<Elem,Expr1>			elem;
 	DomView<Set<Elem>,Expr2>	set;
@@ -202,7 +217,7 @@ struct BndFilterView2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2> : IFilter
 	typedef typename DomView<Set<Eval>,Expr1>::Dom::PIterator PIterator;
 
 	BndFilterView2(Store& s,const Expr1& set, const Expr2& m) :
-		IFilter(s),set(s,set),m(s,m) {}
+		IFilter(s),set(s,set),m(s,m),pOwner(NULL) {}
 
 	bool execute()
 	{
@@ -242,12 +257,18 @@ struct BndFilterView2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2> : IFilter
 	}
 
 	void attach(INotifiable* s)
-	{	set->attachOnDomain(s);	m.attach(s); }
-	void detach(INotifiable* s)
-	{	set->detachOnDomain(s); m.detach(s); }
+	{
+		assert(pOwner==NULL or pOwner==s);
+		pOwner = s;
+		set->attachOnDomain(pOwner);
+		m.attach(pOwner);
+	}
+	void detach()
+	{	set->detachOnDomain(pOwner); m.detach(); }
 
 	DomView<Set<Eval>,Expr1>	set;
 	BndView<Eval,Expr2>			m;
+	INotifiable*	pOwner;
 };
 
 /**
@@ -276,7 +297,7 @@ struct BndFilterView2<MinEqual,Set<Eval>,Expr1,Eval,Expr2> : IFilter
 	typedef typename DomView<Set<Eval>,Expr1>::Dom::PIterator PIterator;
 
 	BndFilterView2(Store& s,const Expr1& set, const Expr2& m) :
-		IFilter(s),set(s,set),m(s,m) {}
+		IFilter(s),set(s,set),m(s,m),pOwner(NULL) {}
 
 	bool execute()
 	{
@@ -316,12 +337,21 @@ struct BndFilterView2<MinEqual,Set<Eval>,Expr1,Eval,Expr2> : IFilter
 	}
 
 	void attach(INotifiable* s)
-	{	set->attachOnDomain(s);	m.attach(s); }
-	void detach(INotifiable* s)
-	{	set->detachOnDomain(s); m.detach(s); }
+	{
+		assert(pOwner==NULL or pOwner==s);
+		pOwner = s;
+		set->attachOnDomain(pOwner);
+		m.attach(pOwner);
+	}
+	void detach()
+	{
+		set->detachOnDomain(pOwner);
+		m.detach();
+	}
 
 	DomView<Set<Eval>,Expr1>	set;
 	BndView<Eval,Expr2>			m;
+	INotifiable* pOwner;
 };
 
 /**
@@ -390,7 +420,7 @@ struct BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 		}
 
 		if (y->ground() or x->ground())
-			detach(pOwner);
+			detach();
 
 		return true;
 	}
@@ -404,10 +434,10 @@ struct BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 		x->attachOnGLB(s);
 		y->attachOnLUB(s);
 	}
-	void detach(INotifiable* s)
+	void detach()
 	{
-		x->detachOnGLB(s);
-		y->detachOnLUB(s);
+		x->detachOnGLB(pOwner);
+		y->detachOnLUB(pOwner);
 	}
 
 	Store&		store;
@@ -458,7 +488,7 @@ struct BndD1FilterView2<Distinct,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 		{
 			if (x->ground())
 				return false;
-			detach(pOwner);
+			detach();
 			return store.post( cardinal(x.getObj()) > cardinal(y.getObj()) );
 		}
 
@@ -466,7 +496,7 @@ struct BndD1FilterView2<Distinct,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 			 			x->beginPoss(),x->endPoss(),
 			 		Detail::RangeEqual<typename Dom2::IIterator>(y->beginIn(),y->endIn())))
 		{
-			detach(pOwner);
+			detach();
 			return store.post( cardinal(x.getObj()) < cardinal(y.getObj()) );
 		}
 
@@ -480,10 +510,10 @@ struct BndD1FilterView2<Distinct,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 		y->attachOnGround(s);
 	}
 
-	void detach(INotifiable* s)
+	void detach()
 	{
-		x->detachOnLUB(s);
-		y->detachOnGround(s);
+		x->detachOnLUB(pOwner);
+		y->detachOnGround(pOwner);
 	}
 
 	Store&		store;
@@ -518,10 +548,8 @@ struct BACDisjointCard : IFilter
 					const Expr1& v1,const Expr2& v2) :
 		IFilter(store),
 		x(store,v1),
-		y(store,v2)
-	//	,
-	//	xLUBDeltasIt(x->lubDeltas().begin()),
-	//	yLUBDeltasIt(y->lubDeltas().begin())
+		y(store,v2),
+		pOwner(NULL)
 		{}
 
 	bool execute()
@@ -541,19 +569,20 @@ struct BACDisjointCard : IFilter
 
 	void attach(INotifiable* s)
 	{
-		x->attachOnLUB(s);
-		y->attachOnLUB(s);
+		assert(pOwner==NULL or pOwner==s);
+		pOwner = s;
+		x->attachOnLUB(pOwner);
+		y->attachOnLUB(pOwner);
 	}
-	void detach(INotifiable* s)
+	void detach()
 	{
-		x->detachOnLUB(s);
-		y->detachOnLUB(s);
+		x->detachOnLUB(pOwner);
+		y->detachOnLUB(pOwner);
 	}
 
 	DomView<Set<Elem>,Expr1>	x;
 	DomView<Set<Elem>,Expr2>	y;
-	//typename DomX::DeltasIterator 		xLUBDeltasIt;
-	//typename DomY::DeltasIterator 		yLUBDeltasIt;
+	INotifiable* pOwner;
 };
 
 
@@ -584,7 +613,7 @@ struct BndFilterView2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 		{
 			if (chk.isTrue())
 			{
-				detach(pOwner);
+				detach();
 				return true;
 			}
 			first = false;
@@ -619,7 +648,7 @@ struct BndFilterView2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 				return false;
 
 		if (chk.isTrue())
-			detach(pOwner);
+			detach();
 		return true;
 	}
 
@@ -632,10 +661,10 @@ struct BndFilterView2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 		x->attachOnGLB(s);
 		y->attachOnGLB(s);
 	}
-	void detach(INotifiable* s)
+	void detach()
 	{
-		x->detachOnGLB(s);
-		y->detachOnGLB(s);
+		x->detachOnGLB(pOwner);
+		y->detachOnGLB(pOwner);
 	}
 
 	Store&	store;
@@ -679,11 +708,8 @@ struct BACIntersectCard1 : IFilter
 		IFilter(store),
 		x(store,v1),
 		y(store,v2),
-		z(store,v3)
-	//	,
-	//	xLUBDeltasIt(x->lubDeltas().begin()),
-	//	yLUBDeltasIt(y->lubDeltas().begin()),
-	//	zLUBDeltasIt(z->lubDeltas().begin())
+		z(store,v3),
+		pOwner(NULL)
 		{}
 
 	bool execute()
@@ -700,20 +726,23 @@ struct BACIntersectCard1 : IFilter
 
 	void attach(INotifiable* s)
 	{
-		x->attachOnLUB(s);
-		y->attachOnLUB(s);
-		z->attachOnLUB(s);
+		assert(pOwner==NULL or pOwner==s);
+		pOwner = s;
+		x->attachOnLUB(pOwner);
+		y->attachOnLUB(pOwner);
+		z->attachOnLUB(pOwner);
 	}
-	void detach(INotifiable* s)
+	void detach()
 	{
-		x->detachOnLUB(s);
-		y->detachOnLUB(s);
-		z->detachOnLUB(s);
+		x->detachOnLUB(pOwner);
+		y->detachOnLUB(pOwner);
+		z->detachOnLUB(pOwner);
 	}
 
 	DomView<Set<Elem>,Expr1>	x;
 	DomView<Set<Elem>,Expr2>	y;
 	DomView<Set<Elem>,Expr3>	z;
+	INotifiable*	pOwner;
 //	typename DomX::DeltasIterator 		xLUBDeltasIt;
 //	typename DomY::DeltasIterator 		yLUBDeltasIt;
 //	typename DomZ::DeltasIterator 		zLUBDeltasIt;
@@ -739,11 +768,8 @@ struct BACIntersectCard2 : IFilter
 		IFilter(store),
 		x(store,v1),
 		y(store,v2),
-		z(store,v3)
-	//	,
-	//	xGLBDeltasIt(x->glbDeltas().begin()),
-	//	yLUBDeltasIt(y->lubDeltas().begin()),
-	//	zLUBDeltasIt(z->lubDeltas().begin())
+		z(store,v3),
+		pOwner(NULL)
 		{}
 
 	bool execute()
@@ -763,20 +789,23 @@ struct BACIntersectCard2 : IFilter
 
 	void attach(INotifiable* s)
 	{
-		x->attachOnGLB(s);
-		y->attachOnLUB(s);
-		z->attachOnLUB(s);
+		assert(pOwner==NULL or pOwner == s);
+		pOwner = s;
+		x->attachOnGLB(pOwner);
+		y->attachOnLUB(pOwner);
+		z->attachOnLUB(pOwner);
 	}
-	void detach(INotifiable* s)
+	void detach()
 	{
-		x->detachOnGLB(s);
-		y->detachOnLUB(s);
-		z->detachOnLUB(s);
+		x->detachOnGLB(pOwner);
+		y->detachOnLUB(pOwner);
+		z->detachOnLUB(pOwner);
 	}
 
 	DomView<Set<Elem>,Expr1>	x;
 	DomView<Set<Elem>,Expr2>	y;
 	DomView<Set<Elem>,Expr3>	z;
+	INotifiable*	pOwner;
 	//typename DomX::DeltasIterator 		xGLBDeltasIt;
 	//typename DomY::DeltasIterator 		yLUBDeltasIt;
 	//typename DomZ::DeltasIterator 		zLUBDeltasIt;
@@ -816,7 +845,7 @@ struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,E
 				return false;
 			if (chk.isTrue())
 			{
-				detach(pOwner);
+				detach();
 				return true;
 			}
 
@@ -881,7 +910,7 @@ struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,E
 
 		if (chk.isTrue())
 		{
-			detach(pOwner);
+			detach();
 			return true;
 		}
 		return true;
@@ -897,11 +926,11 @@ struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,E
 		y->attachOnGLB(s);
 		z->attachOnLUB(s);
 	}
-	void detach(INotifiable* s)
+	void detach()
 	{
-		x->detachOnGLB(s);
-		y->detachOnGLB(s);
-		z->detachOnLUB(s);
+		x->detachOnGLB(pOwner);
+		y->detachOnGLB(pOwner);
+		z->detachOnLUB(pOwner);
 	}
 
 	Store&	store;
@@ -930,7 +959,7 @@ struct DomView<Set<Elem>,Rel2<Intersect,Expr1,Expr2>,Dom> //: IDomExpr<Dom>
 	typedef typename Dom2::Elem	Val2;
 	typedef typename Dom3::Elem	Val3;
 
-	DomView(Store& s, const Rel2<Intersect,Expr1,Expr2>& r) :	r(r)
+	DomView(Store& s, const Rel2<Intersect,Expr1,Expr2>& r) :	r(r),pOwner(NULL)
 	{
 		// FIXME: rewrite using new iteration views
 		DomView<Set<Elem>,Expr1>	v1(s,r.p1);
@@ -955,15 +984,20 @@ struct DomView<Set<Elem>,Rel2<Intersect,Expr1,Expr2>,Dom> //: IDomExpr<Dom>
 	Dom&	operator*() const	{	return const_cast<Dom&>(*auxD);}
 
 	void attach(INotifiable* n)
-	{	auxD->attachOnDomain(n);	}
-	void detach(INotifiable* n)
-	{	auxD->detachOnDomain(n);	}
+	{
+		assert(pOwner==NULL or pOwner==n);
+		pOwner = n;
+		auxD->attachOnDomain(pOwner);
+	}
+	void detach()
+	{	auxD->detachOnDomain(pOwner);	}
 
 	Rel2<Intersect,Expr1,Expr2> getObj() const
 	{	return r; }
 
 	Rel2<Intersect,Expr1,Expr2> r;
-	Dom*			   auxD;
+	Dom*			   	auxD;
+	INotifiable*		pOwner;
 };
 
 /**
@@ -984,7 +1018,8 @@ struct BndFilterView3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3
 		xLUBDeltasIt(x->lubDeltas().begin()),
 		yLUBDeltasIt(y->lubDeltas().begin()),
 		zGLBDeltasIt(z->glbDeltas().begin()),
-		first(s,true) {}
+		first(s,true),
+		pOwner(NULL) {}
 
 	Cost cost() const
 	{	return linearLo;	}
@@ -1080,15 +1115,17 @@ struct BndFilterView3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3
 
 	void attach(INotifiable* s)
 	{
-		x->attachOnLUB(s);
-		y->attachOnLUB(s);
-		z->attachOnDomain(s);
+		assert(pOwner==NULL or pOwner==s);
+		pOwner = s;
+		x->attachOnLUB(pOwner);
+		y->attachOnLUB(pOwner);
+		z->attachOnDomain(pOwner);
 	}
-	void detach(INotifiable* s)
+	void detach()
 	{
-		x->detachOnLUB(s);
-		y->detachOnLUB(s);
-		z->detachOnDomain(s);
+		x->detachOnLUB(pOwner);
+		y->detachOnLUB(pOwner);
+		z->detachOnDomain(pOwner);
 	}
 
 	Store& store;
@@ -1102,6 +1139,8 @@ struct BndFilterView3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3
 	typename DomZ::DeltasIterator 		zGLBDeltasIt;
 
 	Reversible<bool>			first;
+
+	INotifiable*	pOwner;
 };
 
 
@@ -1169,7 +1208,8 @@ struct BndFilterView1<Partition,Seq<Set<Elem> >,Expr1> : IFilter
 		IFilter(s),store(s),x(s,v1),
 		xGLBDeltasIt(x.size()),
 		xLUBDeltasIt(x.size()),
-		first(s,true)
+		first(s,true),
+		pOwner(NULL)
 		{}
 
 	Cost cost() const
@@ -1308,13 +1348,15 @@ struct BndFilterView1<Partition,Seq<Set<Elem> >,Expr1> : IFilter
 
 	void attach(INotifiable* s)
 	{
+		assert(pOwner==NULL or pOwner == s);
+		pOwner = s;
 		for (uint i = 0; i < x.size(); ++i)
-			x[i]->attachOnDomain(s);
+			x[i]->attachOnDomain(pOwner);
 	}
-	void detach(INotifiable* s)
+	void detach()
 	{
 		for (uint i = 0; i < x.size(); ++i)
-			x[i]->detachOnDomain(s);
+			x[i]->detachOnDomain(pOwner);
 	}
 
 	Store&	store;
@@ -1324,6 +1366,7 @@ struct BndFilterView1<Partition,Seq<Set<Elem> >,Expr1> : IFilter
 	Reversible<bool>			first;
 	InPoss						inPoss;
 	uint						maxElems;
+	INotifiable*	pOwner;
 };
 
 
@@ -1349,7 +1392,8 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2> : IFilte
 		xLUBDeltasIt(x.size()),
 		zGLBDeltasIt(z->glbDeltas().begin()),
 		zLUBDeltasIt(z->lubDeltas().begin()),
-		first(s,true)
+		first(s,true),
+		pOwner(NULL)
 		{}
 
 	Cost cost() const
@@ -1481,15 +1525,17 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2> : IFilte
 
 	void attach(INotifiable* s)
 	{
+		assert(pOwner==NULL or pOwner==s);
+		pOwner = s;
 		for (uint i = 0; i < x.size(); ++i)
-			x[i]->attachOnDomain(s);
-		z->attachOnDomain(s);
+			x[i]->attachOnDomain(pOwner);
+		z->attachOnDomain(pOwner);
 	}
-	void detach(INotifiable* s)
+	void detach()
 	{
 		for (uint i = 0; i < x.size(); ++i)
-			x[i]->detachOnDomain(s);
-		z->detachOnDomain(s);
+			x[i]->detachOnDomain(pOwner);
+		z->detachOnDomain(pOwner);
 	}
 
 	Store&	store;
@@ -1504,9 +1550,9 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2> : IFilte
 	Reversible<bool>			first;
 	InLUB						inLUB;
 	uint						maxElems;
+
+	INotifiable*	pOwner;
 };
-
-
 
 /**
  * 	BndView over the minimum of a set variable.
@@ -1584,12 +1630,13 @@ struct BndViewRel1<Min,Var<Set<Eval>,Dom>,Eval>
 	bool updateRange(const Eval& v1, const Eval& v2)
 	{	return updateMin(v1) and updateMax(v2); }
 
-	void attach(INotifiable* n) {	v.domain().attachOnDomain(n);	}
-	void detach(INotifiable* n) {	v.domain().detachOnDomain(n);	}
+	void attach(INotifiable* n) {	pOwner=n; v.domain().attachOnDomain(n);	}
+	void detach() {	v.domain().detachOnDomain(pOwner);	}
 	Rel1<Min,Var<Set<Eval>,Dom> > getObj()  const
 	{ return Rel1<Min,Var<Set<Eval>,Dom> >(v); }
 
 	Var<Set<Eval>,Dom>	v;
+	INotifiable* pOwner;
 };
 
 template<class,class,class,class,class,class,class> struct PostDomFilter3;

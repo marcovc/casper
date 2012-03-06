@@ -46,7 +46,7 @@ extra_example_libs['examples/cp/real/inverse.cpp']=['gsl']
 
 cp_examples+=['set/steiner.cpp']
 cp_examples+=['set/golfer.cpp']
-cp_examples+=['set/debug.cpp']
+#cp_examples+=['set/debug.cpp']
 #cp_examples+=['set/covering.cpp']
 #cp_examples+=['set/packing.cpp']
 #cp_examples+=['set/test.cpp']
@@ -967,8 +967,8 @@ def runTests(target,source,env):
 	from multiprocessing import cpu_count
 	from math import ceil
 	benchmark.runBenchmarks(infilename="test/BenchmarkFile",outfilename="test/BenchmarkResults.xml",
-				  sample_count=8,timeout=30,memout=900e3,product=product,buildenv=buildenv,
-				  number_workers = int(ceil(cpu_count()/2.0)))
+				  sample_count=5,timeout=30,memout=900e3,product=product,buildenv=buildenv,
+				  number_workers = int(ceil(cpu_count()/4.0)))
  	SCons.compat.rename_module('pickle','cPickle') # bypasses SCons bug #2781 
 
 	import platform

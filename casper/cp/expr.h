@@ -101,7 +101,7 @@ struct IDomExpr : INotifier
 	virtual Dom&		operator*() const	=	0;
 
 	virtual void	attach(INotifiable*	n)	= 0;
-	virtual void 	detach(INotifiable*	n) = 0;
+	virtual void 	detach() = 0;
 
 	bool notify() { assert(0); return true; }
 
@@ -145,8 +145,8 @@ struct ValExprWrapper : IValExpr<Eval>
 
 	void attach(INotifiable* f)
 	{	v.attach(f);	}
-	void detach(INotifiable* f)
-	{	v.detach(f);	}
+	void detach()
+	{	v.detach();	}
 	ValView<Eval,View>	v;
 };
 
@@ -168,8 +168,8 @@ struct BndExprWrapper : IBndExpr<Eval>
 	{	return v.updateRange(min,max);	}
 	void attach(INotifiable* f)
 	{	v.attach(f);	}
-	void detach(INotifiable* f)
-	{	v.detach(f);	}
+	void detach()
+	{	v.detach();	}
 	BndView<Eval,View>	v;
 };
 
@@ -191,8 +191,8 @@ struct DomExprWrapper : IDomExpr<Dom>
 
 	void attach(INotifiable* f)
 	{	v.attach(f);	}
-	void detach(INotifiable* f)
-	{	v.detach(f);	}
+	void detach()
+	{	v.detach();	}
 
 	DomView<Eval,View,Dom>	v;
 };
@@ -214,8 +214,8 @@ struct ChkExprWrapper : IChkExpr
 
 	void attach(INotifiable* f)
 	{	v.attach(f);	}
-	void detach(INotifiable* f)
-	{	v.detach(f);	}
+	void detach()
+	{	v.detach();	}
 
 	ChkView<View>	v;
 };
@@ -285,7 +285,7 @@ struct BndExpr : Util::PImplIdiom<Detail::IBndExpr<Eval> >
 	/// Schedules \p f to be notified as soon as the bounded expression changes.
 	void attach(INotifiable* f) { Super::pImpl->attach(f); }
 	/// Stops \p f to be notified as soon as the bounded expression changes.
-	void detach(INotifiable* f) { Super::pImpl->detach(f); }
+	void detach() { Super::pImpl->detach(); }
 
 };
 
@@ -340,7 +340,7 @@ struct ValExpr : Util::PImplIdiom<Detail::IValExpr<Eval> >
 	void attach(INotifiable* f) { Super::pImpl->attach(f); }
 
 	/// Stops \p f to be notified as soon as the expression becomes ground.
-	void detach(INotifiable* f) { Super::pImpl->detach(f); }
+	void detach() { Super::pImpl->detach(); }
 
 
 	/// Returns the Store object associated with the expression.
@@ -412,8 +412,8 @@ struct DomExpr : Util::PImplIdiom<Detail::IDomExpr<DomT> >
 
 	void attach(INotifiable* f)
 	{ return Super::getImpl().attach(f);	}
-	void detach(INotifiable* f)
-	{ return Super::getImpl().detach(f);	}
+	void detach()
+	{ return Super::getImpl().detach();	}
 
 };
 
@@ -468,7 +468,7 @@ struct ChkExpr : Util::PImplIdiom<Detail::IChkExpr>
 	void attach(INotifiable* f) { Super::pImpl->attach(f); }
 
 	/// Stops \p f to be notified as soon as the expression truth value might changed.
-	void detach(INotifiable* f) { Super::pImpl->detach(f); }
+	void detach() { Super::pImpl->detach(); }
 
 	/// Returns the Store object associated with the expression.
 	Store&	getStore() const { return Super::pImpl->getStore(); }

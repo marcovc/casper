@@ -31,6 +31,7 @@
 namespace Casper {
 namespace CP {
 
+#if 0
 struct IElemNotifier : INotifier
 {
 	INotifier& rElem;
@@ -54,6 +55,7 @@ struct MethodNotifier : INotifiable
 template<class Obj,class Meth>
 MethodNotifier<Obj,Meth>* methodNotifier(Obj* o,Meth m)
 {	return new (o->solver().getHeap()) MethodNotifier<Obj,Meth>(o,m);  }
+#endif
 
 namespace Detail {
 
@@ -75,7 +77,7 @@ struct ViewArray : Util::StdVector<Elem>
 	typedef Util::StdVector<Elem> Super;
 	public:
 	ViewArray(Store& store, uint size) :
-		Super(store,size)//,store(store)
+		Super(store,size)
 		{}
 
 	void attach(INotifiable* f)
@@ -84,10 +86,10 @@ struct ViewArray : Util::StdVector<Elem>
 			Super::operator[](i).attach(f);
 	}
 
-	void detach(INotifiable* f)
+	void detach()
 	{
 		for (uint i = 0; i < this->size(); i++)
-			Super::operator[](i).detach(f);
+			Super::operator[](i).detach();
 	}
 
 //	Store& getStore() const {	return store; }
@@ -212,8 +214,8 @@ struct ArrayViewElem
 	void attach(INotifiable* f)
 	{	array[index.value()].attach(f);	}
 
-	void detach(INotifiable* f)
-	{	array[index.value()].detach(f);	}
+	void detach()
+	{	array[index.value()].detach();	}
 
 	///	Returns the element at position \p i.
 	Elem& operator[](uint i)
@@ -537,7 +539,7 @@ struct BndViewRel1<Min,Expr1,Eval>
 		return a[mi].updateMax(v);
 	}
 	void attach(INotifiable* f) { 	a.attach(f); }
-	void detach(INotifiable* f) {	a.detach(f); }
+	void detach() {	a.detach(); }
 	Rel1<Min,Expr1>	getObj() const {	return rel<Min>(a.getObj());	}
 
 	BndArrayView<Eval,Expr1>	a;
@@ -592,7 +594,7 @@ struct BndViewRel1<Max,Expr1,Eval>
 		return a[mi].updateMin(v);
 	}
 	void attach(INotifiable* f) { 	a.attach(f); }
-	void detach(INotifiable* f) {	a.detach(f); }
+	void detach() {	a.detach(); }
 	Rel1<Max,Expr1> getObj() const {	return rel<Max>(a.getObj()); }
 
 	BndArrayView<Eval,Expr1>	a;
@@ -795,7 +797,7 @@ struct BndViewRel1<Sum,Expr1,Eval>
 			v[i].attach(new TermDemon(this,i));
 		init();
 	}
-	void detach(INotifiable* f) {	}
+	void detach() {	}
 
 	Rel1<Sum,Expr1> getObj()  const
 	{ 	return Rel1<Sum,Expr1>(v.getObj());	}

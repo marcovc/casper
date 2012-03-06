@@ -40,17 +40,17 @@ struct ChkViewRel2<Member,Elem,Expr1,Set<Elem>,Expr2>
 	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(member(elem.getObj(),set.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(notMember(elem.getObj(),set.getObj()));
 	}
 
 	void attach(INotifiable* f) { 	pOwner=f; elem.attach(f); set->attachOnDomain(f);}
-	void detach(INotifiable* f) {	elem.detach(f); set->detachOnDomain(f);}
+	void detach() {	elem.detach(); set->detachOnDomain(pOwner);}
 
 	Rel2<Member,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Member,Expr1,Expr2>(elem.getObj(),set.getObj());	}
@@ -79,12 +79,12 @@ struct ChkViewRel2<NotMember,Elem,Expr1,Set<Elem>,Expr2>
 	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(notMember(elem.getObj(),set.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(member(elem.getObj(),set.getObj()));
 	}
 
@@ -121,12 +121,12 @@ struct ChkViewRel2<MinEqual,Set<Elem>,Expr1,Elem,Expr2>
 	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(minEqual(set.getObj(),elem.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach(pOwner);
+		detach();
 		std::set<Elem> lub(set->beginIn(),set->endIn());
 		lub.insert(set->beginPoss(),set->endPoss());
 		Var<Elem> v(store,lub.begin(),lub.end());
@@ -135,7 +135,7 @@ struct ChkViewRel2<MinEqual,Set<Elem>,Expr1,Elem,Expr2>
 	}
 
 	void attach(INotifiable* f) { 	pOwner=f; elem.attach(f); set->attachOnDomain(f);}
-	void detach(INotifiable* f) {	elem.detach(f); set->detachOnDomain(f);}
+	void detach() {	elem.detach(); set->detachOnDomain(pOwner);}
 
 	Rel2<MinEqual,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<MinEqual,Expr1,Expr2>(set.getObj(),elem.getObj());	}
@@ -167,12 +167,12 @@ struct ChkViewRel2<MaxEqual,Set<Elem>,Expr1,Elem,Expr2>
 	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(maxEqual(set.getObj(),elem.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach(pOwner);
+		detach();
 		std::set<Elem> lub(set->beginIn(),set->endIn());
 		lub.insert(set->beginPoss(),set->endPoss());
 		Var<Elem> v(store,lub.begin(),lub.end());
@@ -181,7 +181,7 @@ struct ChkViewRel2<MaxEqual,Set<Elem>,Expr1,Elem,Expr2>
 	}
 
 	void attach(INotifiable* f) { 	pOwner=f; elem.attach(f); set->attachOnDomain(f);}
-	void detach(INotifiable* f) {	elem.detach(f); set->detachOnDomain(f);}
+	void detach() {	elem.detach(); set->detachOnDomain(pOwner);}
 
 	Rel2<MaxEqual,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<MaxEqual,Expr1,Expr2>(set.getObj(),elem.getObj());	}
@@ -207,19 +207,19 @@ struct ChkViewRel2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2>
 	{	return !makeDiffIt(makeInIt(*x),makeLUBIt(*y)).valid();	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return postBndFilter(store,contained(x.getObj(),y.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach(pOwner);
+		detach();
 		return postBndFilter(store,cardinal(intersect(x.getObj(),y.getObj()))<cardinal(x.getObj()));
 	}
 
 	void attach(INotifiable* f)
 	{ 	pOwner=f; x->attachOnDomain(f);	y->attachOnDomain(f);}
-	void detach(INotifiable* f)
-	{	x->detachOnDomain(f); y->detachOnDomain(f);}
+	void detach()
+	{	x->detachOnDomain(pOwner); y->detachOnDomain(pOwner);}
 
 	Rel2<Contained,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Contained,Expr1,Expr2>(x.getObj(),y.getObj());	}
@@ -252,19 +252,19 @@ struct ChkViewRel2<Equal,Set<Elem>,Expr1,Set<Elem>,Expr2>
 	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return postBndFilter(store,equal(x.getObj(),y.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach(pOwner);
+		detach();
 		return postBndFilter(store,distinct(x.getObj(),y.getObj()));
 	}
 
 	void attach(INotifiable* f)
 	{ 	pOwner=f; x->attachOnDomain(f);	y->attachOnDomain(f);}
-	void detach(INotifiable* f)
-	{	x->detachOnDomain(f); y->detachOnDomain(f);}
+	void detach()
+	{	x->detachOnDomain(pOwner); y->detachOnDomain(pOwner);}
 
 	Rel2<Equal,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Equal,Expr1,Expr2>(x.getObj(),y.getObj());	}
@@ -292,12 +292,12 @@ struct ChkViewRel2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2>
 	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(disjoint(x.getObj(),y.getObj()));
 	}
 	bool setToFalse()		// FIXME: using views instead of auxvar
 	{
-		detach(pOwner);
+		detach();
 		Util::StdVector<Elem> lub1(x->inSize()+x->possSize());
 		Detail::setLUB(*x,lub1);
 
@@ -314,7 +314,7 @@ struct ChkViewRel2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2>
 	}
 
 	void attach(INotifiable* f) { 	pOwner=f; x->attachOnDomain(f); y->attachOnDomain(f);}
-	void detach(INotifiable* f) {	x->detachOnDomain(f); y->detachOnDomain(f);}
+	void detach() {	x->detachOnDomain(pOwner); y->detachOnDomain(pOwner);}
 
 	Rel2<Disjoint,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Disjoint,Expr1,Expr2>(x.getObj(),y.getObj());	}
@@ -359,7 +359,7 @@ struct ChkViewRel3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,
 	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(intersectEqual(x.getObj(),y.getObj(),z.getObj()));
 	}
 	bool setToFalse()		// FIXME: using views instead of auxvar
@@ -367,8 +367,8 @@ struct ChkViewRel3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,
 
 	void attach(INotifiable* f)
 	{ 	pOwner=f; x->attachOnDomain(f); y->attachOnDomain(f); z->attachOnDomain(f);}
-	void detach(INotifiable* f)
-	{	x->detachOnDomain(f); y->detachOnDomain(f); z->detachOnDomain(f);	}
+	void detach()
+	{	x->detachOnDomain(pOwner); y->detachOnDomain(pOwner); z->detachOnDomain(pOwner);	}
 
 	Rel3<IntersectEqual,Expr1,Expr2,Expr3> getObj()  const
 	{ 	return Rel3<IntersectEqual,Expr1,Expr2,Expr3>(x.getObj(),y.getObj(),z.getObj());	}
@@ -414,7 +414,7 @@ struct ChkViewRel3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3>
 	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(unionEqual(x.getObj(),y.getObj(),z.getObj()));
 	}
 	bool setToFalse()
@@ -422,8 +422,8 @@ struct ChkViewRel3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3>
 
 	void attach(INotifiable* f)
 	{ 	pOwner=f; x->attachOnDomain(f); y->attachOnDomain(f); z->attachOnDomain(f);}
-	void detach(INotifiable* f)
-	{	x->detachOnDomain(f); y->detachOnDomain(f); z->detachOnDomain(f);	}
+	void detach()
+	{	x->detachOnDomain(pOwner); y->detachOnDomain(pOwner); z->detachOnDomain(pOwner);	}
 
 	Rel3<UnionEqual,Expr1,Expr2,Expr3> getObj()  const
 	{ 	return Rel3<UnionEqual,Expr1,Expr2,Expr3>(x.getObj(),y.getObj(),z.getObj());	}
@@ -471,17 +471,17 @@ struct ChkViewRel1<Partition,Seq<Set<Elem> >,Expr1>
 	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(partition(x.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach(pOwner);
+		detach();
 		throw Exception::UndefinedFilter("not Partition(sets)");
 	}
 
 	void attach(INotifiable* f) { 	pOwner=f; x.attach(f); }
-	void detach(INotifiable* f) {	x.detach(f); }
+	void detach() {	x.detach(pOwner); }
 
 	Rel1<Disjoint,Expr1> getObj()  const
 	{ 	return Rel1<Disjoint,Expr1>(x.getObj());	}

@@ -49,8 +49,8 @@ struct Objective
 		}
 		void attach(INotifiable* p)
 		{	this->p = p; rOwner.b.attach(p); }
-		void detach(INotifiable* p)
-		{	rOwner.b.detach(p); }
+		void detach()
+		{	rOwner.b.detach(); }
 
 		INotifiable* p;
 		Objective& rOwner;

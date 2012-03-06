@@ -252,17 +252,24 @@ struct BndFilterView3<SumEqual,Set<int>,Arg1,
 	BndFilterView3(Store& store,const Arg1& xx,
 			  const EvalMap& evals,const Arg3& yy) :
 				  IFilter(store),x(store,xx),
-				  evals(evals),y(store,yy) {}
+				  evals(evals),y(store,yy),
+				  pOwner(NULL) {}
 
 	bool execute();
 	void attach(INotifiable* f)
-	{	x->attachOnDomain(f); y.attach(f);	}
-	void detach(INotifiable* f)
-	{	x->detachOnDomain(f); y.detach(f);	}
+	{
+		assert(pOwner==NULL or pOwner==f);
+		pOwner = f;
+		x->attachOnDomain(pOwner);
+		y.attach(pOwner);
+	}
+	void detach()
+	{	x->detachOnDomain(pOwner); y.detach();	}
 
 	DomView<Set<int>,Arg1>			x;
 	EvalMap						evals;
 	BndView<int,Arg3>				y;
+	INotifiable*				pOwner;
 };
 
 template<class Arg1,class EvalMap,class Arg3>

@@ -53,10 +53,10 @@ struct Cumulatives : IFilter
 		height.attach(f); capacity.attach(f);
 	}
 
-	void detach(INotifiable* f)
+	void detach()
 	{
-		start.detach(f); duration.detach(f); end.detach(f);
-		height.detach(f); capacity.detach(f);
+		start.detach(); duration.detach(); end.detach();
+		height.detach(); capacity.detach();
 	}
 
 	protected:

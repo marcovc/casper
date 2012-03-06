@@ -57,8 +57,8 @@ struct BndDistinctD1<int,Expr1,int,Expr2> : IFilter
 
 	void attach(INotifiable* s)
 	{	v1.attach(s); v2.attach(s);	}	// note: v1 must be also attached
-	void detach(INotifiable* s)
-	{	v1.detach(s); v2.detach(s);	}
+	void detach()
+	{	v1.detach(); v2.detach();	}
 
 	Expr2				vv2;
 	BndView<int,Expr1>	v1;
@@ -85,7 +85,7 @@ struct DomDistinctD1<int,Expr1,int,Expr2> : IFilter
  	}
 
 	void attach(INotifiable* s) {	p2.attach(s); }
-	void detach(INotifiable* s) {	p2.detach(s); }
+	void detach() {	p2.detach(); }
 
 	DomView<int,Expr1> p1;
 	ValView<int,Expr2> p2;
@@ -106,8 +106,8 @@ struct BndFilterView2<Distinct,int,Expr1,int,Expr2> : IFilter
 	{	return p1.execute() and p2.execute();	}
 	void attach(INotifiable* s)
 	{	p1.attach(s); p2.attach(s); }
-	void detach(INotifiable* s)
-	{	p1.detach(s); p2.detach(s);	}
+	void detach()
+	{	p1.detach(); p2.detach();	}
 
 	BndDistinctD1<int,Expr1,int,Expr2> p1;
 	BndDistinctD1<int,Expr2,int,Expr1> p2;
@@ -128,8 +128,8 @@ struct DomFilterView2<Distinct,int,Expr1,int,Expr2> : IFilter
 	{	return p1.execute() && p2.execute();	}
 	void attach(INotifiable* s)
 	{	p1.attach(s); p2.attach(s); }
-	void detach(INotifiable* s)
-	{	p1.detach(s); p2.detach(s);	}
+	void detach()
+	{	p1.detach(); p2.detach();	}
 
 	DomDistinctD1<int,Expr1,int,Expr2> p1;
 	DomDistinctD1<int,Expr2,int,Expr1> p2;
@@ -208,8 +208,8 @@ struct BndFilterView2<Greater,int,Expr1,int,Expr2> : IFilter
 //	{	return Bnd(p2.getObj() >= p1.getObj());	}
 	void attach(INotifiable* s)
 	{	/*if (!p1.ground() and !p2.ground())*/ {p1.attach(s); p2.attach(s);} }
-	void detach(INotifiable* s)
-	{	p1.detach(s); p2.detach(s);	}
+	void detach()
+	{	p1.detach(); p2.detach();	}
 
 	BndView<int,Expr1> p1;
 	BndView<int,Expr2> p2;

@@ -62,8 +62,8 @@ struct BndFilterView2<Distinct,double,Expr1,double,Expr2> : IFilter
 	{	return Bnd(p1.getObj() == p2.getObj());	}
 	void attach(INotifiable* s)
 	{	p1.attach(s); p2.attach(s); }
-	void detach(INotifiable* s)
-	{	p1.detach(s); p2.detach(s);	}
+	void detach()
+	{	p1.detach(); p2.detach();	}
 
 	BndView<double,Expr1> p1;
 	BndView<double,Expr2> p2;

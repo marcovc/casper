@@ -46,15 +46,12 @@ struct BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>
  	bool	execute();
 
 	void 	attach(INotifiable* pParent);
-	void 	detach(INotifiable* pParent);
+	void 	detach();
 	bool 	notify();
 	Cost 	cost() const {	return linearLo; }
 //	Filter  operator!() { return Bnd(array.getObj()[idx.getObj()]!=res.getObj()); }
 
   private:
-  	//typedef typename BndArrayView<int,ArrayView>::Elem ArrayElem;
-	template<class ArrayElem>
-	void 	detach(ArrayElem v);
 
 	Store&							store;
 	BndArrayView<Eval,ArrayView>	array;
@@ -91,23 +88,13 @@ attach(INotifiable* pParent)
 template<class Eval,class ArrayView,class IdxView,class ResView>
 void
 BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
-detach(INotifiable*)
+detach()
 {
 	on = false;
 /*	for (uint i = 0; i < array.size(); i++)
 		array[i].domain().detachOnBounds(this);
 	idx.domain().detachOnBounds(this);
 	res.detach(this);*/
-}
-
-
-template<class Eval,class ArrayView,class IdxView,class ResView>
-template<class ArrayElem>
-void
-BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::
-detach(ArrayElem v)
-{
-	//v.domain().detachOnBounds(this);
 }
 
 template<class Eval,class ArrayView,class IdxView,class ResView>
@@ -175,7 +162,7 @@ BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::execu
 	// if there is only one possible domain then detach and post equality
 	if (ivMin == ivMax)	// post equality
 	{
-		detach(pParent);
+		detach();
 		return store.post(rel<Equal>(array[ivMin].getObj(),res.getObj()));
   	}
 

@@ -24,7 +24,7 @@ struct SetFDCard1 : IFilter
 {
 	SetFDCard1(SetFD<T>& d) : 
 		IFilter(d.getStore()),
-		d(d) {}
+		d(d),pOwner(NULL) {}
 	
 	bool execute()
 	{	
@@ -32,15 +32,18 @@ struct SetFDCard1 : IFilter
 		return d.card().updateMin(d.inSize());	
 	}
 	
-	bool entailed() const
-	{	return d.card().ground();	}
-	
 	void attach(INotifiable* s) 
-	{	d.attachOnGLB(s);	}
-	void detach(INotifiable* s) 
-	{	d.detachOnGLB(s);	}
+	{
+		assert(pOwner==NULL or pOwner==s);
+		pOwner = s;
+		d.attachOnGLB(pOwner);
+	}
+	void detach()
+	{	d.detachOnGLB(pOwner);	}
 	
 	SetFD<T>& d;
+	INotifiable* pOwner;
+
 };
 
 // cardinal(2.2)
@@ -49,7 +52,7 @@ struct SetFDCard2 : IFilter
 {
 	SetFDCard2(SetFD<T>& d) : 
 		IFilter(d.getStore()),
-		d(d) {}
+		d(d),pOwner(NULL) {}
 	
 	bool execute()
 	{	
@@ -57,15 +60,17 @@ struct SetFDCard2 : IFilter
 		return d.card().updateMax(d.inSize()+d.possSize());	
 	}
 	
-	bool entailed() const
-	{	return d.ground() and d.card().ground();	}
-	
 	void attach(INotifiable* s) 
-	{	d.attachOnLUB(s);	}
-	void detach(INotifiable* s) 
-	{	d.detachOnLUB(s);	}
+	{
+		assert(pOwner==NULL or pOwner==s);
+		pOwner = s;
+		d.attachOnLUB(pOwner);
+	}
+	void detach()
+	{	d.detachOnLUB(pOwner);	}
 	
 	SetFD<T>& d;
+	INotifiable* pOwner;
 };
 
 // cardinal(3)
@@ -74,7 +79,7 @@ struct SetFDCard3 : IFilter
 {
 	SetFDCard3(SetFD<T>& d) : 
 		IFilter(d.getStore()),
-		d(d) {}
+		d(d),pOwner(NULL)  {}
 	
 	bool execute()
 	{	
@@ -90,21 +95,21 @@ struct SetFDCard3 : IFilter
 		return true;		
 	}
 	
-	bool entailed() const
-	{	return d.card().ground();	}
-	
 	void attach(INotifiable* s) 
 	{	
-		d.card().attachOnGround(s);
-		d.attachOnDomain(s);
+		assert(pOwner==NULL or pOwner==s);
+		pOwner = s;
+		d.card().attachOnGround(pOwner);
+		d.attachOnDomain(pOwner);
 	}
-	void detach(INotifiable* s) 
+	void detach()
 	{	
-		d.card().detachOnGround(s);	
-		d.detachOnDomain(s);
+		d.card().detachOnGround(pOwner);
+		d.detachOnDomain(pOwner);
 	}
 	
 	SetFD<T>& d;
+	INotifiable*	pOwner;
 };
 
 // SetFD constructors

@@ -45,7 +45,7 @@ struct IDomExpr<RangeDom<T> > : INotifier
 
 	// temporary -> the ArrayView mess depends on this.
 	void	attach(INotifiable*	n)	{	(*this)->attachOnBounds(n);	}
-	void	detach(INotifiable*	n)	{	(*this)->detachOnBounds(n);	}
+	void	detach()	{	(*this)->detachOnBounds();	}
 
 	bool notify() { assert(0); return true; }
 	/// Return CPSolver& object associated with the expression.

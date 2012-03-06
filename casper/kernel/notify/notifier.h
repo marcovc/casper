@@ -34,7 +34,7 @@ struct INotifier : INotifiable
 	/// Register notifiable.
 	virtual void attach(INotifiable*) = 0;
 	/// Unregister notifiable.
-	virtual void detach(INotifiable*) = 0;
+	virtual void detach() = 0;
 	virtual ~INotifier() {}
 };
 

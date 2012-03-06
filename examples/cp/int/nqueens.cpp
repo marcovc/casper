@@ -34,7 +34,7 @@ struct NoThreatX : IFilter
 {
 	// filter constructor, store parameters in local variables
 	NoThreatX(Solver& solver,IntVar	x, IntVar y, uint d) :
-	 	IFilter(solver),x(x),y(y),d(d)	  { }
+	 	IFilter(solver),x(x),y(y),d(d),pOwner(NULL)	  { }
 
 	// does propagation
 	bool execute()
@@ -55,15 +55,20 @@ struct NoThreatX : IFilter
 	// attach this filter to notifiable s and to the onGround event list
 	// of variable y, since it should run whenever y becomes ground
 	void attach(INotifiable* s)
-	{	y.domain().attachOnGround(s); }
+	{
+		assert(pOwner==NULL or pOwner==s);
+		pOwner = s;
+		y.domain().attachOnGround(pOwner);
+	}
 
 	// does the opposite of the attach method
-	void detach(INotifiable* s)
-	{	y.domain().detachOnGround(s);	}
+	void detach()
+	{	y.domain().detachOnGround(pOwner);	}
 
 	IntVar	x;
 	IntVar	y;
 	const uint	d;
+	INotifiable*	pOwner;
 };
 
 bool postNoThreat(Solver& solver,IntVar x, IntVar y, uint d)

@@ -59,7 +59,7 @@ struct NoBndView
 	void range(Eval& v1,Eval& v2) const {	throw 0; }
 	bool updateRange(const Eval& v1, const Eval& v2) {	throw 0;	}
 	void attach(INotifiable*) { throw 0; }
-	void detach(INotifiable*) { throw 0; }
+	void detach() { throw 0; }
 	Eval getObj()  const { throw 0; }
 };
 #else
@@ -102,7 +102,7 @@ struct NoBndView<bool,View>
 	bool updateRange(const bool& l, const bool& u)
 	{	return updateMin(l) and updateMax(u);	}
 	void attach(INotifiable* f) { v.attach(f);	}
-	void detach(INotifiable* f) { v.detach(f);	}
+	void detach() { v.detach();	}
 	View getObj()  const { return v.getObj(); }
 
 	CChkView<View>	v;
@@ -170,7 +170,7 @@ struct BndView<Eval,Eval>
 //	{	return v;	}
 //	Store& store() const {	return mSolver;	}
 	void attach(INotifiable*) {}
-	void detach(INotifiable*) {}
+	void detach() {}
 	Eval getObj()  const { return v; }
 
 	const Eval	v;
@@ -198,7 +198,7 @@ struct BndView<int,uint>
 	{	return v1<=static_cast<int>(v) and
 			   static_cast<int>(v)<=v2;	}
 	void attach(INotifiable*) {}
-	void detach(INotifiable*) {}
+	void detach() {}
 	uint getObj()  const { return v; }
 	const uint	v;
 };
@@ -276,7 +276,7 @@ struct BndView<Eval,BndExpr<Eval> >
 	{	return r.updateRange(v1,v2);	}
 //	Store& store() const	{	return r.store();	}
 	void attach(INotifiable* n) {	return r.attach(n);	}
-	void detach(INotifiable* n) {	return r.detach(n);	}
+	void detach() {	return r.detach();	}
 	BndExpr<Eval> 	getObj()  const { return r; }
 	BndExpr<Eval>	r;
 };
@@ -337,7 +337,7 @@ struct BndViewRel1<Cast<Eval>,View,Eval>
 							 Util::convUb<EvalFrom>(v2));	}
 
 	void attach(INotifiable* n) {	v.attach(n);	}
-	void detach(INotifiable* n) {	v.detach(n);	}
+	void detach() {	v.detach();	}
 	Rel1<Cast<Eval>,View> getObj()  const
 	{ return Rel1<Cast<Eval>,View>(v.getObj()); }
 
@@ -417,7 +417,7 @@ struct BndViewRel3<IfThenElse,Expr1,Expr2,Expr3,Eval>
 	{	return updateMin(v1) and updateMax(v2);	}
 
 	void attach(INotifiable* f) { 	pOwner=f;c1.attach(f); p2.attach(f);	p3.attach(f); }
-	void detach(INotifiable* f) {	c1.detach(f); p2.detach(f);	p3.detach(f); }
+	void detach() {	c1.detach(); p2.detach();	p3.detach(); }
 	Rel3<IfThenElse,Expr1,Expr2,Expr3> getObj()  const
 	{ 	return Rel3<IfThenElse,Expr1,Expr2,Expr3>(c1.getObj(),p2.getObj(),p3.getObj());	}
 
@@ -468,7 +468,7 @@ struct BndViewRel2<Min,Expr1,Expr2,Eval>
 	{	return updateMin(v1) and updateMax(v2);	}
 
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f); }
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f); }
+	void detach() {	p1.detach(); p2.detach(); }
 	Rel2<Min,Expr1,Expr2>	getObj() const
 	{	return 	Rel2<Min,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
 
@@ -515,7 +515,7 @@ struct BndViewRel2<Max,Expr1,Expr2,Eval>
 	{	return updateMin(v1) and updateMax(v2);	}
 
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f); }
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f); }
+	void detach() {	p1.detach(); p2.detach(); }
 	Rel2<Max,Expr1,Expr2>	getObj() const
 	{	return 	Rel2<Max,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
 
@@ -552,7 +552,7 @@ struct BndViewRel1<Sym,View,Eval>
 							  Util::convUb<ViewEval>(-v1));	}
 
 	void attach(INotifiable* f)	{	p1.attach(f); }
-	void detach(INotifiable* f) {	p1.detach(f); }
+	void detach() {	p1.detach(); }
 	Rel1<Sym,View> getObj()  const
 	{ 	return Rel1<Sym,View>(p1.getObj());	}
 
@@ -588,7 +588,7 @@ struct BndViewRel2<Add,Expr1,Expr2,Eval>
 	{ 	return p1.updateMax(Util::subUb<Eval>(v,p2.min())) and
 			   p2.updateMax(Util::subUb<Eval>(v,p1.min()));}
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
+	void detach()	{	p1.detach(); p2.detach();	}
 	Rel2<Add,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Add,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
 
@@ -626,7 +626,7 @@ struct BndViewRel2<Sub,Expr1,Expr2,Eval>
 							Util::subUb(p1.max(),lb));
 	}
 	void attach(INotifiable* f)	{ 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
+	void detach()	{	p1.detach(); p2.detach();	}
 
 #if 1
 	Rel2<Sub,Expr1,Expr2> getObj()  const
@@ -669,7 +669,7 @@ struct BndViewRel3<InRange,View,Eval,Eval,Eval>
 	{	return u >= lb and l <= ub and v.updateRange(std::max(lb,l),std::min(ub,u));	}
 
 	void attach(INotifiable* f) { 	v.attach(f);	}
-	void detach(INotifiable* f) {	v.detach(f);	}
+	void detach() {	v.detach();	}
 
 	Rel3<InRange,View,Eval,Eval> getObj()  const
 	{ 	return Rel3<InRange,View,Eval,Eval>(v.getObj(),lb,ub);	}
@@ -783,7 +783,7 @@ struct BndViewRel2<Mul,Expr1,Expr2,Eval>
 	bool updateRange(const Eval& min, const Eval& max);
 
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
+	void detach() {	p1.detach(); p2.detach();	}
 
 	Rel2<Mul,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Mul,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
@@ -1276,7 +1276,7 @@ struct BndViewRel2<Div,Expr1,Expr2,Eval>
 	bool updateRange(const Eval& min, const Eval& max);
 
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
+	void detach() {	p1.detach(); p2.detach();	}
 
 	Rel2<Div,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Div,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
@@ -1574,7 +1574,7 @@ struct BndViewRel2<Mod,Expr1,Expr2,Eval>
 	bool updateRange(const Eval& l, const Eval& u)
 	{	return updateMin(l) and updateMax(u);	}
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f); }
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f); }
+	void detach() {	p1.detach(); p2.detach(); }
 	Rel2<Mod,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Mod,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
 
@@ -1754,7 +1754,7 @@ struct BndViewRel1<Abs,Expr1,Eval>
 	}
 
 	void attach(INotifiable* f) { 	p1.attach(f); }
-	void detach(INotifiable* f) {	p1.detach(f); }
+	void detach() {	p1.detach(); }
 	Rel1<Abs,Expr1> getObj()  const
 	{ 	return Rel1<Abs,Expr1>(p1.getObj());	}
 
@@ -1807,7 +1807,7 @@ struct BndViewRel1<Sqr,Expr1,Eval>
 	{	return updateMin(l) and updateMax(u);	}
 
 	void attach(INotifiable* f) { 	p1.attach(f); }
-	void detach(INotifiable* f) {	p1.detach(f); }
+	void detach() {	p1.detach(); }
 	Rel1<Sqr,Expr1> getObj()  const
 	{ 	return Rel1<Sqr,Expr1>(p1.getObj());	}
 
@@ -1838,7 +1838,7 @@ struct BndViewRel1<Exp,Expr1,Eval>
 	{	return updateMin(l) and updateMax(u);	}
 
 	void attach(INotifiable* f) { 	p1.attach(f); }
-	void detach(INotifiable* f) {	p1.detach(f); }
+	void detach() {	p1.detach(); }
 	Rel1<Exp,Expr1> getObj()  const
 	{ 	return Rel1<Exp,Expr1>(p1.getObj());	}
 
@@ -1872,7 +1872,7 @@ struct BndViewRel1<Log,Expr1,Eval>
 	{	return updateMin(l) and updateMax(u);	}
 
 	void attach(INotifiable* f) { 	p1.attach(f); }
-	void detach(INotifiable* f) {	p1.detach(f); }
+	void detach() {	p1.detach(); }
 
 	Rel1<Log,Expr1> getObj()  const
 	{ 	return Rel1<Log,Expr1>(p1.getObj());	}
@@ -1899,7 +1899,7 @@ struct BndView<Eval,Ref<Eval> >
 	{	return l <= val and val <= u;	}
 
 	void attach(INotifiable* f) {}
-	void detach(INotifiable* f) 	{}
+	void detach() 	{}
 	Ref<Eval>	getObj() const
 	{	return Ref<Eval>(state,val);	}
 

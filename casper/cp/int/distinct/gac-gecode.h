@@ -869,7 +869,7 @@ struct DomFilterView1<Distinct,IntSeq,View> : IFilter
 	bool	execute();
 
 	void 	attach(INotifiable* pParent);
-	void 	detach(INotifiable* pParent);
+	void 	detach();
 	Cost 	cost() const {	return quadraticHi; }
 
 	private:
@@ -904,7 +904,7 @@ void DomFilterView1<Distinct,IntSeq,View>::attach(INotifiable* pParent)
 }
 
 template<class View>
-void DomFilterView1<Distinct,IntSeq,View>::detach(INotifiable* pParent)
+void DomFilterView1<Distinct,IntSeq,View>::detach()
 {
 	for (uint i = 0; i < doms.size(); i++)
 		doms[i]->detachOnDomain(pParent);

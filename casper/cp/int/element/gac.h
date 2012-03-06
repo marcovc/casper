@@ -55,7 +55,7 @@ struct WatchedLiteral : INotifier
 	}
 
 
-	void detach(INotifiable* pParent)
+	void detach()
 	{
 		//var.domain().detachOnDomain(this);
 		on = false;
@@ -463,7 +463,7 @@ struct DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView> : 
  	bool	execute();
 
 	void 	attach(INotifiable* f);
-	void 	detach(INotifiable* f);
+	void 	detach();
 	Cost 	cost() const {	return quadraticHi; }
 	Filter  operator!() { return Dom(array.getObj()[idx.getObj()]!=eval.getObj()); }
 
@@ -472,6 +472,7 @@ struct DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView> : 
 	DomArrayView<int,ArrayView>		array;
 	DomView<int,IdxView>			idx;
     DomView<int,EvalView>			eval;
+    INotifiable*	pOwner;
 };
 
 /*
@@ -493,6 +494,7 @@ template<class ArrayView,class IdxView,class EvalView>
 void DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>::
 attach(INotifiable* f)
 {
+	pOwner = f;
 	for (uint i = 0; i < array.size(); i++)
 		array[i]->attachOnDomain(f);
 	idx->attachOnDomain(f);
@@ -501,12 +503,12 @@ attach(INotifiable* f)
 
 template<class ArrayView,class IdxView,class EvalView>
 void DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>::
-detach(INotifiable* f)
+detach()
 {
 	for (uint i = 0; i < array.size(); i++)
-		array[i]->detachOnDomain(f);
-	idx->detachOnDomain(f);
-	eval->detachOnDomain(f);
+		array[i]->detachOnDomain(pOwner);
+	idx->detachOnDomain(pOwner);
+	eval->detachOnDomain(pOwner);
 }
 
 #ifdef CASPER_ELEMENT_IDX_1

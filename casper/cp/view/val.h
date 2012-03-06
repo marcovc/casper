@@ -44,7 +44,7 @@ struct NoValView
 	bool setValue(const Eval& val) {	throw 0;	}
 	bool ground() const {	throw 0;	}
 	void attach(INotifiable*) {	throw 0;	}
-	void detach(INotifiable*) {	throw 0;	}
+	void detach() {	throw 0;	}
 	Eval getObj()  const {	throw 0;	}
 };
 #else
@@ -75,7 +75,7 @@ struct NoValView<bool,View>
 	bool setValue(const bool& val) { return val?v.setToTrue():v.setToFalse();	}
 	bool ground() const { return v.isTrue() or !v.canBeTrue(); }
 	void attach(INotifiable* f) { v.attach(f); }
-	void detach(INotifiable* f) { v.detach(f); }
+	void detach() { v.detach(); }
 	View getObj()  const { return v.getObj(); }
 
 	CChkView<View>	v;
@@ -130,7 +130,7 @@ struct ValView<Eval,Eval>
 	bool setValue(const Eval& val) { return val == v;	}
 	bool ground() const { return true; }
 	void attach(INotifiable*) {}
-	void detach(INotifiable*) {}
+	void detach() {}
 	Eval getObj()  const { return v; }
 	const Eval	v;
 };
@@ -149,7 +149,7 @@ struct ValView<int,uint>
 	bool setValue(const int& val) { return val == static_cast<int>(v);	}
 	bool ground() const { return true; }
 	void attach(INotifiable*) {}
-	void detach(INotifiable*) {}
+	void detach() {}
 	uint getObj()  const { return v; }
 	const uint	v;
 };
@@ -251,7 +251,7 @@ struct ValViewRel1<Cast<Eval>,View,Eval>
 	{ return v.setValue(static_cast<EvalFrom>(val));	}
 	bool ground() const { return v.ground(); }
 	void attach(INotifiable* n) {	v.attach(n);	}
-	void detach(INotifiable* n) {	v.detach(n);	}
+	void detach() {	v.detach();	}
 	Rel1<Cast<Eval>,View> getObj()  const { return rel<Cast<Eval> >(v.getObj()); }
 	ValView<EvalFrom,View>	v;
 };
@@ -269,7 +269,7 @@ struct ValViewRel1<Sym,View,Eval>
 	bool setValue(const Eval& val) { return p1.setValue(-val);	}
 	bool ground() const { return p1.ground(); }
 	void attach(INotifiable* f) { 	p1.attach(f); 	}
-	void detach(INotifiable* f) {	p1.detach(f); }
+	void detach() {	p1.detach(); }
 	Rel1<Sym,View>	getObj() const {	return Rel1<Sym,View>(p1.getObj());}
 	ValView<Eval,View>	p1;
 };
@@ -287,7 +287,7 @@ struct ValViewRel1<Not,View,bool>
 	bool setValue(const bool& val) { return p1.setValue(!val);	}
 	bool ground() const { return p1.ground(); }
 	void attach(INotifiable* f) { 	p1.attach(f); 	}
-	void detach(INotifiable* f)	{	p1.detach(f);	}
+	void detach()	{	p1.detach();	}
 	Rel1<Not,View>	getObj() const {	return Rel1<Not,View>(p1.getObj());}
 	ValView<bool,View>	p1;
 };
@@ -321,7 +321,7 @@ struct ValViewRel2<And,Expr1,Expr2,bool>
 			   (p2.ground() and !p2.value());
 	}
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
+	void detach() {	p1.detach(); p2.detach();	}
 	Rel2<And,Expr1,Expr2>	getObj() const
 	{	return Rel2<And,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 	ValView<bool,Expr1>	p1;
@@ -356,7 +356,7 @@ struct ValViewRel2<Or,Expr1,Expr2,bool>
 	}
 
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
+	void detach()	{	p1.detach(); p2.detach();	}
 	Rel2<Or,Expr1,Expr2>	getObj() const
 	{	return Rel2<Or,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
@@ -384,7 +384,7 @@ struct ValViewRel2<XOr,Expr1,Expr2,bool>
 	}
 	bool ground() const { return p1.ground() and p2.ground(); }
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
+	void detach()	{	p1.detach(); p2.detach();	}
 	Rel2<XOr,Expr1,Expr2>	getObj() const
 	{	return Rel2<XOr,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
@@ -417,7 +417,7 @@ struct ValViewRel2<Add,Expr1,Expr2,Eval>
 	}
 	bool ground() const { return p1.ground() && p2.ground(); }
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
+	void detach()	{	p1.detach(); p2.detach();	}
 	Rel2<Add,Expr1,Expr2>	getObj() const
 	{	return Rel2<Add,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
@@ -448,7 +448,7 @@ struct ValViewRel2<Sub,Expr1,Expr2,Eval>
 	}
 	bool ground() const { return p1.ground() and p2.ground(); }
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);	}
+	void detach() {	p1.detach(); p2.detach();	}
 	Rel2<Sub,Expr1,Expr2>	getObj() const
 	{	return Rel2<Sub,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
@@ -479,7 +479,7 @@ struct ValViewRel2<Mul,Expr1,Expr2,Eval>
 		return true;
 	}
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
+	void detach()	{	p1.detach(); p2.detach();	}
 	Rel2<Mul,Expr1,Expr2>	getObj() const
 	{	return Rel2<Mul,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
@@ -502,7 +502,7 @@ struct ValView<Eval,BndExpr<Eval> >
 	{	return p1.updateRange(val,val);	}
 	bool ground() const { return p1.min()==p1.max(); }
 	void attach(INotifiable* f) { 	p1.attach(f); }
-	void detach(INotifiable* f) {	p1.detach(f); }
+	void detach() {	p1.detach(); }
 	BndExpr<Eval>	getObj() const {	return p1; }
 
 	BndExpr<Eval>	p1;
@@ -516,17 +516,24 @@ template<class Eval,class Dom>
 struct ValView<Eval,DomExpr<Eval,Dom> >
 {
 	ValView(Store& store,const DomExpr<Eval,Dom>& p1) :
-		p1(p1)	{}
+		p1(p1),pOwner(NULL)	{}
 	Eval value() const { assert(ground()); return p1->value(); }
 	bool setValue(const Eval& val)
 	{	return p1->setValue(val);	}
 
 	bool ground() const { return p1->ground(); }
-	void attach(INotifiable* f) { 	p1->attachOnGround(f); }
-	void detach(INotifiable* f) {	p1->detachOnGround(f); }
+	void attach(INotifiable* f)
+	{
+		assert(pOwner==NULL or pOwner==f);
+		pOwner = f;
+		p1->attachOnGround(pOwner);
+	}
+	void detach()
+	{	p1->detachOnGround(pOwner); }
 	DomExpr<Eval,Dom>	getObj() const {	return p1; }
 
 	DomExpr<Eval,Dom>	p1;
+	INotifiable*	pOwner;
 };
 
 /**
@@ -566,7 +573,7 @@ struct ValViewRel2<Element,Expr1,Expr2,Eval>
 				 array[index.value()].ground());
 	}
 	void attach(INotifiable* f) { 	array.attach(f);index.attach(f); }
-	void detach(INotifiable* f) {	array.detach(f);index.detach(f); }
+	void detach() {	array.detach();index.detach(); }
 	Rel2<Element,Expr1,Expr2>	getObj() const
 	{	return Rel2<Element,Expr1,Expr2>(array.getObj(),index.getObj());}
 
@@ -596,7 +603,7 @@ struct ValViewRel1<Abs,Expr1,Eval>
 	}
 	bool ground() const { return p1.ground(); }
 	void attach(INotifiable* f) { 	p1.attach(f); }
-	void detach(INotifiable* f) {	p1.detach(f); }
+	void detach() {	p1.detach(); }
 	Rel1<Abs,Expr1>	getObj() const
 	{	return Rel1<Abs,Expr1>(p1.getObj());}
 
@@ -618,7 +625,7 @@ struct ValView<Eval,Casper::Ref<Eval> >
 
 	bool ground() const { return true; }
 	void attach(INotifiable* f) {}
-	void detach(INotifiable* f) {}
+	void detach() {}
 	Casper::Ref<Eval>	getObj() const
 	{	return Casper::Ref<Eval>(state,val);	}
 
@@ -676,7 +683,7 @@ struct ValViewRel3<IfThenElse,Expr1,Expr2,Expr3,Eval>
 	}
 
 	void attach(INotifiable* f) { 	c1.attach(f); p2.attach(f);	p3.attach(f); }
-	void detach(INotifiable* f) {	c1.detach(f); p2.detach(f);	p3.detach(f); }
+	void detach() {	c1.detach(); p2.detach();	p3.detach(); }
 	Rel3<IfThenElse,Expr1,Expr2,Expr3> getObj()  const
 	{ 	return Rel3<IfThenElse,Expr1,Expr2,Expr3>(c1.getObj(),p2.getObj(),p3.getObj());	}
 
@@ -706,7 +713,7 @@ struct ValViewRel2<Mod,Expr1,Expr2,Eval>
 	}
 	bool ground() const { return p1.ground() && p2.ground(); }
 	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);	}
-	void detach(INotifiable* f)	{	p1.detach(f); p2.detach(f);	}
+	void detach()	{	p1.detach(); p2.detach();	}
 	Rel2<Mod,Expr1,Expr2>	getObj() const
 	{	return Rel2<Mod,Expr1,Expr2>(p1.getObj(),p2.getObj());}
 
@@ -742,7 +749,7 @@ struct ValViewRel3<InRange,View,Eval,Eval,Eval>
 	}
 
 	void attach(INotifiable* f) { 	v.attach(f);	}
-	void detach(INotifiable* f) {	v.detach(f);	}
+	void detach() {	v.detach();	}
 
 	Rel3<InRange,View,Eval,Eval> getObj()  const
 	{ 	return Rel3<InRange,View,Eval,Eval>(v.getObj(),lb,ub);	}

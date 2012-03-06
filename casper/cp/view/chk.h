@@ -46,7 +46,7 @@ struct NoChkView
 	{	throw 0;	}
 	R getObj() const { throw 0; }
 	void attach(INotifiable*)	{	throw 0;	}
-	void detach(INotifiable*)	{	throw 0;	}
+	void detach()	{	throw 0;	}
 };
 #else
 template<class R>
@@ -213,7 +213,7 @@ struct CChkView
 //	Store& store() const {	return v.store();	}
 
 	void attach(INotifiable* f) { 	v.attach(f);}
-	void detach(INotifiable* f) {	v.detach(f);}
+	void detach() {	v.detach();}
 
 	View getObj()  const
 	{ 	return v.getObj();	}
@@ -246,7 +246,7 @@ struct ChkView<bool>
 	//Store& store() const {	return mSolver;	}
 
 	void attach(INotifiable* f) { 	}
-	void detach(INotifiable* f) {	}
+	void detach() {	}
 
 	bool getObj()  const
 	{ 	return b;	}
@@ -271,7 +271,7 @@ struct ChkView<BndExpr<Eval> >
 //	Store& store() const {	return v.store();	}
 
 	void attach(INotifiable* f) { 	v.attach(f);}
-	void detach(INotifiable* f) {	v.detach(f);}
+	void detach() {	v.detach();}
 
 	BndExpr<Eval> getObj()  const
 	{ 	return v;	}
@@ -299,7 +299,7 @@ struct ChkView<Var<bool,Dom> >
 //	Store& store() const {	return v.store();	}
 
 	void attach(INotifiable* f) { 	v.attach(f);}
-	void detach(INotifiable* f) {	v.detach(f);}
+	void detach() {	v.detach();}
 
 	Var<bool,Dom> getObj()  const
 	{ 	return v.getObj();	}
@@ -327,7 +327,7 @@ struct ChkViewRel1<Not,bool,Expr1>
 //	Store& store() const {	return v.store();	}
 
 	void attach(INotifiable* f) { 	v.attach(f);}
-	void detach(INotifiable* f) {	v.detach(f);}
+	void detach() {	v.detach();}
 
 	Rel1<Not,Expr1> getObj()  const
 	{ 	return rel<Not>(v.getObj());	}
@@ -352,12 +352,12 @@ struct ChkViewRel2<And,bool,Expr1,bool,Expr2>
 	{	return p1.setToTrue() and p2.setToTrue();	}
 	bool setToFalse()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(rel<Or>(rel<Not>(p1.getObj()),rel<Not>(p2.getObj())));
 	}
 
 	void attach(INotifiable* f) { 	pOwner=f; p1.attach(f); p2.attach(f);}
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);}
+	void detach() {	p1.detach(); p2.detach();}
 
 	Rel2<And,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<And,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
@@ -383,19 +383,19 @@ struct ChkViewRel2<Or,bool,Expr1,bool,Expr2>
 	{	return p1.canBeTrue() or p2.canBeTrue();	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(rel<Or>(p1.getObj(),p2.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach(pOwner);
+		detach();
 		//return store().post(!p1.getObj() and !p2.getObj());
 		return p1.setToFalse() and p2.setToFalse();
 	}
 //	Store& store() const {	return p1.store();	}
 
 	void attach(INotifiable* f) { 	pOwner=f; p1.attach(f); p2.attach(f);}
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);}
+	void detach() {	p1.detach(); p2.detach();}
 
 	Rel2<Or,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Or,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
@@ -433,18 +433,18 @@ struct ChkViewRel2<Equal,Eval,Expr1,Eval,Expr2>
 	{	return p1.max()>=p2.min() and p1.min()<=p2.max();	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(rel<Equal>(p1.getObj(),p2.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(rel<Distinct>(p1.getObj(),p2.getObj()));
 	}
 //	Store& store() const {	return p1.store();	}
 
 	void attach(INotifiable* f) { 	pOwner=f; p1.attach(f); p2.attach(f);}
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);}
+	void detach() {	p1.detach(); p2.detach();}
 
 	Rel2<Equal,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Equal,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
@@ -486,18 +486,18 @@ struct ChkViewRel2<GreaterEqual,Eval,Expr1,Eval,Expr2>
 	{	return p1.max()>=p2.min();	}
 	bool setToTrue()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(rel<GreaterEqual>(p1.getObj(),p2.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach(pOwner);
+		detach();
 		return store.post(rel<Less>(p1.getObj(),p2.getObj()));
 	}
 //	Store& store() const {	return getState(p1,p2);	}
 
 	void attach(INotifiable* f) { 	pOwner=f; p1.attach(f); p2.attach(f);}
-	void detach(INotifiable* f) {	p1.detach(f); p2.detach(f);}
+	void detach() {	p1.detach(); p2.detach();}
 
 	Rel2<GreaterEqual,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<GreaterEqual,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
@@ -601,7 +601,7 @@ struct ChkViewRel1<Distinct,Seq<Eval>,Expr1>
 //	Store& store() const {	return getState(p1);	}
 
 	void attach(INotifiable* f) { 	}
-	void detach(INotifiable* f) {	}
+	void detach() {	}
 
 	Rel1<Distinct,Expr1> getObj()  const
 	{ 	return Rel1<Distinct,Expr1>(doms.getObj());	}
@@ -633,7 +633,7 @@ struct ChkViewRel2<InTable,Seq<Eval>,Expr1,Seq<Eval>,Expr2>
 //	Store& store() const {	return getState(p1);	}
 
 	void attach(INotifiable* f) { 	}
-	void detach(INotifiable* f) {	}
+	void detach() {	}
 
 	Rel2<InTable,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<InTable,Expr1,Expr2>(p1,p2);	}
@@ -666,7 +666,7 @@ struct ChkViewRel2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2>
 //	Store& store() const {	return getState(p1);	}
 
 	void attach(INotifiable* f) { 	}
-	void detach(INotifiable* f) {	}
+	void detach() {	}
 
 	Rel2<SumEqual,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<SumEqual,Expr1,Expr2>(p1);	}
@@ -688,12 +688,12 @@ struct BndView2ChkView
 	bool canBeTrue() const 	// can it still be true?
 	{	return v.max();	}
 	bool setToTrue()
-	{	v.detach(pOwner); return s.post(true==v.getObj());	}
+	{	v.detach(); return s.post(true==v.getObj());	}
 	bool setToFalse()
-	{	v.detach(pOwner); return s.post(false==v.getObj());	}
+	{	v.detach(); return s.post(false==v.getObj());	}
 
 	void attach(INotifiable* f) { 	pOwner=f; v.attach(f);}
-	void detach(INotifiable* f) {	v.detach(f); }
+	void detach() {	v.detach(); }
 
 	Rel getObj()  const
 	{ 	return v.getObj();	}
@@ -752,7 +752,7 @@ struct ChkViewRel1<Cast<bool>,int,Expr1>
 	}
 
 	void attach(INotifiable* f) { 	v.attach(f);}
-	void detach(INotifiable* f) {	v.detach(f);}
+	void detach() {	v.detach();}
 
 	Rel1<Cast<bool>,Expr1> getObj()  const
 	{ 	return rel<cast<bool>>(v.getObj());	}

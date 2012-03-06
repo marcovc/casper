@@ -96,7 +96,7 @@ struct GACSchema : IFilter
 	bool firstExecute();
 
 	void attach(INotifiable* s);
-	void detach(INotifiable* s) {}
+	void detach() {}
 	Cost cost() const {	return exponentialHi;}
 	void printSupports();
 	private:

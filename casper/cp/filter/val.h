@@ -259,7 +259,7 @@ struct ValFilterView2<And,Eval1,Expr1,Eval2,Expr2> : IFilter
 	{	return Val(!v1 or !v2); }
 */
 	void attach(INotifiable* s) {}
-	void detach(INotifiable* s) {}
+	void detach() {}
 
 	Store&				store;
 	Expr1	v1;

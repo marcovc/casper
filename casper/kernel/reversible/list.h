@@ -74,7 +74,7 @@ struct List
 	typedef size_t				Difference;
 	typedef size_t				Size;
 
-	State&							state;
+	State&						state;
 	RPNodeI						head;
 	RPNodeI						tail;
 

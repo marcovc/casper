@@ -269,7 +269,7 @@ struct DomFilterView2<And,Eval1,Expr1,Eval2,Expr2> : IFilter
 //	Filter operator!()
 //	{	return p1->operator!() or p2->operator!();	}
 	void attach(INotifiable* s) { p1->attach(s); p2->attach(s); }
-	void detach(INotifiable* s) { p1->detach(s); p2->detach(s); }
+	void detach() { p1->detach(); p2->detach(); }
 
 	Store&					store;
 	DomFilterView<Expr1>*	p1;
@@ -313,8 +313,8 @@ struct DomFilterView2<Or,Eval1,Expr1,Eval2,Expr2> : IFilter
 	{	return !(*p1) and !(*p2);	}
 */	void attach(INotifiable* s)
 	{	pOwner=s; p1.attach(s); p2.attach(s);	}
-	void detach(INotifiable* s)
-	{	p1.detach(s); p2.detach(s); }
+	void detach()
+	{	p1.detach(); p2.detach(); }
 
 	Store&				store;
 	BndView<bool,Expr1>	p1;

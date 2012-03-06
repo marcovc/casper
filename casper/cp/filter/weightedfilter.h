@@ -47,8 +47,8 @@ struct WeightedFilter : IFilter
 	{	return weight;	}
 	void attach(INotifiable* n)
 	{	f.attach(n);	}
-	void detach(INotifiable* n)
-	{	f.detach(n);	}
+	void detach()
+	{	f.detach();	}
 
 	Filter	f;
 	uint	weight;

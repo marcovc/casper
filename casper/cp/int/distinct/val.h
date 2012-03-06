@@ -147,7 +147,7 @@ struct ValFilterView1<Distinct,Seq<Eval>,View> : IFilter
 //	bool	entailed() const {	return false;	}			// FIXME
 	Cost 	cost() const {	return linearLo; }
 	void attach(INotifiable* pParent);
-	void detach(INotifiable* pParent);
+	void detach();
 
 	private:
 	struct VarDemon : INotifiable
@@ -187,7 +187,7 @@ void ValFilterView1<Distinct,Seq<Eval>,View>::attach(INotifiable* pParent)
 }
 
 template<class Eval,class View>
-void ValFilterView1<Distinct,Seq<Eval>,View>::detach(INotifiable* pParent)
+void ValFilterView1<Distinct,Seq<Eval>,View>::detach()
 {
 	this->pParent= NULL;
 	// TODO: kill demons

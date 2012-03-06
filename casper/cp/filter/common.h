@@ -68,13 +68,13 @@ struct IFilter : INotifier
 	/// Method that implements filtering.
 	virtual bool execute() = 0;
 
-	/** Sets the owner of the filter. Additionally this method should also
-		attach this filter to all relevant notifiers.	*/
+	/** Sets the owner of the filter. Additionally this method
+		attaches this filter to all relevant notifiers.	*/
 	virtual void attach(INotifiable* pOwner) = 0;
 
-	/** Unsets the owner of the filter. Additionally this method should also
-	 	remove this filter from all relevant notifiers. */
-	virtual void detach(INotifiable* pOwner) = 0;
+	/** Unsets the owner of the filter. Additionally this method
+	 	removed this filter from all relevant notifiers. */
+	virtual void detach() = 0;
 
 	/** Method called by notifiers to signal an update. The \p event parameter
 	 *  carries information on the type of update. Derived classes should
@@ -180,7 +180,7 @@ struct Filter : Util::PImplIdiom<IFilter>
 	bool execute() {	return Super::pImpl->execute(); }
 
 	void attach(INotifiable* pParent)	{	Super::pImpl->attach(pParent); }
-	void detach(INotifiable* pParent)	{	Super::pImpl->detach(pParent); }
+	void detach()	{	Super::pImpl->detach(); }
 
 //	CPSolver&	solver() const  {	return Super::pImpl->solver();	}
 	Cost 	cost() const 	{	return Super::pImpl->cost();	}
@@ -188,6 +188,7 @@ struct Filter : Util::PImplIdiom<IFilter>
 
 
 // FIXME: erase the following checker (minicasper depends on it)
+#if 0
 template<class>
 struct ChkView;
 
@@ -207,13 +208,14 @@ struct ChkView<Filter>
 //	CPSolver& solver() const {	return p1.solver();	}
 
 	void attach(INotifiable* f) { 	}
-	void detach(INotifiable* f) {	}
+	void detach() {	}
 
 	Filter getObj()  const
 	{ 	return p1;	}
 
 	Filter p1;
 };
+#endif
 
 };	// CP
 

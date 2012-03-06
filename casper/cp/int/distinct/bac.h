@@ -66,7 +66,7 @@ struct BndFilterView1<Distinct,IntSeq,View> : IFilter
 	bool	execute();
 	bool	entailed() const {	return false;	}	// FIXME
 	void 	attach(INotifiable* pParent);
-	void 	detach(INotifiable* pParent);
+	void 	detach();
 	Cost 	cost() const {	return linearHi; }
 
   private:
@@ -179,7 +179,7 @@ void BndFilterView1<Distinct,IntSeq,View>::attach(INotifiable* pParent)
 }
 
 template<class View>
-void BndFilterView1<Distinct,IntSeq,View>::detach(INotifiable* pParent)
+void BndFilterView1<Distinct,IntSeq,View>::detach()
 {
 	//this->pParent= NULL;
 //	TODO: kill demons

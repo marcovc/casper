@@ -45,7 +45,7 @@ struct ChkView2BndFilter : IFilter
 	ChkView2BndFilter(Store& s,const Rel& rel) : IFilter(s),chk(s,rel) {}
 	bool execute() {	return chk.setToTrue();	}
 	void attach(INotifiable* f) {	chk.attach(f);	}
-	void detach(INotifiable* f) {	chk.detach(f);	}
+	void detach() {	chk.detach();	}
 	ChkView<Rel> chk;
 };
 
@@ -356,7 +356,7 @@ struct BndFilterView2<And,bool,Expr1,bool,Expr2> : IFilter
 	{	return postBndFilter(store,p1) and postBndFilter(store,p2);	}
 
 	void attach(INotifiable*) {}
-	void detach(INotifiable*) {}
+	void detach() {}
 
 	Store&	store;
 	Expr1	p1;
@@ -384,7 +384,7 @@ struct BndFilterView1<And,Seq<bool>,Expr1> : IFilter
 	}
 
 	void attach(INotifiable*) {}
-	void detach(INotifiable*) {}
+	void detach() {}
 
 	Store&						store;
 	BndArrayView<bool,Expr1>	p1;
@@ -413,8 +413,8 @@ struct BndFilterView2<Or,bool,Expr1,bool,Expr2> : IFilter
 	}
 	void attach(INotifiable* s)
 	{	c1.attach(s); c2.attach(s);}
-	void detach(INotifiable* s)
-	{	c1.detach(s); c2.detach(s);}
+	void detach()
+	{	c1.detach(); c2.detach();}
 
 	CChkView<Expr1>	c1;
 	CChkView<Expr2>	c2;
@@ -466,8 +466,8 @@ struct BndFilterView2<Equal,Eval,Expr1,Eval,Expr2> : IFilter
 			   p2.updateMin(p1.min()) and p2.updateMax(p1.max());}
 	void attach(INotifiable* s)
 	{	/*if (!p1.ground() and !p2.ground())*/ {p1.attach(s); p2.attach(s);}	}
-	void detach(INotifiable* s)
-	{	p1.detach(s); p2.detach(s);	}
+	void detach()
+	{	p1.detach(); p2.detach();	}
 
 	BndView<Eval,Expr1>	p1;
 	BndView<Eval,Expr2>	p2;
@@ -487,8 +487,8 @@ struct BndFilterView2<GreaterEqual,Eval,Expr1,Eval,Expr2> : IFilter
 	{	return p1.updateMin(p2.min()) && p2.updateMax(p1.max());	}
 	void attach(INotifiable* s)
 	{	/*if (!p1.ground() and !p2.ground())*/ { p1.attach(s); p2.attach(s);} }
-	void detach(INotifiable* s)
-	{	p1.detach(s); p2.detach(s);	}
+	void detach()
+	{	p1.detach(); p2.detach();	}
 
 	BndView<Eval,Expr1> p1;
 	BndView<Eval,Expr2> p2;
@@ -523,8 +523,8 @@ struct BndFilterView2<Greater,Eval,Expr1,Eval,Expr2> : IFilter
 	}
 	void attach(INotifiable* s)
 	{	/*if (!p1.ground() and !p2.ground())*/ {p1.attach(s); p2.attach(s);} }
-	void detach(INotifiable* s)
-	{	p1.detach(s); p2.detach(s);	}
+	void detach()
+	{	p1.detach(); p2.detach();	}
 
 	BndView<Eval,Expr1> p1;
 	BndView<Eval,Expr2> p2;
@@ -601,8 +601,8 @@ struct BndFilterView3<SumProductEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3
 	Cost cost() const {	return linearLo; }
 	void attach(INotifiable* s)
 	{	x.attach(s); v.attach(s);	}
-	void detach(INotifiable* s)
-	{	x.detach(s); v.detach(s);	}
+	void detach()
+	{	x.detach(); v.detach();	}
 
 	ValArrayView<Eval,Expr1> c;
 	BndArrayView<Eval,Expr2> x;
@@ -756,10 +756,10 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 		x.attach(s);
 		v.attach(s);
 	}
-	void detach(INotifiable* s)
+	void detach()
 	{
-		x.detach(s);
-		v.detach(s);
+		x.detach();
+		v.detach();
 	}
 
 	Store&					 store;
@@ -950,8 +950,8 @@ struct BndFilterView<Filter> : IFilter
 
 	void attach(INotifiable* s)
 	{	pFilter->attach(s); }
-	void detach(INotifiable* s)
-	{	pFilter->detach(s); }
+	void detach()
+	{	pFilter->detach(); }
 	IFilter*	pFilter;
 };
 
@@ -967,8 +967,8 @@ struct BndFilterView<BndExpr<bool> > : IFilter
 
 	void attach(INotifiable* s)
 	{	rExpr.attach(s); }
-	void detach(INotifiable* s)
-	{	rExpr.detach(s); }
+	void detach()
+	{	rExpr.detach(); }
 	Detail::IBndExpr<bool>&	rExpr;
 };
 
@@ -1482,7 +1482,7 @@ struct BndViewRel1<FastCache,View,Eval>
 		cachedMin = std::max((Eval)cachedMin,v.min());
 		cachedMax = std::min((Eval)cachedMax,v.max());
 	}
-	void detach(INotifiable* f) {	v.detach(f);	}
+	void detach() {	v.detach();	}
 
 	View getObj()  const
 	{ 	return v.getObj();	}
@@ -1515,7 +1515,7 @@ struct BndViewRel1<Cache,View,Eval>
 		{	return rOwner.v.updateRange(rOwner.cachedMin,rOwner.cachedMax) and rOwner.pParent->notify();	}
 		Cost cost() const { return constantLo;}
 		void attach(INotifiable* f) { rOwner.v.attach(f); }
-		void detach(INotifiable* f) { rOwner.v.detach(f); }
+		void detach() { rOwner.v.detach(); }
 		Store&	store;
 		BndViewRel1& rOwner;
 	};
@@ -1582,7 +1582,7 @@ struct BndViewRel1<Cache,View,Eval>
 		cachedMin = std::max((Eval)cachedMin,v.min());
 		cachedMax = std::min((Eval)cachedMax,v.max());
 	}
-	void detach(INotifiable* f) {	v.detach(f);	}
+	void detach() {	v.detach();	}
 
 	View getObj()  const
 	{ 	return v.getObj();	}

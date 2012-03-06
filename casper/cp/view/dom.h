@@ -42,7 +42,8 @@ struct DomView
 	DomView(Store& store, const View& v) :
 		d(store,
 			(Eval)BndView<Eval,View>(store,v).min(),
-			(Eval)BndView<Eval,View>(store,v).max())
+			(Eval)BndView<Eval,View>(store,v).max()),
+		pOwner(NULL)
 	{
 		store.getStats().signalNewIntDomain();	// FIXME
 		store.post( v == Var<Eval,Dom>(store,&d) );
@@ -54,13 +55,19 @@ struct DomView
 	Dom&	operator*()				{	return d;	}
 	Dom&	operator*() const	{	return const_cast<Dom&>(d);	}
 
-	void attach(INotifiable* f)	{ 	d.attachOnDomain(f); }
-	void detach(INotifiable* f)	{	d.detachOnDomain(f); }
+	void attach(INotifiable* f)
+	{
+		assert(pOwner==NULL or pOwner==f);
+		pOwner = f;
+		d.attachOnDomain(pOwner);
+	}
+	void detach()	{	d.detachOnDomain(pOwner); }
 
 //	View getObj() const
 //	{	return Var<Eval,DomT>(this->solver(),&d);}
 
 	Dom	d;
+	INotifiable* pOwner;
 };
 
 /**
@@ -73,12 +80,18 @@ struct DomView<Eval,Var<Eval,DomT>,DomT>
 	typedef	DomT		Dom;
 	DomView(Store& store, const Var<Eval,Dom>& v) :
 		store(store),
-		d(v.domain())
+		d(v.domain()),
+		pOwner(NULL)
 		{}
 	DomView(Store& store, Dom& d) : store(store),d(d) {}
 
-	void attach(INotifiable* f)	{ 	d.attachOnDomain(f); }
-	void detach(INotifiable* f)	{	d.detachOnDomain(f); }
+	void attach(INotifiable* f)
+	{
+		assert(pOwner==f or pOwner==NULL);
+		pOwner = f;
+		d.attachOnDomain(pOwner);
+	}
+	void detach()	{	d.detachOnDomain(pOwner); }
 
 //	CPSolver&	solver() const			{	return d.solver();	}
 	Dom*	operator->()			{	return &d;	}
@@ -90,6 +103,7 @@ struct DomView<Eval,Var<Eval,DomT>,DomT>
 
 	Store& store;
 	Dom&	d;
+	INotifiable* pOwner;
 };
 
 /*
@@ -102,11 +116,17 @@ struct DomView<Eval,DomExpr<Eval,DomT>,DomT>
 	typedef	DomT		Dom;
 	DomView(Store& store, const DomExpr<Eval,Dom>& v) :
 		store(store),
-		d(*v)
+		d(*v),
+		pOwner(NULL)
 		{}
 	DomView(Store& store, Dom& d) : store(store),d(d) {}
-	void attach(INotifiable* f)	{ 	d.attachOnDomain(f); }
-	void detach(INotifiable* f)	{	d.detachOnDomain(f); }
+	void attach(INotifiable* f)
+	{
+		assert(pOwner==NULL or pOwner==f);
+		pOwner = f;
+		d.attachOnDomain(pOwner);
+	}
+	void detach()	{	d.detachOnDomain(pOwner); }
 
 //	CPSolver&	solver() const			{	return d.solver();	}
 	Dom*	operator->()			{	return &d;	}
@@ -117,6 +137,7 @@ struct DomView<Eval,DomExpr<Eval,DomT>,DomT>
 	{	return DomExpr<Eval,DomT>(store,&d);}
 	Store&	store;
 	Dom&	d;
+	INotifiable* pOwner;
 };
 
 namespace Traits {

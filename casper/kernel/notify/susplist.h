@@ -32,7 +32,7 @@ namespace Casper {
 // event-based suspention list
 // always sends the same event to all attached notifiables
 
-struct EventSuspList : INotifier
+struct EventSuspList //: INotifier
 {
 	typedef INotifier	Super;
 	//typedef List<INotifiable*>	Util::StdSList;

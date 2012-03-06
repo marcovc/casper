@@ -63,8 +63,8 @@ struct BndFilterView5<Cumulative,Seq<X>,Start,Seq<X>,Duration,
 	void attach(INotifiable* f)
 	{	start.attach(f); duration.attach(f); end.attach(f); height.attach(f); }
 
-	void detach(INotifiable* f)
-	{	start.detach(f); duration.detach(f); end.detach(f); height.detach(f); }
+	void detach()
+	{	start.detach(); duration.detach(); end.detach(); height.detach(); }
 
 	protected:
 	static const X inf;
