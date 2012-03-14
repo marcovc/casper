@@ -36,14 +36,18 @@ struct EventSuspList //: INotifier
 {
 	typedef INotifier	Super;
 	//typedef List<INotifiable*>	Util::StdSList;
-	typedef SList<INotifiable*>	SL;
+	typedef List<INotifiable*>	SL;
+	typedef typename SL::Iterator AttachLink;
 	SL	l;
+
 	EventSuspList(State& state) : l(state)
 								   {}
-	void attach(INotifiable* f)
-	{	/*l.pushBack(f);*/ l.pushFront(f);	}
+	AttachLink attach(INotifiable* f)
+	{	/*l.pushBack(f);*/ return l.pushFront(f);	}
 	void detach(INotifiable* f)
 	{	l.erase(f); 	}
+	void detach(const AttachLink& link)
+	{	l.erase(link); 	}
 
 	uint getNbFilters() const;
 	uint getNbWeightedFilters() const;

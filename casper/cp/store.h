@@ -25,6 +25,8 @@
 #include <casper/kernel/notify/notifiable.h>
 #include <casper/kernel/rel/rel.h>
 
+#include <casper/util/container/stdhashmap.h>
+
 namespace Casper {
 
 #if defined(SWIG_BUILD)
@@ -39,6 +41,8 @@ namespace CP {
  */
 struct StoreStats
 {
+	Env&	env;
+
 	counter countFPComputations;
 	counter countPropagations;
 	counter countFilters;
@@ -53,7 +57,32 @@ struct StoreStats
 	counter	countSetDomainUpdates;
 	counter	countRangeDomainUpdates;
 
-	StoreStats() :
+	#ifdef CASPER_EXTRA_STATS
+	counter countEffectivePropagations;
+	#endif
+
+	#if defined(CASPER_EXTRA_STATS) and defined(CASPER_LOG)
+	const void* lastExecFilterId;
+	std::string lastExecFilterName;
+	const void* lastExecFilterIdAux;
+	Util::StdHashMap<const void*,std::string> filterName;
+	Util::StdHashMap<const void*,uint> filterProps;
+	Util::StdHashMap<const void*,uint> filterEffProps;
+	struct IndividualPropCounts : Util::Logger::Callback
+	{
+		IndividualPropCounts(StoreStats& rOwner) : rOwner(rOwner) {}
+		void operator()(const Util::Logger::Event& ev)
+		{
+			rOwner.lastExecFilterId = ev.pObj;
+			rOwner.lastExecFilterName = ev.strObj;
+		}
+		StoreStats& rOwner;
+	};
+	IndividualPropCounts individualPropCounts;
+	#endif
+
+	StoreStats(Env& env) :
+				env(env),
 				countFPComputations(0),
 				countPropagations(0),
 				countFilters(0),
@@ -64,10 +93,37 @@ struct StoreStats
 				countBoolDomainUpdates(0),
 				countIntDomainUpdates(0),
 				countSetDomainUpdates(0),
-				countRangeDomainUpdates(0){}
+				countRangeDomainUpdates(0)
+				#ifdef CASPER_EXTRA_STATS
+				,countEffectivePropagations(0)
+				,individualPropCounts(*this)
+				#endif
+	{
+		#if defined(CASPER_EXTRA_STATS) and defined(CASPER_LOG)
+		env.getLogger().registerCallback(Util::Logger::TagMatcher(Util::Logger::filterExecuteBegin), individualPropCounts);
+		filterName[NULL] = "unknown";
+		filterProps[NULL] = 0;
+		filterEffProps[NULL] = 0;
+		#endif
+	}
 
 	void signalPropagation()
-	{ ++countPropagations; }
+	{
+		++countPropagations;
+		#if defined(CASPER_EXTRA_STATS) and defined(CASPER_LOG)
+		auto mit = filterProps.find(lastExecFilterId);
+		if (mit == filterProps.end())
+		{
+			filterProps[lastExecFilterId] = 1;
+			filterEffProps[lastExecFilterId] = 0;
+			filterName[lastExecFilterId] = lastExecFilterName;
+		}
+		else
+			++mit->second;
+		lastExecFilterIdAux = lastExecFilterId;
+		lastExecFilterId = NULL;
+		#endif
+	}
 
 	void signalNewFilter()
 	{ ++countFilters; }
@@ -101,8 +157,23 @@ struct StoreStats
 
 	counter getNbBoolDomainUpdates() const {	return countBoolDomainUpdates;	}
 	counter getNbIntDomainUpdates() const {	return countIntDomainUpdates;	}
-	counter getNSetDomainUpdates() const {	return countSetDomainUpdates;	}
+	counter getNbSetDomainUpdates() const {	return countSetDomainUpdates;	}
 	counter getNbRangeDomainUpdates() const {	return countRangeDomainUpdates;	}
+	counter getNbDomainUpdates() const {	return countBoolDomainUpdates+countIntDomainUpdates+
+													countSetDomainUpdates+countRangeDomainUpdates; }
+
+#ifdef CASPER_EXTRA_STATS
+	void signalEffectivePropagation()
+	{
+		++countEffectivePropagations;
+		#if defined(CASPER_LOG)
+		++filterEffProps[lastExecFilterIdAux];
+		lastExecFilterIdAux = NULL;
+		#endif
+	}
+	counter	getNbEffectivePropagations()	const
+	{	return countEffectivePropagations;	}
+#endif
 
 };
 

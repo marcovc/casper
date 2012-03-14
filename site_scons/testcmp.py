@@ -24,7 +24,7 @@ def compare(file1,file2):
   countPositive = 0
   countFaster = 0
   for i in secs1.keys():
-    if  float(secs1[i])>0 and float(secs2[i])>0:
+    if i in secs2.keys() and float(secs1[i])>0 and float(secs2[i])>0:
       countPositive+=1
       tgavg *= float(secs2[i])/float(secs1[i])
       if float(secs2[i])<float(secs1[i]):
@@ -38,7 +38,7 @@ def compare(file1,file2):
   mgavg=1.0
   c = 0.0
   for i in kbs1.keys():
-    if float(kbs1[i])>0:
+    if i in kbs2.keys() and float(kbs1[i])>0:
         c+=1
         mgavg *= float(kbs2[i])/float(kbs1[i])
   if c > 0:

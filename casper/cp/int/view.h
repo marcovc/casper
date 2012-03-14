@@ -31,7 +31,7 @@ template<class S,class E,class T,class Eval>
 struct BndView<Eval,Var<Eval,FD<S,E,T> > >
 {
 	BndView(Store& store, const Var<Eval,FD<S,E,T> >& v) :
-		store(store),d(v.domain()),pOwner(NULL) {}
+		store(store),d(v.domain()) {}
 	Eval min() const { return d.min(); }
 	Eval max() const { return d.max(); }
 	bool updateMin(const Eval& val)
@@ -44,13 +44,9 @@ struct BndView<Eval,Var<Eval,FD<S,E,T> > >
 	{ lb = d.min(); ub = d.max();	}
 
 	void attach(INotifiable* f)
-	{
-		assert(pOwner==f or pOwner==NULL);
-		pOwner = f;
-		d.attachOnBounds(pOwner);
-	}
+	{	attachLink = d.attachOnBounds(f);	}
 	void detach()
-	{	d.detachOnBounds(pOwner); }
+	{	d.detachOnBounds(attachLink); }
 
 	// temp
 	typedef Var<Eval,FD<S,E,T> > Viewed;
@@ -59,14 +55,14 @@ struct BndView<Eval,Var<Eval,FD<S,E,T> > >
 
 	Store&			store;
 	FD<S,E,T>&		d;
-	INotifiable*	pOwner;
+	typename FD<S,E,T>::AttachLink	attachLink;
 };
 
 template<class Eval,class S,class E,class T>
 struct ValView<Eval,Var<Eval,FD<S,E,T> > >
 {
 	ValView(Store& store, const Var<Eval,FD<S,E,T> >& v) :
-		store(store),d(v.domain()),pOwner(NULL) {}
+		store(store),d(v.domain()) {}
 
 	Eval value() const { return d.min(); }
 	bool setValue(const Eval& val)
@@ -75,20 +71,16 @@ struct ValView<Eval,Var<Eval,FD<S,E,T> > >
 	bool ground() const { return d.singleton(); }
 
 	void attach(INotifiable* f)
-	{
-		assert(pOwner==f or pOwner==NULL);
-		pOwner = f;
-		d.attachOnGround(pOwner);
-	}
+	{	attachLink = d.attachOnGround(f);	}
 	void detach()
-	{	d.detachOnGround(pOwner); }
+	{	d.detachOnGround(attachLink); }
 
 	Var<Eval,FD<S,E,T> > getObj()  const
 	{ return Var<Eval,FD<S,E,T> >(store,&d); }
 
 	Store&	store;
 	FD<S,E,T>&	d;
-	INotifiable*	pOwner;
+	typename FD<S,E,T>::AttachLink	attachLink;
 };
 
 

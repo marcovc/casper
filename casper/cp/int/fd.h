@@ -147,40 +147,62 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		typedef 	ReverseIterator ConstReverseIterator;
 		/// Type of underlying container implementing this \p FD
 		typedef		Super	ImplContainer;
+		/// Used for efficient detaching of notifiables from this domain
+		typedef 	typename EventSuspList::AttachLink	AttachLink;
 
 		/// Creates a FD with a copy of the range [\a first ,\a last ).
 		template <class InputIterator>
 				FD(Store& store, InputIterator first, InputIterator last) :
 					Super(store,first, last),
 					_min(store,*first),_max(store,*--last),
-					groundSL(store),boundsSL(store),domainSL(store) {}
+					groundSL(store),boundsSL(store),domainSL(store)
+					#ifdef CASPER_EXTRA_STATS
+					,store(store)
+					#endif
+					{}
 
 		/// Creates a FD with a copy of the list of ranges \a l.
 				FD(Store& store, const Util::StdList<Util::StdRange<Value> >& l) :
 							Super(Detail::rangeStruct(this,store,l)),
 							_min(store,*Super::begin()),
 							_max(store,*--Super::end()),
-							groundSL(store),boundsSL(store),domainSL(store) {}
+							groundSL(store),boundsSL(store),domainSL(store)
+							#ifdef CASPER_EXTRA_STATS
+							,store(store)
+							#endif
+							{}
 
 		/// Creates a new FD containing element \a e
 				FD(Store& store, const Value& e) :
 					Super(store,Util::SCIterator<Value>(e), ++Util::SCIterator<Value>(e)),
 					_min(store,e),_max(store,e),
-					groundSL(store),boundsSL(store),domainSL(store) {}
+					groundSL(store),boundsSL(store),domainSL(store)
+					#ifdef CASPER_EXTRA_STATS
+					,store(store)
+					#endif
+					{}
 
 		/** Creates a new FD containing all elements in the interval
 			[\a first ,\a last ]. */
 				FD(Store& store, Value first, Value last) :
 					Super(store,Util::SCIterator<Value>(first),++Util::SCIterator<Value>(last)),
 					_min(store,first),_max(store,last),
-					groundSL(store),boundsSL(store),domainSL(store) {}
+					groundSL(store),boundsSL(store),domainSL(store)
+					#ifdef CASPER_EXTRA_STATS
+					,store(store)
+					#endif
+					{}
 
 		///	Copy constructor
 				FD(const FD& s) :
 					Super(s),
 					_min(s._min),_max(s._max),
 					groundSL(s.groundSL),boundsSL(s.boundsSL),
-					domainSL(s.domainSL) {}// CASPER_UNTESTED("FD copy ctor");  }
+					domainSL(s.domainSL)
+					#ifdef CASPER_EXTRA_STATS
+					,store(s.store)
+					#endif
+					{}
 
 
 		/** \brief Generic copy constructor. Creates a copy of the \p FD
@@ -193,7 +215,10 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 				_min(s._min),_max(s._max),
 					groundSL(s.groundSL),boundsSL(s.boundsSL),
 					domainSL(s.domainSL)
-		{	CASPER_UNTESTED("FD copy ctor"); copyC(*this,s);	}
+					#ifdef CASPER_EXTRA_STATS
+					,store(s.store)
+					#endif
+					{	copyC(*this,s);	}
 
 		/// The destructor.
 	 			~FD()	{}
@@ -293,16 +318,25 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		friend struct Detail::PrintFD<Self>;
 #endif
 		/// Registers notifiable \a f on groundness event
-		void attachOnGround(INotifiable*	f) { groundSL.attach(f); }
+		AttachLink attachOnGround(INotifiable*	f) { return groundSL.attach(f); }
 
 		/// Registers notifiable \a f on bound update event
-		void attachOnBounds(INotifiable*	f) { boundsSL.attach(f); }
+		AttachLink attachOnBounds(INotifiable*	f) { return boundsSL.attach(f); }
 
 		/// Registers notifiable \a f on domain update event
-		void attachOnDomain(INotifiable*	f) { domainSL.attach(f); }
+		AttachLink attachOnDomain(INotifiable*	f) { return domainSL.attach(f); }
+
+		/// Cancels groundness event link
+		void detachOnGround(const AttachLink& l) { groundSL.detach(l); }
+
+		/// Cancels bound update event link
+		void detachOnBounds(const AttachLink& l) { boundsSL.detach(l); }
+
+		/// Cancels domain update event link
+		void detachOnDomain(const AttachLink& l) { domainSL.detach(l); }
 
 		/// Unregisters notifiable \a f from groundness event
-		void detachOnGround(INotifiable*	f) { groundSL.detach(f); }
+		void detachOnGround(INotifiable* 	f) { groundSL.detach(f); }
 
 		/// Unregisters notifiable \a f from bound update event
 		void detachOnBounds(INotifiable*	f) { boundsSL.detach(f); }
@@ -337,6 +371,11 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		EventSuspList			groundSL;
 		EventSuspList			boundsSL;
 		EventSuspList			domainSL;
+
+#ifdef CASPER_EXTRA_STATS
+		Store& store;
+#endif
+
 };
 
 template<class Container,class Element,class T>
@@ -628,7 +667,10 @@ inline bool FD<Container,Element,T>::triggerAfterErase()
 {
 	assert(!empty());
 
-	//solver().signalDomainUpdate();
+	#ifdef CASPER_EXTRA_STATS
+	store.getStats().signalIntDomainUpdate();
+	#endif
+
 	if (singleton())
 		if (!groundSL.notifyAll() or empty())
 			return false;

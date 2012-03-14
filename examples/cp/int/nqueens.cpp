@@ -39,9 +39,6 @@ struct NoThreatX : IFilter
 	// does propagation
 	bool execute()
 	{
-		// if x is empty than this method should never been called
-		assert(!x.domain().empty());
-
 		// y must be ground
 		if (!y.domain().singleton())
 			return true;
@@ -78,7 +75,7 @@ bool postNoThreat(Solver& solver,IntVar x, IntVar y, uint d)
 
 // Try to place n queens on a nXn chessboard, such that no two queens attack
 // each other
-void queens(int n, const Util::ExampleOptions& opt)
+void queens1(int n, const Util::ExampleOptions& opt)
 {
 	// create CPSolver object
     Solver solver;
@@ -111,13 +108,54 @@ void queens(int n, const Util::ExampleOptions& opt)
     	cout << solver.getCPUTimer() << endl;
 }
 
+// Try to place n queens on a nXn chessboard, such that no two queens attack
+// each other (alldiff model)
+void queens2(int n, const Util::ExampleOptions& opt)
+{
+	// create CPSolver object
+    Solver solver;
+
+	// declare an array of n variables, each from 0 to n-1
+    IntVarArray	vars(solver,n,0,n-1);
+
+	// post the new noThreat constraint in each pair of queens
+    IntRef i(solver);
+	solver.post(distinct(vars),postDomFilter);
+	solver.post(distinct(all(i,range(0,n-1),true,vars[i]+i)),postDomFilter);
+	solver.post(distinct(all(i,range(0,n-1),true,vars[i]-i)),postDomFilter);
+
+	// search
+	uint nbSols = 0;
+	bool found = solver.solve(label(solver,vars,selectVarMinDom(solver,vars)));
+	while (found)
+	{
+		// print results
+		cout << vars << endl;
+
+		if (++nbSols == opt.nbSolutions())
+			break;
+
+		found = solver.next();
+	}
+
+    if (opt.showStats())
+    	cout << solver.getStats() << endl;
+    if (opt.showRuntime())
+    	cout << solver.getCPUTimer() << endl;
+}
+
 int main(int argc, char** argv)
 {
 	int n = 4;
+	int m = 0;
 	Util::ExampleOptions opt("N-Queens");
 	opt.addPosParam("n",&n,"number of queens");
+	opt.addPosParam("m",&m,"model to use (0 or 1)");
 	if (!opt.parse(argc,argv))
 		return 1;
- 	queens(n,opt);
+ 	if (m==0)
+ 		queens1(n,opt);
+ 	else
+ 		queens2(n,opt);
 	return 0;
 }

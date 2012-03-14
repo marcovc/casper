@@ -102,6 +102,7 @@ struct PostBndFilter2
 	static bool post(Store& s,const Expr1& v1,const Expr2& v2)
 	{
 		return ChkViewRel2<Func,Eval1,Expr1,Eval2,Expr2>(s,v1,v2).canBeTrue() and
+				//(not ChkViewRel2<Func,Eval1,Expr1,Eval2,Expr2>(s,v1,v2).isTrue())  and  // FIXME
 				s.post(new (s) BndFilterView2<Func,Eval1,Expr1,Eval2,Expr2>(s,v1,v2));
 	}
 };
@@ -353,7 +354,11 @@ struct BndFilterView2<And,bool,Expr1,bool,Expr2> : IFilter
 		IFilter(store),store(store),p1(p1),p2(p2) {}
 
 	bool execute()
-	{	return postBndFilter(store,p1) and postBndFilter(store,p2);	}
+	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView2<And,bool,Expr1,bool,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+		return postBndFilter(store,p1) and postBndFilter(store,p2);	}
 
 	void attach(INotifiable*) {}
 	void detach() {}
@@ -377,6 +382,10 @@ struct BndFilterView1<And,Seq<bool>,Expr1> : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView1<And,Seq<bool>,Expr1>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		for (uint i = 0; i < p1.size(); ++i)
 			if (!postBndFilter(store,p1[i]))
 				return false;
@@ -399,10 +408,18 @@ template<class Expr1,class Expr2>
 struct BndFilterView2<Or,bool,Expr1,bool,Expr2> : IFilter
 {
 	BndFilterView2(Store& s,const Expr1& p1, const Expr2& p2) :
-		IFilter(s),c1(s,p1),c2(s,p2) {}
+		IFilter(s),c1(s,p1),c2(s,p2)
+		#ifdef CASPER_LOG
+		,store(s)
+		#endif
+		{}
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView2<Or,bool,Expr1,bool,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (c1.isTrue() or c2.isTrue())
 			return true;
 		if (!c1.canBeTrue())
@@ -418,6 +435,9 @@ struct BndFilterView2<Or,bool,Expr1,bool,Expr2> : IFilter
 
 	CChkView<Expr1>	c1;
 	CChkView<Expr2>	c2;
+	#ifdef CASPER_LOG
+	Store& store;
+	#endif
 };
 
 template<class Expr1, class Expr2>
@@ -459,11 +479,20 @@ struct BndFilterView2<Equal,Eval,Expr1,Eval,Expr2> : IFilter
 {
 	BndFilterView2(Store& store,const Expr1& p1,const Expr2& p2)
 		: IFilter(store),p1(store,p1), p2(store,p2)
+		#ifdef CASPER_LOG
+		,store(store)
+		#endif
 		{}
 
 	bool execute()
-	{	return p1.updateMin(p2.min()) and p1.updateMax(p2.max()) and
-			   p2.updateMin(p1.min()) and p2.updateMax(p1.max());}
+	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView2<Equal,Eval,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
+		return p1.updateMin(p2.min()) and p1.updateMax(p2.max()) and
+			   p2.updateMin(p1.min()) and p2.updateMax(p1.max());
+	}
 	void attach(INotifiable* s)
 	{	/*if (!p1.ground() and !p2.ground())*/ {p1.attach(s); p2.attach(s);}	}
 	void detach()
@@ -471,6 +500,9 @@ struct BndFilterView2<Equal,Eval,Expr1,Eval,Expr2> : IFilter
 
 	BndView<Eval,Expr1>	p1;
 	BndView<Eval,Expr2>	p2;
+	#ifdef CASPER_LOG
+	Store& store;
+	#endif
 };
 
 /**
@@ -481,10 +513,26 @@ template<class Eval,class Expr1,class Expr2>
 struct BndFilterView2<GreaterEqual,Eval,Expr1,Eval,Expr2> : IFilter
 {
 	BndFilterView2(Store& store, const Expr1& p1,const Expr2& p2) :
-		IFilter(store),p1(store,p1), p2(store,p2) {}
+		IFilter(store),p1(store,p1), p2(store,p2)
+		#ifdef CASPER_LOG
+		,store(store)
+		#endif
+		{}
 
 	bool execute()
-	{	return p1.updateMin(p2.min()) && p2.updateMax(p1.max());	}
+	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView2<GreaterEqual,Eval,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
+		if (p1.min()>=p2.max())
+		{
+			detach();
+			return true;
+		}
+		else
+			return p1.updateMin(p2.min()) and p2.updateMax(p1.max());
+	}
 	void attach(INotifiable* s)
 	{	/*if (!p1.ground() and !p2.ground())*/ { p1.attach(s); p2.attach(s);} }
 	void detach()
@@ -492,6 +540,9 @@ struct BndFilterView2<GreaterEqual,Eval,Expr1,Eval,Expr2> : IFilter
 
 	BndView<Eval,Expr1> p1;
 	BndView<Eval,Expr2> p2;
+	#ifdef CASPER_LOG
+	Store& store;
+	#endif
 };
 
 /**
@@ -514,10 +565,18 @@ template<class Eval,class Expr1,class Expr2>
 struct BndFilterView2<Greater,Eval,Expr1,Eval,Expr2> : IFilter
 {
 	BndFilterView2(Store& store, const Expr1& p1,const Expr2& p2) :
-		IFilter(store),p1(store,p1), p2(store,p2) {}
+		IFilter(store),p1(store,p1), p2(store,p2)
+		#ifdef CASPER_LOG
+		,store(store)
+		#endif
+		{}
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView2<Greater,Eval,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		return p1.updateMin(Util::succ(p2.min())) and
 			   p2.updateMax(Util::pred(p1.max()));
 	}
@@ -528,7 +587,11 @@ struct BndFilterView2<Greater,Eval,Expr1,Eval,Expr2> : IFilter
 
 	BndView<Eval,Expr1> p1;
 	BndView<Eval,Expr2> p2;
+	#ifdef CASPER_LOG
+	Store& store;
+	#endif
 };
+
 
 
 /**
@@ -563,12 +626,20 @@ struct BndFilterView3<SumProductEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3
 					const Expr3& v3) :
 						IFilter(store),c(store,v1),x(store,v2),v(store,v3),
 					f(store,rel<Mul>(c[0].value(),x[0].getObj()))
+					#ifdef CASPER_LOG
+					,store(store)
+					#endif
+
 	{
 		for (uint i = 1; i < c.size(); i++)
 			f = f + rel<Mul>(c[i].value(),x[i].getObj());
 	}
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView3<SumProductEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		Eval fmin = f.min();
 		Eval fmax = f.max();
 		if (!v.updateMin(fmin) or !v.updateMax(fmax))
@@ -608,6 +679,9 @@ struct BndFilterView3<SumProductEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3
 	BndArrayView<Eval,Expr2> x;
 	BndView<Eval,Expr3>		 v;
 	BndExpr<Eval>			 f;
+	#ifdef CASPER_LOG
+	Store& store;
+	#endif
 };
 
 
@@ -627,6 +701,10 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (!v.ground())
 			return true;
 
@@ -938,7 +1016,8 @@ struct BndFilterView2<SumProductEqual,Seq<Eval>,Expr2,Eval,Expr3> : IFilter
 	BndExpr<Eval>			 f;
 };*/
 
-// BndFilterView over a Filter
+// BndFilterView over a Filter (still needed?)
+#if 0
 template<>
 struct BndFilterView<Filter> : IFilter
 {
@@ -954,15 +1033,27 @@ struct BndFilterView<Filter> : IFilter
 	{	pFilter->detach(); }
 	IFilter*	pFilter;
 };
+#endif
 
 // BndFilterView over a BndExpr<bool>
 template<>
 struct BndFilterView<BndExpr<bool> > : IFilter
 {
-	BndFilterView(Store& s,BndExpr<bool> e) : IFilter(s),rExpr(e.getImpl()) {}
+	BndFilterView(Store& s,BndExpr<bool> e) :
+		IFilter(s),rExpr(e.getImpl())
+		#ifdef CASPER_LOG
+		,store(store)
+		#endif
+		{}
 
 	bool execute()
-	{	return rExpr.updateMin(true);	}
+	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView<BndExpr<bool> >", Util::Logger::filterExecuteBegin);
+		#endif
+
+		return rExpr.updateMin(true);
+	}
 //	Filter	operator!();
 
 	void attach(INotifiable* s)
@@ -970,7 +1061,11 @@ struct BndFilterView<BndExpr<bool> > : IFilter
 	void detach()
 	{	rExpr.detach(); }
 	Detail::IBndExpr<bool>&	rExpr;
+	#ifdef CASPER_LOG
+	Store& store;
+	#endif
 };
+
 
 
 #if 0
@@ -1512,7 +1607,12 @@ struct BndViewRel1<Cache,View,Eval>
 	{
 		SyncRange(Store& store,BndViewRel1* pOwner) : IFilter(store),store(store), rOwner(*pOwner) {}
 		bool execute()
-		{	return rOwner.v.updateRange(rOwner.cachedMin,rOwner.cachedMax) and rOwner.pParent->notify();	}
+		{
+			#ifdef CASPER_LOG
+			store.getEnv().log(this, "BndViewRel1<Cache,View,Eval>::SyncRange", Util::Logger::filterExecuteBegin);
+			#endif
+			return rOwner.v.updateRange(rOwner.cachedMin,rOwner.cachedMax) and rOwner.pParent->notify();
+		}
 		Cost cost() const { return constantLo;}
 		void attach(INotifiable* f) { rOwner.v.attach(f); }
 		void detach() { rOwner.v.detach(); }
@@ -1547,6 +1647,7 @@ struct BndViewRel1<Cache,View,Eval>
 		}
 		return true;
 	}
+
 	bool updateMax(const Eval& m)
 	{
 		if (m<cachedMax)
@@ -1578,7 +1679,7 @@ struct BndViewRel1<Cache,View,Eval>
 	void attach(INotifiable* f)
 	{
 		pParent = f;
-		pSyncRange->store.post(pSyncRange);
+		pSyncRange->store.filterSched().post(pSyncRange,false);
 		cachedMin = std::max((Eval)cachedMin,v.min());
 		cachedMax = std::min((Eval)cachedMax,v.max());
 	}

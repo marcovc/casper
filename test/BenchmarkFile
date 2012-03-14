@@ -13,13 +13,13 @@
 ./build/release/examples/cp/int/golomb 10 55 --distinct=0 -m0 -s2 -t0
 #test(golomb-2,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent-bnd,label-lex)
 ./build/release/examples/cp/int/golomb 10 55 --distinct=1 -m0 -s2 -t0
-#test(golomb-3,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent,label-lex)
+#test(golomb-3,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent-dom,label-lex)
 ./build/release/examples/cp/int/golomb 10 55 --distinct=2 -m0 -s2 -t0
 #test(golomb-4,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent-val,label-lex)
 ./build/release/examples/cp/int/golomb 11 72 --distinct=0 -m0 -t0
 #test(golomb-5,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent-bnd,label-lex)
 ./build/release/examples/cp/int/golomb 11 72 --distinct=1 -m0 -t0
-#test(golomb-6,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent,label-lex)
+#test(golomb-6,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent-dom,label-lex)
 ./build/release/examples/cp/int/golomb 11 72 --distinct=2 -m0 -t0
 #test(golomb-7,Golomb Problem,pred-eq,int-example,pred-lt,global-alldifferent,label-lex, search-bb)
 ./build/release/examples/cp/int/golomb 10 -t0

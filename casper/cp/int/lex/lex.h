@@ -63,6 +63,7 @@ struct BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2> : IFilter
    // Stack<uint>		toRevise;
 	INotifiable*				pParent;
 	Reversible<bool>			first;
+	Reversible<bool>			on;
 	Detail::IdxBoundsDeltaStack<Expr1>	dx;
 	Detail::IdxBoundsDeltaStack<Expr2>	dy;
 };
@@ -78,6 +79,7 @@ BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::BndFilterView2(Store& store
     		s(store,0),u(store,0),
     		pParent(NULL),
     		first(store,true),
+    		on(store,true),
     		dx(store,x),dy(store,y)
 {	assert(x.size()==y.size());	}
 
@@ -86,6 +88,7 @@ template<class Expr1,class Expr2>
 void BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::attach(INotifiable* pParent)
 {
 	//assert(this->pParent==NULL);
+	std::cout << this << " attach\n";
 	typedef BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2> Self;
 	this->pParent = pParent;
 	dx.attach(pParent);
@@ -100,6 +103,7 @@ void BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::detach()
 	//this->pParent = NULL;
 	//toRevise.clear(); // because some schedulers may have copies
 				  	  // of this filter on queue
+	on = false;
 	dx.detach();
 	dy.detach();
 }
@@ -211,6 +215,13 @@ BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::automatonProcess(uint i)
 template<class Expr1,class Expr2>
 bool BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::execute()
 {
+	#ifdef CASPER_LOG
+	store.getEnv().log(this, "BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>", Util::Logger::filterExecuteBegin);
+	#endif
+
+	if (!on)
+		return true;
+
 	if (first)
 	{
 		first = false;

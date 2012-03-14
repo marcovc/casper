@@ -44,7 +44,7 @@ struct Logger
 		const void* pObj;
 		std::string strObj;
 		EventTag tag;
-		Event(const void* obj, std::string strObj, const EventTag& tag) :
+		Event(const void* pObj, std::string strObj, const EventTag& tag) :
 			pObj(pObj),strObj(strObj),tag(tag) {}
 		virtual bool operator==(const Event& s) const
 		{	return pObj == s.pObj and strObj == s.strObj and tag == s.tag;	}

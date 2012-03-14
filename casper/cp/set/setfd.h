@@ -100,6 +100,8 @@ struct SetFD
 		typedef		typename In::Iterator IIterator;
 		/// Iterator for the \p poss set
 		typedef		typename Poss::Iterator PIterator;
+		/// Used for efficient detaching of notifiables from this domain
+		typedef 	typename EventSuspList::AttachLink	AttachLink;
 
 		/**
 		 *  Creates a SetFD with possible values from the sorted range
@@ -248,16 +250,28 @@ struct SetFD
 		//friend std::ostream& operator<< <>(std::ostream& os, const SetFD& f);
 
 		/// Registers notifiable \a f on groundness event
-		void attachOnGround(INotifiable*	f) { groundSL.attach(f); }
+		AttachLink attachOnGround(INotifiable*	f) { return groundSL.attach(f); }
 
 		/// Registers notifiable \a f on bound update event
-		void attachOnLUB(INotifiable*	f) { lubSL.attach(f); }
+		AttachLink attachOnLUB(INotifiable*	f) { return lubSL.attach(f); }
 
 		/// Registers notifiable \a f on bound update event
-		void attachOnGLB(INotifiable*	f) { glbSL.attach(f); }
+		AttachLink attachOnGLB(INotifiable*	f) { return glbSL.attach(f); }
 
 		/// Registers notifiable \a f on domain update event
-		void attachOnDomain(INotifiable*	f) { domainSL.attach(f); }
+		AttachLink attachOnDomain(INotifiable*	f) { return domainSL.attach(f); }
+
+		/// Cancels attach link \a l from groundness event
+		void detachOnGround(const AttachLink& l) { groundSL.detach(l); }
+
+		/// Cancels attach link \a l from bound update event
+		void detachOnLUB(const AttachLink& l) { lubSL.detach(l); }
+
+		/// Cancels attach link \a l from bound update event
+		void detachOnGLB(const AttachLink& l) { glbSL.detach(l); }
+
+		/// Cancels attach link \a l from domain update event
+		void detachOnDomain(const AttachLink& l) { domainSL.detach(l); }
 
 		/// Unregisters notifiable \a f from groundness event
 		void detachOnGround(INotifiable*	f) { groundSL.detach(f); }
@@ -362,7 +376,10 @@ void SetFD<T>::onBeforeErase(PIterator b, PIterator e)
 template<class T>
 bool SetFD<T>::onAfterErase()
 {
-	//store().signalDomainUpdate();
+	#ifdef CASPER_EXTRA_STATS
+	store.getStats().signalSetDomainUpdate();
+	#endif
+
 	if (ground())
 		if (!groundSL.notifyAll())
 			return false;
@@ -374,8 +391,10 @@ bool SetFD<T>::onAfterErase()
 template<class T>
 bool SetFD<T>::onAfterInsert()
 {
-	//store().signalDomainUpdate();
-	//std::cout << this << std::endl;
+	#ifdef CASPER_EXTRA_STATS
+	store.getStats().signalSetDomainUpdate();
+	#endif
+
 	if (ground())
 		if (!groundSL.notifyAll())
 			return false;

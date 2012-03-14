@@ -25,6 +25,8 @@
 
 #include <casper/kernel/spexpr/expr.h>
 
+#include <casper/util/container/stdarray.h>
+
 using namespace std;
 
 #define CASPER_SHEAP_INIT_SIZE		static_cast<uint>(1024)
@@ -44,8 +46,92 @@ ostream& operator<<(ostream& os, const Casper::CP::StoreStats& s)
 							  << s.getNbFilters() << std::endl
 	   << left << setw (30) << "Number of filter executions" << ":" <<  std::setw (10) << std::right
 							  << s.getNbPropagations() << std::endl
+#ifdef CASPER_EXTRA_STATS
+	   << left << setw (30) << "Number of effective filter executions" << ":" <<  std::setw (10) << std::right
+							  << s.getNbEffectivePropagations() << " ("
+							  << (s.getNbEffectivePropagations()*100.0/s.getNbPropagations()) << "%)" << std::endl
+#endif
+
 	   << left << setw (30) << "Number of fixpoints" << ":" <<  std::setw (10) << std::right
 							  << s.getNbFPComputations();
+#ifdef CASPER_EXTRA_STATS
+	   os << endl << left << setw (30) << "Number of Boolean domain updates" << ":" <<  std::setw (10) << std::right
+							  << s.getNbBoolDomainUpdates()
+	   << endl << left << setw (30) << "Number of integer domain updates" << ":" <<  std::setw (10) << std::right
+							  << s.getNbIntDomainUpdates()
+	   << endl << left << setw (30) << "Number of set domain updates" << ":" <<  std::setw (10) << std::right
+							  << s.getNbSetDomainUpdates()
+	   << endl << left << setw (30) << "Number of range domain updates" << ":" <<  std::setw (10) << std::right
+							  << s.getNbRangeDomainUpdates();
+
+#if defined(CASPER_EXTRA_STATS)
+
+#if 0 // detailed
+	   os << endl;
+	   for (auto it = s.filterProps.begin(); it != s.filterProps.end(); ++it)
+	   {
+		   auto eit = s.filterName.find(it->first);
+		   assert(eit!=s.filterName.end());
+		   os << left << setw (30) << "Number of executions of " << eit->second << "@" << it->first <<  ":" <<  std::setw (10) << std::right
+								  << it->second << std::endl;
+	   }
+	   for (auto it = s.filterEffProps.begin(); it != s.filterEffProps.end(); ++it)
+	   {
+		   auto eit = s.filterName.find(it->first);
+		   assert(eit!=s.filterName.end());
+		   os << left << setw (30) << "Number of effective executions of " << eit->second << "@" << it->first <<  ":" <<  std::setw (10) << std::right
+								  << it->second << std::endl;
+	   }
+#else
+	   os << endl;
+	   std::set<std::string> filterNames;
+	   for (auto it = s.filterName.begin(); it != s.filterName.end(); ++it)
+		   filterNames.insert(it->second);
+	   for (auto nit = filterNames.begin(); nit != filterNames.end(); ++nit)
+	   {
+		   std::string xmlfriendlyname = *nit;
+		   for (auto ait = xmlfriendlyname.begin(); ait != xmlfriendlyname.end(); ++ait)
+			   if (*ait == '<')
+				   *ait = '(';
+			   else
+			   if (*ait == '>')
+				   *ait = ')';
+
+		   uint execs = 0;
+		   uint eexecs = 0;
+		   int np = 5;
+		   Casper::Util::StdArray<int> execp(np,0);
+		   Casper::Util::StdArray<int> eexecp(np,0);
+		   for (auto it = s.filterProps.begin(); it != s.filterProps.end(); ++it)
+		   {
+			   auto eit = s.filterName.find(it->first);
+			   if (eit->second == *nit)
+			   {
+				   uint fexecs = it->second;
+				   uint feexecs = s.filterEffProps.find(it->first)->second;
+				   execs += fexecs;
+				   eexecs += feexecs;
+				   for (uint i = 0; i < np; ++i)
+				   {
+					   if (fexecs >= std::pow(2.0,i))
+						   ++execp[i];
+					   if (feexecs >= std::pow(2.0,i))
+						   ++eexecp[i];
+				   }
+			   }
+		   }
+		   os << left << setw (30) << "Number of executions of " << xmlfriendlyname <<  ":" <<  std::setw (10) << std::right
+								  << execs << " " << execp << std::endl;
+		   os << left << setw (30) << "Number of effective executions of " << xmlfriendlyname <<  ":" <<  std::setw (10) << std::right
+								  << eexecs << " " << eexecp << std::endl;
+
+	   }
+#endif
+
+
+#endif
+
+#endif
 	return os;
 }
 
@@ -56,6 +142,7 @@ Store::Store(Env& env) :
 			env(env),
 			globalSHeap(new Util::DynamicHeap(CASPER_SHEAP_INIT_SIZE,
 										CASPER_SHEAP_GROW_RATIO)),
+			stats(env),
 //			propIDCtr(0),
 		    weightFilters(false),
 		    filters(env),

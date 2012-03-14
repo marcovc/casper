@@ -198,6 +198,10 @@ void ValFilterView1<Distinct,Seq<Eval>,View>::detach()
 template<class Eval,class View>
 bool ValFilterView1<Distinct,Seq<Eval>,View>::execute()
 {
+	#ifdef CASPER_LOG
+	store.getEnv().log(this, "ValFilterView1<Distinct,Seq<Eval>,View>", Util::Logger::filterExecuteBegin);
+	#endif
+
 	typedef typename Traits::GetDom<typename Casper::Traits::GetTermElem<View>::Type>::Type::Iterator Iterator;
 	for (uint i = 0; i < doms.size(); i++)
 		for (Iterator it = doms[i]->begin(); it != doms[i]->end(); )

@@ -41,12 +41,34 @@ template<class Expr1,class Expr2>
 struct BndDistinctD1<int,Expr1,int,Expr2> : IFilter
 {
 	BndDistinctD1(Store& store, const Expr1& v1, const Expr2& v2) :
-		IFilter(store),vv2(v2),v1(store,v1),v2(store,v2) {}
+		IFilter(store),v1(store,v1),v2(store,v2),demon(*this)
+		#ifdef CASPER_LOG
+		,store(store)
+		#endif
+		{}
+
+	struct Demon : INotifiable
+	{
+		Demon(BndDistinctD1& rOwner) : rOwner(rOwner) {}
+		bool notify()
+		{	return !rOwner.v2.ground() or rOwner.pOwner->notify(); }
+		BndDistinctD1& rOwner;
+	};
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndDistinctD1<int,Expr1,int,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (!v2.ground())
 			return true;
+		if (v2.value() < v1.min() or
+			v2.value() > v1.max())
+		{
+			detach();
+			return true;
+		}
 		if (v2.value() == v1.min())
 			return v1.updateMin(v1.min()+1);
 		else
@@ -56,13 +78,21 @@ struct BndDistinctD1<int,Expr1,int,Expr2> : IFilter
 	}
 
 	void attach(INotifiable* s)
-	{	v1.attach(s); v2.attach(s);	}	// note: v1 must be also attached
+	{
+		pOwner = s;
+		v1.attach(&demon);
+		v2.attach(&demon);
+	}
 	void detach()
 	{	v1.detach(); v2.detach();	}
 
-	Expr2				vv2;
 	BndView<int,Expr1>	v1;
 	ValView<int,Expr2>	v2;
+	INotifiable*	pOwner;
+	Demon	demon;
+	#ifdef CASPER_LOG
+	Store& store;
+	#endif
 };
 
 template<class,class,class,class>
@@ -75,10 +105,18 @@ template<class Expr1,class Expr2>
 struct DomDistinctD1<int,Expr1,int,Expr2> : IFilter
 {
 	DomDistinctD1(Store& store, const Expr1& p1,const Expr2& p2) :
-		IFilter(store),p1(store,p1),p2(store,p2) {}
+		IFilter(store),p1(store,p1),p2(store,p2)
+		#ifdef CASPER_LOG
+		,store(store)
+		#endif
+		{}
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "DomDistinctD1<int,Expr1,int,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (!p2.ground())
 			return true;
 		return p1->erase(p2.value());
@@ -89,6 +127,9 @@ struct DomDistinctD1<int,Expr1,int,Expr2> : IFilter
 
 	DomView<int,Expr1> p1;
 	ValView<int,Expr2> p2;
+	#ifdef CASPER_LOG
+	Store& store;
+	#endif
 };
 
 /**
@@ -100,10 +141,20 @@ template<class Expr1,class Expr2>
 struct BndFilterView2<Distinct,int,Expr1,int,Expr2> : IFilter
 {
 	BndFilterView2(Store& store,const Expr1& p1,const Expr2& p2) :
-		IFilter(store),p1(store,p1,p2),p2(store,p2,p1)	{ }
+		IFilter(store),p1(store,p1,p2),p2(store,p2,p1)
+		#ifdef CASPER_LOG
+		,store(store)
+		#endif
+		{ }
 
 	bool execute()
-	{	return p1.execute() and p2.execute();	}
+	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView2<Distinct,int,Expr1,int,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
+		return p1.execute() and p2.execute();
+	}
 	void attach(INotifiable* s)
 	{	p1.attach(s); p2.attach(s); }
 	void detach()
@@ -111,6 +162,9 @@ struct BndFilterView2<Distinct,int,Expr1,int,Expr2> : IFilter
 
 	BndDistinctD1<int,Expr1,int,Expr2> p1;
 	BndDistinctD1<int,Expr2,int,Expr1> p2;
+	#ifdef CASPER_LOG
+	Store& store;
+	#endif
 };
 
 /**
@@ -122,10 +176,20 @@ template<class Expr1,class Expr2>
 struct DomFilterView2<Distinct,int,Expr1,int,Expr2> : IFilter
 {
 	DomFilterView2(Store& store,const Expr1& p1,const Expr2& p2) :
-		IFilter(store),p1(store,p1,p2),p2(store,p2,p1)	{ }
+		IFilter(store),p1(store,p1,p2),p2(store,p2,p1)
+		#ifdef CASPER_LOG
+		,store(store)
+		#endif
+		{ }
 
 	bool execute()
-	{	return p1.execute() && p2.execute();	}
+	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "DomFilterView2<Distinct,int,Expr1,int,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
+		return p1.execute() && p2.execute();
+	}
 	void attach(INotifiable* s)
 	{	p1.attach(s); p2.attach(s); }
 	void detach()
@@ -133,6 +197,9 @@ struct DomFilterView2<Distinct,int,Expr1,int,Expr2> : IFilter
 
 	DomDistinctD1<int,Expr1,int,Expr2> p1;
 	DomDistinctD1<int,Expr2,int,Expr1> p2;
+	#ifdef CASPER_LOG
+	Store& store;
+	#endif
 };
 
 // FIXME: this should be Def consistency since it can prune more than Bnd
@@ -141,6 +208,12 @@ struct PostBndFilter2<Distinct,int,V1,int,V2>
 {
 	static bool post(Store& s, const V1& p1,const V2& p2)
 	{
+		ChkViewRel2<Distinct,int,V1,int,V2> chk(s,p1,p2);
+		if (chk.isTrue())
+			return true;
+		if (!chk.canBeTrue())
+			return false;
+
 		IFilter* f1;
 		IFilter* f2;
 
@@ -196,16 +269,27 @@ template<class Expr1,class Expr2>
 struct BndFilterView2<Greater,int,Expr1,int,Expr2> : IFilter
 {
 	BndFilterView2(Store& store, const Expr1& p1,const Expr2& p2) :
-		IFilter(store),p1(store,p1), p2(store,p2) {}
+		IFilter(store),p1(store,p1), p2(store,p2)
+		#ifdef CASPER_LOG
+		,store(store)
+		#endif
+		{}
 
 	bool execute()
-	{	return p1.updateMin(p2.min()+1) and
+	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView2<Greater,int,Expr1,int,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
+		if (p1.min()>p2.max())
+		{
+			detach();
+			return true;
+		}
+		return p1.updateMin(p2.min()+1) and
 			   p2.updateMax(p1.max()-1);
 	}
-	bool entailed() const
-	{	return p1.min() > p2.max();	}
-//	Filter	operator!()
-//	{	return Bnd(p2.getObj() >= p1.getObj());	}
+
 	void attach(INotifiable* s)
 	{	/*if (!p1.ground() and !p2.ground())*/ {p1.attach(s); p2.attach(s);} }
 	void detach()
@@ -213,6 +297,19 @@ struct BndFilterView2<Greater,int,Expr1,int,Expr2> : IFilter
 
 	BndView<int,Expr1> p1;
 	BndView<int,Expr2> p2;
+	#ifdef CASPER_LOG
+	Store& store;
+	#endif
+};
+
+
+template<class V1,class V2>
+struct PostBndFilter2<Greater,bool,V1,bool,V2>
+{
+	static bool post(Store& s, const V1& p1,const V2& p2)
+	{
+		return postBndFilter(s,p1) and postBndFilter(s,!p2);
+	}
 };
 
 template<class V1,class V2>

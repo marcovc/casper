@@ -572,7 +572,8 @@ struct GetEval<Rel2<MaxEqual,T1,T2> >
 
 template<class T1>
 struct GetEval<Rel1<Min,T1> >
-{	typedef typename Traits::GetSetElem<typename Traits::GetEval<typename Traits::GetTermElem<T1>::Type>::Type>::Type 	Type;	};
+//{	typedef typename Traits::GetSetElem<typename Traits::GetEval<typename Traits::GetTermElem<T1>::Type>::Type>::Type 	Type;	};
+{	typedef typename Traits::GetEval<T1>::Type::Elem 	Type;	};
 
 template<class T1,class T2>
 struct GetEval<Rel2<MinEqual,T1,T2> >

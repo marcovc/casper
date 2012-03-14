@@ -43,23 +43,22 @@ struct ValView<int,Rel1<Cardinal,View> >
 {
 	typedef typename Casper::Traits::GetEval<View>::Type::Elem	Elem;
 	ValView(Store& store, const Rel1<Cardinal,View>& v) :
-		v(store,v.p1),pOwner(NULL) {}
+		v(store,v.p1) {}
 	bool ground() const { return v->card().ground(); 	}
 	int value() const { return v->card().value();	}
 	bool setValue(const int& val) { return v->card()=val;	}
 	void attach(INotifiable* n)
 	{
-		assert(pOwner==NULL or pOwner==n);
-		pOwner = n;
-		v->card().attachOnGround(pOwner);
+		//assert(pOwner==NULL or pOwner==n);
+		attachLink = v->card().attachOnGround(n);
 	}
 	void detach()
-	{	v->card().detachOnGround(pOwner);	}
+	{	v->card().detachOnGround(attachLink);	}
 	Rel1<Cardinal,View>	getObj() const
 	{	return cardinal(v.getObj());	}
 
 	DomView<Set<Elem>,View> v;
-	INotifiable*	pOwner;
+	typename Traits::GetDom<View>::Type::Card::AttachLink attachLink;
 };
 
 /**
@@ -71,7 +70,7 @@ struct BndView<int,Rel1<Cardinal,View> >
 {
 	typedef typename Casper::Traits::GetEval<View>::Type::Elem	Elem;
 	BndView(Store& store, const Rel1<Cardinal,View>& v) :
-		v(store,v.p1),pOwner(NULL) {}
+		v(store,v.p1) {}
 	int min() const { return v->card().min(); 	}
 	int max() const { return v->card().max();	}
 	bool updateMin(const int& val)
@@ -84,17 +83,15 @@ struct BndView<int,Rel1<Cardinal,View> >
 	{	lb = min(); ub = max();	}
 	void attach(INotifiable* n)
 	{
-		assert(pOwner==NULL or pOwner==n);
-		pOwner = n;
-		v->card().attachOnBounds(pOwner);
+		attachLink = v->card().attachOnBounds(n);
 	}
 	void detach()
-	{	v->card().detachOnBounds(pOwner);	}
+	{	v->card().detachOnBounds(attachLink);	}
 	Rel1<Cardinal,View>	getObj() const
 	{	return cardinal(v.getObj());	}
 
 	DomView<Set<Elem>,View> v;
-	INotifiable*	pOwner;
+	typename Traits::GetDom<View>::Type::Card::AttachLink attachLink;
 };
 
 
@@ -107,7 +104,7 @@ struct DomView<int,Rel1<Cardinal,View>,Dom>
 {
 	typedef typename Casper::Traits::GetEval<View>::Type::Elem	Elem;
 	DomView(Store& store, const Rel1<Cardinal,View>& v) :
-		v(store,v.p1),pOwner(NULL) {}
+		v(store,v.p1) {}
 	Dom*	operator->()		{	return &v->card();	}
 	Dom*	operator->() const	{	return const_cast<Dom*>(&v->card());}
 	Dom&	operator*()			{	return v->card();	}
@@ -115,18 +112,17 @@ struct DomView<int,Rel1<Cardinal,View>,Dom>
 
 	void attach(INotifiable* n)
 	{
-		assert(pOwner==NULL or pOwner==n);
-		pOwner = n;
-		v->card().attachOnDomain(pOwner);
+		attachLink = v->card().attachOnDomain(n);
 	}
 	void detach()
-	{	v->card().detachOnDomain(pOwner);	}
+	{	v->card().detachOnDomain(attachLink);	}
 
 	Rel1<Cardinal,View>	getObj() const
 	{	return cardinal(v.getObj());	}
 
 	DomView<Set<Elem>,View> v;
-	INotifiable*	pOwner;
+	typename Traits::GetDom<View>::Type::Card::AttachLink attachLink;
+//	typename DomView<Set<Elem>,View>::Dom::Card::AttachLink attachLink;
 };
 
 /**
@@ -145,6 +141,9 @@ struct BndFilterView2<Member,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		set->getStore().getEnv().log(this, "BndFilterView2<Member,Elem,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
 		if (!elem.ground())	// first time or never
 			return true;
 		detach();
@@ -183,6 +182,10 @@ struct BndFilterView2<NotMember,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		set->getStore().getEnv().log(this, "BndFilterView2<NotMember,Elem,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (!elem.ground())	// first time or never
 			return true;
 		IIterator iIt = set->findInIn(elem.value());
@@ -221,6 +224,10 @@ struct BndFilterView2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2> : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		set->getStore().getEnv().log(this, "BndFilterView2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		// Set -> Max
 		Eval mi,ma;
 		if (set->inSize()==0)
@@ -301,6 +308,10 @@ struct BndFilterView2<MinEqual,Set<Eval>,Expr1,Eval,Expr2> : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		set->getStore().getEnv().log(this, "BndFilterView2<MinEqual,Set<Eval>,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		// Set -> Min
 		Eval mi,ma;
 		if (set->inSize()==0)
@@ -387,7 +398,10 @@ struct BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 
 	bool execute()
 	{
-		//Debug::log(this,"Entering execute");
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (first)
 		{
 			first = false;
@@ -481,6 +495,10 @@ struct BndD1FilterView2<Distinct,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndD1FilterView2<Distinct,Set<Elem>,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (!y->ground())
 			return true;
 
@@ -554,6 +572,10 @@ struct BACDisjointCard : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		x->getStore().getEnv().log(this, "BACDisjointCard", Util::Logger::filterExecuteBegin);
+		#endif
+
 		uint aux = Casper::Detail::distance(makeInterIt(makePossIt(*x),makePossIt(*y)));
 
 		int n3 = x->inSize()+y->inSize()+
@@ -609,6 +631,10 @@ struct BndFilterView2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (first)
 		{
 			if (chk.isTrue())
@@ -714,6 +740,10 @@ struct BACIntersectCard1 : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		x->getStore().getEnv().log(this, "BACIntersectCard1", Util::Logger::filterExecuteBegin);
+		#endif
+
 		int n3 = Casper::Detail::distance(makeUnionIt(makeLUBIt(*x),makeLUBIt(*y)));
 
 		return z->card().updateMin(x->minCard()+y->minCard()-n3) and
@@ -728,8 +758,8 @@ struct BACIntersectCard1 : IFilter
 	{
 		assert(pOwner==NULL or pOwner==s);
 		pOwner = s;
-		x->attachOnLUB(pOwner);
-		y->attachOnLUB(pOwner);
+		x->attachOnLUB(pOwner);	// FIXME (or not) should be Dom
+		y->attachOnLUB(pOwner); // idem
 		z->attachOnLUB(pOwner);
 	}
 	void detach()
@@ -774,6 +804,10 @@ struct BACIntersectCard2 : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		x->getStore().getEnv().log(this, "BACIntersectCard2", Util::Logger::filterExecuteBegin);
+		#endif
+
 		int n3 = Casper::Detail::distance(makeDiffIt(makeInIt(*x),makeLUBIt(*y)));
 
 		return z->card().updateMax(x->card().max()-
@@ -838,16 +872,19 @@ struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,E
 
 	bool execute()
 	{
-		//Debug::log(this,"Entering execute");
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (first)
 		{
-			if (!chk.canBeTrue())
-				return false;
 			if (chk.isTrue())
 			{
 				detach();
 				return true;
 			}
+			if (!chk.canBeTrue())
+				return false;
 
 			first = false;
 
@@ -908,11 +945,6 @@ struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,E
 				return false;
 		}
 
-		if (chk.isTrue())
-		{
-			detach();
-			return true;
-		}
 		return true;
 	}
 
@@ -921,16 +953,15 @@ struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,E
 
 	void attach(INotifiable* s)
 	{
-		pOwner = s;
-		x->attachOnGLB(s);
-		y->attachOnGLB(s);
-		z->attachOnLUB(s);
+		xAttachLink = x->attachOnGLB(s);
+		yAttachLink = y->attachOnGLB(s);
+		zAttachLink = z->attachOnLUB(s);
 	}
 	void detach()
 	{
-		x->detachOnGLB(pOwner);
-		y->detachOnGLB(pOwner);
-		z->detachOnLUB(pOwner);
+		x->detachOnGLB(xAttachLink);
+		y->detachOnGLB(yAttachLink);
+		z->detachOnLUB(zAttachLink);
 	}
 
 	Store&	store;
@@ -941,7 +972,9 @@ struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,E
 	typename DomY::DeltasIterator 		yGLBDeltasIt;
 	typename DomZ::DeltasIterator 		zLUBDeltasIt;
 	Reversible<bool>			first;
-	INotifiable*	pOwner;
+	typename Traits::GetDom<Expr1>::Type::AttachLink	xAttachLink;
+	typename Traits::GetDom<Expr2>::Type::AttachLink	yAttachLink;
+	typename Traits::GetDom<Expr3>::Type::AttachLink	zAttachLink;
 	ChkViewRel3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3> chk;
 };
 
@@ -976,6 +1009,7 @@ struct DomView<Set<Elem>,Rel2<Intersect,Expr1,Expr2>,Dom> //: IDomExpr<Dom>
 						 Util::ListInserter<Val3>(lub3));
 
 		auxD = new (s) Dom(s,lub3.begin(),lub3.end());
+		s.getStats().signalNewSetDomain();
 		s.post( intersectEqual(v1.getObj(),v2.getObj(),Var<Set<Elem>,Dom>(s,auxD)) );
 	}
 	Dom*	operator->()		{	return auxD;	}
@@ -1026,6 +1060,10 @@ struct BndFilterView3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (first)
 		{
 			first = false;
@@ -1217,6 +1255,10 @@ struct BndFilterView1<Partition,Seq<Set<Elem> >,Expr1> : IFilter
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView1<Partition,Seq<Set<Elem>>,Expr1>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (first)
 		{
 			first = false;
@@ -1401,6 +1443,10 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2> : IFilte
 
 	bool execute()
 	{
+		#ifdef CASPER_LOG
+		store.getEnv().log(this, "BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
 		if (first)
 		{
 			first = false;

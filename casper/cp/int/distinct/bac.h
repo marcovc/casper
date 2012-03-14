@@ -64,7 +64,7 @@ struct BndFilterView1<Distinct,IntSeq,View> : IFilter
 	BndFilterView1(Store&, const View& v);
     ~BndFilterView1() {}
 	bool	execute();
-	bool	entailed() const {	return false;	}	// FIXME
+
 	void 	attach(INotifiable* pParent);
 	void 	detach();
 	Cost 	cost() const {	return linearHi; }
@@ -374,6 +374,10 @@ int BndFilterView1<Distinct,IntSeq,View>::filterupper()
 template<class View>
 bool	BndFilterView1<Distinct,IntSeq,View>::execute()
 {
+	#ifdef CASPER_LOG
+	store.getEnv().log(this, "BndFilterView1<Distinct,IntSeq,View>", Util::Logger::filterExecuteBegin);
+	#endif
+
 /*	std::cout << vars.solver().stats().curLevel << " : execute\n";
 	for (uint i = 0; i < vars.size(); i++)
 		std::cout << "[" << vars[i].min() << ".." << vars[i].max() << "] ";

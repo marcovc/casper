@@ -26,9 +26,23 @@ struct SetFDCard1 : IFilter
 		IFilter(d.getStore()),
 		d(d),pOwner(NULL) {}
 	
+	struct Demon: INotifiable
+	{
+		Demon(SetFDCard1& rOwner) : rOwner(rOwner) {}
+		bool notify()
+		{
+			return ((uint)rOwner.d.card().min())>=rOwner.d.inSize() or
+					rOwner.pOwner->notify();
+		}
+		SetFDCard1& rOwner;
+	};
+
 	bool execute()
 	{	
-		//Debug::log( this,"Entering execute");
+		#ifdef CASPER_LOG
+		d.getStore().getEnv().log(this, "SetFDCard1", Util::Logger::filterExecuteBegin);
+		#endif
+
 		return d.card().updateMin(d.inSize());	
 	}
 	
@@ -36,14 +50,15 @@ struct SetFDCard1 : IFilter
 	{
 		assert(pOwner==NULL or pOwner==s);
 		pOwner = s;
-		d.attachOnGLB(pOwner);
+		pDemon = new (d.getState()) Demon(*this);
+		d.attachOnGLB(pDemon);
 	}
 	void detach()
-	{	d.detachOnGLB(pOwner);	}
+	{	d.detachOnGLB(pDemon);	}
 	
 	SetFD<T>& d;
 	INotifiable* pOwner;
-
+	Demon*	pDemon;
 };
 
 // cardinal(2.2)
@@ -54,9 +69,22 @@ struct SetFDCard2 : IFilter
 		IFilter(d.getStore()),
 		d(d),pOwner(NULL) {}
 	
+	struct Demon: INotifiable
+	{
+		Demon(SetFDCard2& rOwner) : rOwner(rOwner) {}
+		bool notify()
+		{
+			return ((uint)rOwner.d.card().max())<=rOwner.d.inSize()+rOwner.d.possSize() or
+					rOwner.pOwner->notify();
+		}
+		SetFDCard2& rOwner;
+	};
+
 	bool execute()
 	{	
-		//Debug::log( this,"Entering execute");
+		#ifdef CASPER_LOG
+		d.getStore().getEnv().log(this, "SetFDCard2", Util::Logger::filterExecuteBegin);
+		#endif
 		return d.card().updateMax(d.inSize()+d.possSize());	
 	}
 	
@@ -64,13 +92,15 @@ struct SetFDCard2 : IFilter
 	{
 		assert(pOwner==NULL or pOwner==s);
 		pOwner = s;
-		d.attachOnLUB(pOwner);
+		pDemon = new (d.getState()) Demon(*this);
+		d.attachOnLUB(pDemon);
 	}
 	void detach()
-	{	d.detachOnLUB(pOwner);	}
+	{	d.detachOnLUB(pDemon);	}
 	
 	SetFD<T>& d;
 	INotifiable* pOwner;
+	Demon*	pDemon;
 };
 
 // cardinal(3)
@@ -81,13 +111,27 @@ struct SetFDCard3 : IFilter
 		IFilter(d.getStore()),
 		d(d),pOwner(NULL)  {}
 	
+	struct Demon: INotifiable
+	{
+		Demon(SetFDCard3& rOwner) : rOwner(rOwner) {}
+		bool notify()
+		{
+			return !rOwner.d.card().ground() or
+					rOwner.d.poss().empty() or
+					((((uint)rOwner.d.card().value()) != rOwner.d.inSize()) and
+					(((uint)rOwner.d.card().value()) != rOwner.d.inSize()+rOwner.d.possSize())) or
+					rOwner.pOwner->notify();
+		}
+		SetFDCard3& rOwner;
+	};
+
 	bool execute()
 	{	
-		//Debug::log( this,"Entering execute");
+		#ifdef CASPER_LOG
+		d.getStore().getEnv().log(this, "SetFDCard3", Util::Logger::filterExecuteBegin);
+		#endif
 		
-		if (!d.card().ground())
-			return true;
-	
+		assert(d.card().ground());
 		if (((uint)d.card().value()) == d.inSize())
 			return d.poss().empty() or d.clearPoss();
 		if (((uint)d.card().value()) == d.inSize()+d.possSize())	
@@ -99,17 +143,19 @@ struct SetFDCard3 : IFilter
 	{	
 		assert(pOwner==NULL or pOwner==s);
 		pOwner = s;
-		d.card().attachOnGround(pOwner);
-		d.attachOnDomain(pOwner);
+		pDemon = new (d.getState()) Demon(*this);
+		d.card().attachOnGround(pDemon);
+		d.attachOnDomain(pDemon);
 	}
 	void detach()
 	{	
-		d.card().detachOnGround(pOwner);
-		d.detachOnDomain(pOwner);
+		d.card().detachOnGround(pDemon);
+		d.detachOnDomain(pDemon);
 	}
 	
 	SetFD<T>& d;
 	INotifiable*	pOwner;
+	Demon*	pDemon;
 };
 
 // SetFD constructors
@@ -130,9 +176,9 @@ SetFD<T>::SetFD(Store& store, const Util::StdRange<Elem>& rPoss) :
 					domainSL(store) 
 {
 	// post internal constraints
-	store.post(Filter(new (store) SetFDCard1<T>(*this)));
-	store.post(Filter(new (store) SetFDCard2<T>(*this)));
-	store.post(Filter(new (store) SetFDCard3<T>(*this)));
+	store.filterSched().post(Filter(new (store) SetFDCard1<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard2<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard3<T>(*this)),false);
 }	
 
 template<class T>
@@ -152,9 +198,9 @@ SetFD<T>::SetFD(Store& store, const Util::StdRange<Elem>& rIn,
 					domainSL(store)
 {
 	// post internal constraints
-	store.post(Filter(new (store) SetFDCard1<T>(*this)));
-	store.post(Filter(new (store) SetFDCard2<T>(*this)));
-	store.post(Filter(new (store) SetFDCard3<T>(*this)));
+	store.filterSched().post(Filter(new (store) SetFDCard1<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard2<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard3<T>(*this)),false);
 }		
 			
 template<class T>
@@ -173,9 +219,9 @@ SetFD<T>::SetFD(Store& store, const Util::StdList<Elem>& rPoss) :
 					domainSL(store) 
 {
 	// post internal constraints
-	store.post(Filter(new (store) SetFDCard1<T>(*this)));
-	store.post(Filter(new (store) SetFDCard2<T>(*this)));
-	store.post(Filter(new (store) SetFDCard3<T>(*this)));
+	store.filterSched().post(Filter(new (store) SetFDCard1<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard2<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard3<T>(*this)),false);
 }	
 
 template<class T>
@@ -195,9 +241,9 @@ SetFD<T>::SetFD(Store& store, const Util::StdList<Elem>& rIn,
 					domainSL(store)
 {
 	// post internal constraints
-	store.post(Filter(new (store) SetFDCard1<T>(*this)));
-	store.post(Filter(new (store) SetFDCard2<T>(*this)));
-	store.post(Filter(new (store) SetFDCard3<T>(*this)));
+	store.filterSched().post(Filter(new (store) SetFDCard1<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard2<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard3<T>(*this)),false);
 }		
 
 template<class T>
@@ -219,9 +265,9 @@ SetFD<T>::SetFD(Store& store, InputIterator possBegin,
 {
 	assert(Casper::Util::Detail::isStrictOrdered(possBegin,possEnd));
 	// post internal constraints
-	store.post(Filter(new (store) SetFDCard1<T>(*this)));
-	store.post(Filter(new (store) SetFDCard2<T>(*this)));
-	store.post(Filter(new (store) SetFDCard3<T>(*this)));
+	store.filterSched().post(Filter(new (store) SetFDCard1<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard2<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard3<T>(*this)),false);
 }
 
 template<class T>
@@ -246,9 +292,9 @@ SetFD<T>::SetFD(Store& store, InputIterator1 inBegin,
 	assert(Casper::Util::Detail::isStrictOrdered(inBegin,inEnd));
 	assert(Casper::Util::Detail::isStrictOrdered(possBegin,possEnd));
 	// post internal constraints
-	store.post(Filter(new (store) SetFDCard1<T>(*this)));
-	store.post(Filter(new (store) SetFDCard2<T>(*this)));
-	store.post(Filter(new (store) SetFDCard3<T>(*this)));
+	store.filterSched().post(Filter(new (store) SetFDCard1<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard2<T>(*this)),false);
+	store.filterSched().post(Filter(new (store) SetFDCard3<T>(*this)),false);
 }
 
 } // CP

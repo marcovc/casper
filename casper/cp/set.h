@@ -11,6 +11,7 @@
 #ifndef _H_CASPER_SET
 #define _H_CASPER_SET
 
+#include <casper/cp/int.h>
 
 #include <casper/cp/set/config.h>
 #include <casper/cp/set/setfd.h>

@@ -40,7 +40,7 @@ struct IFilterSched : IFilter
 		if (attach)
 			s.setFilterSched(this);
 	}
-	virtual bool post(Filter)	=	0;
+	virtual bool post(Filter,bool schedule=true)	=	0;
 	void attach(INotifiable* f)
 	{ /*assert(pParent==NULL);*/ pParent = f; }
 	void detach()
@@ -58,7 +58,7 @@ struct FilterSched : Util::PImplIdiom<IFilterSched>
 
 	FilterSched(IFilterSched*	f) : Super(f) {}
 
-	bool post(Filter f) {	return Super::pImpl->post(f); }
+	bool post(Filter f,bool schedule = true) {	return Super::pImpl->post(f,schedule); }
 	IFilter*	getPActiveFilter() {	return Super::pImpl->getPActiveFilter(); }
 };
 
@@ -84,7 +84,7 @@ struct QueueFilterSched : Util::PImplIdiom<IQueueFilterSched>
 
 	QueueFilterSched(IQueueFilterSched*	f) : Super(f) {}
 
-	bool post(Filter f) {	return Super::pImpl->post(f); }
+	bool post(Filter f,bool schedule=true) {	return Super::pImpl->post(f,schedule); }
 	void clear() {	Super::pImpl->clear(); }
 	bool enqueue(Filter f) {	return Super::pImpl->enqueue(f); }
 	IFilter*	getPActiveFilter() {	return Super::pImpl->getPActiveFilter(); }
@@ -123,13 +123,18 @@ struct GreedyLIFOFilterSched : IFilterSched
 
 	~GreedyLIFOFilterSched() {}
 
-	bool post(Filter f)
+	bool post(Filter f,bool schedule = true)
 	{
 		assert(store.valid());
 		pCurFilterDemon = new (store) FilterDemon(this,f);
-		bool r = pCurFilterDemon->notify();
+		if (schedule)
+		{
+			bool r = pCurFilterDemon->notify();
+			pCurFilterDemon = NULL;
+			return r;
+		}
 		pCurFilterDemon = NULL;
-		return r;
+		return true;
 	}
 	IFilter*	getPActiveFilter()
 	{
@@ -181,10 +186,10 @@ struct ULIFOFilterSched : IQueueFilterSched
 									pActiveFilter(NULL)
 	{}
 
-	bool post(Filter f)
+	bool post(Filter f,bool schedule=true)
 	{
 		FilterDemon* d = new (store) FilterDemon(this,f);
-		return d->notify();
+		return !schedule or d->notify();
 	}
 
 	bool notify()
@@ -275,10 +280,10 @@ struct LIFOFilterSched : IQueueFilterSched
 									pActiveFilter(NULL)
 	{}
 
-	bool post(Filter f)
+	bool post(Filter f,bool schedule=true)
 	{
 		FilterDemon* d = new (store) FilterDemon(this,f);
-		return d->notify();
+		return !schedule or d->notify();
 	}
 
 	bool notify()
@@ -382,17 +387,17 @@ struct FIFOFilterSched : IQueueFilterSched
 									pActiveFilter(NULL)
 	{}
 
-	bool post(Filter f)
+	bool post(Filter f,bool schedule=true)
 	{
 		if (store.getFilterWeighting())
 		{
 			WeightedFilterDemon* d = new (store) WeightedFilterDemon(this,f);
-			return d->notify();
+			return !schedule or d->notify();
 		}
 		else
 		{
 			FilterDemon* d = new (store) FilterDemon(this,f);
-			return d->notify();
+			return !schedule or d->notify();
 		}
 	}
 
@@ -421,15 +426,29 @@ struct FIFOFilterSched : IQueueFilterSched
 
 		while (!toExecute.empty() and !mYield)
 		{
+			#ifndef CASPER_EXTRA_STATS
 			store.getStats().signalPropagation();
+			#endif
 			pActiveFilter = *toExecute.begin();
 			toExecute.popFront();
 			pActiveFilter->setInQueue(noQueue);
+			#ifdef CASPER_EXTRA_STATS
+			counter du = store.getStats().getNbDomainUpdates();
+			#endif
 			if (!pActiveFilter->execute())
 			{
+				#ifdef CASPER_EXTRA_STATS
+				store.getStats().signalPropagation();
+				store.getStats().signalEffectivePropagation();
+				#endif
 				clear();
 				return false;
 			}
+			#ifdef CASPER_EXTRA_STATS
+			store.getStats().signalPropagation();
+			if (du != store.getStats().getNbDomainUpdates())
+				store.getStats().signalEffectivePropagation();
+			#endif
 		}
 		pActiveFilter = NULL;
 		return true;
@@ -506,14 +525,14 @@ struct TwoCostFilterSched : IQueueFilterSched
 							pActiveFilter(NULL)
 	{}
 
-	bool post(Filter f)
+	bool post(Filter f,bool schedule=true)
 	{
 		INotifiable* d;
 		if (f.cost() <= maxFirstStageCost)
 			d = new (store) CheapFilterDemon(this,f);
 		else
 			d = new (store) ExpensiveFilterDemon(this,f);
-		return d->notify();
+		return !schedule or d->notify();
 	}
 
 	bool notify()
@@ -610,8 +629,8 @@ struct CostFilterSched : IQueueFilterSched
 		}
 	}
 
-	bool post(Filter f)
-	{	return queues[(uint)f.cost()]->post(f);	}
+	bool post(Filter f,bool schedule=true)
+	{	return queues[(uint)f.cost()]->post(f,schedule);	}
 
 	bool notify()
 	{	assert(0); /* demons are notified instead */ return true; }
@@ -720,8 +739,8 @@ struct CostFilterSched<TwoCostFilterSched> : public IQueueFilterSched
 		}
 	}
 
-	bool post(Filter f)
-	{	return queues[(uint)(f.cost()/2)]->post(f);	}
+	bool post(Filter f,bool schedule=true)
+	{	return queues[(uint)(f.cost()/2)]->post(f,schedule);	}
 
 	bool notify()
 	{	assert(0); /* demons are notified instead */ return true; }
@@ -831,8 +850,8 @@ struct FullyPreemptCostFilterSched : IQueueFilterSched
 		}
 	}
 
-	bool post(Filter f)
-	{		return queues[(uint)f.cost()]->post(f);	}
+	bool post(Filter f,bool schedule=true)
+	{		return queues[(uint)f.cost()]->post(f,schedule);	}
 
 	// tmp
 /*	bool postNoExec(Filter f)
@@ -940,10 +959,10 @@ struct DynCostFilterSched : IQueueFilterSched
 			queues[i] = new (store) NextFilterSched(store,false,i);
 	}
 
-	bool post(Filter f)
+	bool post(Filter f,bool schedule=true)
 	{
 		INotifiable* d = new (store) FilterDemon(this,f);
-		return d->notify();
+		return !schedule or d->notify();
 	}
 
 	bool notify()

@@ -252,6 +252,7 @@ vars.Add(BoolVariable('warnings', 'compilation with -Wall', True))
 vars.Add(BoolVariable('profile', 'build for profiling with gprof/gcov', False))
 vars.Add(BoolVariable('safe_rounding', 'perform safe rounded operations with float types', 1))
 vars.Add(BoolVariable('asserts', 'extra run-time checks', False))
+vars.Add(BoolVariable('extra_stats', 'collect extra statistic information at cost of runtime', False))
 vars.Add(BoolVariable('log', 'enable builtin debugger', False))
 vars.Add(BoolVariable('static_link', 'static link', False))
 vars.Add(BoolVariable('cpp0x', 'enable c++0x extensions', True))
@@ -375,6 +376,9 @@ if not confCommonEnv.has_key('LIBPATH'):
 
 if env['debug_level'] == 0 and env['asserts'] == 0 :
 	defined_macros += ['NDEBUG']
+
+if env['extra_stats']:
+	defined_macros += ['CASPER_EXTRA_STATS']
 
 if env['log']:
 	defined_macros += ['CASPER_LOG']
@@ -967,7 +971,7 @@ def runTests(target,source,env):
 	from multiprocessing import cpu_count
 	from math import ceil
 	benchmark.runBenchmarks(infilename="test/BenchmarkFile",outfilename="test/BenchmarkResults.xml",
-				  sample_count=5,timeout=30,memout=900e3,product=product,buildenv=buildenv,
+				  sample_count=1,timeout=30,memout=900e3,product=product,buildenv=buildenv,
 				  number_workers = int(ceil(cpu_count()/4.0)))
  	SCons.compat.rename_module('pickle','cPickle') # bypasses SCons bug #2781 
 

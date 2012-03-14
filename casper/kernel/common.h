@@ -155,7 +155,7 @@ typedef Set<bool>	BoolSet;
 
 template<class T>
 struct Seq
-{	typedef T Type;	};
+{	typedef T Elem;	};
 
 ///	Sequence of integers. \ingroup Kernel
 typedef Seq<int>	IntSeq;

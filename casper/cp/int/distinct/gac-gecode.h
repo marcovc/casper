@@ -924,6 +924,10 @@ bool DomFilterView1<Distinct,IntSeq,View>::init()
 template<class View>
 bool DomFilterView1<Distinct,IntSeq,View>::execute()
 {
+	#ifdef CASPER_LOG
+	store.getEnv().log(this, "DomFilterView1<Distinct,IntSeq,View>", Util::Logger::filterExecuteBegin);
+	#endif
+
 	if (btSentinel.hasBacktracked())
 		vvg = NULL;
 	btSentinel.update();

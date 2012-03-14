@@ -112,6 +112,10 @@ template<class Eval,class ArrayView,class IdxView,class ResView>
 bool
 BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::execute()
 {
+	#ifdef CASPER_LOG
+	store.getEnv().log(this, "BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>", Util::Logger::filterExecuteBegin);
+	#endif
+
 #ifdef CASPER_ELEMENT_IDX_1
 	if (!idx.updateRange(1,array.size()))
 		return false;
@@ -139,11 +143,11 @@ BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::execu
 	while (ivMin <= ivMax &&
 		   (array[ivMin].max() < res.min() ||
 			array[ivMin].min() > res.max()))
-		detach(array[ivMin++]);
+		array[ivMin++].detach();
 	while (ivMax >= ivMin &&
 		   (array[ivMax].max() < res.min() ||
 			array[ivMax].min() > res.max()))
-		detach(array[ivMax--]);
+		array[ivMax--].detach();
 
 	// if no idx-domain pairs are possible then fail
 	if (ivMin > ivMax)

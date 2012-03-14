@@ -473,6 +473,9 @@ struct DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView> : 
 	DomView<int,IdxView>			idx;
     DomView<int,EvalView>			eval;
     INotifiable*	pOwner;
+	#ifdef CASPER_LOG
+    Store& store;
+	#endif
 };
 
 /*
@@ -487,7 +490,10 @@ DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>::
 DomFilterView3(Store& store, const ArrayView& array,
     			const IdxView& idx,const EvalView& eval) :
     IFilter(store),array(store,array),idx(store,idx),eval(store,eval)
-{}
+	#ifdef CASPER_LOG
+	,store(store)
+	#endif
+	{}
 
 
 template<class ArrayView,class IdxView,class EvalView>
@@ -541,6 +547,10 @@ template<class ArrayView,class IdxView,class EvalView>
 bool DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>::
 execute()
 {
+	#ifdef CASPER_LOG
+	store.getEnv().log(this, "DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>", Util::Logger::filterExecuteBegin);
+	#endif
+
 	typedef typename Traits::GetDom<IdxView>::Type	IdxDom;
 
 	if (idx->ground())		// FIXME: should post a gac == and detach
