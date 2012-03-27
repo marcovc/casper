@@ -352,7 +352,6 @@ struct ChkViewRel3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,
 	{
 		// if in(z) C intersection(lub(x),lub(y)) and
 		//  intersection(in(x),in(y)) C lub(z)
-
 		return z->minCard()<=std::min(x->maxCard(),y->maxCard()) and
 				!makeDiffIt(makeInIt(*z),makeInterIt(makeLUBIt(*x),makeLUBIt(*y))).valid() and
 				!makeDiffIt(makeInterIt(makeInIt(*x),makeInIt(*y)),makeLUBIt(*z)).valid();

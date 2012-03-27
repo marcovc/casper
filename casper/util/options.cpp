@@ -52,9 +52,9 @@ bool ProgramOptions::parse(int argc, char** argv)
 		cout << "== Help ==" << endl << endl;
 		cout << "usage: " << endl;
 		cout << "\t" << argv[0];
+		cout << " [options]";
 		for (uint i = 0; i < optPositional.max_total_count(); ++i)
 			cout << " " << optPositional.name_for_position(i);
-		cout << " [options]";
 		cout << endl << endl;
 		cout << "where," << endl;
 		for (uint i = 0; i < optPositional.max_total_count(); ++i)

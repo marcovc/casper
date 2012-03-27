@@ -307,7 +307,7 @@ struct StdArray
 #endif
 
 	/// Creates a new (uninitialized) array with room for \p n elements in stdHeap.
-	StdArray(uint n) :
+	StdArray(uint n = 0) :
 			pData(new (stdHeap) Data(stdHeap,n)),
 			mustFree(true) {}
 

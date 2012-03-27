@@ -1,0 +1,11 @@
+predicate all_different_int(array [int] of var int: x);
+predicate disjoint(var set of int: s1, var set of int: s2);
+predicate lex_lesseq_int(array [int] of var int: x, array [int] of var int: y);
+predicate table_bool(array [int] of var bool: x, array [int, int] of bool: t);
+predicate table_int(array [int] of var int: x, array [int, int] of int: t);
+array [1..30] of var 1..10: q :: output_array([1..30]);
+constraint int_lin_eq([-7, 2, -9, 6, 4, 10, -3, 4, -6, -10], [q[1], q[4], q[6], q[9], q[10], q[13], q[16], q[17], q[28], q[29]], -78);
+constraint int_lin_eq([4, -4, -10, 6, -10, -5, -8, 1, 7, 10], [q[3], q[8], q[14], q[15], q[18], q[20], q[22], q[24], q[27], q[30]], -100);
+constraint int_lin_eq([9, 9, 7, -10, 4, 7, 2, -4, 8, 6], [q[2], q[3], q[6], q[9], q[11], q[13], q[16], q[17], q[22], q[24]], 141);
+constraint int_lin_eq([10, 10, 1, 2, 8, 4, 3, -6, 7, -10], [q[2], q[5], q[7], q[11], q[12], q[19], q[21], q[23], q[25], q[26]], 129);
+solve  :: int_search(q, first_fail, indomain_min, complete) satisfy;

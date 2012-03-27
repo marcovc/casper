@@ -373,7 +373,11 @@ NEW_REL_2(maxEqual,MaxEqual)
 
 NEW_REL_2(mod,Mod)
 
-NEW_REL_3(sumProductEqual,SumProductEqual)
+NEW_REL_3(linearEqual,LinearEqual)
+NEW_REL_3(linearGreaterEqual,LinearGreaterEqual)
+NEW_REL_3(linearLessEqual,LinearLessEqual)
+NEW_REL_3(linearGreater,LinearGreater)
+NEW_REL_3(linearLess,LinearLess)
 
 NEW_REL_2(sumProduct,SumProduct)
 
@@ -536,7 +540,23 @@ struct GetEval<Rel2<XOr,T1,T2> >
 {	typedef	bool	Type;	};
 
 template<class T1,class T2,class T3>
-struct GetEval<Rel3<SumProductEqual,T1,T2,T3> >
+struct GetEval<Rel3<LinearEqual,T1,T2,T3> >
+{	typedef bool Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<LinearGreaterEqual,T1,T2,T3> >
+{	typedef bool Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<LinearLessEqual,T1,T2,T3> >
+{	typedef bool Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<LinearGreater,T1,T2,T3> >
+{	typedef bool Type;	};
+
+template<class T1,class T2,class T3>
+struct GetEval<Rel3<LinearLess,T1,T2,T3> >
 {	typedef bool Type;	};
 
 template<class T1,class T2>

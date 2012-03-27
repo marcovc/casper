@@ -21,6 +21,7 @@
 #define CASPER_CP_VIEW_CHK_H_
 
 #include <casper/cp/view/common.h>
+#include <casper/cp/traits.h>
 #include <casper/fwddecl.h>
 
 namespace Casper {
@@ -416,6 +417,11 @@ struct ChkViewRel2<XOr,bool,Expr1,bool,Expr2> :
 {
 	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
 		ChkViewRel2<Distinct,bool,Expr1,bool,Expr2>(store,p1,p2) {}
+	Rel2<XOr,Expr1,Expr2> getObj() const
+	{
+		auto obj = ChkViewRel2<Distinct,bool,Expr1,bool,Expr2>::getObj();
+		return rel<XOr>(obj.p1,obj.p2);
+	}
 };
 
 /**
@@ -534,7 +540,8 @@ struct ChkViewRel2<Less,Eval,Expr1,Eval,Expr2> :
 {
 	typedef ChkViewRel1<Not,bool,Rel2<GreaterEqual,Expr1,Expr2> >	Super;
 	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
-		Super(store,rel<GreaterEqual>(p1,p2)) {}
+		Super(store,rel<GreaterEqual>(p1,p2))
+	{}
 	Rel2<Less,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Less,Expr1,Expr2>(Super::getObj().p1.p1,Super::getObj().p1.p2);	}
 };
@@ -676,6 +683,197 @@ struct ChkViewRel2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2>
 	Expr2 p2;
 };
 
+/**
+ * 	ChkView over the LinearEqual constraint.
+ * 	\pre Requires p1 (the coefficients) to be instantiated.
+ * 	\ingroup ChkViews
+ */
+template<class Eval,class Expr1,class Expr2,class Expr3>
+struct ChkViewRel3<LinearEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3>
+{
+	ChkViewRel3(Store& store, const Expr1& p1, const Expr2& p2, const Expr3& p3) :
+		store(store),c(store,p1),x(store,p2),v(store,p3) {}
+	bool isTrue() const	// is it true?
+	{
+		assert(c.ground());
+		if (!x.ground() or v.min()<v.max())
+			return false;
+		Eval f = 0;
+		for (uint i = 0; i < c.size(); ++i)
+			f += c[i].value()*x[i].min();
+		return f==v.min();
+	}
+	bool canBeTrue() const 	// can it still be true?
+	{
+		if (!c.ground())
+			return true;
+		Eval mi = 0;
+		Eval ma = 0;
+		for (uint i = 0; i < c.size(); ++i)
+			if (c[i].value()>0)
+			{
+				mi += c[i].value()*x[i].min();
+				ma += c[i].value()*x[i].max();
+			}
+			else
+			{
+				ma += c[i].value()*x[i].min();
+				mi += c[i].value()*x[i].max();
+			}
+		return mi <= v.max() and ma >= v.min();
+	}
+	bool setToTrue()
+	{	return store.post(linearEqual(c.getObj(),x.getObj(),v.getObj()));	}
+	bool setToFalse()
+	{
+		Var<Eval,typename Traits::GetDefaultDom<Eval>::Type> auxV(store,v.min(),v.max());
+		return store.post(linearEqual(c.getObj(),x.getObj(),auxV) and
+						  auxV != v.getObj());
+	}
+
+	void attach(INotifiable* f)
+	{
+		c.attach(f);
+		x.attach(f);
+		v.attach(f);
+	}
+	void detach()
+	{
+		c.detach();
+		x.detach();
+		v.detach();
+	}
+
+	Rel3<LinearEqual,Expr1,Expr2,Expr3> getObj()  const
+	{ 	return Rel3<LinearEqual,Expr1,Expr2,Expr3>(c.getObj(),x.getObj(),v.getObj());	}
+
+	Store&	store;
+	ValArrayView<Eval,Expr1> c;
+	BndArrayView<Eval,Expr2> x;
+	BndView<Eval,Expr3> v;
+
+};
+
+/**
+ * 	ChkView over the LinearGreaterEqual constraint.
+ * 	\pre Requires p1 (the coefficients) to be instantiated.
+ * 	\ingroup ChkViews
+ */
+template<class Eval,class Expr1,class Expr2,class Expr3>
+struct ChkViewRel3<LinearGreaterEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3>
+{
+	ChkViewRel3(Store& store, const Expr1& p1, const Expr2& p2, const Expr3& p3) :
+		store(store),c(store,p1),x(store,p2),v(store,p3) {}
+	bool isTrue() const	// is it true?
+	{
+		assert(c.ground());
+		Eval mi = 0;
+		for (uint i = 0; i < c.size(); ++i)
+			if (c[i].value()>0)
+				mi += c[i].value()*x[i].min();
+			else
+				mi += c[i].value()*x[i].max();
+		return mi>=v.max();
+	}
+	bool canBeTrue() const 	// can it still be true?
+	{
+		assert(c.ground());
+		Eval ma = 0;
+		for (uint i = 0; i < c.size(); ++i)
+			if (c[i].value()>0)
+				ma += c[i].value()*x[i].max();
+			else
+				ma += c[i].value()*x[i].min();
+		return ma>=v.min();
+	}
+	bool setToTrue()
+	{	return store.post(linearGreaterEqual(c.getObj(),x.getObj(),v.getObj()));	}
+	bool setToFalse()
+	{	return store.post(linearLess(c.getObj(),x.getObj(),v.getObj()));	}
+
+	void attach(INotifiable* f)
+	{
+		c.attach(f);
+		x.attach(f);
+		v.attach(f);
+	}
+	void detach()
+	{
+		c.detach();
+		x.detach();
+		v.detach();
+	}
+
+	Rel3<LinearGreaterEqual,Expr1,Expr2,Expr3> getObj()  const
+	{ 	return Rel3<LinearGreaterEqual,Expr1,Expr2,Expr3>(c.getObj(),x.getObj(),v.getObj());	}
+
+	Store&	store;
+	ValArrayView<Eval,Expr1> c;
+	BndArrayView<Eval,Expr2> x;
+	BndView<Eval,Expr3> v;
+};
+
+/**
+ * 	ChkView over the LinearLessEqual constraint.
+ * 	\pre Requires p1 (the coefficients) to be instantiated.
+ * 	\ingroup ChkViews
+ */
+template<class Eval,class Expr1,class Expr2,class Expr3>
+struct ChkViewRel3<LinearLessEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3>
+{
+	ChkViewRel3(Store& store, const Expr1& p1, const Expr2& p2, const Expr3& p3) :
+		store(store),c(store,p1),x(store,p2),v(store,p3) {}
+
+	bool isTrue() const	// is it true?
+	{
+		assert(c.ground());
+		Eval ma = 0;
+		for (uint i = 0; i < c.size(); ++i)
+			if (c[i].value()>0)
+				ma += c[i].value()*x[i].max();
+			else
+				ma += c[i].value()*x[i].min();
+		return ma<=v.min();
+	}
+	bool canBeTrue() const 	// can it still be true?
+	{
+		assert(c.ground());
+		Eval mi = 0;
+		for (uint i = 0; i < c.size(); ++i)
+			if (c[i].value()>0)
+				mi += c[i].value()*x[i].min();
+			else
+				mi += c[i].value()*x[i].max();
+		return mi<=v.max();
+
+	}
+	bool setToTrue()
+	{	return store.post(linearLessEqual(c.getObj(),x.getObj(),v.getObj()));	}
+	bool setToFalse()
+	{	return store.post(linearGreater(c.getObj(),x.getObj(),v.getObj()));	}
+
+	void attach(INotifiable* f)
+	{
+		c.attach(f);
+		x.attach(f);
+		v.attach(f);
+	}
+	void detach()
+	{
+		c.detach();
+		x.detach();
+		v.detach();
+	}
+
+	Rel3<LinearLessEqual,Expr1,Expr2,Expr3> getObj()  const
+	{ 	return Rel3<LinearLessEqual,Expr1,Expr2,Expr3>(c.getObj(),x.getObj(),v.getObj());	}
+
+	Store&	store;
+	ValArrayView<Eval,Expr1> c;
+	BndArrayView<Eval,Expr2> x;
+	BndView<Eval,Expr3> v;
+};
+
 // This class adapts bnd views over boolean expressions to work as checkers
 // note: this is not enabled for all checkers to avoid complex compiler error
 // messages when user makes a mistake. To use it see example below (IfThenElse).
@@ -729,6 +927,9 @@ struct ChkViewRel2<Element,Seq<bool>,T1,int,T2> :
 
 /**
  * 	ChkView over a cast expression.
+ * 	\note We follow the same semantics of the C/C++ programming language:
+ * 	From bool to int, false is always 0, true is always 1. (see BndViewCast<bool,int,View>)
+ * 	From int to bool, 0 is always false, anything other than 0 is true. <== implemented below
  * 	\ingroup ChkViews
  */
 template<class Expr1>
@@ -737,25 +938,27 @@ struct ChkViewRel1<Cast<bool>,int,Expr1>
 	ChkViewRel1(Store& store, const Expr1& p1) :
 			v(store,p1) {}
 	bool isTrue() const	// is it true?
-	{	return v.max()==v.min() and v.max()==1;	}
+	{	return v.max()<0 or v.min()>0;	}
 	bool canBeTrue() const 	// can it still be true?
-	{	return v.max()>=1 and v.min()<=1;	}
+	{	return v.max()>0 or v.min()<0;	}
 	bool setToTrue()
-	{	return v.updateRange(1,1);	}
+	{
+		if (v.min()==0)
+			v.updateMin(1);
+		if (v.max()==0)
+			v.updateMax(-1);
+		return true;
+	}
 	bool setToFalse()
 	{
-		if (v.min()==1)
-			return v.updateMin(2);
-		if (v.max()==1)
-			return v.updateMax(0);
-		return true;
+		return v.updateRange(0,0);
 	}
 
 	void attach(INotifiable* f) { 	v.attach(f);}
 	void detach() {	v.detach();}
 
 	Rel1<Cast<bool>,Expr1> getObj()  const
-	{ 	return rel<cast<bool>>(v.getObj());	}
+	{ 	return rel<Cast<bool>>(v.getObj());	}
 
 	BndView<int,Expr1>	v;
 };

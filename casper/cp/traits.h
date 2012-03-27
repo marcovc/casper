@@ -20,6 +20,13 @@
 #ifndef CASPER_CP_TRAITS_H_
 #define CASPER_CP_TRAITS_H_
 
+/// Defines if CP::Element is applied over zero or one based arrays
+#ifdef CASPER_CP_ELEMENT_BASE_1
+	#define CASPER_CP_ELEMENT_ARRAY_BASE	1
+#else
+	#define CASPER_CP_ELEMENT_ARRAY_BASE	0
+#endif
+
 #include <casper/kernel/traits.h>
 
 namespace Casper {

@@ -1,0 +1,5560 @@
+<testsuite id='FzConformanceTest'>
+    <description>Conformance tests included in the flatzinc distribution</description>
+    <product id='1'>
+        <name></name>
+        <version></version>
+        <revision></revision>
+        <note></note>
+    </product>
+    <buildenv id='1'>
+        <compiler></compiler>
+        <stdlib></stdlib>
+        <buildflags></buildflags>
+    </buildenv>
+    <runenv id='1'>
+        <os>Linux 2.6.37.6 #10 SMP PREEMPT Wed Nov 16 16:39:29 WET 2011</os>
+        <arch>i686</arch>
+        <processor>Intel(R) Core(TM)2 Duo CPU T7500 @ 2.20GHz</processor>
+    </runenv>
+    <test id='FzConformanceTest-0'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/output/float</description>
+        <cout></cout>
+        <cerr>
+Error: Floats not supported. in line no. 4
+Error: Floats not supported. in line no. 5
+Error: undefined variable x1 in line no. 6
+Error: undefined variable x2 in line no. 7
+</cerr>
+        <secs>0.030994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-1'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_input_order_indomain_max</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-2'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/bool_search_input_order_indomain_max</description>
+        <cout>
+xs = array1d(1..2, [false, false]);
+----------
+xs = array1d(1..2, [false, true]);
+----------
+xs = array1d(1..2, [true, false]);
+----------
+xs = array1d(1..2, [true, true]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-3'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_plus</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_plus not found in line no. 4
+</cerr>
+        <secs>0.029996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-4'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/parsing/invalid/bad_id_2</description>
+        <cout></cout>
+        <cerr>
+Error: Unknown character in line no. 1
+Error: Unknown character in line no. 1
+Error: Unknown character in line no. 1
+Error: Unknown character in line no. 1
+Error: Unknown character in line no. 1
+Error: Unknown character in line no. 1
+Error: syntax error, unexpected ';', expecting FZ_ID or FZ_U_ID in line no. 1
+</cerr>
+        <secs>0.031994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-5'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_union</description>
+        <cout>
+x1 = {1, 2};
+x2 = {2, 3};
+x3 = {1, 2, 3};
+----------
+x1 = {1, 2};
+x2 = {2};
+x3 = {1, 2};
+----------
+x1 = {1, 2};
+x2 = {3};
+x3 = {1, 2, 3};
+----------
+x1 = {1, 2};
+x2 = {};
+x3 = {1, 2};
+----------
+x1 = {1};
+x2 = {2, 3};
+x3 = {1, 2, 3};
+----------
+x1 = {1};
+x2 = {2};
+x3 = {1, 2};
+----------
+x1 = {1};
+x2 = {3};
+x3 = {1, 3};
+----------
+x1 = {1};
+x2 = {};
+x3 = {1};
+----------
+x1 = {2};
+x2 = {2, 3};
+x3 = {2, 3};
+----------
+x1 = {2};
+x2 = {2};
+x3 = {2};
+----------
+x1 = {2};
+x2 = {3};
+x3 = {2, 3};
+----------
+x1 = {2};
+x2 = {};
+x3 = {2};
+----------
+x1 = {};
+x2 = {2, 3};
+x3 = {2, 3};
+----------
+x1 = {};
+x2 = {2};
+x3 = {2};
+----------
+x1 = {};
+x2 = {3};
+x3 = {3};
+----------
+x1 = {};
+x2 = {};
+x3 = {};
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-6'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/parsing/invalid/bad_id_1</description>
+        <cout></cout>
+        <cerr>
+Error: Unknown character in line no. 1
+Error: syntax error, unexpected ';', expecting FZ_ID or FZ_U_ID in line no. 1
+</cerr>
+        <secs>0.030996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-7'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_le_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_lin_le_reif not found in line no. 3
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-8'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_largest_outdomain_min</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_min
+</cerr>
+        <secs>0.032995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-9'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_eq_reif</description>
+        <cout>
+x1 = -1;
+x2 = -1;
+x3 = true;
+----------
+x1 = -1;
+x2 = 0;
+x3 = false;
+----------
+x1 = -1;
+x2 = 1;
+x3 = false;
+----------
+x1 = 0;
+x2 = -1;
+x3 = false;
+----------
+x1 = 0;
+x2 = 0;
+x3 = true;
+----------
+x1 = 0;
+x2 = 1;
+x3 = false;
+----------
+x1 = 1;
+x2 = -1;
+x3 = false;
+----------
+x1 = 1;
+x2 = 0;
+x3 = false;
+----------
+x1 = 1;
+x2 = 1;
+x3 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-10'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_set_element</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint array_set_element not found in line no. 7
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-11'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_ne</description>
+        <cout>
+x1 = {1, 2};
+x2 = {0, 1};
+----------
+x1 = {1, 2};
+x2 = {0};
+----------
+x1 = {1, 2};
+x2 = {1};
+----------
+x1 = {1, 2};
+x2 = {};
+----------
+x1 = {1};
+x2 = {0, 1};
+----------
+x1 = {1};
+x2 = {0};
+----------
+x1 = {1};
+x2 = {};
+----------
+x1 = {2};
+x2 = {0, 1};
+----------
+x1 = {2};
+x2 = {0};
+----------
+x1 = {2};
+x2 = {1};
+----------
+x1 = {2};
+x2 = {};
+----------
+x1 = {};
+x2 = {0, 1};
+----------
+x1 = {};
+x2 = {0};
+----------
+x1 = {};
+x2 = {1};
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-12'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_ne</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_ne not found in line no. 2
+</cerr>
+        <secs>0.030996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-13'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/bool_search_input_order_indomain_min</description>
+        <cout>
+xs = array1d(1..2, [false, false]);
+----------
+xs = array1d(1..2, [false, true]);
+----------
+xs = array1d(1..2, [true, false]);
+----------
+xs = array1d(1..2, [true, true]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-14'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_le</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_le not found in line no. 4
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-15'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_input_order_indomain_reverse_split</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-16'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_bool_element</description>
+        <cout>
+x1 = 0;
+x2 = false;
+x3 = false;
+x4 = false;
+----------
+x1 = 0;
+x2 = false;
+x3 = false;
+x4 = true;
+----------
+x1 = 0;
+x2 = false;
+x3 = true;
+x4 = false;
+----------
+x1 = 0;
+x2 = false;
+x3 = true;
+x4 = true;
+----------
+x1 = 0;
+x2 = true;
+x3 = false;
+x4 = false;
+----------
+x1 = 0;
+x2 = true;
+x3 = false;
+x4 = true;
+----------
+x1 = 0;
+x2 = true;
+x3 = true;
+x4 = false;
+----------
+x1 = 0;
+x2 = true;
+x3 = true;
+x4 = true;
+----------
+x1 = 1;
+x2 = false;
+x3 = false;
+x4 = false;
+----------
+x1 = 1;
+x2 = false;
+x3 = false;
+x4 = true;
+----------
+x1 = 1;
+x2 = false;
+x3 = true;
+x4 = false;
+----------
+x1 = 1;
+x2 = false;
+x3 = true;
+x4 = true;
+----------
+x1 = 1;
+x2 = true;
+x3 = false;
+x4 = false;
+----------
+x1 = 1;
+x2 = true;
+x3 = false;
+x4 = true;
+----------
+x1 = 1;
+x2 = true;
+x3 = true;
+x4 = false;
+----------
+x1 = 1;
+x2 = true;
+x3 = true;
+x4 = true;
+----------
+x1 = 2;
+x2 = false;
+x3 = false;
+x4 = false;
+----------
+x1 = 2;
+x2 = false;
+x3 = false;
+x4 = true;
+----------
+x1 = 2;
+x2 = false;
+x3 = true;
+x4 = false;
+----------
+x1 = 2;
+x2 = false;
+x3 = true;
+x4 = true;
+----------
+x1 = 2;
+x2 = true;
+x3 = false;
+x4 = false;
+----------
+x1 = 2;
+x2 = true;
+x3 = false;
+x4 = true;
+----------
+x1 = 2;
+x2 = true;
+x3 = true;
+x4 = false;
+----------
+x1 = 2;
+x2 = true;
+x3 = true;
+x4 = true;
+----------
+x1 = 3;
+x2 = false;
+x3 = false;
+x4 = false;
+----------
+x1 = 3;
+x2 = false;
+x3 = false;
+x4 = true;
+----------
+x1 = 3;
+x2 = false;
+x3 = true;
+x4 = false;
+----------
+x1 = 3;
+x2 = false;
+x3 = true;
+x4 = true;
+----------
+x1 = 3;
+x2 = true;
+x3 = false;
+x4 = false;
+----------
+x1 = 3;
+x2 = true;
+x3 = false;
+x4 = true;
+----------
+x1 = 3;
+x2 = true;
+x3 = true;
+x4 = false;
+----------
+x1 = 3;
+x2 = true;
+x3 = true;
+x4 = true;
+----------
+==========
+</cout>
+        <cerr>
+array_bool_element(i(2),[b(true), b(false)],b(false))::NULL
+array_bool_element(xi(0),[xb(0), xb(1)],xb(2))::NULL
+</cerr>
+        <secs>0.032995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-17'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_input_order_outdomain_min</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_min
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-18'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/output/int</description>
+        <cout>
+x1 = -42;
+x2 = 69;
+----------
+</cout>
+        <cerr></cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-19'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_first_fail_indomain_max</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-20'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/output/set</description>
+        <cout>
+x1 = {};
+x2 = {1, 2, 3};
+----------
+</cout>
+        <cerr></cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-21'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/output/bool</description>
+        <cout>
+x1 = false;
+x2 = true;
+----------
+</cout>
+        <cerr></cerr>
+        <secs>0.029995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-22'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/parsing/invalid/bad_id_3</description>
+        <cout></cout>
+        <cerr>
+Error: Unknown character in line no. 1
+Error: Unknown character in line no. 1
+Error: Unknown character in line no. 1
+Error: syntax error, unexpected FZ_INT_LIT, expecting FZ_ID or FZ_U_ID in line no. 1
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-23'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_anti_first_fail_outdomain_min</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_min
+</cerr>
+        <secs>0.032995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-24'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_largest_outdomain_min</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_min
+</cerr>
+        <secs>0.031996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-25'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_anti_first_fail_outdomain_max</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_max
+</cerr>
+        <secs>0.032996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-26'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/int2float</description>
+        <cout></cout>
+        <cerr>
+Error: Floats not supported. in line no. 4
+Error: undefined variable y in line no. 6
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-27'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_largest_outdomain_max</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_max
+</cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-28'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_le_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint int_lin_le_reif not found in line no. 10
+</cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-29'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_ne_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint int_lin_ne_reif not found in line no. 10
+</cerr>
+        <secs>0.031994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-30'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_input_order_indomain_min</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-31'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lt_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_lt_reif not found in line no. 3
+</cerr>
+        <secs>0.030996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-32'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_ne_reif</description>
+        <cout>
+x1 = -1;
+x2 = -1;
+x3 = false;
+----------
+x1 = -1;
+x2 = 0;
+x3 = true;
+----------
+x1 = -1;
+x2 = 1;
+x3 = true;
+----------
+x1 = 0;
+x2 = -1;
+x3 = true;
+----------
+x1 = 0;
+x2 = 0;
+x3 = false;
+----------
+x1 = 0;
+x2 = 1;
+x3 = true;
+----------
+x1 = 1;
+x2 = -1;
+x3 = true;
+----------
+x1 = 1;
+x2 = 0;
+x3 = true;
+----------
+x1 = 1;
+x2 = 1;
+x3 = false;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-33'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_first_fail_indomain_reverse_split</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-34'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_in</description>
+        <cout>
+x1 = 0;
+x2 = {0, 1};
+----------
+x1 = 0;
+x2 = {0};
+----------
+x1 = 1;
+x2 = {0, 1};
+----------
+x1 = 1;
+x2 = {1};
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-35'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_abs</description>
+        <cout>
+x1 = -1;
+x2 = 1;
+----------
+x1 = 0;
+x2 = 0;
+----------
+x1 = 1;
+x2 = 1;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-36'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_smallest_indomain_min</description>
+        <cout>
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-37'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lin_le</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint bool_lin_le not found in line no. 11
+</cerr>
+        <secs>0.031996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-38'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_eq_reif</description>
+        <cout>
+x1 = false;
+x2 = false;
+x3 = true;
+----------
+x1 = false;
+x2 = true;
+x3 = false;
+----------
+x1 = true;
+x2 = false;
+x3 = false;
+----------
+x1 = true;
+x2 = true;
+x3 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-39'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_input_order_indomain_median</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: indomain_median
+</cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-40'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_mod</description>
+        <cout></cout>
+        <cerr></cerr>
+        <secs>0.030996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-41'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_anti_first_fail_indomain_min</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.032994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-42'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_anti_first_fail_indomain_reverse_split</description>
+        <cout>
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [1, 4]);
+----------
+xs = array1d(1..2, [1, 5]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [2, 4]);
+----------
+xs = array1d(1..2, [2, 5]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-43'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_ne_reif</description>
+        <cout>
+x1 = {1, 2};
+x2 = {0, 1};
+x3 = true;
+----------
+x1 = {1, 2};
+x2 = {0};
+x3 = true;
+----------
+x1 = {1, 2};
+x2 = {1};
+x3 = true;
+----------
+x1 = {1, 2};
+x2 = {};
+x3 = true;
+----------
+x1 = {1};
+x2 = {0, 1};
+x3 = true;
+----------
+x1 = {1};
+x2 = {0};
+x3 = true;
+----------
+x1 = {1};
+x2 = {1};
+x3 = false;
+----------
+x1 = {1};
+x2 = {};
+x3 = true;
+----------
+x1 = {2};
+x2 = {0, 1};
+x3 = true;
+----------
+x1 = {2};
+x2 = {0};
+x3 = true;
+----------
+x1 = {2};
+x2 = {1};
+x3 = true;
+----------
+x1 = {2};
+x2 = {};
+x3 = true;
+----------
+x1 = {};
+x2 = {0, 1};
+x3 = true;
+----------
+x1 = {};
+x2 = {0};
+x3 = true;
+----------
+x1 = {};
+x2 = {1};
+x3 = true;
+----------
+x1 = {};
+x2 = {};
+x3 = false;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.030996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-44'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_or</description>
+        <cout>
+x1 = false;
+x2 = false;
+x3 = false;
+----------
+x1 = false;
+x2 = true;
+x3 = true;
+----------
+x1 = true;
+x2 = false;
+x3 = true;
+----------
+x1 = true;
+x2 = true;
+x3 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-45'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_anti_first_fail_indomain_max</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-46'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_first_fail_indomain_split</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.029996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-47'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_first_fail_indomain_min</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-48'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_ne</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint int_lin_ne not found in line no. 9
+</cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-49'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_int_element</description>
+        <cout>
+x1 = 0;
+x2 = 0;
+----------
+x1 = 0;
+x2 = 1;
+----------
+x1 = 0;
+x2 = 2;
+----------
+x1 = 0;
+x2 = 3;
+----------
+x1 = 1;
+x2 = 0;
+----------
+x1 = 1;
+x2 = 1;
+----------
+x1 = 1;
+x2 = 2;
+----------
+x1 = 1;
+x2 = 3;
+----------
+x1 = 2;
+x2 = 0;
+----------
+x1 = 2;
+x2 = 1;
+----------
+x1 = 2;
+x2 = 2;
+----------
+x1 = 2;
+x2 = 3;
+----------
+x1 = 3;
+x2 = 0;
+----------
+x1 = 3;
+x2 = 1;
+----------
+x1 = 3;
+x2 = 2;
+----------
+x1 = 3;
+x2 = 3;
+----------
+==========
+</cout>
+        <cerr>
+array_int_element(i(2),[i(1), i(2), i(3)],i(2))::NULL
+array_int_element(xi(0),[i(1), i(2)],xi(1))::NULL
+</cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-50'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_first_fail_indomain_max</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-51'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_not</description>
+        <cout>
+x1 = false;
+x2 = true;
+----------
+x1 = true;
+x2 = false;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-52'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/output/array_of_int</description>
+        <cout>
+xs = array1d(1..2, [-42, 69]);
+----------
+</cout>
+        <cerr></cerr>
+        <secs>0.030996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-53'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/parsing/invalid/bad_pred_param_id</description>
+        <cout></cout>
+        <cerr>
+Error: syntax error, unexpected FZ_U_ID, expecting FZ_ID in line no. 1
+</cerr>
+        <secs>0.030996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-54'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/parsing/invalid/bad_ann_id</description>
+        <cout>
+ ----------
+</cout>
+        <cerr></cerr>
+        <secs>0.029995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-55'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_abs</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_abs not found in line no. 2
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-56'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_lt_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_lin_lt_reif not found in line no. 3
+</cerr>
+        <secs>0.029995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-57'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/seq_search</description>
+        <cout>
+x1 = false;
+x2 = false;
+x3 = false;
+----------
+x1 = false;
+x2 = false;
+x3 = true;
+----------
+x1 = false;
+x2 = true;
+x3 = false;
+----------
+x1 = false;
+x2 = true;
+x3 = true;
+----------
+x1 = true;
+x2 = false;
+x3 = false;
+----------
+x1 = true;
+x2 = false;
+x3 = true;
+----------
+x1 = true;
+x2 = true;
+x3 = false;
+----------
+x1 = true;
+x2 = true;
+x3 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.030996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-58'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_xor</description>
+        <cout>
+x1 = false;
+x2 = false;
+x3 = false;
+----------
+x1 = false;
+x2 = true;
+x3 = true;
+----------
+x1 = true;
+x2 = false;
+x3 = true;
+----------
+x1 = true;
+x2 = true;
+x3 = false;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-59'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_eq</description>
+        <cout>
+x1 = false;
+x2 = false;
+----------
+x1 = true;
+x2 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.029995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-60'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_first_fail_indomain_median</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: indomain_median
+</cerr>
+        <secs>0.031996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-61'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_int_element</description>
+        <cout>
+x1 = 0;
+x2 = 1;
+x3 = 1;
+x4 = 0;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 1;
+x4 = 1;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 1;
+x4 = 2;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 1;
+x4 = 3;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 2;
+x4 = 0;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 2;
+x4 = 1;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 2;
+x4 = 2;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 2;
+x4 = 3;
+----------
+x1 = 0;
+x2 = 2;
+x3 = 1;
+x4 = 0;
+----------
+x1 = 0;
+x2 = 2;
+x3 = 1;
+x4 = 1;
+----------
+x1 = 0;
+x2 = 2;
+x3 = 1;
+x4 = 2;
+----------
+x1 = 0;
+x2 = 2;
+x3 = 1;
+x4 = 3;
+----------
+x1 = 0;
+x2 = 2;
+x3 = 2;
+x4 = 0;
+----------
+x1 = 0;
+x2 = 2;
+x3 = 2;
+x4 = 1;
+----------
+x1 = 0;
+x2 = 2;
+x3 = 2;
+x4 = 2;
+----------
+x1 = 0;
+x2 = 2;
+x3 = 2;
+x4 = 3;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 1;
+x4 = 0;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 1;
+x4 = 1;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 1;
+x4 = 2;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 1;
+x4 = 3;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 2;
+x4 = 0;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 2;
+x4 = 1;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 2;
+x4 = 2;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 2;
+x4 = 3;
+----------
+x1 = 1;
+x2 = 2;
+x3 = 1;
+x4 = 0;
+----------
+x1 = 1;
+x2 = 2;
+x3 = 1;
+x4 = 1;
+----------
+x1 = 1;
+x2 = 2;
+x3 = 1;
+x4 = 2;
+----------
+x1 = 1;
+x2 = 2;
+x3 = 1;
+x4 = 3;
+----------
+x1 = 1;
+x2 = 2;
+x3 = 2;
+x4 = 0;
+----------
+x1 = 1;
+x2 = 2;
+x3 = 2;
+x4 = 1;
+----------
+x1 = 1;
+x2 = 2;
+x3 = 2;
+x4 = 2;
+----------
+x1 = 1;
+x2 = 2;
+x3 = 2;
+x4 = 3;
+----------
+x1 = 2;
+x2 = 1;
+x3 = 1;
+x4 = 0;
+----------
+x1 = 2;
+x2 = 1;
+x3 = 1;
+x4 = 1;
+----------
+x1 = 2;
+x2 = 1;
+x3 = 1;
+x4 = 2;
+----------
+x1 = 2;
+x2 = 1;
+x3 = 1;
+x4 = 3;
+----------
+x1 = 2;
+x2 = 1;
+x3 = 2;
+x4 = 0;
+----------
+x1 = 2;
+x2 = 1;
+x3 = 2;
+x4 = 1;
+----------
+x1 = 2;
+x2 = 1;
+x3 = 2;
+x4 = 2;
+----------
+x1 = 2;
+x2 = 1;
+x3 = 2;
+x4 = 3;
+----------
+x1 = 2;
+x2 = 2;
+x3 = 1;
+x4 = 0;
+----------
+x1 = 2;
+x2 = 2;
+x3 = 1;
+x4 = 1;
+----------
+x1 = 2;
+x2 = 2;
+x3 = 1;
+x4 = 2;
+----------
+x1 = 2;
+x2 = 2;
+x3 = 1;
+x4 = 3;
+----------
+x1 = 2;
+x2 = 2;
+x3 = 2;
+x4 = 0;
+----------
+x1 = 2;
+x2 = 2;
+x3 = 2;
+x4 = 1;
+----------
+x1 = 2;
+x2 = 2;
+x3 = 2;
+x4 = 2;
+----------
+x1 = 2;
+x2 = 2;
+x3 = 2;
+x4 = 3;
+----------
+x1 = 3;
+x2 = 1;
+x3 = 1;
+x4 = 0;
+----------
+x1 = 3;
+x2 = 1;
+x3 = 1;
+x4 = 1;
+----------
+x1 = 3;
+x2 = 1;
+x3 = 1;
+x4 = 2;
+----------
+x1 = 3;
+x2 = 1;
+x3 = 1;
+x4 = 3;
+----------
+x1 = 3;
+x2 = 1;
+x3 = 2;
+x4 = 0;
+----------
+x1 = 3;
+x2 = 1;
+x3 = 2;
+x4 = 1;
+----------
+x1 = 3;
+x2 = 1;
+x3 = 2;
+x4 = 2;
+----------
+x1 = 3;
+x2 = 1;
+x3 = 2;
+x4 = 3;
+----------
+x1 = 3;
+x2 = 2;
+x3 = 1;
+x4 = 0;
+----------
+x1 = 3;
+x2 = 2;
+x3 = 1;
+x4 = 1;
+----------
+x1 = 3;
+x2 = 2;
+x3 = 1;
+x4 = 2;
+----------
+x1 = 3;
+x2 = 2;
+x3 = 1;
+x4 = 3;
+----------
+x1 = 3;
+x2 = 2;
+x3 = 2;
+x4 = 0;
+----------
+x1 = 3;
+x2 = 2;
+x3 = 2;
+x4 = 1;
+----------
+x1 = 3;
+x2 = 2;
+x3 = 2;
+x4 = 2;
+----------
+x1 = 3;
+x2 = 2;
+x3 = 2;
+x4 = 3;
+----------
+==========
+</cout>
+        <cerr>
+array_int_element(i(2),[i(2), i(3), i(4)],i(3))::NULL
+array_int_element(xi(0),[xi(1), xi(2)],xi(3))::NULL
+</cerr>
+        <secs>0.032995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-62'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_ne</description>
+        <cout>
+x1 = -1;
+x2 = 0;
+----------
+x1 = -1;
+x2 = 1;
+----------
+x1 = 0;
+x2 = -1;
+----------
+x1 = 0;
+x2 = 1;
+----------
+x1 = 1;
+x2 = -1;
+----------
+x1 = 1;
+x2 = 0;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.033995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-63'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_input_order_indomain_min</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.033994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-64'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_plus</description>
+        <cout>
+x1 = -1;
+x2 = -1;
+x3 = -2;
+----------
+x1 = -1;
+x2 = 0;
+x3 = -1;
+----------
+x1 = -1;
+x2 = 1;
+x3 = 0;
+----------
+x1 = 0;
+x2 = -1;
+x3 = -1;
+----------
+x1 = 0;
+x2 = 0;
+x3 = 0;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 1;
+----------
+x1 = 1;
+x2 = -1;
+x3 = 0;
+----------
+x1 = 1;
+x2 = 0;
+x3 = 1;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 2;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.032995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-65'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_card</description>
+        <cout>
+x1 = {0, 1};
+x2 = 2;
+----------
+x1 = {0};
+x2 = 1;
+----------
+x1 = {1};
+x2 = 1;
+----------
+x1 = {};
+x2 = 0;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-66'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_smallest_indomain_max</description>
+        <cout>
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.032995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-67'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_smallest_indomain_median</description>
+        <cout>
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: indomain_median
+</cerr>
+        <secs>0.031996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-68'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/parsing/invalid/bad_pred_id</description>
+        <cout></cout>
+        <cerr>
+Error: syntax error, unexpected FZ_U_ID, expecting FZ_ID in line no. 1
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-69'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lt_reif</description>
+        <cout>
+x1 = false;
+x2 = false;
+x3 = false;
+----------
+x1 = false;
+x2 = true;
+x3 = true;
+----------
+x1 = true;
+x2 = false;
+x3 = false;
+----------
+x1 = true;
+x2 = true;
+x3 = false;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.029995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-70'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_float_element</description>
+        <cout></cout>
+        <cerr>
+Error: syntax error, unexpected FZ_FLOAT_LIT in line no. 4
+</cerr>
+        <secs>0.030996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-71'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_anti_first_fail_indomain_median</description>
+        <cout>
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+</cout>
+        <cerr>
+Warning, ignored search annotation: indomain_median
+fzn-casper: ./casper/cp/goal/heuristic.h:198: int Casper::CP::Detail::SelectVarAllRR<Obj, TermCond, Evaluator>::select() [with Obj = Casper::CP::VarArray<int>, TermCond = Casper::CP::GroundTermCond, Evaluator = Casper::CP::Detail::MaxDomEvaluator<int>]: Assertion `bestIdx>=0' failed.
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-72'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_ne_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_ne_reif not found in line no. 3
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-73'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_intersect</description>
+        <cout>
+x1 = {2, 3};
+x2 = {1, 2};
+x3 = {2};
+----------
+x1 = {2, 3};
+x2 = {1};
+x3 = {};
+----------
+x1 = {2, 3};
+x2 = {2};
+x3 = {2};
+----------
+x1 = {2, 3};
+x2 = {};
+x3 = {};
+----------
+x1 = {2};
+x2 = {1, 2};
+x3 = {2};
+----------
+x1 = {2};
+x2 = {1};
+x3 = {};
+----------
+x1 = {2};
+x2 = {2};
+x3 = {2};
+----------
+x1 = {2};
+x2 = {};
+x3 = {};
+----------
+x1 = {3};
+x2 = {1, 2};
+x3 = {};
+----------
+x1 = {3};
+x2 = {1};
+x3 = {};
+----------
+x1 = {3};
+x2 = {2};
+x3 = {};
+----------
+x1 = {3};
+x2 = {};
+x3 = {};
+----------
+x1 = {};
+x2 = {1, 2};
+x3 = {};
+----------
+x1 = {};
+x2 = {1};
+x3 = {};
+----------
+x1 = {};
+x2 = {2};
+x3 = {};
+----------
+x1 = {};
+x2 = {};
+x3 = {};
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-74'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_input_order_outdomain_max</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_max
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-75'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_le</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint int_lin_le not found in line no. 9
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-76'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_symdiff</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint set_symdiff not found in line no. 9
+</cerr>
+        <secs>0.029996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-77'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_mod_2</description>
+        <cout>
+a = 10;
+b = 3;
+----------
+a = 3;
+b = 1;
+----------
+a = 6;
+b = 2;
+----------
+a = 7;
+b = 2;
+----------
+a = 9;
+b = 3;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-78'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_smallest_indomain_max</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-79'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_in_reif</description>
+        <cout>
+x1 = 0;
+x2 = {0, 1};
+x3 = true;
+----------
+x1 = 0;
+x2 = {0};
+x3 = true;
+----------
+x1 = 0;
+x2 = {1};
+x3 = false;
+----------
+x1 = 0;
+x2 = {};
+x3 = false;
+----------
+x1 = 1;
+x2 = {0, 1};
+x3 = true;
+----------
+x1 = 1;
+x2 = {0};
+x3 = false;
+----------
+x1 = 1;
+x2 = {1};
+x3 = true;
+----------
+x1 = 1;
+x2 = {};
+x3 = false;
+----------
+x1 = 2;
+x2 = {0, 1};
+x3 = false;
+----------
+x1 = 2;
+x2 = {0};
+x3 = false;
+----------
+x1 = 2;
+x2 = {1};
+x3 = false;
+----------
+x1 = 2;
+x2 = {};
+x3 = false;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-80'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_min</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_min not found in line no. 2
+</cerr>
+        <secs>0.030995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-81'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_largest_indomain_reverse_split</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.029996</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-82'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_min</description>
+        <cout>
+x1 = -1;
+x2 = -1;
+x3 = -1;
+----------
+x1 = -1;
+x2 = 0;
+x3 = -1;
+----------
+x1 = -1;
+x2 = 1;
+x3 = -1;
+----------
+x1 = 0;
+x2 = -1;
+x3 = -1;
+----------
+x1 = 0;
+x2 = 0;
+x3 = 0;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 0;
+----------
+x1 = 1;
+x2 = -1;
+x3 = -1;
+----------
+x1 = 1;
+x2 = 0;
+x3 = 0;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 1;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.031995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-83'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_times</description>
+        <cout>
+x1 = -1;
+x2 = -1;
+x3 = 1;
+----------
+x1 = -1;
+x2 = -2;
+x3 = 2;
+----------
+x1 = -1;
+x2 = 0;
+x3 = 0;
+----------
+x1 = -1;
+x2 = 1;
+x3 = -1;
+----------
+x1 = -1;
+x2 = 2;
+x3 = -2;
+----------
+x1 = 0;
+x2 = -1;
+x3 = 0;
+----------
+x1 = 0;
+x2 = -2;
+x3 = 0;
+----------
+x1 = 0;
+x2 = 0;
+x3 = 0;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 0;
+----------
+x1 = 0;
+x2 = 2;
+x3 = 0;
+----------
+x1 = 1;
+x2 = -1;
+x3 = -1;
+----------
+x1 = 1;
+x2 = -2;
+x3 = -2;
+----------
+x1 = 1;
+x2 = 0;
+x3 = 0;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 1;
+----------
+x1 = 1;
+x2 = 2;
+x3 = 2;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.033995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-84'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_input_order_indomain_max</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.037994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-85'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_largest_indomain_median</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: indomain_median
+</cerr>
+        <secs>0.043993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-86'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_max</description>
+        <cout>
+x1 = -1;
+x2 = -1;
+x3 = -1;
+----------
+x1 = -1;
+x2 = 0;
+x3 = 0;
+----------
+x1 = -1;
+x2 = 1;
+x3 = 1;
+----------
+x1 = 0;
+x2 = -1;
+x3 = 0;
+----------
+x1 = 0;
+x2 = 0;
+x3 = 0;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 1;
+----------
+x1 = 1;
+x2 = -1;
+x3 = 1;
+----------
+x1 = 1;
+x2 = 0;
+x3 = 1;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 1;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-87'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_first_fail_indomain_min</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.044993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-88'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_input_order_outdomain_min</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_min
+</cerr>
+        <secs>0.044994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-89'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_eq</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_lin_eq not found in line no. 4
+</cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-90'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_first_fail_outdomain_min</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_min
+</cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-91'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_bool_element</description>
+        <cout>
+x1 = 0;
+x2 = false;
+----------
+x1 = 0;
+x2 = true;
+----------
+x1 = 1;
+x2 = false;
+----------
+x1 = 1;
+x2 = true;
+----------
+x1 = 2;
+x2 = false;
+----------
+x1 = 2;
+x2 = true;
+----------
+x1 = 3;
+x2 = false;
+----------
+x1 = 3;
+x2 = true;
+----------
+==========
+</cout>
+        <cerr>
+array_bool_element(i(1),[b(true), b(false)],b(true))::NULL
+array_bool_element(xi(0),[b(false), b(true)],xb(0))::NULL
+</cerr>
+        <secs>0.043993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-92'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_smallest_indomain_min</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.044993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-93'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_div</description>
+        <cout></cout>
+        <cerr></cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-94'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/output/array_of_set</description>
+        <cout>
+xs = array1d(1..2, [{}, {1, 2, 3}]);
+----------
+</cout>
+        <cerr></cerr>
+        <secs>0.041994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-95'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_eq_reif</description>
+        <cout>
+x1 = {1, 2};
+x2 = {0, 1};
+x3 = false;
+----------
+x1 = {1, 2};
+x2 = {0};
+x3 = false;
+----------
+x1 = {1, 2};
+x2 = {1};
+x3 = false;
+----------
+x1 = {1, 2};
+x2 = {};
+x3 = false;
+----------
+x1 = {1};
+x2 = {0, 1};
+x3 = false;
+----------
+x1 = {1};
+x2 = {0};
+x3 = false;
+----------
+x1 = {1};
+x2 = {1};
+x3 = true;
+----------
+x1 = {1};
+x2 = {};
+x3 = false;
+----------
+x1 = {2};
+x2 = {0, 1};
+x3 = false;
+----------
+x1 = {2};
+x2 = {0};
+x3 = false;
+----------
+x1 = {2};
+x2 = {1};
+x3 = false;
+----------
+x1 = {2};
+x2 = {};
+x3 = false;
+----------
+x1 = {};
+x2 = {0, 1};
+x3 = false;
+----------
+x1 = {};
+x2 = {0};
+x3 = false;
+----------
+x1 = {};
+x2 = {1};
+x3 = false;
+----------
+x1 = {};
+x2 = {};
+x3 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.044993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-96'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_subset</description>
+        <cout>
+x1 = {1};
+x2 = {0, 1};
+----------
+x1 = {1};
+x2 = {1};
+----------
+x1 = {};
+x2 = {0, 1};
+----------
+x1 = {};
+x2 = {0};
+----------
+x1 = {};
+x2 = {1};
+----------
+x1 = {};
+x2 = {};
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-97'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_le_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_le_reif not found in line no. 3
+</cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-98'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lt</description>
+        <cout>
+x1 = false;
+x2 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042992</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-99'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_set_element</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint array_var_set_element not found in line no. 9
+</cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-100'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_largest_indomain_min</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.044993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-101'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_anti_first_fail_indomain_split</description>
+        <cout>
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [1, 4]);
+----------
+xs = array1d(1..2, [1, 5]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [2, 4]);
+----------
+xs = array1d(1..2, [2, 5]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.043992</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-102'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_div</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_div not found in line no. 2
+</cerr>
+        <secs>0.041995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-103'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lt</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_lt not found in line no. 4
+</cerr>
+        <secs>0.042995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-104'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/parsing/valid/id</description>
+        <cout>
+ ----------
+</cout>
+        <cerr></cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-105'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_eq</description>
+        <cout>
+x1 = -1;
+x2 = -1;
+----------
+x1 = 0;
+x2 = 0;
+----------
+x1 = 1;
+x2 = 1;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-106'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_le</description>
+        <cout>
+x1 = false;
+x2 = false;
+----------
+x1 = false;
+x2 = true;
+----------
+x1 = true;
+x2 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-107'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/output/unsat</description>
+        <cout></cout>
+        <cerr></cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-108'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_first_fail_outdomain_min</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_min
+</cerr>
+        <secs>0.044992</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-109'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_le</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_lin_le not found in line no. 4
+</cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-110'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_first_fail_outdomain_max</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_max
+</cerr>
+        <secs>0.043994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-111'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/bool2int</description>
+        <cout>
+x1 = false;
+x2 = 0;
+----------
+x1 = true;
+x2 = 1;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-112'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_eq_reif</description>
+        <cout>
+x1 = 0;
+x2 = 0;
+x3 = 0;
+x4 = true;
+----------
+x1 = 0;
+x2 = 0;
+x3 = 1;
+x4 = false;
+----------
+x1 = 0;
+x2 = 0;
+x3 = 2;
+x4 = false;
+----------
+x1 = 0;
+x2 = 0;
+x3 = 3;
+x4 = false;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 0;
+x4 = false;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 1;
+x4 = false;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 2;
+x4 = false;
+----------
+x1 = 0;
+x2 = 1;
+x3 = 3;
+x4 = true;
+----------
+x1 = 1;
+x2 = 0;
+x3 = 0;
+x4 = false;
+----------
+x1 = 1;
+x2 = 0;
+x3 = 1;
+x4 = false;
+----------
+x1 = 1;
+x2 = 0;
+x3 = 2;
+x4 = true;
+----------
+x1 = 1;
+x2 = 0;
+x3 = 3;
+x4 = false;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 0;
+x4 = false;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 1;
+x4 = false;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 2;
+x4 = false;
+----------
+x1 = 1;
+x2 = 1;
+x3 = 3;
+x4 = false;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.044993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-113'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_subset_reif</description>
+        <cout>
+x1 = {1, 2};
+x2 = {0, 1};
+x3 = false;
+----------
+x1 = {1, 2};
+x2 = {0};
+x3 = false;
+----------
+x1 = {1, 2};
+x2 = {1};
+x3 = false;
+----------
+x1 = {1, 2};
+x2 = {};
+x3 = false;
+----------
+x1 = {1};
+x2 = {0, 1};
+x3 = true;
+----------
+x1 = {1};
+x2 = {0};
+x3 = false;
+----------
+x1 = {1};
+x2 = {1};
+x3 = true;
+----------
+x1 = {1};
+x2 = {};
+x3 = false;
+----------
+x1 = {2};
+x2 = {0, 1};
+x3 = false;
+----------
+x1 = {2};
+x2 = {0};
+x3 = false;
+----------
+x1 = {2};
+x2 = {1};
+x3 = false;
+----------
+x1 = {2};
+x2 = {};
+x3 = false;
+----------
+x1 = {};
+x2 = {0, 1};
+x3 = true;
+----------
+x1 = {};
+x2 = {0};
+x3 = true;
+----------
+x1 = {};
+x2 = {1};
+x3 = true;
+----------
+x1 = {};
+x2 = {};
+x3 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.044993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-114'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_eq</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_eq not found in line no. 4
+</cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-115'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_max</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_max not found in line no. 3
+</cerr>
+        <secs>0.042992</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-116'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_times</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_times not found in line no. 2
+</cerr>
+        <secs>0.041993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-117'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_diff</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint set_diff not found in line no. 9
+</cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-118'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_le_reif</description>
+        <cout>
+x1 = false;
+x2 = false;
+x3 = true;
+----------
+x1 = false;
+x2 = true;
+x3 = true;
+----------
+x1 = true;
+x2 = false;
+x3 = false;
+----------
+x1 = true;
+x2 = true;
+x3 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-119'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_le_reif</description>
+        <cout>
+x1 = -1;
+x2 = -1;
+x3 = true;
+----------
+x1 = -1;
+x2 = 0;
+x3 = true;
+----------
+x1 = -1;
+x2 = 1;
+x3 = true;
+----------
+x1 = 0;
+x2 = -1;
+x3 = false;
+----------
+x1 = 0;
+x2 = 0;
+x3 = true;
+----------
+x1 = 0;
+x2 = 1;
+x3 = true;
+----------
+x1 = 1;
+x2 = -1;
+x3 = false;
+----------
+x1 = 1;
+x2 = 0;
+x3 = false;
+----------
+x1 = 1;
+x2 = 1;
+x3 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.043993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-120'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/output/array_of_bool</description>
+        <cout>
+xs = array1d(1..2, [false, true]);
+----------
+</cout>
+        <cerr></cerr>
+        <secs>0.041994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-121'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_smallest_outdomain_min</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_min
+</cerr>
+        <secs>0.044993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-122'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/output/array_of_float</description>
+        <cout></cout>
+        <cerr>
+Error: Floats not supported. in line no. 4
+</cerr>
+        <secs>0.041994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-123'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_ne_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_lin_ne_reif not found in line no. 3
+</cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-124'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_lt_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint set_lt_reif not found in line no. 8
+</cerr>
+        <secs>0.041994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-125'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_le_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint set_le_reif not found in line no. 8
+</cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-126'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_smallest_indomain_split</description>
+        <cout>
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-127'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_smallest_outdomain_min</description>
+        <cout>
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_min
+</cerr>
+        <secs>0.043992</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-128'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lt_reif</description>
+        <cout>
+x1 = -1;
+x2 = -1;
+x3 = false;
+----------
+x1 = -1;
+x2 = 0;
+x3 = true;
+----------
+x1 = -1;
+x2 = 1;
+x3 = true;
+----------
+x1 = 0;
+x2 = -1;
+x3 = false;
+----------
+x1 = 0;
+x2 = 0;
+x3 = false;
+----------
+x1 = 0;
+x2 = 1;
+x3 = true;
+----------
+x1 = 1;
+x2 = -1;
+x3 = false;
+----------
+x1 = 1;
+x2 = 0;
+x3 = false;
+----------
+x1 = 1;
+x2 = 1;
+x3 = false;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.043993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-129'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_largest_indomain_max</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.044994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-130'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_smallest_indomain_reverse_split</description>
+        <cout>
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-131'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_eq</description>
+        <cout>
+x1 = {1, 2};
+x2 = {1, 2};
+----------
+x1 = {1};
+x2 = {1};
+----------
+x1 = {2};
+x2 = {2};
+----------
+x1 = {};
+x2 = {};
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.043994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-132'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_eq_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_lin_eq_reif not found in line no. 3
+</cerr>
+        <secs>0.041993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-133'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_lt</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_lin_lt not found in line no. 4
+</cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-134'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_lt</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint set_lt not found in line no. 7
+</cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-135'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_anti_first_fail_indomain_max</description>
+        <cout>
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-136'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_and</description>
+        <cout>
+x1 = false;
+x2 = false;
+x3 = false;
+----------
+x1 = false;
+x2 = true;
+x3 = false;
+----------
+x1 = true;
+x2 = false;
+x3 = false;
+----------
+x1 = true;
+x2 = true;
+x3 = true;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.041995</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-137'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/array_bool_or</description>
+        <cout>
+x1 = false;
+x2 = false;
+x3 = false;
+----------
+x1 = false;
+x2 = false;
+x3 = true;
+----------
+x1 = false;
+x2 = true;
+x3 = false;
+----------
+x1 = false;
+x2 = true;
+x3 = true;
+----------
+x1 = true;
+x2 = false;
+x3 = false;
+----------
+x1 = true;
+x2 = false;
+x3 = true;
+----------
+x1 = true;
+x2 = true;
+x3 = false;
+----------
+x1 = true;
+x2 = true;
+x3 = true;
+----------
+==========
+</cout>
+        <cerr>
+array_bool_or([],b(false))::NULL
+array_bool_or([b(false)],b(false))::NULL
+array_bool_or([b(true)],b(true))::NULL
+array_bool_or([b(false), b(true)],b(true))::NULL
+array_bool_or([b(false), b(false)],b(false))::NULL
+array_bool_or([b(true), b(false)],b(true))::NULL
+array_bool_or([b(true), b(true)],b(true))::NULL
+array_bool_or([xb(0), xb(1)],xb(2))::NULL
+</cerr>
+        <secs>0.043993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-138'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_eq_reif</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_eq_reif not found in line no. 3
+</cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-139'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_le</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint set_le not found in line no. 7
+</cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-140'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_ne</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint float_lin_ne not found in line no. 2
+</cerr>
+        <secs>0.041994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-141'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_eq</description>
+        <cout></cout>
+        <cerr>
+fzn-casper: ./casper/util/container/stdvector.h:182: Elem& Casper::Util::StdVector< <template-parameter-1-1> >::operator[](uint) [with Elem = Casper::CP::BndView<int, Casper::CP::Var<int> >, uint = unsigned int]: Assertion `i<_size' failed.
+</cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-142'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_anti_first_fail_outdomain_min</description>
+        <cout>
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_min
+</cerr>
+        <secs>0.041993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-143'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_input_order_indomain_split</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+xs = array1d(1..2, [3, 1]);
+----------
+xs = array1d(1..2, [3, 2]);
+----------
+xs = array1d(1..2, [3, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.043994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-144'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_largest_indomain_max</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-145'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lin_eq</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint bool_lin_eq not found in line no. 13
+</cerr>
+        <secs>0.043994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-146'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lt</description>
+        <cout>
+x1 = -1;
+x2 = 0;
+----------
+x1 = -1;
+x2 = 1;
+----------
+x1 = -1;
+x2 = 2;
+----------
+x1 = 0;
+x2 = 1;
+----------
+x1 = 0;
+x2 = 2;
+----------
+x1 = 1;
+x2 = 2;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-147'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_largest_indomain_min</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.043993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-148'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/set_search_smallest_outdomain_max</description>
+        <cout>
+xs = array1d(1..3, [{1, 2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {1}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {2}]);
+----------
+xs = array1d(1..3, [{1, 2}, {3}]);
+----------
+xs = array1d(1..3, [{1, 2}, {}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1, 2}]);
+----------
+xs = array1d(1..3, [{1}, {1, 3}]);
+----------
+xs = array1d(1..3, [{1}, {1}]);
+----------
+xs = array1d(1..3, [{1}, {2, 3}]);
+----------
+xs = array1d(1..3, [{1}, {2}]);
+----------
+xs = array1d(1..3, [{1}, {3}]);
+----------
+xs = array1d(1..3, [{1}, {}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1, 2}]);
+----------
+xs = array1d(1..3, [{2}, {1, 3}]);
+----------
+xs = array1d(1..3, [{2}, {1}]);
+----------
+xs = array1d(1..3, [{2}, {2, 3}]);
+----------
+xs = array1d(1..3, [{2}, {2}]);
+----------
+xs = array1d(1..3, [{2}, {3}]);
+----------
+xs = array1d(1..3, [{2}, {}]);
+----------
+xs = array1d(1..3, [{}, {1, 2, 3}]);
+----------
+xs = array1d(1..3, [{}, {1, 2}]);
+----------
+xs = array1d(1..3, [{}, {1, 3}]);
+----------
+xs = array1d(1..3, [{}, {1}]);
+----------
+xs = array1d(1..3, [{}, {2, 3}]);
+----------
+xs = array1d(1..3, [{}, {2}]);
+----------
+xs = array1d(1..3, [{}, {3}]);
+----------
+xs = array1d(1..3, [{}, {}]);
+----------
+==========
+</cout>
+        <cerr>
+Warning, ignored search annotation: outdomain_max
+</cerr>
+        <secs>0.044993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-149'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_clause</description>
+        <cout>
+x1 = false;
+x2 = false;
+----------
+x1 = false;
+x2 = true;
+----------
+x1 = true;
+x2 = false;
+----------
+x1 = true;
+x2 = true;
+----------
+==========
+</cout>
+        <cerr>
+array_bool_clause([b(true)],[])::NULL
+array_bool_clause([],[b(false)])::NULL
+array_bool_clause([b(true)],[b(true)])::NULL
+array_bool_clause([b(true)],[b(false)])::NULL
+array_bool_clause([b(false)],[b(false)])::NULL
+array_bool_clause([xb(0)],[xb(1)])::NULL
+</cerr>
+        <secs>0.043992</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-150'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_le</description>
+        <cout>
+x1 = -1;
+x2 = -1;
+----------
+x1 = -1;
+x2 = 0;
+----------
+x1 = -1;
+x2 = 1;
+----------
+x1 = -1;
+x2 = 2;
+----------
+x1 = 0;
+x2 = 0;
+----------
+x1 = 0;
+x2 = 1;
+----------
+x1 = 0;
+x2 = 2;
+----------
+x1 = 1;
+x2 = 1;
+----------
+x1 = 1;
+x2 = 2;
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-151'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/array_bool_xor</description>
+        <cout></cout>
+        <cerr>
+Error: Registry: Constraint array_bool_xor not found in line no. 8
+</cerr>
+        <secs>0.043994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-152'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_float_element</description>
+        <cout></cout>
+        <cerr>
+Error: Floats not supported. in line no. 5
+Error: undefined variable x2 in line no. 7
+</cerr>
+        <secs>0.041994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-153'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_largest_indomain_split</description>
+        <cout>
+xs = array1d(1..2, [1, 1]);
+----------
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 2]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042994</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-154'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/array_bool_and</description>
+        <cout>
+x1 = false;
+x2 = false;
+x3 = false;
+----------
+x1 = false;
+x2 = false;
+x3 = true;
+----------
+x1 = false;
+x2 = true;
+x3 = false;
+----------
+x1 = false;
+x2 = true;
+x3 = true;
+----------
+x1 = true;
+x2 = false;
+x3 = false;
+----------
+x1 = true;
+x2 = false;
+x3 = true;
+----------
+x1 = true;
+x2 = true;
+x3 = false;
+----------
+x1 = true;
+x2 = true;
+x3 = true;
+----------
+==========
+</cout>
+        <cerr>
+array_bool_and([],b(true))::NULL
+array_bool_and([b(false)],b(false))::NULL
+array_bool_and([b(true)],b(true))::NULL
+array_bool_and([b(false), b(true)],b(false))::NULL
+array_bool_and([b(false), b(false)],b(false))::NULL
+array_bool_and([b(true), b(false)],b(false))::NULL
+array_bool_and([b(true), b(true)],b(true))::NULL
+array_bool_and([xb(0), xb(1)],xb(2))::NULL
+</cerr>
+        <secs>0.042992</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+    <test id='FzConformanceTest-155'>
+        <description>/home/marco/other/cp-solvers/minizinc-1.5/fcts/search/int_search_anti_first_fail_indomain_min</description>
+        <cout>
+xs = array1d(1..2, [1, 2]);
+----------
+xs = array1d(1..2, [1, 3]);
+----------
+xs = array1d(1..2, [2, 1]);
+----------
+xs = array1d(1..2, [2, 3]);
+----------
+==========
+</cout>
+        <cerr></cerr>
+        <secs>0.042993</secs>
+        <kb>0</kb>
+        <result>ok</result>
+        <categories>
+            <category>flatzin</category>
+        </categories>
+    </test>
+</testsuite>

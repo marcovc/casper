@@ -40,7 +40,7 @@ cp_examples+=['int/debug.cpp']
 
 #cp_examples+=['real/equation.cpp']
 #cp_examples+=['real/newton.cpp']
-cp_examples+=['real/inverse.cpp']
+#cp_examples+=['real/inverse.cpp']
 extra_example_libs['examples/cp/real/inverse.cpp']=['gsl']
 
 
@@ -57,10 +57,10 @@ cp_examples+=['set/partition.cpp']
 
 
 lp_examples=[]
-lp_examples+=['debug.cpp']
-lp_examples+=['tritype.cpp']
-lp_examples+=['binsearch.cpp']
-lp_examples+=['bubble.cpp']
+#lp_examples+=['debug.cpp']
+#lp_examples+=['tritype.cpp']
+#lp_examples+=['binsearch.cpp']
+#lp_examples+=['bubble.cpp']
 
 for i in lp_examples:
 	extra_example_libs['examples/lp/'+i]=['glpk']
@@ -841,17 +841,19 @@ Alias('casperbind_xcsp',casperbind_xcsp_target)
 ### support for building fzn-casper ###
 
 casperbind_fzn_target_libpath = confCommonEnv['LIBPATH']
-casperbind_fzn_target_libs = confCommonEnv['LIBS']+[libcasperbind_cpp]+[libcasper]
+casperbind_fzn_target_libs = library_modules
 							     
 casperbind_fzn_target = env.Program(env['PREFIX']+'/bindings/fzn/fzn-casper',
-									[env['PREFIX']+'/bindings/fzn/parser.yy',
-									  env['PREFIX']+'/bindings/fzn/lexer.ll',
-									  env['PREFIX']+'/bindings/fzn/driver.cpp',
-									  env['PREFIX']+'/bindings/fzn/main.cpp'],
-									  CPPPATH=['#src','#src/bindings/fzn','#src/bindings/cpp',
-									  '#build/'+MODE+'/bindings/fzn'],
-									  LIBS=casperbind_fzn_target_libs,
-									  LIBPATH=casperbind_fzn_target_libpath)
+									[env['PREFIX']+'/bindings/fzn/flatzinc.cpp',
+									 env['PREFIX']+'/bindings/fzn/registry.cpp',
+									 env['PREFIX']+'/bindings/fzn/options.cpp',
+									 env['PREFIX']+'/bindings/fzn/fz.cpp',
+									 env['PREFIX']+'/thirdparty/flatzinc_skeleton/lexer.yy.cpp',
+									 env['PREFIX']+'/thirdparty/flatzinc_skeleton/parser.tab.cpp'],
+									 CPPPATH=['#'],
+									 CPPDEFINES=env['CPPDEFINES']+['CASPER_CP_ELEMENT_BASE_1'],
+									 LIBS=confCommonEnv['LIBS']+[libcasper],
+									 LIBPATH=casperbind_fzn_target_libpath)
 
 Alias('casperbind_fzn',casperbind_fzn_target)
 
@@ -971,7 +973,7 @@ def runTests(target,source,env):
 	from multiprocessing import cpu_count
 	from math import ceil
 	benchmark.runBenchmarks(infilename="test/BenchmarkFile",outfilename="test/BenchmarkResults.xml",
-				  sample_count=1,timeout=30,memout=900e3,product=product,buildenv=buildenv,
+				  sample_count=5,timeout=30,memout=900e3,product=product,buildenv=buildenv,
 				  number_workers = int(ceil(cpu_count()/4.0)))
  	SCons.compat.rename_module('pickle','cPickle') # bypasses SCons bug #2781 
 

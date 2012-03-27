@@ -1,0 +1,62 @@
+Parser Skeleton for FlatZinc
+============================
+
+This is the Gecode FlatZinc parser and interpreter, stripped of all
+Gecode-specific stuff. You can use it as a starting point for your own
+FlatZinc interpreter.
+
+This is version 1.0, released 2011-01-17.
+
+If you have questions, don't hesitate to contact me by email: tack@gecode.org
+
+The copyright and license information is listed in the header of each file.
+
+Guido Tack, 2011
+
+Implementing solver-specific methods
+------------------------------------
+
+In order to hook up your solver to the parser, look at the file flatzinc.hh.
+It contains a class FlatZincModel, which is implemented in flatzinc.cpp. It
+defines a number of methods that you have to implement, e.g. methods that
+create variables, that post constraints, or that run the actual search.
+
+All these methods are marked with TODO comments and an output on stderr. Just
+search for these comments and make the necessary changes.
+
+The actual constraint posting is done in the file registry.cpp. You have to
+add a posting function for each constraint you want to implement, and register
+it with the corresponding flatzinc name (see the examples in the file).
+
+Compilation
+-----------
+
+Compile the *.cpp files using your favorite C++ compiler (tested with gcc 4.2
+and Microsoft Visual C++ 2008). If you want to rebuild the lexer and parser
+from the sources, you need flex (version 2.5.33 or better) and bison (version
+2.3 or better), and run the following commands:
+
+flex -olexer.yy.cpp lexer.lxx
+bison -t -o parser.tab.cpp -d parser.yxx
+
+If you want to use the parser as a library, link the object code from all .cpp
+files except fz.cpp with you own code. The file fz.cpp contains a main method
+that constructs a parser and executes a FlatZinc program, so you can use this
+to get a standalone executable.
+
+The code archive contains a Makefile that should build the standalone fz
+executable on any platform where a recent version of gcc and make are
+installed.
+
+Changelog
+---------
+
+1.0 (2010-01-17)
+Initial release.
+
+1.1 (2010-01-18)
+Added missing includes to enable compilation with gcc >= 4.3. Added sample
+Makefile.
+
+1.2 (2012-03-09)
+Fixed some bugs in the parser and lexer, and updated to latest FlatZinc spec.

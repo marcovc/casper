@@ -313,36 +313,64 @@ struct BndView<Eval,DomView<Eval,View,Dom> > : BndView<Eval,Var<Eval,Dom> >
 // ******** conversion **********
 
 /**
- * 	BndView over a type cast  expression.
+ * 	BndView over a generic type cast expression.
+ * 	\todo Test
  * 	\ingroup BndViews
  */
-template<class View,class Eval>
-struct BndViewRel1<Cast<Eval>,View,Eval>
+template<class EvalFrom,class EvalTo, class View>
+struct BndViewCast
 {
-	typedef typename Casper::Traits::GetEval<View>::Type	EvalFrom;
-
-	BndViewRel1(Store& store, const View& v) :
+	BndViewCast(Store& store, const View& v) :
 		v(store,v) {}
 
-	Eval min() const { return Util::convLb<Eval>(v.min()); }
-	Eval max() const { return Util::convUb<Eval>(v.max()); }
-	bool updateMin(const Eval& val)
-	{ return val<=limits<EvalFrom>::max() and v.updateMin(Util::convLb<EvalFrom>(val));	}
-	bool updateMax(const Eval& val)
-	{ return val>=limits<EvalFrom>::min() and v.updateMax(Util::convUb<EvalFrom>(val));	}
-	void range(Eval& v1,Eval& v2) const
+	EvalTo min() const
+	{
+		if (v.min()<Util::convLb<EvalFrom>(limits<EvalTo>::negInf()))
+			return limits<EvalTo>::negInf();
+		return Util::convLb<EvalTo>(v.min());
+	}
+	EvalTo max() const
+	{
+		if (v.max()>Util::convUb<EvalFrom>(limits<EvalTo>::posInf()))
+			return limits<EvalTo>::posInf();
+		return Util::convUb<EvalTo>(v.max());
+	}
+	bool updateMin(const EvalTo& val)
+	{
+		return Util::convLb<EvalFrom>(val)<=limits<EvalFrom>::posInf() and
+				v.updateMin(Util::convLb<EvalFrom>(val));
+	}
+	bool updateMax(const EvalTo& val)
+	{
+		return Util::convUb<EvalFrom>(val)>=limits<EvalFrom>::negInf() and
+				v.updateMax(Util::convUb<EvalFrom>(val));
+	}
+	void range(EvalTo& v1,EvalTo& v2) const
 	{ v1 = min(); v2=max(); }
-	bool updateRange(const Eval& v1, const Eval& v2)
+	bool updateRange(const EvalTo& v1, const EvalTo& v2)
 	{	return v.updateRange(Util::convLb<EvalFrom>(v1),
 							 Util::convUb<EvalFrom>(v2));	}
 
 	void attach(INotifiable* n) {	v.attach(n);	}
 	void detach() {	v.detach();	}
-	Rel1<Cast<Eval>,View> getObj()  const
-	{ return Rel1<Cast<Eval>,View>(v.getObj()); }
+	Rel1<Cast<EvalTo>,View> getObj()  const
+	{ return Rel1<Cast<EvalTo>,View>(v.getObj()); }
 
 	BndView<EvalFrom,View>	v;
 };
+
+/**
+ * 	BndView over a type cast  expression.
+ * 	\ingroup BndViews
+ */
+template<class View,class Eval>
+struct BndViewRel1<Cast<Eval>,View,Eval> :
+	BndViewCast<typename Casper::Traits::GetEval<View>::Type,Eval,View>
+{
+	typedef BndViewCast<typename Casper::Traits::GetEval<View>::Type,Eval,View> Super;
+	BndViewRel1(Store& store, const View& v) : Super(store,v) {}
+};
+
 
 
 /**
@@ -822,7 +850,7 @@ void mulRange(const P1& p1, const P2& p2,Eval& lb, Eval& ub)
 		else
 		if (isNeg(yu)) // P * N
 		{ lb = mulLb(xu,yl); ub = mulUb(xl,yu);	}
-		else	// P * X
+		else			// P * X
 		{ lb = mulLb(xu,yl); ub = mulUb(xu,yu);	}
 	}
 	else
@@ -849,18 +877,8 @@ void mulRange(const P1& p1, const P2& p2,Eval& lb, Eval& ub)
 	}
 }
 
-};
-
-template<class Expr1,class Expr2,class Eval>
-void BndViewRel2<Mul,Expr1,Expr2,Eval>::range(Eval& lb, Eval& ub) const
-{	
-	lb = limits<Eval>::negInf();
-	ub = limits<Eval>::posInf();
-	Detail::mulRange(p1,p2,lb,ub);
-}
-
-template<class Expr1,class Expr2,class Eval>
-inline Eval BndViewRel2<Mul,Expr1,Expr2,Eval>::min() const
+template<class P1,class P2,class Eval>
+void mulMin(const P1& p1, const P2& p2,Eval& lb)
 {
 	using Util::mulLb;
 	using Util::isNeg;
@@ -875,30 +893,30 @@ inline Eval BndViewRel2<Mul,Expr1,Expr2,Eval>::min() const
 	if (isPos(xl))	// P * X
 	{
 		if (isPos(yl))	// P * P
-			return mulLb(xl,yl);
+			lb = mulLb(xl,yl);
 		else // P * N or P * X
-			return mulLb(xu,yl);
+			lb = mulLb(xu,yl);
 	}
 	else
 	if (isNeg(xu))	// N * X
 	{
 		if (isNeg(yu))	// N * N
-			return mulLb(xu,yu);
+			lb = mulLb(xu,yu);
 		else // N * P or N * X
-			return mulLb(xl,yu);
+			lb = mulLb(xl,yu);
 	}
 	else
 	if (isPos(yl))	// X * P
-		return mulLb(yu,xl);
+		lb = mulLb(yu,xl);
 	else
 	if (isNeg(yu))	// X * N
-		return mulLb(yl,xu);
+		lb = mulLb(yl,xu);
 	else	// X * X
-	return std::min(mulLb(xl,yu),mulLb(xu,yl));
+		lb = std::min(mulLb(xl,yu),mulLb(xu,yl));
 }
 
-template<class Expr1,class Expr2,class Eval>
-inline Eval BndViewRel2<Mul,Expr1,Expr2,Eval>::max() const
+template<class P1,class P2,class Eval>
+void mulMax(const P1& p1, const P2& p2,Eval& ub)
 {
 	using Util::mulUb;
 	using Util::isNeg;
@@ -913,27 +931,45 @@ inline Eval BndViewRel2<Mul,Expr1,Expr2,Eval>::max() const
 	if (isPos(xl))	// P * X
 	{
 		if (isNeg(yu)) // P * N
-			return mulUb(xl,yu);
+			ub = mulUb(xl,yu);
 		else 	// P * P or P * X
-			return mulUb(xu,yu);
+			ub = mulUb(xu,yu);
 	}
 	else
 	if (isNeg(xu))	// N * X
 	{
 		if (isPos(yl)) // N * P
-			return mulUb(xu,yl);
+			ub = mulUb(xu,yl);
 		else	// N * N or N * X
-			return mulUb(xl,yl);
+			ub = mulUb(xl,yl);
 	}
 	else
 	if (isPos(yl))	// X * P
-		return mulUb(yu,xu);
+		ub = mulUb(yu,xu);
 	else
 	if (isNeg(yu))	// X * N
-		return mulUb(yl,xl);
+		ub = mulUb(yl,xl);
 	else	// X * X
-	return std::max(mulUb(xl,yl),mulUb(xu,yu));
+		ub =  std::max(mulUb(xl,yl),mulUb(xu,yu));
 }
+
+}; // Detail
+
+template<class Expr1,class Expr2,class Eval>
+void BndViewRel2<Mul,Expr1,Expr2,Eval>::range(Eval& lb, Eval& ub) const
+{
+	lb = limits<Eval>::negInf();
+	ub = limits<Eval>::posInf();
+	Detail::mulRange(p1,p2,lb,ub);
+}
+
+template<class Expr1,class Expr2,class Eval>
+inline Eval BndViewRel2<Mul,Expr1,Expr2,Eval>::min() const
+{	Eval lb; Detail::mulMin(p1,p2,lb);	return lb;	}
+
+template<class Expr1,class Expr2,class Eval>
+inline Eval BndViewRel2<Mul,Expr1,Expr2,Eval>::max() const
+{	Eval ub; Detail::mulMax(p1,p2,ub);	return ub;	}
 
 namespace Detail {
 template<class P1,class P2,class Eval> void divRange(const P1&,const P2&,
@@ -1553,6 +1589,7 @@ bool BndViewRel2<Div,Expr1,Expr2,Eval>::updateRange(const Eval& lb,
 	return true;
 }
 
+#if 0
 /**
  *	BndView over the modulo of an expression.
  *  \warning Works with positive intervals only.
@@ -1691,7 +1728,31 @@ bool BndViewRel2<Mod,Expr1,Expr2,Eval>::updateMax(const Eval& v)
 		r &= p2.updateMax((Dmax-rmin)/lq);
 	return r;
 }
+#else
 
+template<class Expr1,class Expr2,class Eval>
+struct BndViewRel2<Mod,Expr1,Expr2,Eval>
+{
+	typedef Rel2<Sub,Expr1,Rel2<Mul,Expr2,Rel2<Div,Expr1,Expr2> > > R;
+
+	BndViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
+		r(store,rel<Sub>(p1,rel<Mul>(p2,rel<Div>(p1,p2)))) {}
+	Eval min() const {	return r.min(); }
+	Eval max() const {	return r.max(); }
+	bool updateMin(const Eval& v) {	return r.updateMin(v);	}
+	bool updateMax(const Eval& v) {	return r.updateMax(v);	}
+	void range(Eval& l,Eval& u) const {	r.range(l,u);	}
+	bool updateRange(const Eval& l, const Eval& u)
+	{	return r.updateRange(l,u);	}
+	void attach(INotifiable* f) { 	r.attach(f); }
+	void detach() {	r.detach(); }
+	Rel2<Mod,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<Mod,Expr1,Expr2>(r.getObj().p1,r.getObj().p2.p1);	}
+
+	BndView<Eval,R>	r;
+};
+
+#endif
 /**
  *	BndView over the absolute value of an expression.
  *	\ingroup BndViews

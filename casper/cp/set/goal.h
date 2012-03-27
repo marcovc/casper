@@ -20,6 +20,7 @@ namespace CP {
 namespace Detail {
 
 
+
 template<class ElemEval>
 struct MinDomEvaluator<Set<ElemEval> >
 {
@@ -36,6 +37,30 @@ struct MaxDomEvaluator<Set<ElemEval> >
 	template<class Dom>
 	Eval operator()(const Dom& d) const
 	{	return -d.possSize(); }
+};
+
+template<class ElemEval>
+struct MinMinElemEvaluator<Set<ElemEval> >
+{
+	typedef ElemEval	Eval;
+	template<class Dom>
+	Eval operator()(const Dom& d) const
+	{
+		assert(!d.poss().empty());
+		return *d.poss().begin();
+	}
+};
+
+template<class ElemEval>
+struct MaxMaxElemEvaluator<Set<ElemEval> >
+{
+	typedef ElemEval	Eval;
+	template<class Dom>
+	Eval operator()(const Dom& d) const
+	{
+		assert(!d.poss().empty());
+		return -*--d.poss().end();
+	}
 };
 
 template<class ElemEval>
@@ -198,6 +223,28 @@ struct SelectValMin<Seq<Set<Eval> >,Obj > : IValSelector
 	Store&	store;
 	DomArrayView<Set<Eval>,Obj>	doms;
 };
+
+/**
+ *	Goal for bisecting a set variable. Attempts to assign a value
+ *  to the variable trying all possible values in descending order on backtracking.
+ */
+template<class Eval, class Obj>
+struct SelectValMax<Seq<Set<Eval> >,Obj > : IValSelector
+{
+	SelectValMax(Store& store, const Obj& obj) : store(store),doms(store,obj) {}
+
+	Goal select(uint idx)
+	{
+		if (doms[idx]->ground())
+			return succeed();
+		return Goal(store,
+				insertElem<Eval>(store,doms[idx].getObj(),--doms[idx]->endPoss()) or
+			   eraseElem<Eval>(store,doms[idx].getObj(),--doms[idx]->endPoss()));
+	}
+	Store&	store;
+	DomArrayView<Set<Eval>,Obj>	doms;
+};
+
 };
 
 

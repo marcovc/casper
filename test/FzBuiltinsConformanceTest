@@ -1,0 +1,175 @@
+#testsuite(FzConformanceTest,Conformance tests included in the flatzinc distribution)
+#test(FzConformanceTest-0,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_plus,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_plus.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-1,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_union,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_union.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-2,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_le_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_le_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-3,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_eq_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_eq_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-4,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_set_element,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_set_element.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-5,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_ne,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_ne.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-6,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/bool2int,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/bool2int.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-7,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_le,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_le.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-8,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_bool_element,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_bool_element.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-9,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_lt_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_lt_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-10,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_ne,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_ne.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-11,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/int2float,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/int2float.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-12,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lin_le,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lin_le.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-13,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_ne_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_ne_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-14,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lt_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lt_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-15,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_ne_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_ne_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-16,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_in,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_in.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-17,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_abs,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_abs.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-18,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_le_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_le_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-19,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_eq_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_eq_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-20,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_mod,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_mod.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-21,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_ne_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_ne_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-22,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_or,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_or.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-23,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/array_bool_and,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/array_bool_and.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-24,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_ne,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_ne.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-25,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_int_element,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_int_element.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-26,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_not,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_not.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-27,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_abs,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_abs.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-28,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_lt_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_lt_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-29,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_xor,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_xor.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-30,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_int_element,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_int_element.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-31,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_ne,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_ne.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-32,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_plus,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_plus.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-33,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_subset_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_subset_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-34,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lt_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lt_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-35,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_float_element,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_float_element.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-36,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_ne_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_ne_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-37,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_intersect,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_intersect.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-38,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_symdiff,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_symdiff.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-39,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_in_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_in_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-40,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_min,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_min.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-41,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_min,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_min.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-42,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_times,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_times.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-43,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_eq,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_eq.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-44,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_max,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_max.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-45,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_eq,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_eq.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-46,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_bool_element,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_bool_element.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-47,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_div,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_div.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-48,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_eq_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_eq_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-49,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_subset,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_subset.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-50,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_le_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_le_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-51,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lt,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lt.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-52,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_set_element,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_var_set_element.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-53,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_lt,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_lt.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-54,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_div,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_div.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-55,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lt,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lt.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-56,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_eq,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_eq.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-57,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_le,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_le.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-58,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_le,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_le.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-59,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_le,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_le.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-60,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_eq_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_eq_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-61,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_card,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_card.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-62,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_eq,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_eq.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-63,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_max,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_max.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-64,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_times,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_times.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-65,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_diff,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_diff.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-66,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_le_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_le_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-67,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_le_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_le_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-68,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_ne_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_ne_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-69,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_le_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_le_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-70,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lt_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lt_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-71,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_eq,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_eq.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-72,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_eq_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_eq_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-73,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_lt,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_lt.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-74,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_and,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_and.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-75,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/array_bool_or,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/array_bool_or.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-76,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_eq_reif,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_eq_reif.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-77,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_le,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/set/set_le.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-78,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_ne,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper  /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/float/float_lin_ne.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-79,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_eq,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lin_eq.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-80,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_mod_2,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_mod_2.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-81,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lin_eq,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_lin_eq.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-82,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lt,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_lt.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-83,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_clause,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/bool_clause.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-84,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_le,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/int/int_le.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-85,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/array_bool_xor,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/bool/array_bool_xor.fzn | test/canonFzOutput.py"
+#test(FzConformanceTest-86,/home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_float_element,flatzinc)
+bash -c "build/debug/bindings/fzn/fzn-casper -a /home/marco/other/cp-solvers/minizinc-1.5/fcts/builtins/array/array_float_element.fzn | test/canonFzOutput.py"

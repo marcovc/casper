@@ -29,9 +29,11 @@
 
 //#include <gmp.h>
 #include <mpfr.h>
+#include <stdint.h>
 
 namespace Casper {
 namespace Util {
+
 
 // the following intends to replace functionality from boost::interval
 // it works but needs testing.
@@ -137,6 +139,26 @@ public:
   GENR_FUNC2(pow)
 };
 
+// Utility class for avoiding numeric overflows below
+template<class>
+struct GetHigherRank;
+
+template<>
+struct GetHigherRank<std::int8_t>
+{	typedef std::int16_t Type;	};
+
+template<>
+struct GetHigherRank<std::int16_t>
+{	typedef std::int32_t Type;	};
+
+template<>
+struct GetHigherRank<std::int32_t>
+{	typedef std::int64_t Type;	};
+
+//template<>
+//struct GetHigherRank<std::int64_t>
+//{	typedef std::int128_t Type;	};
+
 // Special rounding policy for handling integers, since its missing from
 // boost::interval library (nothing needs rounding, except division which is
 // always rounded in the non-conservative way)
@@ -160,14 +182,86 @@ struct rounded_arith_integer : Rounding
   T conv_up  (int const &v)
   {	return static_cast<T>(std::floor(static_cast<double>(v))); }
 
-  T add_down(const T& x, const T& y) { return x + y; }
-  T sub_down(const T& x, const T& y) { return x - y; }
-  T mul_down(const T& x, const T& y) { return x * y; }
+  T add_down(const T& x, const T& y)
+  {
+#ifdef CASPER_CHECK_OVERFLOW
+	  typedef typename GetHigherRank<T>::Type HT;
+	  HT r = static_cast<HT>(x) + static_cast<HT>(y);
+	  assert(r <= static_cast<HT>(limits<T>::posInf()));
+	  if (r < static_cast<HT>(limits<T>::negInf()))
+		  return limits<T>::negInf();
+	  return r;
+#else
+	  return x+y;
+#endif
+  }
+  T sub_down(const T& x, const T& y)
+  {
+#ifdef CASPER_CHECK_OVERFLOW
+	  typedef typename GetHigherRank<T>::Type HT;
+	  HT r = static_cast<HT>(x) - static_cast<HT>(y);
+	  assert(r <= static_cast<HT>(limits<T>::posInf()));
+	  if (r < static_cast<HT>(limits<T>::negInf()))
+		  return limits<T>::negInf();
+	  return r;
+#else
+	  return x-y;
+#endif
+  }
+  T mul_down(const T& x, const T& y)
+  {
+#ifdef CASPER_CHECK_OVERFLOW
+	  typedef typename GetHigherRank<T>::Type HT;
+	  HT r = static_cast<HT>(x) * static_cast<HT>(y);
+	  assert(r <= static_cast<HT>(limits<T>::posInf()));
+	  if (r < static_cast<HT>(limits<T>::negInf()))
+		  return limits<T>::negInf();
+	  return r;
+#else
+	  return x*y;
+#endif
+  }
   T div_down(const T& x, const T& y)
   { return conv_down(static_cast<double>(x) / y); }
-  T add_up  (const T& x, const T& y) { return x + y; }
-  T sub_up  (const T& x, const T& y) { return x - y; }
-  T mul_up  (const T& x, const T& y) { return x * y; }
+  T add_up  (const T& x, const T& y)
+  {
+#ifdef CASPER_CHECK_OVERFLOW
+	  typedef typename GetHigherRank<T>::Type HT;
+	  HT r = static_cast<HT>(x) + static_cast<HT>(y);
+	  assert(r >= static_cast<HT>(limits<T>::negInf()));
+	  if (r > static_cast<HT>(limits<T>::posInf()))
+		  return limits<T>::posInf();
+	  return r;
+#else
+	  return x+y;
+#endif
+  }
+  T sub_up  (const T& x, const T& y)
+  {
+#ifdef CASPER_CHECK_OVERFLOW
+	  typedef typename GetHigherRank<T>::Type HT;
+	  HT r = static_cast<HT>(x) - static_cast<HT>(y);
+	  assert(r >= static_cast<HT>(limits<T>::negInf()));
+	  if (r > static_cast<HT>(limits<T>::posInf()))
+		  return limits<T>::posInf();
+	  return r;
+#else
+	  return x-y;
+#endif
+  }
+  T mul_up  (const T& x, const T& y)
+  {
+#ifdef CASPER_CHECK_OVERFLOW
+	  typedef typename GetHigherRank<T>::Type HT;
+	  HT r = static_cast<HT>(x) * static_cast<HT>(y);
+	  assert(r >= static_cast<HT>(limits<T>::negInf()));
+	  if (r > static_cast<HT>(limits<T>::posInf()))
+		  return limits<T>::posInf();
+	  return r;
+#else
+	  return x*y;
+#endif
+  }
   T div_up  (const T& x, const T& y)
   { return conv_up(static_cast<double>(x) / y); }
   T median(const T& x, const T& y) { BOOST_NR((x + y) / 2); }
@@ -451,12 +545,30 @@ Eval divLb(const Eval& t1, const Eval& t2)
 
 inline int idivUb(const int& t1, const int& t2)
 {
+#ifdef CASPER_CHECK_OVERFLOW
+	typedef typename GetHigherRank<int>::Type HT;
+	HT r = static_cast<HT>(t1) / static_cast<HT>(t2);
+	assert(r <= static_cast<HT>(limits<int>::posInf()));
+	if (r < static_cast<HT>(limits<int>::negInf()))
+	  return limits<int>::negInf();
+	return r;
+#else
 	return t1/t2;
+#endif
 }
 
 inline int idivLb(const int& t1, const int& t2)
 {
+#ifdef CASPER_CHECK_OVERFLOW
+	typedef typename GetHigherRank<int>::Type HT;
+	HT r = static_cast<HT>(t1) / static_cast<HT>(t2);
+	assert(r >= static_cast<HT>(limits<int>::negInf()));
+	if (r > static_cast<HT>(limits<int>::posInf()))
+	  return limits<int>::posInf();
+	return r;
+#else
 	return t1/t2;
+#endif
 }
 
 template<class Eval>

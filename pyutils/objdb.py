@@ -110,7 +110,7 @@ objs.add(Rule(type="tRel",func="InTable",ev="bool",nArgs=2,arg1Eval="Casper::Int
 objs.add(Rule(type="tRel",func="NotInTable",ev="bool",nArgs=2,arg1Eval="Casper::IntSeq",arg2Eval="Casper::IntSeq"))
 
 # boolean ternary operations
-objs.add(Rule(type="tRel",func="SumProductEqual",ev="bool",nArgs=3,arg1Eval="Casper::IntSeq",arg2Eval="Casper::IntSeq",arg3Eval="int"))
+objs.add(Rule(type="tRel",func="LinearEqual",ev="bool",nArgs=3,arg1Eval="Casper::IntSeq",arg2Eval="Casper::IntSeq",arg3Eval="int"))
 objs.add(Rule(type="tRel",func="ElementEqual",ev="bool",nArgs=3,arg1Eval="Casper::IntSeq",arg2Eval="int",arg3Eval="int"))
 objs.add(Rule(type="tRel",func="ElementEqual",ev="bool",nArgs=3,arg1Eval="Casper::BoolSeq",arg2Eval="int",arg3Eval="bool"))
 for e in ["Casper::IntSet","Casper::BoolSet"]:

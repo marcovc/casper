@@ -47,9 +47,6 @@
 
 #endif
 
-/// Defines is Casper treats arrays as 0 or 1 indexed based arrays
-#define CASPER_ELEMENT_ARRAY_BASE	0
-
 #define CASPER_UNTESTED(S)	\
 {std::cerr << "error: Trying to use an untested feature: " \
 			  << S << std::endl; assert(0); }
@@ -105,7 +102,7 @@ template<>
 struct limits<int>
 {
 	static const int max()	{	return std::numeric_limits<int>::max();	}
-	static const int min()	{	return std::numeric_limits<int>::min();	}
+	static const int min()	{	return std::numeric_limits<int>::min()+1;	}
 	static const int inf()	{	return max();	}
 	static const int posInf()	{	return max();	}
 	static const int negInf()	{	return min();	}

@@ -20,6 +20,7 @@
 #define _H_CASPER_CP_INT_FILTER
 
 #include <casper/cp/filter/common.h>
+#include <casper/cp/filter/linear.h>
 #include <casper/cp/filter/dom.h>
 //#include <casper/kernel/expression.h>
 #include <casper/cp/int/fd.h>
@@ -308,7 +309,18 @@ struct PostBndFilter2<Greater,bool,V1,bool,V2>
 {
 	static bool post(Store& s, const V1& p1,const V2& p2)
 	{
-		return postBndFilter(s,p1) and postBndFilter(s,!p2);
+		return postBndFilter(s,p1==true) and
+			   postBndFilter(s,p2==false);
+	}
+};
+
+template<class V1,class V2>
+struct PostBndFilter2<Less,bool,V1,bool,V2>
+{
+	static bool post(Store& s, const V1& p1,const V2& p2)
+	{
+		return postBndFilter(s,p1==false) and
+			   postBndFilter(s,p2==true);
 	}
 };
 
@@ -338,6 +350,20 @@ struct PostDomFilter2<LessEqual,int,V1,int,V2>
 {
 	static bool post(Store& s, const V1& p1,const V2& p2)
 	{	return postBndFilter(s,rel<LessEqual>(p1,p2)); }
+};
+
+template<class Expr1,class Expr2,class Expr3>
+struct PostBndFilter3<LinearGreater,Seq<int>,Expr1,Seq<int>,Expr2,int,Expr3>
+{
+    static bool post(Store& s,const Expr1& p1,const Expr2& p2,const Expr3& p3)
+    {	return s.post(linearGreaterEqual(p1,p2,p3+1));   }
+};
+
+template<class Expr1,class Expr2,class Expr3>
+struct PostBndFilter3<LinearLess,Seq<int>,Expr1,Seq<int>,Expr2,int,Expr3>
+{
+    static bool post(Store& s,const Expr1& p1,const Expr2& p2,const Expr3& p3)
+    {	return s.post(linearLessEqual(p1,p2,p3-1));   }
 };
 
 

@@ -97,7 +97,7 @@ struct ViewArray : Util::StdVector<Elem>
 	bool ground() const
 	{
 		for (uint i = 0; i < this->size(); i++)
-			if (!Super::operator[](i)->ground())
+			if (!Super::operator[](i).ground())
 				return false;
 		return true;
 	}
@@ -142,6 +142,14 @@ struct BndArrayView :
 			ret[i] = Super::operator[](i).getObj();
 		return ret;
 	}
+	bool ground() const
+	{
+		for (uint i = 0; i < this->size(); ++i)
+			if (Super::operator[](i).min()<Super::operator[](i).max())
+				return false;
+		return true;
+	}
+
 	Store& store;
 };
 
@@ -164,6 +172,14 @@ struct BndArrayView<Eval,VarArray<Eval,dims,Dom> > :
 			::new(&Super::operator[](i)) Elem(store,p1(i));
 	}
 	VarArray<Eval,dims,Dom> getObj() const {	return b;	}
+	bool ground() const
+	{
+		for (uint i = 0; i < this->size(); ++i)
+			if (Super::operator[](i).min()<Super::operator[](i).max())
+				return false;
+		return true;
+	}
+
 	VarArray<Eval,dims,Dom>	b;
 };
 
@@ -260,6 +276,14 @@ struct BndArrayView<Eval,Rel2<Element,ArrayView,IdxView> > :
 	typedef typename Super::Elem	Elem;
 
 	BndArrayView(Store& store, const Rel& p1) : Super(store,p1) {}
+	bool ground() const
+	{
+		for (uint i = 0; i < this->size(); ++i)
+			if (Super::operator[](i).min()<Super::operator[](i).max())
+				return false;
+		return true;
+	}
+
 };
 
 /**
@@ -284,12 +308,21 @@ struct ValArrayView :
 		return r;
 	}
 	ValArrayView(Store& store, const View& p1) :
-		Super(store,getSize(p1))
+		Super(store,getSize(p1)),store(store)
 	{
 		uint i = 0;
 		for (IterationView<View>	it(p1); it.valid(); it.iterate())
 			::new(&Super::operator[](i++)) Elem(store,it.value());
 	}
+	View getObj() const
+	{
+		View ret(store,this->size());
+		for (uint i = 0; i < this->size(); ++i)
+			ret[i] = Super::operator[](i).getObj();
+		return ret;
+	}
+
+	Store& store;
 };
 
 /**
@@ -618,6 +651,36 @@ struct BndArrayView<Eval,Rel4<All,VarT,SetT,CondT,ExprT> > :
 	}
 
 	BndArrayView(Store& store, const RelT& p) :
+		Super(store,getSize(p)),p(p)
+	{
+		uint i = 0;
+		for (Casper::Detail::PIteration<VarT,SetT,CondT> it(p.p1,p.p2,p.p3); it.valid(); it.iterate())
+			::new(&Super::operator[](i++)) Elem(store,p.p4);
+	}
+	Rel4<All,VarT,SetT,CondT,ExprT> getObj() const
+	{	return p;	}
+
+	RelT p;
+};
+
+template<class Eval,class VarT,class SetT,class CondT,class ExprT>
+struct ValArrayView<Eval,Rel4<All,VarT,SetT,CondT,ExprT> > :
+	Detail::ViewArray<ValView<Eval,ExprT> >
+{
+	typedef Rel4<All,VarT,SetT,CondT,ExprT> RelT;
+
+	typedef ValView<Eval,ExprT>	Elem;
+	typedef Detail::ViewArray<Elem> Super;
+
+	static uint getSize(const RelT& p)
+	{
+		uint r = 0;
+		for (Casper::Detail::PIteration<VarT,SetT,CondT> it(p.p1,p.p2,p.p3); it.valid(); it.iterate())
+			r++;
+		return r;
+	}
+
+	ValArrayView(Store& store, const RelT& p) :
 		Super(store,getSize(p))
 	{
 		uint i = 0;
@@ -816,18 +879,20 @@ struct BndViewRel1<Sum,Expr1,Eval>
 template<class Expr1,class Expr2,class Eval>
 struct BndViewRel2<SumProduct,Expr1,Expr2,Eval> :
 	BndViewRel1<Sum,Rel4<All,Ref<int>,Casper::Util::StdRange<int>,bool,
-		Rel2<Mul,Rel2<Element,Expr1,Ref<int> >,
-				 Rel2<Element,Expr2,Ref<int> > > >,Eval>
+		Rel2<Mul,Rel2<Element,Expr1,Rel2<Add,Ref<int>,int> >,
+				 Rel2<Element,Expr2,Rel2<Add,Ref<int>,int> > > >,Eval>
 {
 	typedef Rel4<All,Ref<int>,Casper::Util::StdRange<int>,bool,
-				Rel2<Mul,Rel2<Element,Expr1,Ref<int> >,
-						 Rel2<Element,Expr2,Ref<int> > > > Agg;
+				Rel2<Mul,Rel2<Element,Expr1,Rel2<Add,Ref<int>,int> >,
+						 Rel2<Element,Expr2,Rel2<Add,Ref<int>,int> > > > Agg;
 	typedef BndViewRel1<Sum,Agg,Eval> Super;
 	Agg agg(Store& store,const Expr1& v1, const Expr2& v2)
 	{
 		BndArrayView<Eval,Expr1> b1(store,v1);
 		Ref<int> i(store);
-		return all(i,range(0,b1.size()-1),true,element(v1,i)*element(v2,i));
+		return all(i,range(0,b1.size()-1),true,
+				element(v1,rel<Add>(i,CASPER_CP_ELEMENT_ARRAY_BASE))*
+				element(v2,rel<Add>(i,CASPER_CP_ELEMENT_ARRAY_BASE)));
 	}
 
 	BndViewRel2(Store& store,const Expr1& v1, const Expr2& v2) :
@@ -836,6 +901,30 @@ struct BndViewRel2<SumProduct,Expr1,Expr2,Eval> :
 
 };
 
+template<class Expr1,class Expr2,class Eval>
+struct ValViewRel2<SumProduct,Expr1,Expr2,Eval> :
+	ValViewRel1<Sum,Rel4<All,Ref<int>,Casper::Util::StdRange<int>,bool,
+		Rel2<Mul,Rel2<Element,Expr1,Rel2<Add,Ref<int>,int> >,
+				 Rel2<Element,Expr2,Rel2<Add,Ref<int>,int> > > >,Eval>
+{
+	typedef Rel4<All,Ref<int>,Casper::Util::StdRange<int>,bool,
+				Rel2<Mul,Rel2<Element,Expr1,Rel2<Add,Ref<int>,int> >,
+						 Rel2<Element,Expr2,Rel2<Add,Ref<int>,int> > > > Agg;
+	typedef ValViewRel1<Sum,Agg,Eval> Super;
+	Agg agg(Store& store,const Expr1& v1, const Expr2& v2)
+	{
+		ValArrayView<Eval,Expr1> b1(store,v1);
+		Ref<int> i(store);
+		return all(i,range(0,b1.size()-1),true,
+				element(v1,rel<Add>(i,CASPER_CP_ELEMENT_ARRAY_BASE))*
+				element(v2,rel<Add>(i,CASPER_CP_ELEMENT_ARRAY_BASE)));
+	}
+
+	ValViewRel2(Store& store,const Expr1& v1, const Expr2& v2) :
+		Super(store,agg(store,v1,v2))
+		{}
+
+};
 
 // dom view over element expression
 template<class Expr1,class Eval>

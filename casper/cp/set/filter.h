@@ -883,6 +883,7 @@ struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,E
 				detach();
 				return true;
 			}
+
 			if (!chk.canBeTrue())
 				return false;
 

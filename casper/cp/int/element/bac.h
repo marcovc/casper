@@ -116,22 +116,12 @@ BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::execu
 	store.getEnv().log(this, "BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>", Util::Logger::filterExecuteBegin);
 	#endif
 
-#ifdef CASPER_ELEMENT_IDX_1
-	if (!idx.updateRange(1,array.size()))
+	if (!idx.updateRange(CASPER_CP_ELEMENT_ARRAY_BASE,
+						 array.size()+CASPER_CP_ELEMENT_ARRAY_BASE-1))
 		return false;
-#else
-	if (!idx.updateRange(0,array.size()-1))
-		return false;
-#endif
 
-
-#ifdef CASPER_ELEMENT_IDX_1
-	int ivMin = idx.min()-1;
-	int ivMax = idx.max()-1;
-#else
-	int ivMin = idx.min();
-	int ivMax = idx.max();
-#endif
+	int ivMin = idx.min()-CASPER_CP_ELEMENT_ARRAY_BASE;
+	int ivMax = idx.max()-CASPER_CP_ELEMENT_ARRAY_BASE;
 
 	// detach from unnecessary vars in array
 /*	while (idx.domain().min() > ivMin)
@@ -153,15 +143,10 @@ BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::execu
 	if (ivMin > ivMax)
 		return false;
 
-#ifdef CASPER_ELEMENT_IDX_1
 	// if all possible domains have invalid idx then fail
-	if (!idx.updateMin(ivMin+1) || !idx.updateMax(ivMax+1))
+	if (!idx.updateRange(ivMin+CASPER_CP_ELEMENT_ARRAY_BASE,
+						 ivMax+CASPER_CP_ELEMENT_ARRAY_BASE))
 		return false;
-#else
-	// if all possible domains have invalid idx then fail
-	if (!idx.updateMin(ivMin) || !idx.updateMax(ivMax))
-		return false;
-#endif
 
 	// if there is only one possible domain then detach and post equality
 	if (ivMin == ivMax)	// post equality
@@ -178,7 +163,7 @@ BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::execu
 		min = std::min(array[ivMin].min(),min);
 		max = std::max(array[ivMin].max(),max);
 	}
-	return res.updateMax(max) and res.updateMin(min);
+	return res.updateRange(min,max);
 }
 
 // element as expression:

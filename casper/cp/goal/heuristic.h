@@ -142,17 +142,18 @@ struct SelectVarAll : IVarSelector
 		typedef typename Evaluator::Eval Eval;
 		if (terminate(doms))
 			return -1;
-		Eval bestVal = ev(*doms[0]);
-		int bestIdx = 0;
-		for (uint i = 1; i < doms.size(); ++i)
-		{
-			Eval curVal = ev(*doms[i]);
-			if (curVal < bestVal)
+		Eval bestVal = limits<Eval>::posInf();
+		int bestIdx = -1;
+		for (uint i = 0; i < doms.size(); ++i)
+			if (!doms[i]->ground())
 			{
-				bestVal = curVal;
-				bestIdx = i;
+				Eval curVal = ev(*doms[i]);
+				if (curVal < bestVal)
+				{
+					bestVal = curVal;
+					bestIdx = i;
+				}
 			}
-		}
 		assert(bestIdx>=0);
 		return bestIdx;
 	}
@@ -178,14 +179,14 @@ struct SelectVarAllRR : IVarSelector
 		// if the current round is over then start again
 		uint i;
 		for (i = 0; i < doms.size(); ++i)
-			if (!selected[i])
+			if (!selected[i] and !doms[i]->ground())
 				break;
 		if (i == doms.size())
 			selected = false;
 		Eval bestVal = Eval();
 		int bestIdx = -1;
 		for (uint i = 0; i < doms.size(); ++i)
-			if (!selected[i])
+			if (!selected[i] and !doms[i]->ground())
 			{
 				Eval curVal = ev(*doms[i]);
 				if (bestIdx==-1 or curVal < bestVal)
@@ -346,8 +347,12 @@ struct SelectVarLex : IVarSelector
 	{
 		if (termCond(obj))
 			return -1;
-		if (curIdx >= obj.size())
-			curIdx = 0;
+		for ( ; curIdx < obj.size(); ++curIdx)
+			if (!obj[curIdx]->ground())
+				return curIdx++;
+		curIdx = 0;
+		while (obj[curIdx]->ground())
+			++curIdx;
 		return curIdx++;
 	}
 	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<Obj>::Type>::Type	ElemEval;

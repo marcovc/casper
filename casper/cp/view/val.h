@@ -550,27 +550,27 @@ struct ValViewRel2<Element,Expr1,Expr2,Eval>
 	Eval value() const
 	{
 		assert(ground());
-		if (index.value()< CASPER_ELEMENT_ARRAY_BASE or
-			index.value() >= static_cast<int>(array.size())+CASPER_ELEMENT_ARRAY_BASE)
+		if (index.value() < CASPER_CP_ELEMENT_ARRAY_BASE or
+			index.value() >= static_cast<int>(array.size())+CASPER_CP_ELEMENT_ARRAY_BASE)
 			throw Exception::IndexOutOfBounds();
-		return array[index.value()].value();
+		return array[index.value()-CASPER_CP_ELEMENT_ARRAY_BASE].value();
 	}
 	bool setValue(const Eval& val)
 	{
 		if (!index.ground())
 			return true;
-		if (index.value()< CASPER_ELEMENT_ARRAY_BASE or
-			index.value() >= static_cast<int>(array.size())+CASPER_ELEMENT_ARRAY_BASE)
+		if (index.value() < CASPER_CP_ELEMENT_ARRAY_BASE or
+			index.value() >= static_cast<int>(array.size())+CASPER_CP_ELEMENT_ARRAY_BASE)
 			throw Exception::IndexOutOfBounds();
-		return array[index.value()].setValue(val);
+		return array[index.value()-CASPER_CP_ELEMENT_ARRAY_BASE].setValue(val);
 	}
 
 	bool ground() const
 	{
 		return index.ground() and
-				(index.value()< CASPER_ELEMENT_ARRAY_BASE or
-				 index.value() >= static_cast<int>(array.size())+CASPER_ELEMENT_ARRAY_BASE or
-				 array[index.value()].ground());
+				(index.value() < CASPER_CP_ELEMENT_ARRAY_BASE or
+				 index.value() >= static_cast<int>(array.size())+CASPER_CP_ELEMENT_ARRAY_BASE or
+				 array[index.value()-CASPER_CP_ELEMENT_ARRAY_BASE].ground());
 	}
 	void attach(INotifiable* f) { 	array.attach(f);index.attach(f); }
 	void detach() {	array.detach();index.detach(); }
@@ -757,6 +757,50 @@ struct ValViewRel3<InRange,View,Eval,Eval,Eval>
 	ValView<Eval,View>			v;
 	const Eval	lb;
 	const Eval	ub;
+};
+
+
+
+/**
+ *	ValView over a Sum of values.
+ *	\ingroup Views
+ **/
+template<class Expr1,class Eval>
+struct ValViewRel1<Sum,Expr1,Eval>
+{
+	typedef ValViewRel1<Sum,Expr1,Eval> Self;
+
+	ValViewRel1(Store& store,const Expr1& p) :
+		v(store,p) {}
+
+	Eval value() const
+	{
+		Eval s = 0;
+		for (auto it = v.begin(); it != v.end(); ++it)
+			s += it->value();
+		return s;
+	}
+	bool setValue(const Eval& v)
+	{
+		if (!ground())
+			return true;
+		return v==value();
+	}
+	bool ground() const
+	{
+		for (auto it = v.begin(); it != v.end(); ++it)
+			if (!it->ground())
+				return false;
+		return true;
+	}
+
+	void attach(INotifiable* f) { 	v.attach(f);	}
+	void detach() {	v.detach();	}
+
+	Rel1<Sum,Expr1> getObj()  const
+	{ 	return Rel1<Sum,Expr1>(v.getObj());	}
+
+	ValArrayView<Eval,Expr1>	v;
 };
 
 } // CP

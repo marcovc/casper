@@ -59,6 +59,22 @@ struct ProgramOptions
 			return *this;
 	}
 
+	ProgramOptions& addOptZeroParam(const std::string& str, bool* ptrArg, const std::string& desc)
+	{
+		optVisible.add(
+			boost::shared_ptr<po::option_description>(new po::option_description(str.c_str(),
+									po::value<bool>(ptrArg)->default_value(*ptrArg)->zero_tokens(),desc.c_str())));
+			return *this;
+	}
+
+	ProgramOptions& addOptZeroParam(const std::string& str, const bool& refArg, const std::string& desc)
+	{
+		optVisible.add(
+			boost::shared_ptr<po::option_description>(new po::option_description(str.c_str(),
+									po::value<bool>()->default_value(refArg)->zero_tokens(),desc.c_str())));
+			return *this;
+	}
+
 	template<class T>
 	ProgramOptions& addPosParam(const std::string& str, T* ptrArg, const std::string& desc)
 	{

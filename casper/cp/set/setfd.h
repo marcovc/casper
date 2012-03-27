@@ -246,6 +246,13 @@ struct SetFD
 		bool insertBefore(IIterator a, PIterator p);
 		bool insertBefore(IIterator a, PIterator p, PIterator q);
 
+		/// Returns the number of filters referencing this domain
+		uint getNbSuspFilters() const;
+		/// Returns the number of weighted filters referencing this domain
+		uint getNbSuspWeightedFilters() const;
+		/// Returns the accumulated failure count of the domain
+		uint getAFC() const;
+
 		/// Sends the contents of the set to stream \p os
 		//friend std::ostream& operator<< <>(std::ostream& os, const SetFD& f);
 
@@ -401,6 +408,24 @@ bool SetFD<T>::onAfterInsert()
 	if (!glbSL.notifyAll())
 		return false;
 	return domainSL.notifyAll();
+}
+
+
+template<class T>
+uint SetFD<T>::getNbSuspFilters() const
+{	return groundSL.getNbFilters() + glbSL.getNbFilters() +
+			lubSL.getNbFilters() + domainSL.getNbFilters(); }
+
+template<class T>
+uint SetFD<T>::getNbSuspWeightedFilters() const
+{	return groundSL.getNbWeightedFilters() + glbSL.getNbWeightedFilters() +
+		lubSL.getNbWeightedFilters() + domainSL.getNbWeightedFilters(); }
+
+template<class T>
+uint SetFD<T>::getAFC() const
+{
+	return groundSL.getTotalAFC() + glbSL.getTotalAFC() +
+			lubSL.getTotalAFC() + domainSL.getTotalAFC();
 }
 
 /**

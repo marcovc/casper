@@ -86,13 +86,20 @@ struct ValView<Eval,Var<Eval,FD<S,E,T> > >
 
 /**
  *	BndView over integer division.
+ *	\todo Split in 6 views p|n|z / p|n|z and store a (reversible) pointer to the current case
  *	\ingroup Views
  **/
 template<class Expr1,class Expr2>
 struct BndViewRel2<Div,Expr1,Expr2,int>
 {
 	BndViewRel2(Store& store, const Expr1& p1, const Expr2& p2) :
-		p1(store,p1),p2(store,p2) {}
+		p1(store,p1),p2(store,p2)
+	{
+		// FIXME: if this view is used before the filter below is run then
+		// it may fail in one of the asserts(p2!=0) below. One possible fix
+		// is to attach a demon to p2 to fail when p2=0.
+		store.post(p2!=0);
+	}
 
 	int min() const;
 	int max() const;
@@ -122,22 +129,23 @@ template<class P1,class P2>
 void idivRange(const P1& p1, const P2& p2, int& lb, int& ub)
 {	IDivRange()(p1,p2,lb,ub);	}
 
-// Integer version
-// NOTE: lb and ub are also IN parameters (will be used for pruning
-// in cases the division evaluates to two intervals)
-// NOTE: implementation always assume that 0 will be eventually removed from
-// denominator, except in the case ?/0 in which it will raise an exception
+/**
+ * Integer division: lb..ub <= p1/p2
+ * \note lb and ub are also IN parameters (will be used for pruning
+ * in cases the division evaluates to two intervals)
+ * \note implementation always assume that 0 will be eventually removed from
+ * denominator, except in the case ?/0 in which it will raise an exception
+ * \note rounding is always towards 0 as in standard C++
+ */
 struct IDivRange
 {
 	template<class P1,class P2>
 	void operator()(const P1& p1, const P2& p2, int& lb, int& ub)
 	{
-		using Util::isPos;
-		using Util::isNeg;
-		using Util::idivLb;
 		using Util::idivUb;
-
-		//const int zero = 0;
+		using Util::idivLb;
+		using Util::isNeg;
+		using Util::isPos;
 
 		int a1,a2,b1,b2;
 
@@ -146,7 +154,11 @@ struct IDivRange
 
 		if (b1==0)
 			if (b2==0)
-				throw Exception::DivisionByZero();
+			{
+				lb = limits<int>::posInf();
+				ub = limits<int>::negInf();
+				return;
+			}
 			else
 				++b1;
 		else
@@ -196,18 +208,31 @@ struct IDivRange
 		{
 			if (isNeg(a2))	// [-,-] / [-,+]
 			{
-				if (idivLb(a2,b1)>ub)
+				if (a2/b1>ub)
 					ub = idivUb(a2,b2);
-				if (idivUb(a2,b2)<lb)
+				else
+					ub = -a1;
+				if (a2/b2<lb)
 					lb = idivLb(a2,b1);
+				else
+					lb = a1;
 			}
 			else
 			if (isPos(a1))	// [+,+] / [-,+]
 			{
-				if (idivUb(a1,b1)<lb)
+				if (a1/b1<lb)
 					lb = idivLb(a1,b2);
-				if (idivLb(a1,b2)>ub)
+				else
+					lb = -a2;
+				if (a1/b2>ub)
 					ub = idivUb(a1,b1);
+				else
+					ub = a2;
+			}
+			else	// [-,+] / [-,+]
+			{
+				lb = std::min(a1,-a2);
+				ub = std::max(a2,-a1);
 			}
 		}
 	}
@@ -222,8 +247,6 @@ int BndViewRel2<Div,Expr1,Expr2,int>::min() const
 	using Util::isNeg;
 	using Util::isPos;
 
-	//const int zero = static_cast<int>(0);
-
 	int a1,a2,b1,b2;
 
 	p1.range(a1,a2);
@@ -231,7 +254,7 @@ int BndViewRel2<Div,Expr1,Expr2,int>::min() const
 
 	if (b1==0)
 		if (b2==0)
-			throw Exception::DivisionByZero();
+			limits<int>::posInf();	// force fail
 		else
 			++b1;
 	else
@@ -240,26 +263,30 @@ int BndViewRel2<Div,Expr1,Expr2,int>::min() const
 
 	if (isPos(b1))	// ? / [+,+]
 	{
-		if (!isNeg(a1))	// [0+,+] / [+,+]
+		if (isPos(a1))	// [+,+] / [+,+]
 			return idivLb(a1,b2);
-		else
-		if (!isPos(a2))	// [-,-0] / [+,+]
+		else			// [-,+] / [+,+]
 			return idivLb(a1,b1);
-		else
-			return idivLb(a1,b1);	// [-,+] / [+,+]
 	}
 	else
 	if (isNeg(b2))	// ? / [-,-]
 	{
-		if (!isNeg(a1))	// [0+,+] / [-,-]
-			return idivLb(a2,b2);
-		else
-		if (!isPos(a2))	// [-,-0] / [-,-]
+		if (isNeg(a2))	// [-,-] / [-,-]
 			return idivLb(a2,b1);
-		else
-			return idivLb(a2,b2);	// [-,+] / [-,-]
+		else			// [-,+] / [-,-]
+			return idivLb(a2,b2);
 	}
-	return limits<int>::min();
+	else	// ? / [-,+]
+	{
+		if (!isNeg(a1)) // [0+,+] / [-,+]
+			return -a2;
+		else
+		if (!isPos(a2)) // [-,-0] / [-,+]
+			return a1;
+		else
+			return std::min(a1,-a2);
+	}
+	assert(0);
 }
 
 template<class Expr1,class Expr2>
@@ -270,8 +297,6 @@ int BndViewRel2<Div,Expr1,Expr2,int>::max() const
 	using Util::isNeg;
 	using Util::isPos;
 
-	//const int zero = static_cast<int>(0);
-
 	int a1,a2,b1,b2;
 
 	p1.range(a1,a2);
@@ -279,7 +304,7 @@ int BndViewRel2<Div,Expr1,Expr2,int>::max() const
 
 	if (b1==0)
 		if (b2==0)
-			throw Exception::DivisionByZero();
+			limits<int>::negInf();	// force fail
 		else
 			++b1;
 	else
@@ -288,26 +313,30 @@ int BndViewRel2<Div,Expr1,Expr2,int>::max() const
 
 	if (isPos(b1))	// ? / [+,+]
 	{
-		if (!isNeg(a1))	// [0+,+] / [+,+]
-			return idivUb(a2,b1);
-		else
-		if (!isPos(a2))	// [-,-0] / [+,+]
+		if (isNeg(a2))	// [-,-] / [+,+]
 			return idivUb(a2,b2);
-		else
-			return idivUb(a2,b1);	// [-,+] / [+,+]
+		else			// [0+,+] / [+,+] or [-,+] / [+,+]
+			return idivUb(a2,b1);
 	}
 	else
 	if (isNeg(b2))	// ? / [-,-]
 	{
-		if (!isNeg(a1))	// [0+,+] / [-,-]
+		if (isPos(a1))	// [+,+] / [-,-]
 			return idivUb(a1,b1);
-		else
-		if (!isPos(a2))	// [-,-0] / [-,-]
+		else			// [-,-0] / [-,-] or [-,+] / [-,-]
 			return idivUb(a1,b2);
-		else
-			return idivUb(a1,b2);	// [-,+] / [-,-]
 	}
-	return limits<int>::max();
+	else	// ? / [-,+]
+	{
+		if (!isNeg(a1)) // [0+,+] / [-,+]
+			return a2;
+		else
+		if (!isPos(a2)) // [-,-0] / [-,+]
+			return -a1;
+		else
+			return std::max(a2,-a1);
+	}
+	assert(0);
 };
 
 template<class Expr1,class Expr2>
@@ -320,35 +349,78 @@ void BndViewRel2<Div,Expr1,Expr2,int>::range(int& lb, int& ub) const
 
 template<class Expr1,class Expr2>
 bool BndViewRel2<Div,Expr1,Expr2,int>::updateRange(const int& lb,
-												const int& ub)
+												   const int& ub)
 {
 	Util::StdRange<int> r(lb,ub);
 	if (lb>max() or ub<min())
 		return false;
 
 	int l1,u1;
-	Detail::mulRange(p2,r,l1,u1);
-
-	int restUb = std::min(
-					std::max(std::abs(p1.min()),std::abs(p1.max())),
-					std::max(std::abs(p2.min()),std::abs(p2.max()))-1);
-
-	if (!p1.updateRange(l1,u1+restUb))
-		return false;
+	p1.range(l1,u1);
 
 	int l2,u2;
 	p2.range(l2,u2);
 
+	int nl1 = l1;
+	int nu1 = u1;
+	Detail::mulRange(p2,r,nl1,nu1);
+
+	int nl2 = l2;
+	int nu2 = u2;
+
+//	std::cout << p1 << "/" << p2 << "=" << r << std::endl;
+//	std::cout << "n1=" << nl1 << ".." << nu1 << std::endl;
+
+	// find upper bound on the remainder of the division
+	int rest = std::min(std::max(std::abs(l1),std::abs(u1)),
+						std::max(std::abs(l2),std::abs(u2))-1);
+
+//	std::cout << "rest=" << rest << std::endl;
+
+	// if the remainder is non negative
+	if (l1>=0 or (lb>0 and l2>0) or (ub<0 and u2<0))
+	{
+		if (!p1.updateRange(nl1,std::max(nu1,nu1+rest)))
+			return false;
+		if (lb>0 or ub<0)
+		{
+			Detail::idivRange(Util::StdRange<int>(std::min(nl1-rest,nl1),nu1),r,nl2,nu2);
+			if (!p2.updateRange(nl2,nu2))
+				return false;
+		}
+	}
+	else
+	// if the remainder is non positive
+	if (u1<=0 or (lb>0 and u2<0) or (ub<0 and l2>0))
+	{
+		if (!p1.updateRange(std::min(nl1,nl1-rest),nu1))
+			return false;
+		if (lb>0 or ub<0)
+		{
+			Detail::idivRange(Util::StdRange<int>(nl1,std::max(nu1,nu1+rest)),r,nl2,nu2);
+			if (!p2.updateRange(nl2,nu2))
+				return false;
+		}
+	}
+	else
+	// if the remainder may be positive or negative
+	{
+		nl1 = std::min(nl1,nl1-rest); // to prevent wrap around -inf
+		nu1 = std::max(nu1,nu1+rest); // to prevent wrap around +inf
+		if (!p1.updateRange(nl1,nu1))
+			return false;
+		if (lb>0 or ub<0)
+		{
+			Detail::idivRange(Util::StdRange<int>(nl1,nu1),r,nl2,nu2);
+			if (!p2.updateRange(nl2,nu2))
+				return false;
+		}
+	}
+
 	// try to remove 0 from p2 if possible
 	if (l2 == 0 and !p2.updateMin(l2+1))
 		return false;
-	if (u2 == 0 and !p2.updateMax(l2-1))
-		return false;
-
-	if (r.min()*r.max()>0)
-		Detail::idivRange(Util::StdRange<int>(p1.min()-restUb,p1.max()),r,l2,u2);
-
-	if (!p2.updateRange(l2,u2))
+	if (u2 == 0 and !p2.updateMax(u2-1))
 		return false;
 
 	return true;
@@ -384,6 +456,78 @@ struct ValViewRel2<Div,Expr1,Expr2,Eval>
 
 	ValView<View1Eval,Expr1>	p1;
 	ValView<View2Eval,Expr2>	p2;
+};
+
+/**
+ * 	BndView over a int->bool cast expression.
+ * 	\note We follow the same semantics of the C/C++ programming language:
+ * 	From bool to int, false is always 0, true is always 1.	<== implemented below
+ * 	From int to bool, 0 is always false, anything other than 0 is true. (see ChkView<Cast<bool> >)
+ * 	\ingroup BndViews
+ */
+template<class View>
+struct BndViewCast<bool,int,View>
+{
+	BndViewCast(Store& store, const View& v) :
+		v(store,v) {}
+
+	int min() const
+	{	return (int) v.min();	}
+	int max() const
+	{	return (int) v.max();	}
+	bool updateMin(const int& val)
+	{	return val<1 or (val==1 and v.updateMin(true));	}
+	bool updateMax(const int& val)
+	{	return val>0 or (val==0 and v.updateMax(false));	}
+	void range(int& v1,int& v2) const
+	{ v1 = min(); v2=max(); }
+	bool updateRange(const int& v1, const int& v2)
+	{	return updateMin(v1) and updateMax(v2);	}
+
+	void attach(INotifiable* n) {	v.attach(n);	}
+	void detach() {	v.detach();	}
+	Rel1<Cast<int>,View> getObj()  const
+	{ return Rel1<Cast<int>,View>(v.getObj()); }
+
+	BndView<bool,View>	v;
+};
+
+/**
+ * 	ChkView over the LinearGreater constraint.
+ * 	\pre Requires p1 (the coefficients) to be instantiated.
+ * 	\ingroup ChkViews
+ */
+template<class Eval,class Expr1,class Expr2,class Expr3>
+struct ChkViewRel3<LinearGreater,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3> :
+	ChkViewRel3<LinearGreaterEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Rel2<Add,Expr3,int> >
+{
+	typedef ChkViewRel3<LinearGreaterEqual,Seq<Eval>,Expr1,
+						Seq<Eval>,Expr2,Eval,Rel2<Add,Expr3,int> > Super;
+	ChkViewRel3(Store& store, const Expr1& p1, const Expr2& p2, const Expr3& p3) :
+		Super(store,p1,p2,rel<Add>(p3,1)) {}
+	Rel3<LinearGreater,Expr1,Expr2,Expr3> getObj()  const
+	{ 	return rel<LinearGreater>(Super::getObj().p1,
+								  Super::getObj().p2,
+								  Super::getObj().p3.p1);	}
+};
+
+/**
+ * 	ChkView over the LinearGreater constraint.
+ * 	\pre Requires p1 (the coefficients) to be instantiated.
+ * 	\ingroup ChkViews
+ */
+template<class Eval,class Expr1,class Expr2,class Expr3>
+struct ChkViewRel3<LinearLess,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3> :
+	ChkViewRel3<LinearLessEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Rel2<Sub,Expr3,int> >
+{
+	typedef ChkViewRel3<LinearLessEqual,Seq<Eval>,Expr1,
+						Seq<Eval>,Expr2,Eval,Rel2<Sub,Expr3,int> > Super;
+	ChkViewRel3(Store& store, const Expr1& p1, const Expr2& p2, const Expr3& p3) :
+		Super(store,p1,p2,rel<Sub>(p3,1)) {}
+	Rel3<LinearLess,Expr1,Expr2,Expr3> getObj()  const
+	{ 	return rel<LinearLess>(Super::getObj().p1,
+							   Super::getObj().p2,
+							   Super::getObj().p3.p1);	}
 };
 
 } // CP

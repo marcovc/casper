@@ -489,7 +489,6 @@ struct BndFilterView2<Equal,Eval,Expr1,Eval,Expr2> : IFilter
 		#ifdef CASPER_LOG
 		store.getEnv().log(this, "BndFilterView2<Equal,Eval,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
-
 		return p1.updateMin(p2.min()) and p1.updateMax(p2.max()) and
 			   p2.updateMin(p1.min()) and p2.updateMax(p1.max());
 	}
@@ -604,84 +603,6 @@ struct BndFilterView2<Less,Eval,Expr1,Eval,Expr2> :
 {
 	BndFilterView2(Store& store, const Expr1& p1, const Expr2& p2) :
 		BndFilterView2<Greater,Eval,Expr2,Eval,Expr1>(store,p2,p1) {}
-};
-
-/**
- *	Enforces the constraint \f$\sum_{i=1}^{n}c_{i}x_{i}=b\f$.
- *	\tparam Expr1 The sequence of coefficients \f$c_1\ldots c_n\f$
- *	\tparam Expr2 The sequence of variables \f$x_1\ldots x_n\f$
- *	\tparam Expr3 \f$b\f$.
- *
- *	Propagator from
- *  "Yuanlin,Yap, Arc-consistency on n-ary monotonic and linear constraints"
- *	\note Requires Expr1 to be ground.
- *  \todo: improve using index deltas
- *  \todo: make sure it also works for reals
- *  \ingroup Filtering
- */
-template<class Eval,class Expr1,class Expr2,class Expr3>
-struct BndFilterView3<SumProductEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3> : IFilter
-{
-	BndFilterView3(Store& store,const Expr1& v1, const Expr2& v2,
-					const Expr3& v3) :
-						IFilter(store),c(store,v1),x(store,v2),v(store,v3),
-					f(store,rel<Mul>(c[0].value(),x[0].getObj()))
-					#ifdef CASPER_LOG
-					,store(store)
-					#endif
-
-	{
-		for (uint i = 1; i < c.size(); i++)
-			f = f + rel<Mul>(c[i].value(),x[i].getObj());
-	}
-	bool execute()
-	{
-		#ifdef CASPER_LOG
-		store.getEnv().log(this, "BndFilterView3<SumProductEqual,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3>", Util::Logger::filterExecuteBegin);
-		#endif
-
-		Eval fmin = f.min();
-		Eval fmax = f.max();
-		if (!v.updateMin(fmin) or !v.updateMax(fmax))
-			return false;
-		fmin = fmin-v.max();
-		fmax = fmax-v.min();
-
-		for (uint i = 0; i < c.size(); i++)
-		{
-			Eval lb = limits<Eval>::negInf();
-			Eval ub = limits<Eval>::posInf();
-			Detail::mulRange(range(c[i].value(),c[i].value()),
-							 range(x[i].min(),x[i].max()),lb,ub);
-			Eval lb1 = x[i].min();
-			Eval ub1 = x[i].max();
-			Detail::divRange(range(ub-fmax,lb-fmin),
-							 range(c[i].value(),c[i].value()),lb1,ub1);
-			Eval oldxmin = x[i].min();
-			Eval oldxmax = x[i].max();
-			if (oldxmin < lb1 or oldxmax > ub1)
-			{
-				if (!x[i].updateMin(lb1) or !x[i].updateMax(ub1))
-					return false;
-				fmin = f.min()-v.max();
-				fmax = f.max()-v.min();
-			}
-		}
-		return true;
-	}
-	Cost cost() const {	return linearLo; }
-	void attach(INotifiable* s)
-	{	x.attach(s); v.attach(s);	}
-	void detach()
-	{	x.detach(); v.detach();	}
-
-	ValArrayView<Eval,Expr1> c;
-	BndArrayView<Eval,Expr2> x;
-	BndView<Eval,Expr3>		 v;
-	BndExpr<Eval>			 f;
-	#ifdef CASPER_LOG
-	Store& store;
-	#endif
 };
 
 
@@ -958,63 +879,6 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 };
 #endif
 
-/**
- *	BndView over a linear(vars) relation, where coefs are ground. From
- *  "Yuanlin,Yap, Arc-consistency on n-ary monotonic and linear constraints"
- *  TODO: improve using index deltas
- *  TODO: make sure it also works for reals
- */ /*
-template<class Eval,class Expr2,class Expr3>
-struct BndFilterView2<SumProductEqual,Seq<Eval>,Expr2,Eval,Expr3> : IFilter
-{
-	BndFilterView2(CPSolver& solver,const Expr2& v2,const Expr3& v3) : IFilter(solver),
-					x(solver,v2),v(solver,v3),
-					f(solver,x[0])
-	{
-		for (uint i = 1; i < c.size(); i++)
-			f = f + x[i];
-	}
-	bool execute()
-	{
-		Eval fmin = f.min();
-		Eval fmax = f.max();
-		if (!v.updateMin(fmin) or !v.updateMax(fmax))
-			return false;
-		fmin = fmin-v.max();
-		fmax = fmax-v.min();
-
-		for (uint i = 0; i < x.size(); i++)
-		{
-			Eval lb = x[i].min();
-			Eval ub = x[i].max();
-
-			Eval lb1 = ub-fmax;
-			Eval ub1 = lb-fmin;
-
-			Eval oldxmin = x[i].min();
-			Eval oldxmax = x[i].max();
-			if (x[i].min() < x[i].max()-fmax or x[i].max() > x[i].min()-fmin)
-			{
-				if (!x[i].updateMin(lb1) or !x[i].updateMax(ub1))
-					return false;
-				fmin = f.min()-v.max();
-				fmax = f.max()-v.min();
-			}
-		}
-		return true;
-	}
-	bool entailed() const {	assert(0);	return false; }
-	Cost cost() const {	return linearLo; }
-	void attach(INotifiable* s)
-	{	x.attach(s); v.attach(s);	}
-	void detach(INotifiable* s)
-	{	x.detach(s); v.detach(s);	}
-
-	ValArrayView<Eval,Expr1> c;
-	BndArrayView<Eval,Expr2> x;
-	BndView<Eval,Expr3>		 v;
-	BndExpr<Eval>			 f;
-};*/
 
 // BndFilterView over a Filter (still needed?)
 #if 0
@@ -1271,7 +1135,8 @@ struct PostBndFilter3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,EvalView
     	if (ValView<int,IdxView>(s,p2).ground())
     	{
     		DomArrayView<Eval,ArrayView> b(s,p1);
-    		Var<Eval> aux(s,&(*b[ValView<int,IdxView>(s,p2).value()]));
+    		Var<Eval> aux(s,&(*b[ValView<int,IdxView>(s,p2).value()-
+    		                     CASPER_CP_ELEMENT_ARRAY_BASE]));
     		return postBndFilter(s,aux==p3);
     	}
     	else
@@ -1309,7 +1174,7 @@ struct BndViewRel2<Element,Expr1,Expr2,Eval> :
 	{
 		if (ValView<int,Expr2>(s,p2).ground())
 		{
-			int idx = ValView<int,Expr2>(s,p2).value();
+			int idx = ValView<int,Expr2>(s,p2).value()-CASPER_CP_ELEMENT_ARRAY_BASE;
 
 			typedef typename Casper::Traits::GetElem<Expr1>::Type EElem;
 			ElementView<Expr1> elem(p1);

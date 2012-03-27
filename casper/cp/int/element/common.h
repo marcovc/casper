@@ -19,11 +19,5 @@
 #ifndef _H_CASPER_CP_INT_ELEMENT_COMMON
 #define _H_CASPER_CP_INT_ELEMENT_COMMON
 
-//#define CASPER_ELEMENT_IDX_1
-
-
-#ifdef CASPER_ELEMENT_IDX_1
-	#warning Using 1-based Element constraint
-#endif
 
 #endif /*_H_CASPER_CP_INT_ELEMENT_COMMON*/

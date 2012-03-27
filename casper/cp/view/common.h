@@ -51,6 +51,10 @@ template<class,class,class>			struct DomView;
 
 template<class>			struct ChkView;
 
+template<class,class>				struct ValArrayView;
+template<class,class>				struct BndArrayView;
+template<class,class>				struct DomArrayView;
+
 template<class,class,class>
 struct ChkViewRel1;
 

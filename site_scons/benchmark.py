@@ -5,7 +5,7 @@
  #   Python script for automating benchmark execution and statistics       #
  #                                                                         #
  #   Copyright:                                                            #
- #   2011 - Marco Correia <marco.v.correia@gmail.com>                      #
+ #   2011-2012 - Marco Correia <marco.v.correia@gmail.com>                 #
  #                                                                         #
  #   Licensed under the Apache License, Version 2.0 (the "License");       # 
  #   you may not use this file except in compliance with the License.      # 
@@ -45,6 +45,7 @@ def calcETA(x, y, total):
     return p(total-len(x)),0
         
 import math
+import shlex
 
 class ProgressBar:
     def __init__(self,width=40):
@@ -105,13 +106,12 @@ class Benchmark:
             return self.result2str[self.result]
         return "error: "+str(self.exception)
     
-    def __init__(self,command,args,name=None,description=None,categories=["Benchmark"]):
+    def __init__(self,command,name=None,description=None,categories=["Benchmark"]):
         self.command = command
-        self.args = args
         if name==None:
-            name = command
+            name = shlex.split(command)[0]
         if description==None:
-            description = command+" "+" ".join(args)
+            description = command
         self.name = name
         self.description = description
         self.result = self.skipped
@@ -126,11 +126,11 @@ class Benchmark:
       
     def __call__(self,maxtime,maxmem):
         def target():
-            cmd =[self.command]+self.args
+            cmd = shlex.split(self.command)
             self.stats.start()
             try:
-                if maxmem!=None and onlinux:
-                    resource.setrlimit(resource.RLIMIT_AS,(maxmem*1024,maxmem*1024))
+                #if maxmem!=None and onlinux:	FIXME
+                #    resource.setrlimit(resource.RLIMIT_AS,(maxmem*1024,maxmem*1024))
                 self.process = subprocess.Popen(cmd,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
                 self.cout,self.cerr = self.process.communicate()
                 self.err = None
@@ -309,11 +309,10 @@ class BenchmarkFile:
                     else:
                         test_categories = None
                 elif match_comment == None: # data
-                    args = line.split()
                     if not has_test_info:
-                        self.benchmarks.append(Benchmark(command=args[0],args=args[1:]))
+                        self.benchmarks.append(Benchmark(command=line))
                     else:
-                        self.benchmarks.append(Benchmark(command=args[0],args=args[1:],\
+                        self.benchmarks.append(Benchmark(command=line,\
                                                          name=test_name,description=test_description,categories=test_categories))
                     has_test_info = False
 
@@ -392,7 +391,7 @@ def runBenchmarks(infilename,outfilename,sample_count,timeout,memout,product,bui
             runqueue.add(b,endTaskHandler,maxtime=timeout,maxmem=memout)
         
     runqueue.wait()    
-    
+
     f = open(outfilename,"w")
     f.write(getBenchmarksXML(bf,product,buildenv,runenv))
     f.close()

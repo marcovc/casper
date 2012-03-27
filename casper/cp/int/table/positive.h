@@ -180,7 +180,7 @@ GACSchema<T,View>::seekSupport(uint varIdx, const T& val)
 	//std::cout << "seekSupport: " << varIdx << " = " << val << std::endl;
 	//std::cout << "curDoms: " << doms << std::endl;
 	//printSupports();
-	Util::StdArray<int>*	pTuple;
+	Util::StdArray<T>*	pTuple;
 	while ((pTuple = ss.seekSupport(varIdx,val)) != NULL)
 	{
 		// validate support pTuple
@@ -270,7 +270,7 @@ struct PosTableRel : IExtRel<T>,Util::StdArray<T,2>
 		curSolIdx(store,s.curSolIdx.size(0),s.curSolIdx.size(1),0),
 		nsols(s.nsols) {}
 
-	PosTableRel(Store& store,const Util::StdArray<int,2>& s) :
+	PosTableRel(Store& store,const Util::StdArray<T,2>& s) :
 		Super(s),
 		minElem(findMin(s)),
 		curSolIdx(store,s.size(1),findMax(s)-minElem+1,0),
@@ -290,7 +290,7 @@ struct PosTableRel : IExtRel<T>,Util::StdArray<T,2>
 		return NULL;
 	}
 
-	int findMin(const Util::StdArray<int,2>& s)
+	int findMin(const Util::StdArray<T,2>& s)
 	{
 		int r = s(0);
 		for (uint i = 1; i < s.count(); i++)
@@ -299,7 +299,7 @@ struct PosTableRel : IExtRel<T>,Util::StdArray<T,2>
 		return r;
 	}
 
-	int findMax(const Util::StdArray<int,2>& s)
+	int findMax(const Util::StdArray<T,2>& s)
 	{
 		int r = s(0);
 		for (uint i = 1; i < s.count(); i++)
