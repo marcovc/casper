@@ -1,0 +1,17 @@
+predicate all_different_int(array [int] of var int: x);
+predicate disjoint(var set of int: s1, var set of int: s2);
+predicate lex_lesseq_int(array [int] of var int: x, array [int] of var int: y);
+predicate table_bool(array [int] of var bool: x, array [int, int] of bool: t);
+predicate table_int(array [int] of var int: x, array [int, int] of int: t);
+array [1..15] of var 1..10: q :: output_array([1..15]);
+constraint int_lin_le([-9, 3, 3, -2, 7], [q[2], q[5], q[8], q[10], q[13]], 1);
+constraint int_lin_le([-7, -2, -10, 5, 2], [q[1], q[2], q[6], q[10], q[12]], -80);
+constraint int_lin_le([-7, 3, -4, -6, -4], [q[3], q[6], q[7], q[11], q[14]], -66);
+constraint int_lin_le([-6, 9, 7, -6, -1], [q[1], q[3], q[9], q[11], q[14]], 91);
+constraint int_lin_le([-5, -1, -2, 6, -1], [q[1], q[4], q[9], q[12], q[15]], -8);
+constraint int_lin_le([-2, -9, -7, -4, -3], [q[5], q[8], q[10], q[12], q[15]], -116);
+constraint int_lin_le([1, 5, -5, 10, 1], [q[2], q[6], q[9], q[10], q[12]], 52);
+constraint int_lin_le([8, 2, -2, 2, 6], [q[3], q[4], q[11], q[13], q[14]], 83);
+constraint int_lin_le([10, -5, 4, -10, 6], [q[1], q[5], q[7], q[8], q[15]], 32);
+constraint int_lin_le([10, 1, 2, 8, 10], [q[2], q[4], q[6], q[7], q[13]], 224);
+solve  :: int_search(q, first_fail, indomain_min, complete) satisfy;

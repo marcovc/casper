@@ -157,12 +157,13 @@ class CLinearEq:
 		return nbValues**(ep-en)
 
 class CLinearIneq:
-	def __init__(self,sol,arity,absCoeff=5,nbCons=None):
+	def __init__(self,sol,arity,looseness=5,absCoeff=5,nbCons=None):
 		self.sol = sol
 		self.arity = arity
 		self.constraints = getIdxsCombs(sol,arity,nbCons)
 		self.minCoeff = -absCoeff;
 		self.maxCoeff = absCoeff;
+		self.looseness = looseness;
 		
 	def getFreeVars(self):
 		return getFreeVars(self.sol,self.constraints)
@@ -178,8 +179,8 @@ class CLinearIneq:
 					coeff = 1
 				l.append("q["+str(i+1)+"]*"+str(coeff))
 				r += self.sol[i]*coeff
-			ctr = random.choice([">="+str(r-random.choice(self.looseness)),
-							     "<="+str(r+random.choice(self.looseness))])
+			ctr = random.choice([">="+str(r-random.choice(xrange(self.looseness+1))),
+							     "<="+str(r+random.choice(xrange(self.looseness+1)))])
 			if constraintAnn==None:
 				print "constraint "+"+".join(l)+ctr+";"
 			else:
@@ -242,9 +243,9 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	
 	random.seed(int(args.seed[0]))
-	csp = StressCSP(150,10)
+	csp = StressCSP(15,10)
 	#csp.addConstraint(CIntDistinct, 100, 43)
-	csp.addConstraint(CLinearEq, 100, 10, 3)
+	csp.addConstraint(CLinearIneq, 5, 10, 10, 20)
 	csp.printMzn()
 	#csp.computeK()
 	
