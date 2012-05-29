@@ -30,37 +30,37 @@ struct LogRangeCount : IGoal
 		auto it1 = depthCount.begin();
 		auto it2 = rangesAcc.begin();
 		int curDepth = explorer.getStats().curDepth;
-		while (it1 != depthCount.end() && curDepth>=0)
+		while (it1 != depthCount.end() && curDepth>0)
 		{
 			++it1;
 			++it2;
 			--curDepth;
 		}
-		while (curDepth>=0)
+		while (curDepth>0)
 		{
 			it1 = depthCount.pushBack(0);
 			it2 = rangesAcc.pushBack(0);
 			--curDepth;
 		}
 		
-                for (uint i = 0; i < vars.size(); ++i)
-                {
-                        int nranges = 1;
-                        auto it = vars[i].domain().begin();
-                        if (!vars[i].domain().ground())
-                        {
-                                int lastVal = *it;
-                                ++it;
-                                for ( ; it != vars[i].domain().end(); ++it)
-                                        if (*it > lastVal+1)
-                                        {
-                                                ++nranges;
-                                                lastVal = *it;
-                                        }
-                        }
-                        *it2 += nranges;
-                }
-                ++*it1;
+		for (uint i = 0; i < vars.size(); ++i)
+		{
+				int nranges = 1;
+				auto it = vars[i].domain().begin();
+				if (!vars[i].domain().ground())
+				{
+						int lastVal = *it;
+						++it;
+						for ( ; it != vars[i].domain().end(); ++it)
+								if (*it > lastVal+1)
+								{
+										++nranges;
+										lastVal = *it;
+								}
+				}
+				*it2 += nranges;
+		}
+		++*it1;
 		return succeed();	
 	}
 	IExplorer& explorer;
@@ -397,9 +397,13 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
         		  continue;
               va[k++] = (*piv)[vars->a[i]->getIntVar()];
           }
-
-          search = Casper::CP::label(solver,va,/*Casper::CP::Detail::logRangeCount(*solver.getExplorer(),*piv),*/getIntVarSelector(solver,va,args->a[1]),
+		  #ifdef CASPER_LOG_NRANGES_DEPTH
+          search = Casper::CP::label(solver,va,Casper::CP::Detail::logRangeCount(*solver.getExplorer(),*piv),getIntVarSelector(solver,va,args->a[1]),
         		  	  	  	  	   	   	   	   getIntValSelector(solver,va,args->a[2]));
+		  #else
+          search = Casper::CP::label(solver,va,getIntVarSelector(solver,va,args->a[1]),
+        		  	  	  	  	   	   	   	   getIntValSelector(solver,va,args->a[2]));
+		  #endif
         } catch (AST::TypeError& e) {
           (void) e;
           try {
@@ -646,12 +650,14 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
 		#endif
 
 		#ifdef CASPER_LOG_NRANGES_DEPTH
-           	out << "% NbRangesDist: ";
-		for (auto it = Casper::CP::Detail::depthCount.begin(); it != Casper::CP::Detail::depthCount.end(); ++it )
+           	out << "% NbRangesDist: {";
+        auto it1 = Casper::CP::Detail::depthCount.begin();
+        auto it2 = Casper::CP::Detail::rangesAcc.begin();
+		for ( ; it1 != Casper::CP::Detail::depthCount.end(); ++it1,++it2 )
 		{
-			out << *it << " ";
+			out << (*it2/ *it1) << ",";
 		}
-		out << std::endl;
+		out << "}" << std::endl;
 		#endif
 
 
