@@ -1344,8 +1344,6 @@ struct DivRange
 	{
 		using Util::isPos;
 		using Util::isNeg;
-		using Util::divLb;
-		using Util::divUb;
 
 		const Eval zero = static_cast<Eval>(0);
 
@@ -1359,19 +1357,19 @@ struct DivRange
 		{
 			if (!isNeg(a1))	// [0+,+] / [+,+]
 			{
-				lb = divLb(a1,b2);
-				ub = divUb(a2,b1);
+				lb = Util::divLbPP(a1,b2);
+				ub = Util::divUbPP(a2,b1);
 			}
 			else
 			if (!isPos(a2))	// [-,-0] / [+,+]
 			{
-				lb = divLb(a1,b1);
-				ub = divUb(a2,b2);
+				lb = Util::divLbNP(a1,b1);
+				ub = Util::divUbNP(a2,b2);
 			}
 			else
 			{				// [-,+] / [+,+]
-				lb = divLb(a1,b1);
-				ub = divUb(a2,b1);
+				lb = Util::divLbNP(a1,b1);
+				ub = Util::divUbPP(a2,b1);
 			}
 		}
 		else
@@ -1379,19 +1377,19 @@ struct DivRange
 		{
 			if (!isNeg(a1))	// [0+,+] / [-,-]
 			{
-				lb = divLb(a2,b2);
-				ub = divUb(a1,b1);
+				lb = Util::divLbPN(a2,b2);
+				ub = Util::divUbPN(a1,b1);
 			}
 			else
 			if (!isPos(a2))	// [-,-0] / [-,-]
 			{
-				lb = divLb(a2,b1);
-				ub = divUb(a1,b2);
+				lb = Util::divLbNN(a2,b1);
+				ub = Util::divUbNN(a1,b2);
 			}
 			else
 			{				// [-,+] / [-,-]
-				lb = divLb(a2,b2);
-				ub = divUb(a1,b2);
+				lb = Util::divLbPN(a2,b2);
+				ub = Util::divUbNN(a1,b2);
 			}
 		}
 		else	// ? / [-0,0+]
@@ -1401,36 +1399,36 @@ struct DivRange
 				if (b2==zero) // ? / [0]
 					throw Exception::DivisionByZero();
 				if (isNeg(a2)) // [-,-] / [0,0+]
-					ub = divUb(a2,b2);
+					ub = Util::divUbNP(a2,b2);
 				else
 				if (isPos(a1)) // [+,+] / [0,0+]
-					lb = divLb(a1,b2);
+					lb = Util::divLbPP(a1,b2);
 			}
 			else
 			if (b2==zero)	// ? / [-0,0]
 			{
 				if (isNeg(a2)) // [-,-] / [0,0+]
-					lb = divLb(a2,b1);
+					lb = Util::divLbNP(a2,b1);
 				else
 				if (isPos(a1)) // [+,+] / [0,0+]
-					ub = divUb(a1,b1);
+					ub = Util::divUbPP(a1,b1);
 			}
 			else	// ? / [-,+]
 			{
 				if (isNeg(a2))	// [-,-] / [-,+]
 				{
-					if (divLb(a2,b1)>ub)
-						ub = divUb(a2,b2);
-					if (divUb(a2,b2)<lb)
-						lb = divLb(a2,b1);
+					if (Util::divLbNN(a2,b1)>ub)
+						ub = Util::divUbNP(a2,b2);
+					if (Util::divUbNP(a2,b2)<lb)
+						lb = Util::divLbNN(a2,b1);
 				}
 				else
 				if (isPos(a1))	// [+,+] / [-,+]
 				{
-					if (divUb(a1,b1)<lb)
-						lb = divLb(a1,b2);
-					if (divLb(a1,b2)>ub)
-						ub = divUb(a1,b1);
+					if (Util::divUbPN(a1,b1)<lb)
+						lb = Util::divLbPP(a1,b2);
+					if (Util::divLbPP(a1,b2)>ub)
+						ub = Util::divUbPN(a1,b1);
 				}
 			}
 		}
@@ -1443,8 +1441,6 @@ Eval BndViewRel2<Div,Expr1,Expr2,Eval>::min() const
 {
 	using Util::isPos;
 	using Util::isNeg;
-	using Util::divLb;
-	using Util::divUb;
 
 	const Eval zero = static_cast<Eval>(0);
 
@@ -1457,23 +1453,17 @@ Eval BndViewRel2<Div,Expr1,Expr2,Eval>::min() const
 	if (isPos(b1))	// ? / [+,+]
 	{
 		if (!isNeg(a1))	// [0+,+] / [+,+]
-			return divLb(a1,b2);
-		else
-		if (!isPos(a2))	// [-,-0] / [+,+]
-			return divLb(a1,b1);
-		else
-			return divLb(a1,b1);	// [-,+] / [+,+]
+			return Util::divLbPP(a1,b2);
+		else			// [-,+] / [+,+]
+			return Util::divLbNP(a1,b1);
 	}
 	else
 	if (isNeg(b2))	// ? / [-,-]
 	{
-		if (!isNeg(a1))	// [0+,+] / [-,-]
-			return divLb(a2,b2);
-		else
 		if (!isPos(a2))	// [-,-0] / [-,-]
-			return divLb(a2,b1);
-		else
-			return divLb(a2,b2); // [-,+] / [-,-]
+			return Util::divLbNN(a2,b1);
+		else			// [-,+] / [-,-]
+			return Util::divLbPN(a2,b2);
 	}
 	else	// ? / [-0,0+]
 	{
@@ -1482,13 +1472,13 @@ Eval BndViewRel2<Div,Expr1,Expr2,Eval>::min() const
 			if (b2==zero) // ? / [0]
 				throw Exception::DivisionByZero();
 			if (isPos(a1)) // [+,+] / [0,0+]
-				return divLb(a1,b2);
+				return Util::divLbPP(a1,b2);
 		}
 		else
 		if (b2==zero)	// ? / [-0,0]
 		{
-			if (isNeg(a2)) // [-,-] / [0,0+]
-				return divLb(a2,b1);
+			if (isNeg(a2)) // [-,-] / [0-,0]
+				return Util::divLbNN(a2,b1);
 		}
 	}
 	return limits<Eval>::negInf();
@@ -1499,8 +1489,6 @@ Eval BndViewRel2<Div,Expr1,Expr2,Eval>::max() const
 {
 	using Util::isPos;
 	using Util::isNeg;
-	using Util::divLb;
-	using Util::divUb;
 
 	const Eval zero = static_cast<Eval>(0);
 
@@ -1512,24 +1500,18 @@ Eval BndViewRel2<Div,Expr1,Expr2,Eval>::max() const
 
 	if (isPos(b1))	// ? / [+,+]
 	{
-		if (!isNeg(a1))	// [0+,+] / [+,+]
-			return divUb(a2,b1);
-		else
 		if (!isPos(a2))	// [-,-0] / [+,+]
-			return divUb(a2,b2);
-		else
-			return divUb(a2,b1); // [-,+] / [+,+]
+			return Util::divUbNP(a2,b2);
+		else			// [-,+] / [+,+]
+			return Util::divUbPP(a2,b1);
 	}
 	else
 	if (isNeg(b2))	// ? / [-,-]
 	{
 		if (!isNeg(a1))	// [0+,+] / [-,-]
-			return divUb(a1,b1);
-		else
-		if (!isPos(a2))	// [-,-0] / [-,-]
-			return divUb(a1,b2);
-		else
-			return divUb(a1,b2); // [-,+] / [-,-]
+			return Util::divUbPN(a1,b1);
+		else			// [-,+] / [-,-]
+			return Util::divUbNN(a1,b2);
 	}
 	else	// ? / [-0,0+]
 	{
@@ -1538,13 +1520,13 @@ Eval BndViewRel2<Div,Expr1,Expr2,Eval>::max() const
 			if (b2==zero) // ? / [0]
 				throw Exception::DivisionByZero();
 			if (isNeg(a2)) // [-,-] / [0,0+]
-				return divUb(a2,b2);
+				return Util::divUbNP(a2,b2);
 		}
 		else
 		if (b2==zero)	// ? / [-0,0]
 		{
-			if (isPos(a1)) // [+,+] / [0,0+]
-				return divUb(a1,b1);
+			if (isPos(a1)) // [+,+] / [-0,0]
+				return Util::divUbPN(a1,b1);
 		}
 	}
 	return limits<Eval>::posInf();

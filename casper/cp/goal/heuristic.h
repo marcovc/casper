@@ -336,10 +336,32 @@ struct MaxDomOverWeightedDegreeEvaluator
  *  \ingroup CPSearch
  * 	Variable heuristic that selects variables lexicographically.
  **/
-template<class Obj,class TermCond = GroundTermCond>
+template<class Obj>
 struct SelectVarLex : IVarSelector
 {
-	SelectVarLex(Store& s,const Obj& obj,const TermCond& tc = TermCond()) :
+	SelectVarLex(Store& s,const Obj& obj) :
+		obj(s,obj) {}
+	int select()
+	{
+		for (uint r = 0 ; r < obj.size(); ++r)
+			if (!obj[r]->ground())
+				return static_cast<int>(r);
+		return -1;
+	}
+	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<Obj>::Type>::Type	ElemEval;
+	DomArrayView<ElemEval,Obj> obj;
+};
+
+/**
+ *  \ingroup CPSearch
+ * 	Variable heuristic that selects variables lexicographically.
+ * 	It never selects a variable earlier in the array unless all variables have been selected once,
+ * 	even when backtracking.
+ **/
+template<class Obj,class TermCond = GroundTermCond>
+struct SelectVarLexRR : IVarSelector
+{
+	SelectVarLexRR(Store& s,const Obj& obj,const TermCond& tc = TermCond()) :
 		obj(s,obj),
 		curIdx(s,0),
 		termCond(tc) {}
@@ -365,8 +387,13 @@ struct SelectVarLex : IVarSelector
 
 // FIXME: leaking - must delay Label goal
 template<class Obj>
-VarSelector selectVarLex(Store& s,const Obj& obj)
-{return new Detail::SelectVarLex<Obj>(s,obj);}
+VarSelector selectVarLex(Store& s,const Obj& obj, bool roundRobin = true)
+{
+	if (roundRobin)
+		return new Detail::SelectVarLexRR<Obj>(s,obj);
+	else
+		return new Detail::SelectVarLex<Obj>(s,obj);
+}
 
 #define CASPER_DEF_VAR_SELECT(name) \
 namespace Detail { \

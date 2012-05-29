@@ -16,7 +16,7 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-#define EX 13
+#define EX 17
 
 #if EX==1
 
@@ -1568,6 +1568,47 @@ int main(int argc, char** argv)
 //	std::cout << v1 << " " << v2 << " " << v3 << std::endl;
 //	std::cout << store.getStats() << std::endl;
 //	std::cout << env.getStats() << std::endl;
+}
+#elif EX==17
+
+
+#include <casper/kernel.h>
+#include <casper/cp/int.h>
+#include <iostream>
+#include <fstream>
+
+using namespace Casper;
+using namespace Casper::CP;
+using namespace std;
+
+int main(int argc, char** argv)
+{
+	int n = 5;
+	int m = 10;
+
+	Solver solver;
+	IntVarArray	marks(solver,n,0,m);
+	IntVarArray	diffs(solver,n*(n-1)/2,0,m);
+
+	int cc = 0;
+	for (int i = 0; i < n; ++i)
+		for (int j = i+1; j < n; ++j)
+			solver.post(diffs[cc++] == marks[j]-marks[i]);
+
+	solver.post(distinct(diffs));
+
+	// break some symmetries
+	for (uint i = 0; i < n-1; i++)
+		solver.post(marks[i] < marks[i+1]);
+
+	solver.post(marks[0] == 0);
+
+	//solver.post(diffs[0] < diffs[cc-1]);
+
+	bool found = solver.solve(label(solver,marks,selectVarLex(solver,marks)));
+	cout << found << " " << marks << " " << diffs << endl;
+	cout << solver.getStats() << endl;
+
 }
 
 #endif

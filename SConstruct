@@ -129,6 +129,7 @@ casper_util+=['debug.cpp']
 casper_util+=['options.cpp']
 casper_util+=['timer.cpp']
 casper_util+=['util.cpp']
+casper_util+=['init.cpp']
 
 casper_lp=[]
 casper_lp+=['driver.cpp']
@@ -249,7 +250,7 @@ vars.Add(EnumVariable('optimize_level', '0 (none) to 3 (full)', '0',
 						allowed_values=('0','1', '2','3')), converter=int)
 vars.Add(BoolVariable('precompile', 'precompile a large set of expressions', False))
 vars.Add(BoolVariable('warnings', 'compilation with -Wall', True))
-vars.Add(BoolVariable('profile', 'build for profiling with gprof/gcov', False))
+vars.Add(BoolVariable('profile', 'enable builtin profiler', False))
 vars.Add(BoolVariable('safe_rounding', 'perform safe rounded operations with float types', 1))
 vars.Add(BoolVariable('asserts', 'extra run-time checks', False))
 vars.Add(BoolVariable('extra_stats', 'collect extra statistic information at cost of runtime', False))
@@ -344,18 +345,15 @@ confCommon = Configure( confCommonEnv )
 
 if not confCommon.CheckLib( library='rt', symbol='clock_gettime',autoadd=1):
 	confCommon.env.Append(CPPDEFINES = ['CASPER_NO_RT'])
-if env['profile']:
-	env['profile'] = confCommon.CheckLib( library='gcov', libpath=env['LIBPATH'], autoadd=1)	
-	if not env['profile']:
-		print "Warning: gcov library not found. No code coverage available."
 if not confCommon.CheckLib( library='glpk', autoadd=0):
 	env['lp'] = False
 for (k,v) in examples_for_extra_lib.iteritems():
 	if not confCommon.CheckLib( library=k, autoadd=0):
 		print "Warning: library "+k+" not found. The following examples will not be built:"
 		for i in v:
-			print "\t\t"+i
-			example_srcs.remove(i)
+			if i in example_srcs:
+				print "\t\t"+i
+				example_srcs.remove(i)
 if not env['safe_rounding'] or \
 	not confCommon.CheckLib( library='mpfr', autoadd=1):
 	confCommon.env.Append(CPPDEFINES = ['CASPER_UNSAFE_ROUNDING'])
@@ -364,7 +362,7 @@ if not confCommon.CheckLib(library='boost_program_options',language='C++', autoa
 	Exit(1)
 confCommon.Finish();
 
-if not env['lp']:
+if not env['lp'] and 'glpk' in examples_for_extra_lib:
 	for i in examples_for_extra_lib['glpk']:
 		if i in example_srcs:
 			example_srcs.remove(i)
@@ -382,7 +380,10 @@ if env['extra_stats']:
 
 if env['log']:
 	defined_macros += ['CASPER_LOG']
-	
+
+if env['profile']:
+	defined_macros += ['CASPER_LOG','CASPER_PROFILE']
+		
 if env['cpp0x']:
 	defined_macros += ['CASPER_CPP0X']
 	
@@ -417,9 +418,6 @@ def getBuildFlags(env,debug_level,optimize_level):
 		build_flags += ['-g${debug_level}','-O${optimize_level}']
 		if env['warnings']:
 			build_flags += ['-Wall']
-		if env['profile']:
-			build_flags += ['-fprofile-arcs','-ftest-coverage','-pg']
-			link_flags += ['-pg']
 		if env['static_link']:
 			build_flags += ['-static']
 			link_flags += ['-static']
@@ -973,7 +971,7 @@ def runTests(target,source,env):
 	from multiprocessing import cpu_count
 	from math import ceil
 	benchmark.runBenchmarks(infilename="test/BenchmarkFile",outfilename="test/BenchmarkResults.xml",
-				  sample_count=5,timeout=30,memout=900e3,product=product,buildenv=buildenv,
+				  sample_count=2,timeout=30,memout=900e3,product=product,buildenv=buildenv,
 				  number_workers = int(ceil(cpu_count()/4.0)))
  	SCons.compat.rename_module('pickle','cPickle') # bypasses SCons bug #2781 
 

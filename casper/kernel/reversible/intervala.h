@@ -28,6 +28,7 @@
 #include <casper/util/container/sciterator.h>
 #include <casper/util/container/reverseiterator.h>
 #include <casper/util/container/stdpair.h>
+#include <casper/util/container/stdrange.h>
 #include <casper/kernel/reversible/reversible.h>
 #include <casper/kernel/reversible/sulist.h>
 
@@ -182,7 +183,7 @@ class IntervalA
 					curInt(curInt),curVal(curVal) {}
 		bool operator==(const Iterator& s) const;
 		bool operator!=(const Iterator& s) const;
-		Value operator*() const;
+		const Value& operator*() const;
 		//typename IntervalA::Pointer operator->() const;
 		Iterator& operator++(); // pre-increment
 		Iterator operator++(int); //post-increment
@@ -202,6 +203,7 @@ class IntervalA
 	IntervalA(State&,scit first, scit last);
 	template <class InputIterator>
 	IntervalA(State&,InputIterator first, InputIterator last, const Compare& c);
+	IntervalA(State&, const Util::StdRange<T>& r);
 	IntervalA(const IntervalA&);
 //	IntervalA(key_compare);
 	~IntervalA();
@@ -312,7 +314,7 @@ bool IntervalA<T,Container,Compare>::Iterator::
 
 template<class T, class Container, class Compare>
 inline
-typename IntervalA<T,Container,Compare>::Value
+const typename IntervalA<T,Container,Compare>::Value&
 	IntervalA<T,Container,Compare>::Iterator::
 		operator*() const
 { return curVal; }
@@ -514,6 +516,15 @@ IntervalA<T,Container,Compare>::IntervalA(const IntervalA& s) :
 	for (typename DataT::ConstIterator it = s.data.begin();
 		 it != s.data.end(); ++it)
 		 insertInterval(*it);
+}
+
+template<class T, class Container, class Compare>
+IntervalA<T,Container,Compare>::IntervalA(State& s, const Util::StdRange<T>& r) :
+	state(s),
+	data(s)
+{
+	initListAndSentinel();
+	insertInterval(Interval(s,r.min(),r.max()));
 }
 
 /**
@@ -1036,6 +1047,25 @@ bool IntervalA<T,Container,Compare>::
 }
 
 } // Detail
+
+namespace Traits {
+
+template<class T,class Container,class Compare>
+struct GetEval<Casper::Detail::IntervalA<T,Container,Compare> >
+{	typedef Seq<T>	Type; };
+
+template<class T,class Container,class Compare>
+struct GetElem<Casper::Detail::IntervalA<T,Container,Compare> >
+{	typedef T	Type; };
+
+template<class T,class Container,class Compare>
+struct GetTypeStr<Casper::Detail::IntervalA<T,Container,Compare> >
+{
+	std::string operator()()
+	{	return std::string("Casper::Detail::IntervalA<")+getTypeStr<T>()+">"; }
+};
+
+} // Traits
 } // Casper
 
 

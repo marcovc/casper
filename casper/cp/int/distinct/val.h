@@ -198,7 +198,7 @@ void ValFilterView1<Distinct,Seq<Eval>,View>::detach()
 template<class Eval,class View>
 bool ValFilterView1<Distinct,Seq<Eval>,View>::execute()
 {
-	#ifdef CASPER_LOG
+	#ifdef CASPER_LOG_OLD
 	store.getEnv().log(this, "ValFilterView1<Distinct,Seq<Eval>,View>", Util::Logger::filterExecuteBegin);
 	#endif
 

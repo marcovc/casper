@@ -63,6 +63,7 @@ struct DomView
 	}
 	void detach()	{	d.detachOnDomain(pOwner); }
 
+	bool ground() const {	return d.ground();	}
 //	View getObj() const
 //	{	return Var<Eval,DomT>(this->solver(),&d);}
 
@@ -100,7 +101,7 @@ struct DomView<Eval,Var<Eval,DomT>,DomT>
 	Dom&	operator*() const	{	return const_cast<Dom&>(d);	}
 	Var<Eval,DomT> getObj() const
 	{	return Var<Eval,DomT>(store,&d);}
-
+	bool ground() const {	return d.ground();}
 	Store& store;
 	Dom&	d;
 	INotifiable* pOwner;

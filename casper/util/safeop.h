@@ -70,11 +70,11 @@ private:
 
 public:
 # define GENR_FUNC_1(name) \
-  double name##_down(double x) { return invoke_mpfr(x, mpfr_##name, GMP_RNDD); } \
-  double name##_up  (double x) { return invoke_mpfr(x, mpfr_##name, GMP_RNDU); }
+  double name##Lb(double x) { return invoke_mpfr(x, mpfr_##name, GMP_RNDD); } \
+  double name##Ub  (double x) { return invoke_mpfr(x, mpfr_##name, GMP_RNDU); }
 # define GENR_FUNC_2(name) \
-  double name##_down(double x,double y) { return invoke_mpfr(x,y, mpfr_##name, GMP_RNDD); } \
-  double name##_up  (double x,double y) { return invoke_mpfr(x,y, mpfr_##name, GMP_RNDU); }
+  double name##Lb(double x,double y) { return invoke_mpfr(x,y, mpfr_##name, GMP_RNDD); } \
+  double name##Ub  (double x,double y) { return invoke_mpfr(x,y, mpfr_##name, GMP_RNDU); }
 
   GENR_FUNC_2(add)
   GENR_FUNC_2(sub)
@@ -87,9 +87,7 @@ public:
 
 // Transcendental functions need special rounding class
 template<class T>
-struct mpfr_rounded_transc:
-  boost::numeric::interval_lib::rounded_arith_std<T>
-	//mpfr_rounded_std<T>
+struct mpfr_rounded_transc
 {
 private:
   //typedef int mpfr_func(mpfr_t, const __mpfr_struct*, mp_rnd_t);
@@ -117,11 +115,11 @@ private:
 
 public:
 # define GENR_FUNC(name) \
-  double name##_down(double x) { return invoke_mpfr(x, mpfr_##name, GMP_RNDD); } \
-  double name##_up  (double x) { return invoke_mpfr(x, mpfr_##name, GMP_RNDU); }
+  static double name##Lb(double x) { return invoke_mpfr(x, mpfr_##name, GMP_RNDD); } \
+  static double name##Ub  (double x) { return invoke_mpfr(x, mpfr_##name, GMP_RNDU); }
 # define GENR_FUNC2(name) \
-  double name##_down(double x,double y) { return invoke_mpfr(x,y, mpfr_##name, GMP_RNDD); } \
-  double name##_up  (double x,double y) { return invoke_mpfr(x,y, mpfr_##name, GMP_RNDU); }
+  static double name##Lb(double x,double y) { return invoke_mpfr(x,y, mpfr_##name, GMP_RNDD); } \
+  static double name##Ub  (double x,double y) { return invoke_mpfr(x,y, mpfr_##name, GMP_RNDU); }
   GENR_FUNC(exp)
   GENR_FUNC(log)
   GENR_FUNC(sin)
@@ -137,6 +135,8 @@ public:
   GENR_FUNC(acosh)
   GENR_FUNC(atanh)
   GENR_FUNC2(pow)
+
+  boost::numeric::interval_lib::rounded_arith_std<T>	rounder;
 };
 
 // Utility class for avoiding numeric overflows below
@@ -162,27 +162,29 @@ struct GetHigherRank<std::int32_t>
 // Special rounding policy for handling integers, since its missing from
 // boost::interval library (nothing needs rounding, except division which is
 // always rounded in the non-conservative way)
-template<class T, class Rounding = boost::numeric::interval_lib::rounding_control<T> >
-struct rounded_arith_integer : Rounding
+template<class T, class Rounder = boost::numeric::interval_lib::rounding_control<T> >
+struct rounded_arith_integer : Rounder
 {
-# define BOOST_DN(EXPR) this->downward();   return this->force_rounding(EXPR)
-# define BOOST_NR(EXPR) this->to_nearest(); return this->force_rounding(EXPR)
-# define BOOST_UP(EXPR) this->upward();     return this->force_rounding(EXPR)
-  void init() { }
-  template<class U> T conv_down(U const &v)
+# define BOOST_DN(EXPR) rounder.downward();   return rounder.force_rounding(EXPR)
+# define BOOST_NR(EXPR) rounder.to_nearest(); return rounder.force_rounding(EXPR)
+# define BOOSTUb(EXPR) rounder.upward();     return rounder.force_rounding(EXPR)
+
+  template<class U>
+  static T convLb(U const &v)
   {	 return static_cast<T>(std::ceil(v)); }
-  template<class U> T conv_up  (U const &v)
+  template<class U>
+  static T convUb  (U const &v)
   {	return static_cast<T>(std::floor(v)); }
-  T conv_down(bool const &v)
+  static T convLb(bool const &v)
   {	 return static_cast<T>(std::ceil(static_cast<double>(v))); }
-  T conv_up  (bool const &v)
+  static T convUb  (bool const &v)
   {	return static_cast<T>(std::floor(static_cast<double>(v))); }
-  T conv_down(int const &v)
+  static T convLb(int const &v)
   {	 return static_cast<T>(std::ceil(static_cast<double>(v))); }
-  T conv_up  (int const &v)
+  static T convUb  (int const &v)
   {	return static_cast<T>(std::floor(static_cast<double>(v))); }
 
-  T add_down(const T& x, const T& y)
+  static T addLb(const T& x, const T& y)
   {
 #ifdef CASPER_CHECK_OVERFLOW
 	  typedef typename GetHigherRank<T>::Type HT;
@@ -195,7 +197,7 @@ struct rounded_arith_integer : Rounding
 	  return x+y;
 #endif
   }
-  T sub_down(const T& x, const T& y)
+  static T subLb(const T& x, const T& y)
   {
 #ifdef CASPER_CHECK_OVERFLOW
 	  typedef typename GetHigherRank<T>::Type HT;
@@ -208,7 +210,7 @@ struct rounded_arith_integer : Rounding
 	  return x-y;
 #endif
   }
-  T mul_down(const T& x, const T& y)
+  static T mulLb(const T& x, const T& y)
   {
 #ifdef CASPER_CHECK_OVERFLOW
 	  typedef typename GetHigherRank<T>::Type HT;
@@ -221,9 +223,9 @@ struct rounded_arith_integer : Rounding
 	  return x*y;
 #endif
   }
-  T div_down(const T& x, const T& y)
-  { return conv_down(static_cast<double>(x) / y); }
-  T add_up  (const T& x, const T& y)
+  static T divLb(const T& x, const T& y)
+  {	return convLb(static_cast<double>(x) / y);	}
+  static T addUb  (const T& x, const T& y)
   {
 #ifdef CASPER_CHECK_OVERFLOW
 	  typedef typename GetHigherRank<T>::Type HT;
@@ -236,7 +238,7 @@ struct rounded_arith_integer : Rounding
 	  return x+y;
 #endif
   }
-  T sub_up  (const T& x, const T& y)
+  static T subUb  (const T& x, const T& y)
   {
 #ifdef CASPER_CHECK_OVERFLOW
 	  typedef typename GetHigherRank<T>::Type HT;
@@ -249,7 +251,7 @@ struct rounded_arith_integer : Rounding
 	  return x-y;
 #endif
   }
-  T mul_up  (const T& x, const T& y)
+  static T mulUb  (const T& x, const T& y)
   {
 #ifdef CASPER_CHECK_OVERFLOW
 	  typedef typename GetHigherRank<T>::Type HT;
@@ -262,25 +264,47 @@ struct rounded_arith_integer : Rounding
 	  return x*y;
 #endif
   }
-  T div_up  (const T& x, const T& y)
-  { return conv_up(static_cast<double>(x) / y); }
-  T median(const T& x, const T& y) { BOOST_NR((x + y) / 2); }
-  T sqrt_down(const T& x)
-  { BOOST_NUMERIC_INTERVAL_using_math(sqrt); BOOST_UP(sqrt(x)); }
-  T sqrt_up  (const T& x)
+  static T divUb  (const T& x, const T& y)
+  {	return convUb(static_cast<double>(x) / y);	}
+
+  /// division when the sign of x and y is known in advance
+  /// (assumes integer division rounds toward zero)
+  static T divUbPP(const T& x, const T& y)
+  {	return x/y;	}
+  static T divLbPP(const T& x, const T& y)
+  {	return (x+y-1)/y;	}
+  static T divUbPN(const T& x, const T& y)
+  {	return (x+y+1)/y;	}
+  static T divLbPN(const T& x, const T& y)
+  {	return x/y; }
+  static T divUbNP(const T& x, const T& y)
+  {	return (x-y+1)/y;	}
+  static T divLbNP(const T& x, const T& y)
+  {	return x/y; }
+  static T divUbNN(const T& x, const T& y)
+  {	return x/y; }
+  static T divLbNN(const T& x, const T& y)
+  {	return (x+y+1)/y;	}
+
+  static T median(const T& x, const T& y) { BOOST_NR((x + y) / 2); }
+  static T sqrtLb(const T& x)
+  { BOOST_NUMERIC_INTERVAL_using_math(sqrt); BOOSTUb(sqrt(x)); }
+  static T sqrtUb  (const T& x)
   { BOOST_NUMERIC_INTERVAL_using_math(sqrt); BOOST_DN(sqrt(x)); }
-  T int_down(const T& x) { return x; }
-  T int_up  (const T& x) { return x; }
-  T pow_up  (const T& x, const T& y) { return std::pow(x,y); }
-  T pow_down  (const T& x, const T& y) { return std::pow(x,y); }
-  T exp_up  (const T& x) { return std::exp(x); }
-  T exp_down  (const T& x) { return std::exp(x); }
-  T log_up  (const T& x) { return std::log(x); }
-  T log_down  (const T& x) { return std::log(x); }
+  static T intLb(const T& x) { return x; }
+  static T intUb  (const T& x) { return x; }
+  static T powUb  (const T& x, const T& y) { return std::pow(x,y); }
+  static T powLb  (const T& x, const T& y) { return std::pow(x,y); }
+  static T expUb  (const T& x) { return std::exp(x); }
+  static T expLb  (const T& x) { return std::exp(x); }
+  static T logUb  (const T& x) { return std::log(x); }
+  static T logLb  (const T& x) { return std::log(x); }
+
+  static Rounder rounder;
 
 # undef BOOST_DN
 # undef BOOST_NR
-# undef BOOST_UP
+# undef BOOSTUb
 };
 
 };
@@ -288,110 +312,31 @@ struct rounded_arith_integer : Rounding
 #endif
 
 
-#ifdef CASPER_UNSAFE_ROUNDING
-
-#include <math.h>
-
-namespace Casper {
-namespace Util {
-
-
-// Transcendental functions need special rounding class
-template<class T>
-struct no_rounding
-{
-private:
-
-public:
-# define GENR_FUNC(name) \
-  T name##_down(T x) { return ::name(x); } \
-  T name##_up  (T x) { return ::name(x); }
-
-# define GENR_FUNC2(name,res) \
-  T name##_down(T x,T y) { return res; } \
-  T name##_up  (T x,T y) { return res; }
-
-# define GENR_FUNC_CAST(name,castas) \
-  T name##_down(T x) { return ::name(static_cast<castas>(x)); } \
-  T name##_up  (T x) { return ::name(static_cast<castas>(x)); }
-
-  template<class U> T conv_down(U const &v)
-  { /*assert(v != std::numeric_limits<U>::infinity() &&
-  		   -v != std::numeric_limits<U>::infinity());*/
-  		   return static_cast<T>(::ceil(static_cast<double>(v))); }
-  template<class U> T conv_up  (U const &v)
-  { /*assert(v != std::numeric_limits<U>::infinity() &&
-  		   -v != std::numeric_limits<U>::infinity());*/
-  		   return static_cast<T>(::floor(static_cast<double>(v))); }
-
-  GENR_FUNC2(add,x+y);
-  GENR_FUNC2(sub,x-y);
-  GENR_FUNC2(mul,x*y);
-  GENR_FUNC2(div,x/y);
-  GENR_FUNC_CAST(sqrt,double);
-
-  GENR_FUNC(exp)
-  GENR_FUNC(log)
-  GENR_FUNC(sin)
-  GENR_FUNC(cos)
-  GENR_FUNC(tan)
-  GENR_FUNC(asin)
-  GENR_FUNC(acos)
-  GENR_FUNC(atan)
-  GENR_FUNC(sinh)
-  GENR_FUNC(cosh)
-  GENR_FUNC(tanh)
-  GENR_FUNC(asinh)
-  GENR_FUNC(acosh)
-  GENR_FUNC(atanh)
-  GENR_FUNC2(pow,std::pow(x,y))
-
-  T median(const T& x, const T& y) { return (x + y) / 2; }
-
-  #undef GENR_FUNC
-  #undef GENR_FUNC2
-};
-
-
-template<class T>
-//struct Round : boost::numeric::interval_lib::rounded_math<T>
-struct Round : Util::no_rounding<T>
-{};
-};
-};
-
-#else
-
 namespace Casper {
 namespace Util {
 
 template<class T>
-//struct Round : boost::numeric::interval_lib::rounded_math<T>
-struct Round :
-	boost::numeric::interval_lib::save_state<
-		mpfr_rounded_transc<T> >
+struct Round : boost::numeric::interval_lib::save_state<mpfr_rounded_transc<T> >
 {};
 
 
 template<>
-struct Round<int> :
-	boost::numeric::interval_lib::save_state_nothing<rounded_arith_integer<int> >
+struct Round<int> : rounded_arith_integer<int>
+{};
+
+template<>
+struct Round<bool> : rounded_arith_integer<bool>
 {};
 
 };
 };
 
-#endif
 
 
 
 namespace Casper {
 namespace Util {
 
-
-template<class T>
-Round<T> rounder()
-{	return	Round<T>();	}
 
 // conversion
 
@@ -399,9 +344,9 @@ template<class To,class From>
 struct Convert
 {
 	static To down(const From& from)
-	{	return rounder<To>().conv_down(from); }
+	{	return Round<To>::convLb(from); }
 	static To up(const From& from)
-	{	return rounder<To>().conv_up(from); }
+	{	return Round<To>::convUb(from); }
 };
 
 template<class To>
@@ -498,50 +443,116 @@ bool isCanonical(const T& min, const T& max)
 template<class Eval>
 Eval addUb(const Eval& t1, const Eval& t2)
 {
-	return rounder<Eval>().add_up(t1,t2);
+	return Round<Eval>::addUb(t1,t2);
 }
 
 template<class Eval>
 Eval addLb(const Eval& t1, const Eval& t2)
 {
-	return rounder<Eval>().add_down(t1,t2);
+	return Round<Eval>::addLb(t1,t2);
 }
 
 template<class Eval>
 Eval subUb(const Eval& t1, const Eval& t2)
 {
-	return rounder<Eval>().sub_up(t1,t2);
+	return Round<Eval>::subUb(t1,t2);
 }
 
 template<class Eval>
 Eval subLb(const Eval& t1, const Eval& t2)
 {
-	return rounder<Eval>().sub_down(t1,t2);
+	return Round<Eval>::subLb(t1,t2);
 }
 
 template<class Eval>
 Eval mulUb(const Eval& t1, const Eval& t2)
 {
-	return rounder<Eval>().mul_up(t1,t2);
+	return Round<Eval>::mulUb(t1,t2);
 }
 
 template<class Eval>
 Eval mulLb(const Eval& t1, const Eval& t2)
 {
-	return rounder<Eval>().mul_down(t1,t2);
+	return Round<Eval>::mulLb(t1,t2);
 }
 
 template<class Eval>
 Eval divUb(const Eval& t1, const Eval& t2)
 {
-	return rounder<Eval>().div_up(t1,t2);
+	return Round<Eval>::divUb(t1,t2);
 }
 
 template<class Eval>
 Eval divLb(const Eval& t1, const Eval& t2)
 {
-	return rounder<Eval>().div_down(t1,t2);
+	return Round<Eval>::divLb(t1,t2);
 }
+
+/*
+ *  The following 8 routines divide t1 by t2 when
+ *  the sign of t1 and t2 is known in advance.
+ *  This speeds up computation for integer values.
+ */
+
+template<class Eval>
+inline Eval divUbPP(const Eval& t1, const Eval& t2)
+{	return Round<Eval>::divUbPP(t1,t2);	}
+
+template<class Eval>
+inline Eval divLbPP(const Eval& t1, const Eval& t2)
+{	return Round<Eval>::divLbPP(t1,t2);	}
+
+template<class Eval>
+inline Eval divUbPN(const Eval& t1, const Eval& t2)
+{	return Round<Eval>::divUbPN(t1,t2); }
+
+template<class Eval>
+inline Eval divLbPN(const Eval& t1, const Eval& t2)
+{	return Round<Eval>::divLbPN(t1,t2); }
+
+template<class Eval>
+inline Eval divUbNP(const Eval& t1, const Eval& t2)
+{	return Round<Eval>::divUbNP(t1,t2); }
+
+template<class Eval>
+inline Eval divLbNP(const Eval& t1, const Eval& t2)
+{	return Round<Eval>::divLbNP(t1,t2); }
+
+template<class Eval>
+inline Eval divUbNN(const Eval& t1, const Eval& t2)
+{	return Round<Eval>::divUbNN(t1,t2); }
+
+template<class Eval>
+inline Eval divLbNN(const Eval& t1, const Eval& t2)
+{	return Round<Eval>::divLbNN(t1,t2); }
+
+/*
+template<class Eval>
+inline Eval divUbPN(const Eval& t1, const Eval& t2)
+{	return -divLbPP(t1,-t2); }
+
+template<class Eval>
+inline Eval divUbNP(const Eval& t1, const Eval& t2)
+{	return -divLbPP(-t1,t2); }
+
+template<class Eval>
+inline Eval divUbNN(const Eval& t1, const Eval& t2)
+{	return divUbPP(-t1,-t2); }
+
+template<class Eval>
+inline Eval divLbPN(const Eval& t1, const Eval& t2)
+{	return -divUbPP(t1,-t2); }
+
+template<class Eval>
+inline Eval divLbNP(const Eval& t1, const Eval& t2)
+{	return -divUbPP(-t1,t2); }
+
+template<class Eval>
+inline Eval divLbNN(const Eval& t1, const Eval& t2)
+{	return divLbPP(-t1,-t2); }
+*/
+
+// Integer division
 
 inline int idivUb(const int& t1, const int& t2)
 {
@@ -574,25 +585,25 @@ inline int idivLb(const int& t1, const int& t2)
 template<class Eval>
 Eval powUb(const Eval& t1, const Eval& t2)
 {
-	return rounder<Eval>().pow_up(t1,t2);
+	return Round<Eval>::powUb(t1,t2);
 }
 
 template<class Eval>
 Eval powLb(const Eval& t1, const Eval& t2)
 {
-	return rounder<Eval>().pow_down(t1,t2);
+	return Round<Eval>::powLb(t1,t2);
 }
 
 template<class Eval>
 Eval expUb(const Eval& t1)
 {
-	return rounder<Eval>().exp_up(t1);
+	return Round<Eval>::expUb(t1);
 }
 
 template<class Eval>
 Eval expLb(const Eval& t1)
 {
-	return rounder<Eval>().exp_down(t1);
+	return Round<Eval>::expLb(t1);
 }
 
 template<class Eval>
@@ -610,30 +621,30 @@ Eval sqrLb(const Eval& t1)
 template<class Eval>
 Eval sqrtUb(const Eval& t1)
 {
-	return rounder<Eval>().sqrt_up(t1);
+	return Round<Eval>::sqrtUb(t1);
 }
 
 template<class Eval>
 Eval sqrtLb(const Eval& t1)
 {
-	return rounder<Eval>().sqrt_down(t1);
+	return Round<Eval>::sqrtLb(t1);
 }
 
 template<class Eval>
 Eval logUb(const Eval& t1)
 {
-	return rounder<Eval>().log_up(t1);
+	return Round<Eval>::logUb(t1);
 }
 
 template<class Eval>
 Eval logLb(const Eval& t1)
 {
-	return rounder<Eval>().log_down(t1);
+	return Round<Eval>::logLb(t1);
 }
 
 template<class Eval>
 Eval median(const Eval& t1,const Eval& t2)
-{	return rounder<Eval>().median(t1,t2);	}
+{	return Round<Eval>::median(t1,t2);	}
 
 };
 

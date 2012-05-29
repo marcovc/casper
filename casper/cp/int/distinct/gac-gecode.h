@@ -924,7 +924,7 @@ bool DomFilterView1<Distinct,IntSeq,View>::init()
 template<class View>
 bool DomFilterView1<Distinct,IntSeq,View>::execute()
 {
-	#ifdef CASPER_LOG
+	#ifdef CASPER_LOG_OLD
 	store.getEnv().log(this, "DomFilterView1<Distinct,IntSeq,View>", Util::Logger::filterExecuteBegin);
 	#endif
 

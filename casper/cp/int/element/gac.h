@@ -106,7 +106,7 @@ template<class ArrayView,class IdxView,class EvalView>
 bool DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>::
 execute()
 {
-	#ifdef CASPER_LOG
+	#ifdef CASPER_LOG_OLD
 	store.getEnv().log(this, "DomFilterView3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>", Util::Logger::filterExecuteBegin);
 	#endif
 

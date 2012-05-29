@@ -58,7 +58,7 @@ struct BndDistinctD1<int,Expr1,int,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndDistinctD1<int,Expr1,int,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -114,7 +114,7 @@ struct DomDistinctD1<int,Expr1,int,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "DomDistinctD1<int,Expr1,int,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -150,7 +150,7 @@ struct BndFilterView2<Distinct,int,Expr1,int,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView2<Distinct,int,Expr1,int,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -185,7 +185,7 @@ struct DomFilterView2<Distinct,int,Expr1,int,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "DomFilterView2<Distinct,int,Expr1,int,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -278,7 +278,7 @@ struct BndFilterView2<Greater,int,Expr1,int,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView2<Greater,int,Expr1,int,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -364,6 +364,54 @@ struct PostBndFilter3<LinearLess,Seq<int>,Expr1,Seq<int>,Expr2,int,Expr3>
 {
     static bool post(Store& s,const Expr1& p1,const Expr2& p2,const Expr3& p3)
     {	return s.post(linearLessEqual(p1,p2,p3-1));   }
+};
+
+/**
+ * 	Enforces the seq membership constraint.
+ */
+template<class Expr1,class Elem,class Expr2>
+struct BndFilterView2<Member,Elem,Expr1,Seq<Elem>,Expr2> : IFilter
+{
+	BndFilterView2(Store& s,const Expr1& elem, const Expr2& seq) :
+		IFilter(s),elem(s,elem),seq(seq) {}
+
+	bool execute()
+	{
+		#ifdef CASPER_LOG_OLD
+		set->getStore().getEnv().log(this, "BndFilterView2<Member,Elem,Expr1,Seq<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
+		#endif
+
+		if (!elem->intersectWithSeq(seq))
+			return false;
+		return true;
+	}
+
+	void attach(INotifiable* s)
+	{	}
+	void detach()
+	{	 }
+
+	DomView<Elem,Expr1>	elem;
+	Expr2	seq;
+};
+
+template<class Elem,class Expr1,class Expr2>
+struct PostBndFilter2<Member,Elem,Expr1,Seq<Elem>,Expr2 >
+{
+    static bool post(Store& s,const Expr1& p1,const Expr2& p2)
+    {
+    	IterationView<Expr2> it(p2);
+    	if (!it.valid())
+    		return false;
+    	Elem lastVal = it.value();
+    	it.iterate();
+    	for ( ; it.valid(); it.iterate())
+    	{
+    		assert(it.value()>lastVal);
+    		lastVal = it.value();
+    	}
+    	return s.post(new (s) BndFilterView2<Member,Elem,Expr1,Seq<Elem>,Expr2>(s,p1,p2));
+    }
 };
 
 

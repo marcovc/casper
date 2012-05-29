@@ -25,6 +25,39 @@
 
 namespace Casper {
 
+#ifdef CASPER_LOG
+namespace Util {
+
+/**
+ * 	Support for logging filter events.
+ *
+ */
+struct ExplorerEG : ClassEventGenerator
+{
+	ClassEventGenerator::MethodEvent executeEv;
+
+
+	ExplorerEG(const void* pExplorer) :
+		executeEv(pExplorer,"Casper::Explorer","Casper::Explorer","execute") {}
+
+	void executeEnter() {	logger.logBegin(executeEv);	}
+	void executeLeave() {	logger.logEnd();	}
+};
+
+} // Util
+
+#define CASPER_AT_EXPLORER_EXEC_ENTER(eg) \
+		do { eg.setInstrumentBit(); eg.executeEnter(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_EXPLORER_EXEC_LEAVE(eg) \
+		do { eg.setInstrumentBit(); eg.executeLeave(); eg.unsetInstrumentBit(); } while (0)
+
+#else
+
+#define CASPER_AT_EXPLORER_EXEC_ENTER(eg)
+#define CASPER_AT_EXPLORER_EXEC_LEAVE(eg)
+
+#endif
+
 // goal scheduler
 
 // here CP means choice point, not check point as in State
@@ -96,6 +129,9 @@ struct IExplorer
     Reversible<PIGoal>    		pRightGoal;
     Goals                       goals;
 	ExplorerStats				stats;
+	#ifdef CASPER_LOG
+	Casper::Util::ExplorerEG	eg;
+	#endif
 
 	IExplorer(State& state);
     ~IExplorer();

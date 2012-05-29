@@ -7,6 +7,8 @@
  *  	Marco Correia, 2012
  */
 
+#define CASPER_LOG_NRANGES_DEPTH
+
 #ifndef CASPER_FLATZINC_HH__
 #define CASPER_FLATZINC_HH__
 

@@ -39,7 +39,7 @@ struct SetFDCard1 : IFilter
 
 	bool execute()
 	{	
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		d.getStore().getEnv().log(this, "SetFDCard1", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -82,7 +82,7 @@ struct SetFDCard2 : IFilter
 
 	bool execute()
 	{	
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		d.getStore().getEnv().log(this, "SetFDCard2", Util::Logger::filterExecuteBegin);
 		#endif
 		return d.card().updateMax(d.inSize()+d.possSize());	
@@ -127,7 +127,7 @@ struct SetFDCard3 : IFilter
 
 	bool execute()
 	{	
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		d.getStore().getEnv().log(this, "SetFDCard3", Util::Logger::filterExecuteBegin);
 		#endif
 		

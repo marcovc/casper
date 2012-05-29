@@ -230,6 +230,69 @@ struct ChkView<Filter>
 //template<>	struct GetEval<CP::Filter>	{	typedef	bool	Type;	};
 //}; // Traits
 
+namespace Util {
+
+#ifdef CASPER_LOG
+/**
+ * 	Support for logging filter events.
+ *
+ */
+struct FilterEG : ClassEventGenerator
+{
+	ClassEventGenerator::MethodEvent ctorEv;
+	ClassEventGenerator::MethodEvent executeEv;
+	ClassEventGenerator::MethodEvent attachEv;
+	ClassEventGenerator::MethodEvent detachEv;
+
+	FilterEG(Casper::CP::IFilter* pObj, const std::string& type) :
+		ctorEv(pObj,type,"Casper::CP::Filter","ctor"),
+		executeEv(pObj,type,"Casper::CP::Filter","execute"),
+		attachEv(pObj,type,"Casper::CP::Filter","attach"),
+		detachEv(pObj,type,"Casper::CP::Filter","detach") {}
+
+	void ctorEnter() {	logger.logBegin(ctorEv);	}
+	void ctorLeave() {	logger.logEnd();	}
+	void executeEnter() {	logger.logBegin(executeEv);	}
+	void executeLeave() {	logger.logEnd();	}
+	void attachEnter() {	logger.logBegin(attachEv);	}
+	void attachLeave() {	logger.logEnd();	}
+	void detachEnter() {	logger.logBegin(detachEv);	}
+	void detachLeave() {	logger.logEnd();	}
+};
+
+
+#define CASPER_AT_FILTER_CTOR_ENTER(eg) \
+	do { eg.setInstrumentBit(); eg.ctorEnter(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_FILTER_CTOR_LEAVE(eg) \
+	do { eg.setInstrumentBit(); eg.ctorLeave(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_FILTER_EXEC_ENTER(eg) \
+	do { eg.setInstrumentBit(); eg.executeEnter(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_FILTER_EXEC_LEAVE(eg,retVal) \
+	do { eg.setInstrumentBit(); eg.executeLeave(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_FILTER_ATTACH_ENTER(eg) \
+	do { eg.setInstrumentBit(); eg.attachEnter(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_FILTER_ATTACH_LEAVE(eg) \
+	do { eg.setInstrumentBit(); eg.attachLeave(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_FILTER_DETACH_ENTER(eg) \
+	do { eg.setInstrumentBit(); eg.detachEnter(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_FILTER_DETACH_LEAVE(eg) \
+	do { eg.setInstrumentBit(); eg.detachLeave(); eg.unsetInstrumentBit(); } while (0)
+
+#else
+
+#define CASPER_AT_FILTER_CTOR_ENTER(eg)
+#define CASPER_AT_FILTER_CTOR_LEAVE(eg)
+#define CASPER_AT_FILTER_EXEC_ENTER(eg)
+#define CASPER_AT_FILTER_EXEC_LEAVE(eg,retVal)
+#define CASPER_AT_FILTER_ATTACH_ENTER(eg)
+#define CASPER_AT_FILTER_ATTACH_LEAVE(eg)
+#define CASPER_AT_FILTER_DETACH_ENTER(eg)
+#define CASPER_AT_FILTER_DETACH_LEAVE(eg)
+
+#endif
+
+} // Util
+
 }; // Casper
 
 #endif

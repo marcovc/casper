@@ -26,6 +26,41 @@ namespace CP {
 
 namespace Detail {
 
+#define LABEL_OPTIM
+
+#ifdef LABEL_OPTIM
+template<class Dom,class Eval>
+struct PostVarEqualCons : IGoal
+{
+	PostVarEqualCons(Store& s, Dom& d, const Eval& c) : s(s),d(d),c(c) {}
+	Goal execute()
+	{	return Goal((d = c) and s.valid());	}
+	Store& s;
+	Dom& d;
+	Eval c;
+};
+
+template<class Dom,class Eval>
+Goal postVarEqualCons(Store& s, Dom& d, const Eval& c)
+{	return new (s) PostVarEqualCons<Dom,Eval>(s,d,c);	}
+
+template<class Dom,class Eval>
+struct PostVarGreaterCons : IGoal
+{
+	PostVarGreaterCons(Store& s, Dom& d, const Eval& c) : s(s),d(d),c(c) {}
+	Goal execute()
+	{	return Goal(d.updateMin(Util::succ(c)) and s.valid());	}
+	Store& s;
+	Dom& d;
+	Eval c;
+};
+
+template<class Dom,class Eval>
+Goal postVarGreaterCons(Store& s, Dom& d, const Eval& c)
+{	return new (s) PostVarGreaterCons<Dom,Eval>(s,d,c);	}
+#endif
+
+
 template<class Eval,class View>
 struct SelectValsMin<Seq<Eval>,View> : IValSelector
 {
@@ -100,10 +135,18 @@ struct SelectValMin<Seq<Eval>,View> : IValSelector
 	{
 		if (doms[idx]->ground())
 			return succeed();
+
+#ifdef LABEL_OPTIM
+		return Goal(store,
+				postVarEqualCons(store,*doms[idx],doms[idx]->min()) or
+				postVarGreaterCons(store,*doms[idx],doms[idx]->min())
+			);
+#else
 		return Goal(store,
 				post(store,rel<Equal>(doms[idx].getObj(),doms[idx]->min())) or
 				post(store,rel<Greater>(doms[idx].getObj(),doms[idx]->min()))
 			);
+#endif
 	}
 	Store& store;
 	DomArrayView<Eval,View> doms;

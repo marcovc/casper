@@ -23,8 +23,6 @@ namespace Casper {
 namespace Util {
 
 
-StdMem	stdHeap;
-
 DynamicHeap::DynamicHeap(uint initSize,double factor) : initSize(initSize),
 														factor(factor),
 				  		maxBulks(static_cast<uint>(::log(4E9)/::log(factor)))

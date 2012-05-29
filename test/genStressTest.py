@@ -27,7 +27,7 @@ def nbCombs(n,k):
 	return reduce(lambda a,b: a*(n-b)/(b+1),xrange(k),1)
 
 def getIdxsCombs(sol,arity,nbCons):
-	if nbCons==None or nbCons >= nbCombs(len(sol),arity):
+	if nbCons==None: # or nbCons >= nbCombs(len(sol),arity):
 		combs = [c for c in itertools.combinations(range(len(sol)),arity)]
 		random.shuffle(combs)
 	else:
@@ -243,9 +243,9 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	
 	random.seed(int(args.seed[0]))
-	csp = StressCSP(15,10)
+	csp = StressCSP(100,50)
 	#csp.addConstraint(CIntDistinct, 100, 43)
-	csp.addConstraint(CLinearIneq, 5, 10, 10, 20)
+	csp.addConstraint(CLinearIneq, 100, 10, 10, 3)
 	csp.printMzn()
 	#csp.computeK()
 	

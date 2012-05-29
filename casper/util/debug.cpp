@@ -21,21 +21,9 @@
 namespace Casper {
 namespace Util {
 
-
-std::string Logger::eventTagToString[] = {
-		"solverFail",
-		"filterSchedIterate",
-		"filterExecuteBegin",
-		"filterExecuteEnd",
-		"solverNotify",
-		"goalSchedIterate",
-		"solverPost"
-};
-
-
-void Logger::log(const void* obj, std::string strObj, const EventTag& tag)
+#ifdef CASPER_LOG
+void Logger::log(const Event& ev)
 {
-	Event ev(obj,strObj,tag);
 	for (auto it = callbacks.begin(); it != callbacks.end(); ++it)
 		if ((*it->first)(ev))
 			(*it->second)(ev);
@@ -45,7 +33,9 @@ void Logger::registerCallback(const EventMatcher& match, Callback& callback)
 {
 	callbacks.pushBack(Casper::pair(match.clone(),&callback));
 }
+#endif
 
+/*
 void LogEventStats::operator()(const Logger::Event& ev)
 {
 	bool found = false;
@@ -74,11 +64,16 @@ void LogEventStats::operator()(const Logger::Event& ev)
 	if (!found)
 		stats.pushBack(FromEvent(ev));
 }
+*/
 
+
+
+std::list<Alarm::Callback*>	Alarm::callbacks;
 
 } // Util
 } // Casper
 
+#if 0
 std::ostream& operator<<(std::ostream& s,const Casper::Util::Logger::Event& ev)
 {
 #if 1
@@ -133,3 +128,6 @@ std::ostream& operator<<(std::ostream& os, const Casper::Util::LogEventStats& e)
 	return os;
 #endif
 }
+
+#endif
+

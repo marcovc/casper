@@ -50,6 +50,9 @@ IExplorer::IExplorer(State& state) :
     	pLeftGoal(state,NULL),
     	pRightGoal(state,NULL),
     	goals(state)
+		#ifdef CASPER_LOG
+		,eg(this)
+		#endif
 {}
 
 IExplorer::~IExplorer()
@@ -66,6 +69,7 @@ bool IExplorer::resume()
 
 bool IExplorer::executeLoop()
 {
+	CASPER_AT_EXPLORER_EXEC_ENTER(eg);
 	for (EVER)
 	{
 		assert(pCurGoal);
@@ -81,6 +85,7 @@ bool IExplorer::executeLoop()
 					if (acceptSolution())
 					{
 						stats.signalNewSolution();
+						CASPER_AT_EXPLORER_EXEC_LEAVE(eg);
 						return true;
 					}
 					else
@@ -89,7 +94,11 @@ bool IExplorer::executeLoop()
 				pCurGoal = goals.top();
 				goals.pop();
 				if (pCurGoal == static_cast<IGoal*>(NULL))
-				{	assert(goals.empty());	return false; }
+				{
+					assert(goals.empty());
+					CASPER_AT_EXPLORER_EXEC_LEAVE(eg);
+					return false;
+				}
 			}
 			else	// pCurGoal != succeed() and pCurGoal != fail()
 				pCurGoal = g.getPImpl();
@@ -103,6 +112,7 @@ bool IExplorer::executeLoop()
 			{
                	//std::cout << "removing first CP\n";
                	//solver().removeCP();	// remove first CP
+            	CASPER_AT_EXPLORER_EXEC_LEAVE(eg);
 				return false;
             }
 			mValid = true;

@@ -374,7 +374,7 @@ int BndFilterView1<Distinct,IntSeq,View>::filterupper()
 template<class View>
 bool	BndFilterView1<Distinct,IntSeq,View>::execute()
 {
-	#ifdef CASPER_LOG
+	#ifdef CASPER_LOG_OLD
 	store.getEnv().log(this, "BndFilterView1<Distinct,IntSeq,View>", Util::Logger::filterExecuteBegin);
 	#endif
 
@@ -441,6 +441,18 @@ bool	BndFilterView1<Distinct,IntSeq,View>::execute()
   	return true;
 }
 
+/*
+template<class Eval,class View>
+struct PostBndFilter1<Distinct,Seq<Eval>,View>
+{
+	static bool post(Store& s,const View& v)
+	{
+		DomArrayView<Eval,View> a(s,v);
+		for (uint i = 0; i < a.size(); ++i)
+			std::cout << &*a[i] << " " << *a[i] << std::endl;
+		return s.post(new (s) BndFilterView1<Distinct,Seq<Eval>,View>(s,v));
+	}
+};*/
 
 } // CP
 } // Casper

@@ -112,7 +112,7 @@ template<class Eval,class ArrayView,class IdxView,class ResView>
 bool
 BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>::execute()
 {
-	#ifdef CASPER_LOG
+	#ifdef CASPER_LOG_OLD
 	store.getEnv().log(this, "BndFilterView3<ElementEqual,Seq<Eval>,ArrayView,int,IdxView,Eval,ResView>", Util::Logger::filterExecuteBegin);
 	#endif
 

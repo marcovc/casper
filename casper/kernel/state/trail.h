@@ -27,6 +27,7 @@
 
 namespace Casper {
 
+
 struct ITrailAgent
 {
 //	void* id;
@@ -59,7 +60,7 @@ struct Trail
 
 	// implies saving the old one
 	void stateNew()
-	{	s.push(Level(heap)); }
+	{	s.push(Level(heap));	}
 
 	void stateRollback()
 	{

@@ -57,8 +57,10 @@ struct EventSuspList //: INotifier
 	bool notifyAll()
 	{
 		for (SL::Iterator it = l.begin(); it != l.end(); ++it)
+		{
 			if (!(*it)->notify())
 				return false;
+		}
 		return true;
 	}
 };

@@ -215,7 +215,7 @@ BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::automatonProcess(uint i)
 template<class Expr1,class Expr2>
 bool BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::execute()
 {
-	#ifdef CASPER_LOG
+	#ifdef CASPER_LOG_OLD
 	store.getEnv().log(this, "BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>", Util::Logger::filterExecuteBegin);
 	#endif
 

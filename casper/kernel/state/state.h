@@ -25,11 +25,46 @@
 #include <casper/util/container/stdstack.h>
 #include <casper/kernel/state/trail.h>
 
+#include <casper/util/debug.h>
+
 namespace Casper {
 
 struct INotifiable;
 
 struct State;
+
+#ifdef CASPER_LOG
+namespace Util {
+
+/**
+ * 	Support for logging trail events.
+ *
+ */
+struct StateEG : ClassEventGenerator
+{
+	ClassEventGenerator::MethodEvent restoreEv;
+
+
+	StateEG(const void* pState) :
+		restoreEv(pState,"Casper::State","Casper::State","restore") {}
+
+	void restoreEnter() {	logger.logBegin(restoreEv);	}
+	void restoreLeave() {	logger.logEnd();	}
+};
+
+} // Util
+
+#define CASPER_AT_STATE_RESTORE_ENTER(eg) \
+		do { eg.setInstrumentBit(); eg.restoreEnter(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_STATE_RESTORE_LEAVE(eg) \
+		do { eg.setInstrumentBit(); eg.restoreLeave(); eg.unsetInstrumentBit(); } while (0)
+
+#else
+
+#define CASPER_AT_STATE_RESTORE_ENTER(eg)
+#define CASPER_AT_STATE_RESTORE_LEAVE(eg)
+
+#endif
 
 /**
  * 	State statistics.
@@ -164,6 +199,9 @@ struct State
 	counter							mFails;
 	Util::StdStack<INotifiable*>	onNextCPSL;
 	StateStats						stats;
+	#ifdef CASPER_LOG
+	Casper::Util::StateEG			eg;
+	#endif
 };
 
 template<class T>

@@ -42,7 +42,7 @@ struct EnvStats
 
 struct Env
 {
-	Env() {}
+	Env(){}
 
 	State& getState() { return state;	}
 	const State& getState() const { return state;	}
@@ -59,22 +59,17 @@ struct Env
 	operator Util::IHeap&() { return state;	}
 	operator const Util::IHeap&() const { return state;	}
 
-	Util::Logger& getLogger()
-	{ 	return logger;	}
-	const Util::Logger& getLogger() const
-	{ 	return logger;	}
-
+	/*
 #ifdef CASPER_LOG
 	void log(const void* obj, const std::string& strObj, const Util::Logger::EventTag& tag)
 	{ 	logger.log(obj,strObj,tag); }
 #else
 	void log(const void*, const std::string&, const Util::Logger::EventTag&)
 	{}
-#endif
+#endif*/
 	protected:
 	State 			state;
 	EnvStats		stats;
-	Util::Logger 	logger;
 };
 
 

@@ -33,6 +33,51 @@ namespace Casper {
 template<class> struct Expr;
 #endif
 
+
+#ifdef CASPER_LOG
+namespace Util {
+
+/**
+ * 	Support for logging filter events.
+ *
+ */
+struct CPStoreEG : ClassEventGenerator
+{
+	ClassEventGenerator::MethodEvent postEv;
+	ClassEventGenerator::MethodEvent fpEv;
+
+
+	CPStoreEG(const void* pStore) :
+		postEv(pStore,"Casper::CP::Store","Casper::CP::Store","post"),
+		fpEv(pStore,"Casper::CP::Store","Casper::CP::Store","fixpoint") {}
+
+	void postEnter() {	logger.logBegin(postEv);	}
+	void postLeave() {	logger.logEnd();	}
+	void fpEnter() {	logger.logBegin(fpEv);	}
+	void fpLeave() {	logger.logEnd();	}
+};
+
+} // Util
+
+#define CASPER_AT_STORE_FP_ENTER(eg) \
+		do { eg.setInstrumentBit(); eg.fpEnter(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_STORE_FP_LEAVE(eg) \
+		do { eg.setInstrumentBit(); eg.fpLeave(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_STORE_POST_ENTER(eg) \
+		do { eg.setInstrumentBit(); eg.postEnter(); eg.unsetInstrumentBit(); } while (0)
+#define CASPER_AT_STORE_POST_LEAVE(eg) \
+		do { eg.setInstrumentBit(); eg.postLeave(); eg.unsetInstrumentBit(); } while (0)
+
+#else
+
+#define CASPER_AT_STORE_FP_ENTER(eg)
+#define CASPER_AT_STORE_FP_LEAVE(eg)
+#define CASPER_AT_STORE_POST_ENTER(eg)
+#define CASPER_AT_STORE_POST_LEAVE(eg)
+
+#endif
+
+
 namespace CP {
 
 /**
@@ -349,7 +394,7 @@ struct Store : INotifiable
 
 	bool notify()
 	{
-		env.log(this,"CP::Store",Util::Logger::solverNotify);
+		//env.log(this,"CP::Store",Util::Logger::solverNotify);
 		bPending = true;
 		return bValid;
 	}
@@ -366,6 +411,10 @@ protected:
 
 	Reversible<bool> 	bValid;
 	Reversible<bool> 	bPending;
+
+	#ifdef CASPER_LOG
+	Casper::Util::CPStoreEG eg;
+	#endif
 };
 
 

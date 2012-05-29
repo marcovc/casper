@@ -174,7 +174,7 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 
 		/// Creates a new FD containing element \a e
 				FD(Store& store, const Value& e) :
-					Super(store,Util::SCIterator<Value>(e), ++Util::SCIterator<Value>(e)),
+					Super(store,Util::StdRange<Value>(e)),
 					_min(store,e),_max(store,e),
 					groundSL(store),boundsSL(store),domainSL(store)
 					#ifdef CASPER_EXTRA_STATS
@@ -185,7 +185,7 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		/** Creates a new FD containing all elements in the interval
 			[\a first ,\a last ]. */
 				FD(Store& store, Value first, Value last) :
-					Super(store,Util::SCIterator<Value>(first),++Util::SCIterator<Value>(last)),
+					Super(store,Util::StdRange<Value>(first,last)),
 					_min(store,first),_max(store,last),
 					groundSL(store),boundsSL(store),domainSL(store)
 					#ifdef CASPER_EXTRA_STATS
@@ -306,6 +306,9 @@ class FD : private Casper::Detail::SelectElement<Element,T,Container,std::less<T
 		bool intersect(BiDirIterator1 b, BiDirIterator1 e);
 		template<class FwdIterator1>
 		bool intersectFwd(FwdIterator1 b, FwdIterator1 e);
+		template<class Seq>
+		bool intersectWithSeq(const Seq& s);
+
 		template<class Iterator1>
 		bool erase(Iterator1 b, Iterator1 e);
 
@@ -608,6 +611,37 @@ bool FD<Container,Element,T>::intersectFwd(ForwardIterator1 b,ForwardIterator1 e
 		{
 			assert(*b < *myIt);
 			++b;
+		}
+	}
+	if (myIt != end() and (myIt==begin() or !updateMax(myIt)))
+		return false;
+	return true;
+}
+
+template<class Container,class Element,class T>
+template<class Seq>
+bool FD<Container,Element,T>::intersectWithSeq(const Seq& s)
+{
+	IterationView<Seq> sit(s);
+	if (!sit.valid() or !updateMin(sit.value()))
+		return false;
+	Iterator myIt = begin();
+	while (sit.valid() and myIt != end())
+	{
+		if (*myIt < sit.value())	// prune value
+		{
+			if (!erase(myIt++))
+				return false;
+		}
+		else
+		if (*myIt == sit.value())
+		{
+			sit.iterate(); ++myIt;
+		}
+		else
+		{
+			assert(sit.value() < *myIt);
+			sit.iterate();
 		}
 	}
 	if (myIt != end() and (myIt==begin() or !updateMax(myIt)))

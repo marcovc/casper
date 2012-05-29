@@ -530,6 +530,40 @@ struct ChkViewRel3<LinearLess,Seq<Eval>,Expr1,Seq<Eval>,Expr2,Eval,Expr3> :
 							   Super::getObj().p3.p1);	}
 };
 
+
+/**
+ * 	Enforces the seq membership constraint.
+ */
+template<class Expr1,class Elem,class Expr2>
+struct ChkViewRel2<Member,Elem,Expr1,Seq<Elem>,Expr2>
+{
+	ChkViewRel2(Store& s,const Expr1& elem, const Expr2& set) :
+		store(s),elem(s,elem),seq(s,seq) {}
+
+	bool isTrue() const	// is it true?
+	{	return !makeDiffIt(makeIt(*elem),makeIt(seq)).valid();	}
+	bool canBeTrue() const 	// can it still be true?
+	{	return makeInterIt(makeIt(*elem),makeIt(seq)).valid();	}
+	bool setToTrue()
+	{
+		detach();
+		return store.post(getObj());
+	}
+	bool setToFalse()
+	{	throw Exception::UndefinedFilter("not member(elem,seq)");	}
+	//Store& store() const {	return mSolver;	}
+
+	void attach(INotifiable* f) { elem->attach(f);	}
+	void detach() {	elem->detach(); }
+
+	bool getObj()  const
+	{ 	return member(elem.getObj(),seq);	}
+
+	Store& store;
+	DomView<Elem,Expr1>	elem;
+	Expr2	seq;
+};
+
 } // CP
 } // Casper
 

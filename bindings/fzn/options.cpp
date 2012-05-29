@@ -26,8 +26,8 @@ Options::Options() :
 		Casper::Util::ProgramOptions("Casper-FlatZinc Options"),
 		outputOptions("Output Options"),
 		searchOptions("Search Options"),
-		mShowStats(true),
-		mShowRuntime(true),
+		mShowStats(false),
+		mShowRuntime(false),
 		mShowVersion(false),
 		mNbSolutions(1),
 		mAllSolutions(false),
@@ -56,7 +56,7 @@ bool Options::parse(int argc, char** argv)
 
 	if (mShowVersion)
 	{
-		std::cout << "This is the FlatZinc interface for CaSPER (supports FlatZinc-" << CASPER_FLATZINC_VERSION << ")" << std::endl;
+		std::cout << "This is the FlatZinc interface for CaSPER (supporting FlatZinc-" << CASPER_FLATZINC_VERSION << ")" << std::endl;
 		std::cout << "CaSPER - Constraint Solving Platform for Engineering and Research" << std::endl;
 		std::cout << "Version " << Casper::getVersionDetailed() << std::endl;
 		std::cout << "2003-2012 Copyright (C) Marco Correia (http://proteina.di.fct.unl.pt/casper)" << std::endl;

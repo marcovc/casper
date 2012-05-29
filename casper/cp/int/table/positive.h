@@ -205,12 +205,12 @@ GACSchema<T,View>::seekSupport(uint varIdx, const T& val)
 template<class T, class View>
 bool GACSchema<T,View>::execute()
 {
-	store.getEnv().log(this,"GACSchema",Util::Logger::filterExecuteBegin);
+	//store.getEnv().log(this,"GACSchema",Util::Logger::filterExecuteBegin);
 	if (firstExecution)
 	{
 		firstExecution = false;
 		bool r = firstExecute();
-		store.getEnv().log(this,"GACSchema",Util::Logger::filterExecuteEnd);
+	//	store.getEnv().log(this,"GACSchema",Util::Logger::filterExecuteEnd);
 		return r;
 	}
 
@@ -237,7 +237,7 @@ bool GACSchema<T,View>::execute()
 						{	//std::cout << "couldn't find support for " << varIdx << " " << (*itTup)[varIdx]->val << std::endl;
 							if (!doms[varIdx]->erase((*itSup->pTuple)[varIdx]))
 							{
-								store.getEnv().log(this,"GACSchema",Util::Logger::filterExecuteEnd);
+								//store.getEnv().log(this,"GACSchema",Util::Logger::filterExecuteEnd);
 								return false;
 							}
 						}
@@ -245,7 +245,7 @@ bool GACSchema<T,View>::execute()
 			}
 	}
 //	std::cout << "returning true\n";
-	store.getEnv().log(this,"GACSchema",Util::Logger::filterExecuteEnd);
+	//store.getEnv().log(this,"GACSchema",Util::Logger::filterExecuteEnd);
 	return true;
 }
 

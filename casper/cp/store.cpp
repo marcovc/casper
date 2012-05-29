@@ -64,7 +64,7 @@ ostream& operator<<(ostream& os, const Casper::CP::StoreStats& s)
 	   << endl << left << setw (30) << "Number of range domain updates" << ":" <<  std::setw (10) << std::right
 							  << s.getNbRangeDomainUpdates();
 
-#if defined(CASPER_EXTRA_STATS)
+#if defined(CASPER_LOG)
 
 #if 0 // detailed
 	   os << endl;
@@ -141,13 +141,16 @@ namespace CP {
 Store::Store(Env& env) :
 			env(env),
 			globalSHeap(new Util::DynamicHeap(CASPER_SHEAP_INIT_SIZE,
-										CASPER_SHEAP_GROW_RATIO)),
+											  CASPER_SHEAP_GROW_RATIO)),
 			stats(env),
 //			propIDCtr(0),
 		    weightFilters(false),
 		    filters(env),
 		    bValid(env,true),
 		    bPending(env,false)
+			#ifdef CASPER_LOG
+			,eg(this)
+			#endif
 {
 	pFilterSched = new (env) FullyPreemptCostFilterSched<FIFOFilterSched>(*this);
 }
@@ -167,14 +170,17 @@ void Store::setFilterSched(IFilterSched* p)
 
 bool Store::post(const Filter& f)
 {
+	CASPER_AT_STORE_POST_ENTER(eg);
 	filters.pushFront(f.getPImpl());
 
 	if (!pFilterSched->post(f))
 	{
 		bPending = false;
 		bValid = false;
+		CASPER_AT_STORE_POST_LEAVE(eg);
 		return false;
 	}
+	CASPER_AT_STORE_POST_LEAVE(eg);
 	return true;
 }
 
@@ -204,12 +210,14 @@ bool Store::getFilterWeighting() const
 
 bool Store::valid()
 {
+	CASPER_AT_STORE_FP_ENTER(eg);
 	if (bPending)
 	{
 		bPending = false;
 		bValid = pFilterSched->execute();
 		stats.signalFPComputation();
 	}
+	CASPER_AT_STORE_FP_LEAVE(eg);
 	return bValid;
 }
 

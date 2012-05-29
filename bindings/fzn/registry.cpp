@@ -9,6 +9,7 @@
 #include <thirdparty/flatzinc_skeleton/registry.hh>
 #include <bindings/fzn/flatzinc.hh>
 
+
 namespace FlatZinc {
 
   Registry& registry(void) {
@@ -85,6 +86,18 @@ namespace FlatZinc {
   			for (unsigned int i = 0; i < a->a.size(); ++i)
   				r[i] = GetLit<T>()(s,a->a[i]);
   			return r;
+  		}
+  	};
+
+  	template<class T>
+  	struct GetLitSet {
+  		Casper::Detail::IntervalA<T> operator()(FlatZincModel& s,AST::Node* pNode) const
+  		{
+  			 AST::SetLit* sl = pNode->getSet();
+			 if (sl->interval)
+				 return Casper::Detail::IntervalA<T>(s.solver,Casper::Util::StdRange<T>(sl->min, sl->max));
+			  else
+				 return Casper::Detail::IntervalA<T>(s.solver,&sl->s[0],&sl->s[0] + sl->s.size());
   		}
   	};
 
@@ -597,9 +610,14 @@ namespace FlatZinc {
     }
 
     void p_int_in(FlatZincModel& s, const ConExpr& ce, AST::Node *ann) {
-      std::cerr << "int_in("<<(*ce[0])<<","<<(*ce[1])
-        <<")::"<<(*ann)<<"\n";
-    }
+    	if (IsVar<int>()(ce[0]))
+    		s.valid = s.solver.post(Casper::member(GetVar<int>()(s,ce[0]),GetLitSet<int>()(s,ce[1])));
+    	else
+		if (IsVar<bool>()(ce[0]))
+			s.valid = s.solver.post(Casper::member(GetVar<bool>()(s,ce[0]),GetLitSet<bool>()(s,ce[1])));
+		else
+			assert(0);
+        }
 
     void p_abs(FlatZincModel& s, const ConExpr& ce, AST::Node* ann) {
       p_rel2_1_2<Casper::Abs,Casper::Equal,int,int>(s,ce,ann);
@@ -679,7 +697,8 @@ namespace FlatZinc {
         registry().add("array_bool_element", &p_array_bool_element);
         registry().add("array_var_bool_element", &p_array_bool_element);
         registry().add("bool2int", &p_bool2int);
-        //registry().add("int_in", &p_int_in);
+
+        registry().add("int_in", &p_int_in);
         //registry().add("bool_lin_eq", &p_bool_lin_eq);
         //registry().add("bool_lin_le", &p_bool_lin_le);
 

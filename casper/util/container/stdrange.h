@@ -95,6 +95,7 @@ struct StdRange
 	Value& max() {	return ub;	}
 	void   range(Value& l, Value& u) const { l = lb; u = ub;	}
 	StdRange(const Value& lb, const Value& ub) : lb(lb),ub(ub) {}
+	StdRange(const Value& v) : lb(v),ub(v) {}
 	typedef RangeIterator<Value>	Iterator;
 	Iterator begin() const {	return Iterator(lb);	}
 	Iterator end() const	 {	return Iterator(ub+1);	}

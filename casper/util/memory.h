@@ -356,7 +356,7 @@ inline void*	RDynamicHeap::allocate(size_t s) throw(Exception::HeapOverflow)
 		while (s > bulkSize[curBulk])
 			++curBulk;
 #else
-		if (s >= initSize)
+		if (s >= initSize)	// FIXME: why isn't this s>=bulksize[curBulk] ?
 			curBulk = std::max(curBulk,
 					 static_cast<uint>(::ceil(::log(static_cast<double>(s))/logFactor-logInitSizeOverLogFactor)));
 #endif

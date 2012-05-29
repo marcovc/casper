@@ -14,6 +14,67 @@
 #include <string>
 using namespace std;
 
+#ifdef CASPER_LOG_NRANGES_DEPTH
+namespace Casper {
+namespace CP {
+namespace Detail {
+
+Casper::Util::StdList<int> depthCount;
+Casper::Util::StdList<int> rangesAcc; 
+
+struct LogRangeCount : IGoal 
+{
+	LogRangeCount(IExplorer& explorer, const IntVarArray& vars) : explorer(explorer),vars(vars) {}
+	Goal execute()
+	{
+		auto it1 = depthCount.begin();
+		auto it2 = rangesAcc.begin();
+		int curDepth = explorer.getStats().curDepth;
+		while (it1 != depthCount.end() && curDepth>=0)
+		{
+			++it1;
+			++it2;
+			--curDepth;
+		}
+		while (curDepth>=0)
+		{
+			it1 = depthCount.pushBack(0);
+			it2 = rangesAcc.pushBack(0);
+			--curDepth;
+		}
+		
+                for (uint i = 0; i < vars.size(); ++i)
+                {
+                        int nranges = 1;
+                        auto it = vars[i].domain().begin();
+                        if (!vars[i].domain().ground())
+                        {
+                                int lastVal = *it;
+                                ++it;
+                                for ( ; it != vars[i].domain().end(); ++it)
+                                        if (*it > lastVal+1)
+                                        {
+                                                ++nranges;
+                                                lastVal = *it;
+                                        }
+                        }
+                        *it2 += nranges;
+                }
+                ++*it1;
+		return succeed();	
+	}
+	IExplorer& explorer;
+	IntVarArray vars;
+};
+
+Goal logRangeCount(IExplorer& explorer, const IntVarArray& vars) 
+{	return new (explorer.state) LogRangeCount(explorer,vars);	}
+
+}
+}
+}
+
+#endif
 
 namespace FlatZinc {
   
@@ -22,7 +83,12 @@ namespace FlatZinc {
     _solveAnnotations(NULL),
     valid(true),
     search(Casper::succeed()),
-    piv(NULL),pbv(NULL),psv(NULL){}
+    piv(NULL),pbv(NULL),psv(NULL)
+  {
+	#ifdef CASPER_PROFILE
+	Casper::Util::Alarm::start(100,true);
+	#endif
+  }
 
   void
   FlatZincModel::init(int intVars, int boolVars, int setVars) {
@@ -190,17 +256,17 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
   {
 	  if (AST::Atom* s = dynamic_cast<AST::Atom*>(ann)) {
 	      if (s->id == "input_order")
-	        return Casper::CP::selectVarLex(store,va);
+	        return Casper::CP::selectVarLex(store,va,false);
 	      if (s->id == "first_fail")
-	        return Casper::CP::selectVarMinDom(store,va);
+	        return Casper::CP::selectVarMinDom(store,va,false);
 	      if (s->id == "anti_first_fail")
-	        return Casper::CP::selectVarMaxDom(store,va);
+	        return Casper::CP::selectVarMaxDom(store,va,false);
 	      if (s->id == "smallest")
-	        return Casper::CP::selectVarMinMinElem(store,va);
+	        return Casper::CP::selectVarMinMinElem(store,va,false);
 	      if (s->id == "largest")
-	        return Casper::CP::selectVarMaxMaxElem(store,va);
+	        return Casper::CP::selectVarMaxMaxElem(store,va,false);
 	      if (s->id == "occurrence")
-	        return Casper::CP::selectVarMaxDegree(store,va);
+	        return Casper::CP::selectVarMaxDegree(store,va,false);
 	      //if (s->id == "max_regret")
 	      //  return TieBreakVarBranch<IntVarBranch>(INT_VAR_REGRET_MIN_MAX);
 	      //if (s->id == "most_constrained")
@@ -209,18 +275,18 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
 	      //if (s->id == "random")
 	      //  return TieBreakVarBranch<IntVarBranch>(INT_VAR_RND);
 	      if (s->id == "afc_min")
-	        return Casper::CP::selectVarMinWeightedDegree(store,va);
+	        return Casper::CP::selectVarMinWeightedDegree(store,va,false);
 	      if (s->id == "afc_max")
-	        return Casper::CP::selectVarMaxWeightedDegree(store,va);
+	        return Casper::CP::selectVarMaxWeightedDegree(store,va,false);
 	      if (s->id == "size_afc_min")
-	        return Casper::CP::selectVarMinDomOverWeightedDegree(store,va);
+	        return Casper::CP::selectVarMinDomOverWeightedDegree(store,va,false);
 	      if (s->id == "size_afc_max")
-	        return Casper::CP::selectVarMaxDomOverWeightedDegree(store,va);
+	        return Casper::CP::selectVarMaxDomOverWeightedDegree(store,va,false);
 	    }
 	    std::cerr << "Warning, ignored search annotation: ";
 	    ann->print(std::cerr);
 	    std::cerr << std::endl;
-	    return Casper::CP::selectVarLex(store,va);
+	    return Casper::CP::selectVarLex(store,va,false);
   }
 
   template<class VarArray>
@@ -264,20 +330,20 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
   {
 	  if (AST::Atom* s = dynamic_cast<AST::Atom*>(ann)) {
 		  if (s->id == "input_order")
-			return Casper::CP::selectVarLex(store,va);
+			return Casper::CP::selectVarLex(store,va,false);
 		  if (s->id == "first_fail")
-			return Casper::CP::selectVarMinDom(store,va);
+			return Casper::CP::selectVarMinDom(store,va,false);
 		  if (s->id == "anti_first_fail")
-			return Casper::CP::selectVarMaxDom(store,va);
+			return Casper::CP::selectVarMaxDom(store,va,false);
 		  if (s->id == "smallest")
-			return Casper::CP::selectVarMinMinElem(store,va);
+			return Casper::CP::selectVarMinMinElem(store,va,false);
 		  if (s->id == "largest")
-			return Casper::CP::selectVarMaxMaxElem(store,va);
+			return Casper::CP::selectVarMaxMaxElem(store,va,false);
 	  }
     std::cerr << "Warning, ignored search annotation: ";
     ann->print(std::cerr);
     std::cerr << std::endl;
-    return Casper::CP::selectVarLex(store,va);
+    return Casper::CP::selectVarLex(store,va,false);
   }
 
   Casper::CP::ValSelector getSetValSelector(Casper::CP::Store& store,
@@ -331,7 +397,8 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
         		  continue;
               va[k++] = (*piv)[vars->a[i]->getIntVar()];
           }
-          search = Casper::CP::label(solver,va,getIntVarSelector(solver,va,args->a[1]),
+
+          search = Casper::CP::label(solver,va,/*Casper::CP::Detail::logRangeCount(*solver.getExplorer(),*piv),*/getIntVarSelector(solver,va,args->a[1]),
         		  	  	  	  	   	   	   	   getIntValSelector(solver,va,args->a[2]));
         } catch (AST::TypeError& e) {
           (void) e;
@@ -533,26 +600,60 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
 
   void  FlatZincModel::printStats(std::ostream& out)
   {
-		out  << left << setw (30) << "% Number of Boolean domains" << ":" <<  std::setw (10) << std::right
+	  const int lw=32;
+	  const int rw=10;
+		out  << left << setw(lw) << "% Number of Boolean domains" << ":" <<  std::setw(rw) << std::right
 			  << static_cast<Casper::CP::Store&>(solver).getStats().getNbBoolDomains() << std::endl
-		   << left << setw (30) << "% Number of integer domains" << ":" <<  std::setw (10) << std::right
+		   << left << setw(lw) << "% Number of integer domains" << ":" <<  std::setw(rw) << std::right
 		      << static_cast<Casper::CP::Store&>(solver).getStats().getNbIntDomains() << std::endl
-		   << left << setw (30) << "% Number of set domains" << ":" <<  std::setw (10) << std::right
+		   << left << setw(lw) << "% Number of set domains" << ":" <<  std::setw(rw) << std::right
 			  << static_cast<Casper::CP::Store&>(solver).getStats().getNSetDomains() << std::endl
-		   << left << setw (30) << "% Number of range domains" << ":" <<  std::setw (10) << std::right
+		   << left << setw(lw) << "% Number of range domains" << ":" <<  std::setw(rw) << std::right
 			  << static_cast<Casper::CP::Store&>(solver).getStats().getNbRangeDomains() << std::endl
-		   << left << setw (30) << "% Number of filters" << ":" <<  std::setw (10) << std::right
+		   << left << setw(lw) << "% Number of filters" << ":" <<  std::setw(rw) << std::right
 			  << static_cast<Casper::CP::Store&>(solver).getStats().getNbFilters() << std::endl
-		   << left << setw (30) << "% Number of filter executions" << ":" <<  std::setw (10) << std::right
+		   << left << setw(lw) << "% Number of filter executions" << ":" <<  std::setw(rw) << std::right
 			  << static_cast<Casper::CP::Store&>(solver).getStats().getNbPropagations() << std::endl;
-		out << left << setw (30) << "% Number of choice points" << ":" <<  std::setw (10) << std::right
+#ifdef CASPER_EXTRA_STATS
+	   out << left << setw(lw) << "% Number of effective filter executions" << ":" <<  std::setw (rw) << std::right
+			  << static_cast<Casper::CP::Store&>(solver).getStats().getNbEffectivePropagations() << " ("
+			  << (static_cast<Casper::CP::Store&>(solver).getStats().getNbEffectivePropagations()*100.0/
+				  static_cast<Casper::CP::Store&>(solver).getStats().getNbPropagations()) << "%)" << std::endl;
+	   out << left << setw(lw) << "% Number of Boolean domain updates" << ":" <<  std::setw(rw) << std::right
+			  << static_cast<Casper::CP::Store&>(solver).getStats().getNbBoolDomainUpdates() << endl
+	      << left << setw(lw) << "% Number of integer domain updates" << ":" <<  std::setw(rw) << std::right
+			  << static_cast<Casper::CP::Store&>(solver).getStats().getNbIntDomainUpdates() << endl
+	      << left << setw(lw) << "% Number of set domain updates" << ":" <<  std::setw(rw) << std::right
+			  << static_cast<Casper::CP::Store&>(solver).getStats().getNbSetDomainUpdates() << endl
+	      << left << setw(lw) << "% Number of range domain updates" << ":" <<  std::setw(rw) << std::right
+			  << static_cast<Casper::CP::Store&>(solver).getStats().getNbRangeDomainUpdates() << endl;
+#endif
+		out << left << setw(lw) << "% Number of choice points" << ":" <<  std::setw(rw) << std::right
 			   << solver.getExplorer()->getStats().getNbChoicePoints() << std::endl
-		   << left << setw (30) << "% Number of fails" << ":" <<  std::setw (10) << std::right
+		   << left << setw(lw) << "% Number of fixpoints" << ":" <<  std::setw(rw) << std::right
+			  << static_cast<Casper::CP::Store&>(solver).getStats().getNbFPComputations() << std::endl
+		   << left << setw(lw) << "% Number of fails" << ":" <<  std::setw(rw) << std::right
 		   	   << solver.getExplorer()->getStats().getNbFails() << std::endl
-		   << left << setw (30) << "% Maximum depth" << ":" <<  std::setw (10) << std::right
+		   << left << setw(lw) << "% Maximum depth" << ":" <<  std::setw(rw) << std::right
 		   	   << solver.getExplorer()->getStats().getMaxDepth() << std::endl
-		   << left << setw (30) << "% Number of solutions" << ":" <<  std::setw (10) << std::right
-		   	   << solver.getExplorer()->getStats().getNbSolutions();
+		   << left << setw(lw) << "% Number of solutions" << ":" <<  std::setw(rw) << std::right
+		   	   << solver.getExplorer()->getStats().getNbSolutions() << std::endl
+		   << left << setw(lw) << "% Peak of reversible heap (KiB)" << ":" <<  std::setw(rw) << std::right
+			   << (static_cast<const Casper::Util::IHeap&>(solver).maxAllocated()/1024) << std::endl;
+
+		#ifdef CASPER_PROFILE
+		Casper::Util::profiler.print(out);
+		#endif
+
+		#ifdef CASPER_LOG_NRANGES_DEPTH
+           	out << "% NbRangesDist: ";
+		for (auto it = Casper::CP::Detail::depthCount.begin(); it != Casper::CP::Detail::depthCount.end(); ++it )
+		{
+			out << *it << " ";
+		}
+		out << std::endl;
+		#endif
+
 
   }
   void  FlatZincModel::run(std::ostream& out, const Printer& p, const FlatZinc::Options& opt)
@@ -570,6 +671,10 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
 	  		  runSAT(out,p,opt);
 	  		  break;
 	  }
+	#ifdef CASPER_PROFILE
+	Casper::Util::Alarm::stop();
+	#endif
+
 	  if (opt.showStats())
 		  printStats(out);
   }

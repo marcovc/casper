@@ -80,6 +80,9 @@ struct ViewArray : Util::StdVector<Elem>
 		Super(store,size)
 		{}
 
+//	ViewArray(Store& store,const ViewArray& s) :
+//		Super(store,s) {}
+
 	void attach(INotifiable* f)
 	{
 		for (uint i = 0; i < this->size(); i++)
@@ -135,6 +138,9 @@ struct BndArrayView :
 		for (IterationView<View>	it(p1); it.valid(); it.iterate())
 			::new(&Super::operator[](i++)) Elem(store,it.value());
 	}
+//	BndArrayView(Store& store, const BndArrayView& s) :
+//		Super(store,s) {}
+
 	View getObj() const
 	{
 		View ret(store,this->size());

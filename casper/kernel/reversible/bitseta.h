@@ -117,6 +117,8 @@ class BitsetA : private Vector<bool>
 	{ insert(scit(first),++scit(last)); }
 	template <class InputIterator>
 	BitsetA(State& state,InputIterator first, InputIterator last);
+	BitsetA(State& state, const Util::StdRange<T>&);
+
 	BitsetA(const BitsetA& s) : Super(s),
 								count(s.count),state(s.state) {}
 	const BitsetA<T,maxSize,Alloc>& operator=(const BitsetA<T,maxSize,Alloc>& s)
@@ -224,6 +226,13 @@ BitsetA<T,maxSize,AllocT>::BitsetA(State& state,
 	InputIterator f, InputIterator l) :
 	 Super(state,maxSize,false),count(state,0),state(state)
 { insert(f,l); }
+
+
+template<class T, int maxSize,class AllocT>
+BitsetA<T,maxSize,AllocT>::BitsetA(State& state,
+		const Util::StdRange<T>& r) :
+	 Super(state,maxSize,false),count(state,0),state(state)
+{ insert(r.begin(),r.end()); }
 
 template<class T, int maxSize,class AllocT>
 typename BitsetA<T,maxSize,AllocT>::Iterator

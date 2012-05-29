@@ -38,6 +38,9 @@ State::State() :
 		stateIDCtr(0),
 	    onNextCPSL(getCPHeap()),
 	    stats(*this)
+		#ifdef CASPER_LOG
+		,eg(this)
+		#endif
 {
 		insertCP();
 }
@@ -60,6 +63,7 @@ void State::insertCP()
 
 void State::restoreCP()
 {
+	CASPER_AT_STATE_RESTORE_ENTER(eg);
 	//++propIDCtr;
 	trail.stateRollback();
 	++mFails;
@@ -67,6 +71,7 @@ void State::restoreCP()
 	wakeupCPDemons();
 	//Debug::log(this,Debug::onFail);
 	stats.signalCPRestore();
+	CASPER_AT_STATE_RESTORE_LEAVE(eg);
 }
 
 void State::removeCP()

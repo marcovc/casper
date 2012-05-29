@@ -141,7 +141,7 @@ struct BndFilterView2<Member,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		set->getStore().getEnv().log(this, "BndFilterView2<Member,Elem,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 		if (!elem.ground())	// first time or never
@@ -166,6 +166,8 @@ struct BndFilterView2<Member,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 	INotifiable*				pOwner;
 };
 
+
+
 /**
  * 	Enforces the set membership exclusion constraint.
  *  \todo Propagation in the Set->FD direction is missing.
@@ -182,7 +184,7 @@ struct BndFilterView2<NotMember,Elem,Expr1,Set<Elem>,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		set->getStore().getEnv().log(this, "BndFilterView2<NotMember,Elem,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -224,7 +226,7 @@ struct BndFilterView2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		set->getStore().getEnv().log(this, "BndFilterView2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -308,7 +310,7 @@ struct BndFilterView2<MinEqual,Set<Eval>,Expr1,Eval,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		set->getStore().getEnv().log(this, "BndFilterView2<MinEqual,Set<Eval>,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -398,7 +400,7 @@ struct BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView2<Contained,Set<Elem>,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -495,7 +497,7 @@ struct BndD1FilterView2<Distinct,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndD1FilterView2<Distinct,Set<Elem>,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -572,7 +574,7 @@ struct BACDisjointCard : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		x->getStore().getEnv().log(this, "BACDisjointCard", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -631,7 +633,7 @@ struct BndFilterView2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView2<Disjoint,Set<Elem>,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -740,7 +742,7 @@ struct BACIntersectCard1 : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		x->getStore().getEnv().log(this, "BACIntersectCard1", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -804,7 +806,7 @@ struct BACIntersectCard2 : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		x->getStore().getEnv().log(this, "BACIntersectCard2", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -872,7 +874,7 @@ struct BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,E
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView3<IntersectEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -1061,7 +1063,7 @@ struct BndFilterView3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView3<UnionEqual,Set<Elem>,Expr1,Set<Elem>,Expr2,Set<Elem>,Expr3>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -1256,7 +1258,7 @@ struct BndFilterView1<Partition,Seq<Set<Elem> >,Expr1> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView1<Partition,Seq<Set<Elem>>,Expr1>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -1444,7 +1446,7 @@ struct BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2> : IFilte
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView2<UnionEqual,Seq<Set<Elem> >,Expr1,Set<Elem>,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 

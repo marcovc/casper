@@ -355,7 +355,7 @@ struct BndFilterView2<And,bool,Expr1,bool,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView2<And,bool,Expr1,bool,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 		return postBndFilter(store,p1) and postBndFilter(store,p2);	}
@@ -382,7 +382,7 @@ struct BndFilterView1<And,Seq<bool>,Expr1> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView1<And,Seq<bool>,Expr1>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -416,7 +416,7 @@ struct BndFilterView2<Or,bool,Expr1,bool,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView2<Or,bool,Expr1,bool,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -486,9 +486,11 @@ struct BndFilterView2<Equal,Eval,Expr1,Eval,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView2<Equal,Eval,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
+		p1.min();
+		p2.min();
 		return p1.updateMin(p2.min()) and p1.updateMax(p2.max()) and
 			   p2.updateMin(p1.min()) and p2.updateMax(p1.max());
 	}
@@ -520,7 +522,7 @@ struct BndFilterView2<GreaterEqual,Eval,Expr1,Eval,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView2<GreaterEqual,Eval,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -572,7 +574,7 @@ struct BndFilterView2<Greater,Eval,Expr1,Eval,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView2<Greater,Eval,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -590,8 +592,6 @@ struct BndFilterView2<Greater,Eval,Expr1,Eval,Expr2> : IFilter
 	Store& store;
 	#endif
 };
-
-
 
 /**
  * 	Enforces inequality between two expressions evaluating to a generic type Eval.
@@ -622,7 +622,7 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2>", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -912,7 +912,7 @@ struct BndFilterView<BndExpr<bool> > : IFilter
 
 	bool execute()
 	{
-		#ifdef CASPER_LOG
+		#ifdef CASPER_LOG_OLD
 		store.getEnv().log(this, "BndFilterView<BndExpr<bool> >", Util::Logger::filterExecuteBegin);
 		#endif
 
@@ -1473,7 +1473,7 @@ struct BndViewRel1<Cache,View,Eval>
 		SyncRange(Store& store,BndViewRel1* pOwner) : IFilter(store),store(store), rOwner(*pOwner) {}
 		bool execute()
 		{
-			#ifdef CASPER_LOG
+			#ifdef CASPER_LOG_OLD
 			store.getEnv().log(this, "BndViewRel1<Cache,View,Eval>::SyncRange", Util::Logger::filterExecuteBegin);
 			#endif
 			return rOwner.v.updateRange(rOwner.cachedMin,rOwner.cachedMax) and rOwner.pParent->notify();

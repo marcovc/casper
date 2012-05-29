@@ -310,7 +310,7 @@ struct LIFOFilterSched : IQueueFilterSched
 			{
 				store.getStats().signalPropagation();
 				pActiveFilter->setInQueue(noQueue);
-				store.getEnv().log(this,"LIFOFilterSched",Util::Logger::filterSchedIterate);
+				//store.getEnv().log(this,"LIFOFilterSched",Util::Logger::filterSchedIterate);
 				if (!pActiveFilter->execute())
 				{
 					clear();
@@ -345,6 +345,7 @@ struct LIFOFilterSched : IQueueFilterSched
 
 LIFOFilterSched* lifoFilterSched(Store& store, bool attach=true);
 
+#if 0
 struct FIFOFilterSched : IQueueFilterSched
 {
 	typedef IFilter*						PIFilter;
@@ -406,7 +407,7 @@ struct FIFOFilterSched : IQueueFilterSched
 
 	bool enqueue(Filter f)
 	{
-		if (f.getImpl().inQueue() <= qid)
+		if (f.getImpl().inQueue() != noQueue/*<= qid*/)
 			return false;
 		f.getImpl().setInQueue(qid);
 		//toExecute.pushBack(f.getPImpl());
@@ -474,7 +475,192 @@ struct FIFOFilterSched : IQueueFilterSched
 	FilterQueue::Iterator	itLast;
 	PIFilter				pActiveFilter;
 };
+#else
+struct FIFOFilterSched : IQueueFilterSched
+{
+	typedef IFilter*						PIFilter;
+	typedef INotifiable*					PINotifiable;
+	typedef	std::vector<PIFilter>			FilterQueue;
 
+	struct FilterDemon : INotifiable
+	{
+		FIFOFilterSched& rOwner;
+		Filter f;
+		uint lastFixpoint;
+		FilterDemon(FIFOFilterSched* pOwner, Filter f) :
+			rOwner(*pOwner),f(f),lastFixpoint(0) { f.attach(this); }
+		bool notify()
+		{
+#ifndef CASPER_OPTIM_DONT_CLEAR_ON_FAIL	// FIXME: doesn't work since some filters rely on scheduled status (see below)
+			return !rOwner.enqueue(f) ||
+				   rOwner.pParent->notify();
+#else
+			if (lastFixpoint < rOwner.nbFixpoints)
+			{
+				lastFixpoint = rOwner.nbFixpoints;
+				rOwner.enqueueForce(f);
+				return rOwner.pParent->notify();
+			}
+			return !rOwner.enqueue(f) ||
+					rOwner.pParent->notify();
+#endif
+		}
+	};
+
+	struct WeightedFilterDemon : INotifiable
+	{
+		FIFOFilterSched& rOwner;
+		WeightedFilter f;
+		uint lastFixpoint;
+		WeightedFilterDemon(FIFOFilterSched* pOwner, Filter f) :
+			rOwner(*pOwner),f(rOwner.store,f),lastFixpoint(0) { f.attach(this); }
+		bool notify()
+		{
+	/*		return !rOwner.enqueue(&f) ||
+				   rOwner.pParent->notify();*/
+			if (lastFixpoint < rOwner.nbFixpoints)
+			{
+				lastFixpoint = rOwner.nbFixpoints;
+				rOwner.enqueueForce(&f);
+				return rOwner.pParent->notify();
+			}
+			return !rOwner.enqueue(&f) ||
+					rOwner.pParent->notify();
+		}
+		uint getAFC() const { return f.getWeight(); }
+	};
+
+	FIFOFilterSched(Store& store,bool attach = true,uint qid=1) :
+									IQueueFilterSched(store,attach,qid),
+									store(store),
+									toExecute(10),
+									toExecuteMaxSize(10),
+									toExecuteBegin(0),
+									toExecuteEnd(0),
+									nbPosts(1),
+									nbFixpoints(1),
+									mYield(false),
+									pActiveFilter(NULL)
+	{}
+
+	bool post(Filter f,bool schedule=true)
+	{
+		++nbPosts;
+		if (nbPosts == toExecuteMaxSize)
+		{
+			toExecuteMaxSize *= 2;
+			toExecute.resize(toExecuteMaxSize);
+		}
+		if (store.getFilterWeighting())
+		{
+			WeightedFilterDemon* d = new (store) WeightedFilterDemon(this,f);
+			return !schedule or d->notify();
+		}
+		else
+		{
+			FilterDemon* d = new (store) FilterDemon(this,f);
+			return !schedule or d->notify();
+		}
+	}
+
+	bool notify()
+	{	assert(0); /* demons are notified instead */ return true; }
+
+	bool enqueue(Filter f)
+	{
+		if (f.getImpl().inQueue() != noQueue/*<= qid*/)
+			return false;
+		f.getImpl().setInQueue(qid);
+		toExecute[toExecuteEnd] = f.getPImpl();
+		++toExecuteEnd;
+		if (toExecuteEnd == toExecuteMaxSize)
+			toExecuteEnd = 0;
+		return true;
+	}
+
+	bool enqueueForce(Filter f)
+	{
+		f.getImpl().setInQueue(qid);
+		toExecute[toExecuteEnd] = f.getPImpl();
+		++toExecuteEnd;
+		if (toExecuteEnd == toExecuteMaxSize)
+			toExecuteEnd = 0;
+		return true;
+	}
+
+	PIFilter	getPActiveFilter()
+	{	return pActiveFilter;	}
+
+	bool execute()
+	{
+		mYield = false;
+
+		while (toExecuteBegin!=toExecuteEnd and !mYield)
+		{
+			#ifndef CASPER_EXTRA_STATS
+			store.getStats().signalPropagation();
+			#endif
+			pActiveFilter = toExecute[toExecuteBegin];
+			pActiveFilter->setInQueue(noQueue);
+			#ifdef CASPER_EXTRA_STATS
+			counter du = store.getStats().getNbDomainUpdates();
+			#endif
+			if (!pActiveFilter->execute())
+			{
+				#ifdef CASPER_EXTRA_STATS
+				store.getStats().signalPropagation();
+				store.getStats().signalEffectivePropagation();
+				#endif
+				clear();
+				++nbFixpoints;
+				return false;
+			}
+			#ifdef CASPER_EXTRA_STATS
+			store.getStats().signalPropagation();
+			if (du != store.getStats().getNbDomainUpdates())
+				store.getStats().signalEffectivePropagation();
+			#endif
+			if (++toExecuteBegin == toExecuteMaxSize)
+				toExecuteBegin = 0;
+		}
+		pActiveFilter = NULL;
+		++nbFixpoints;
+		return true;
+	}
+
+	void clear()
+	{
+#ifndef CASPER_OPTIM_DONT_CLEAR_ON_FAIL
+		if (toExecuteEnd < toExecuteBegin)
+		{
+			for ( ; toExecuteBegin < toExecuteMaxSize; ++toExecuteBegin)
+				toExecute[toExecuteBegin]->setInQueue(noQueue);
+			toExecuteBegin = 0;
+		}
+		for ( ; toExecuteBegin != toExecuteEnd; ++toExecuteBegin)
+			toExecute[toExecuteBegin]->setInQueue(noQueue);
+#else
+		toExecuteBegin = toExecuteEnd;
+#endif
+		pActiveFilter = NULL;
+	}
+
+	bool entailed()	const
+	{	return false;	}
+
+	void yield() {	mYield = true;	}	// TODO
+
+	Store&					store;
+	FilterQueue				toExecute;
+	uint					toExecuteMaxSize;
+	uint					toExecuteBegin;
+	uint					toExecuteEnd;
+	uint					nbPosts;
+	uint					nbFixpoints;
+	bool					mYield;
+	PIFilter				pActiveFilter;
+};
+#endif
 FIFOFilterSched* fifoFilterSched(Store& store,bool attach=true);
 
 
@@ -814,12 +1000,12 @@ struct FullyPreemptCostFilterSched : IQueueFilterSched
 	typedef INotifiable*					PINotifiable;
 	typedef IQueueFilterSched*				PQueueFilterSched;
 
-	struct FilterDemon : INotifiable
+	struct QueueDemon : INotifiable
 	{
 		FullyPreemptCostFilterSched& rOwner;
 		IQueueFilterSched& f;
 		uint		queueCost;
-		FilterDemon(FullyPreemptCostFilterSched* pOwner, IQueueFilterSched* f) :
+		QueueDemon(FullyPreemptCostFilterSched* pOwner, IQueueFilterSched* f) :
 			rOwner(*pOwner),f(*f),queueCost(f->qid) { f->attach(this); }
 		bool notify()
 		{
@@ -836,7 +1022,34 @@ struct FullyPreemptCostFilterSched : IQueueFilterSched
 			return rOwner.pParent->notify();
 		}
 	};
+/*
+	struct FilterDemon : INotifiable
+	{
+		FullyPreemptCostFilterSched& rOwner;
+		Filter f;
+		FilterDemon(FullyPreemptCostFilterSched* pOwner, Filter f) :
+			rOwner(*pOwner),f(f) { f.attach(this); }
+		bool notify()
+		{
+			return !rOwner.enqueue(f) ||
+				   rOwner.pParent->notify();
+		}
+	};
 
+	struct WeightedFilterDemon : INotifiable
+	{
+		FullyPreemptCostFilterSched& rOwner;
+		WeightedFilter f;
+		WeightedFilterDemon(FullyPreemptCostFilterSched* pOwner, Filter f) :
+			rOwner(*pOwner),f(rOwner.store,f) { f.attach(this); }
+		bool notify()
+		{
+			return !rOwner.enqueue(&f) ||
+				   rOwner.pParent->notify();
+		}
+		uint getAFC() const { return f.getWeight(); }
+	};
+*/
 	FullyPreemptCostFilterSched(Store& store, bool attach = true) :
 									IQueueFilterSched(store,attach),
 									store(store),
@@ -846,17 +1059,28 @@ struct FullyPreemptCostFilterSched : IQueueFilterSched
 		for (uint i = 0; i < maxCost; i++)
 		{
 			queues[i] = new (store) NextFilterSched(store,false,i);
-			new (store) FilterDemon(this,queues[i]);
+			new (store) QueueDemon(this,queues[i]);
 		}
 	}
 
 	bool post(Filter f,bool schedule=true)
-	{		return queues[(uint)f.cost()]->post(f,schedule);	}
+	{
+#if 1
+		return queues[(uint)f.cost()]->post(f,schedule);
+#else	// for dynamic weight update
+		if (store.getFilterWeighting())
+		{
+			WeightedFilterDemon* d = new (store) WeightedFilterDemon(this,f);
+			return !schedule or d->notify();
+		}
+		else
+		{
+			FilterDemon* d = new (store) FilterDemon(this,f);
+			return !schedule or d->notify();
+		}
+#endif
+	}
 
-	// tmp
-/*	bool postNoExec(Filter f)
-	{		return static_cast<NextFilterSched*>(queues[(uint)f.cost()])->postNoExec(f);	}
-*/
 	bool notify()
 	{	assert(0); /* demons are notified instead */ return true; }
 
@@ -915,9 +1139,9 @@ struct FullyPreemptCostFilterSched : IQueueFilterSched
 				return i;
 		return i;
 	}
-	Store&						store;
+	Store&								store;
 	Util::StdArray<PQueueFilterSched>	queues;
-	uint						activeQueueIdx;
+	uint								activeQueueIdx;
 };
 
 template<class SlaveFilterSched>
