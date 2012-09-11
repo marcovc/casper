@@ -29,17 +29,17 @@ template<class T> struct Reversible;
 
 
 template<class T>
-struct TrailAgent : ITrailAgent
+struct TrailReversible : ITrailAgent
 {
-	Reversible<T>* id;
-	T data;
-	ulonglong lastStateId;
-	TrailAgent(Reversible<T>& obj,const T& data, ulonglong lastStateId) :
-		ITrailAgent(),id(&obj),data(data),lastStateId(lastStateId) {}
+	Reversible<T>& 	id;
+	T 				data;
+	counter 		lastStateId;
+	TrailReversible(Reversible<T>& obj) :
+		id(obj),data(obj.data),lastStateId(obj.lastStateID) {}
 	void restore()
 	{
-		id->data = data;
-		id->lastStateID = lastStateId;
+		id.data = data;
+		id.lastStateID = lastStateId;
 	}
 };
 
@@ -64,10 +64,10 @@ struct PointerTraits<T*>
 template<class T>
 struct Reversible
 {
-	typedef Reversible<T>			Self;
-	T	data;
-	State&		state;
-	ulonglong 	lastStateID;
+	typedef Reversible<T>	Self;
+	T						data;
+	State&					state;
+	counter 				lastStateID;
 
 	Reversible(State& state) : state(state),lastStateID(0) {}
 	Reversible(State& state,const T& t) : data(t),  state(state),
@@ -182,7 +182,7 @@ force_inline void  Reversible<T>::operator-=(const T& s)
 template<class T>
 force_inline void Reversible<T>::saveMe()
 {
-	state.record(new (state.getHeap()) TrailAgent<T>(*this,data,lastStateID));
+	state.record(new (state.getHeap()) TrailReversible<T>(*this));
 	lastStateID = state.id();
 }
 

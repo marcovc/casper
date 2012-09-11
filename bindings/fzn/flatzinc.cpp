@@ -14,13 +14,20 @@
 #include <string>
 using namespace std;
 
-#ifdef CASPER_LOG_NRANGES_DEPTH
+int trailAllocs;
+int trailVarAllocs;
+int trailIncAllocs;
+bool inTrailVarAllocs;
+bool inTrailIncAllocs;
+
 namespace Casper {
 namespace CP {
 namespace Detail {
 
-Casper::Util::StdList<int> depthCount;
-Casper::Util::StdList<int> rangesAcc; 
+#ifdef CASPER_LOG_NRANGES_DEPTH
+
+std::list<int> depthCount;
+std::list<int> rangesAcc;
 
 struct LogRangeCount : IGoal 
 {
@@ -30,19 +37,27 @@ struct LogRangeCount : IGoal
 		auto it1 = depthCount.begin();
 		auto it2 = rangesAcc.begin();
 		int curDepth = explorer.getStats().curDepth;
-		while (it1 != depthCount.end() && curDepth>0)
-		{
-			++it1;
-			++it2;
-			--curDepth;
-		}
+
 		while (curDepth>0)
 		{
-			it1 = depthCount.pushBack(0);
-			it2 = rangesAcc.pushBack(0);
+			if (it1 == depthCount.end())
+			{
+				depthCount.push_back(0);
+				rangesAcc.push_back(0);
+				it1 = depthCount.end();
+				it2 = rangesAcc.end();
+			}
+			else
+			{
+				++it1;
+				++it2;
+			}
 			--curDepth;
 		}
 		
+	   	  --it1;
+	   	  --it2;
+
 		for (uint i = 0; i < vars.size(); ++i)
 		{
 				int nranges = 1;
@@ -52,11 +67,11 @@ struct LogRangeCount : IGoal
 						int lastVal = *it;
 						++it;
 						for ( ; it != vars[i].domain().end(); ++it)
+						{
 								if (*it > lastVal+1)
-								{
 										++nranges;
-										lastVal = *it;
-								}
+								lastVal = *it;
+						}
 				}
 				*it2 += nranges;
 		}
@@ -70,11 +85,66 @@ struct LogRangeCount : IGoal
 Goal logRangeCount(IExplorer& explorer, const IntVarArray& vars) 
 {	return new (explorer.state) LogRangeCount(explorer,vars);	}
 
+#endif
+
+#ifdef CASPER_LOG_MODRANGES_DEPTH
+
+int updModCount;
+int updCount;
+
+struct LogRangeModCount : IGoal
+{
+	LogRangeModCount(IExplorer& explorer, const IntVarArray& vars) : explorer(explorer),vars(vars),ranges(vars.size(),0)
+	{
+		for (int i = 0; i < vars.size(); ++i)
+		{
+			ranges[i].min() = vars[i].domain().min();
+			ranges[i].max() = vars[i].domain().max();
+		}
+		curDepth = explorer.getStats().curDepth;
+		curNbFPs = vars.getStore().getStats().getNbFPComputations();
+	}
+	Goal execute()
+	{
+		if (curDepth < explorer.getStats().curDepth and
+			curNbFPs < vars.getStore().getStats().getNbFPComputations())
+		{
+			int oldUpdModCount = updModCount;
+			for (int i = 0; i < vars.size(); ++i)
+			{
+				if (vars[i].domain().min() > ranges[i].min())
+				{
+					++updModCount;
+					ranges[i].min() = vars[i].domain().min();
+				}
+				if (vars[i].domain().max() < ranges[i].max())
+				{
+					++updModCount;
+					ranges[i].max() = vars[i].domain().max();
+				}
+			}
+			updCount += updModCount != oldUpdModCount;
+			curNbFPs = vars.getStore().getStats().getNbFPComputations();
+		}
+		curDepth = explorer.getStats().curDepth;
+		return succeed();
+	}
+	IExplorer& explorer;
+	IntVarArray vars;
+	Util::StdArray<Util::StdRange<int> > ranges;
+	int curDepth;
+	int curNbFPs;
+};
+
+Goal logRangeModCount(IExplorer& explorer, const IntVarArray& vars)
+{	return new (explorer.state) LogRangeModCount(explorer,vars);	}
+
+#endif
+
 }
 }
 }
 
-#endif
 
 namespace FlatZinc {
   
@@ -83,6 +153,7 @@ namespace FlatZinc {
     _solveAnnotations(NULL),
     valid(true),
     search(Casper::succeed()),
+    timer(""),
     piv(NULL),pbv(NULL),psv(NULL)
   {
 	#ifdef CASPER_PROFILE
@@ -92,6 +163,7 @@ namespace FlatZinc {
 
   void
   FlatZincModel::init(int intVars, int boolVars, int setVars) {
+	//pTimer = new Casper::Util::CPUTimer("",true);
     intVarCount = 0;
     piv = new (solver) IntVarArray(solver,intVars);
     iv_introduced = std::vector<bool>(intVars);
@@ -397,8 +469,11 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
         		  continue;
               va[k++] = (*piv)[vars->a[i]->getIntVar()];
           }
-		  #ifdef CASPER_LOG_NRANGES_DEPTH
+		  #if defined(CASPER_LOG_NRANGES_DEPTH)
           search = Casper::CP::label(solver,va,Casper::CP::Detail::logRangeCount(*solver.getExplorer(),*piv),getIntVarSelector(solver,va,args->a[1]),
+        		  	  	  	  	   	   	   	   getIntValSelector(solver,va,args->a[2]));
+		  #elif defined(CASPER_LOG_MODRANGES_DEPTH)
+          search = Casper::CP::label(solver,va,Casper::CP::Detail::logRangeModCount(*solver.getExplorer(),*piv),getIntVarSelector(solver,va,args->a[1]),
         		  	  	  	  	   	   	   	   getIntValSelector(solver,va,args->a[2]));
 		  #else
           search = Casper::CP::label(solver,va,getIntVarSelector(solver,va,args->a[1]),
@@ -579,6 +654,7 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
 
   FlatZincModel::~FlatZincModel(void) {
     delete _solveAnnotations;
+  //  delete pTimer;
   }
 
   void FlatZincModel::runSAT(std::ostream& out, const Printer& p, const FlatZinc::Options& opt)
@@ -655,13 +731,29 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
         auto it2 = Casper::CP::Detail::rangesAcc.begin();
 		for ( ; it1 != Casper::CP::Detail::depthCount.end(); ++it1,++it2 )
 		{
-			out << (*it2/ *it1) << ",";
+			out << (*it2/ *it1) << " [" << *it1 << "] ,";
 		}
 		out << "}" << std::endl;
 		#endif
 
+		#ifdef CASPER_LOG_MODRANGES_DEPTH
+			out << "% NbRangesMod: " << Casper::CP::Detail::updModCount/static_cast<double>(Casper::CP::Detail::updCount) << std::endl;
+		#endif
 
+		out << "% trail/FP/nbVars: " << trailAllocs/static_cast<double>(static_cast<Casper::CP::Store&>(solver).getStats().getNbFPComputations())/intVarCount << std::endl;
+		out << "% trailVar: " << trailVarAllocs/static_cast<double>(trailAllocs) << std::endl;
+		out << "% trailInc: " << trailIncAllocs/static_cast<double>(trailAllocs) << std::endl;
   }
+
+  void  FlatZincModel::printRuntime(std::ostream& out)
+  {
+	  const int lw=32;
+	  const int rw=10;
+	  timer.pause();
+	  out  << left << setw(lw) << "% Total time (secs)" << ":" <<  std::setw(rw) << std::right
+			  << timer.getSecs() << std::endl;
+  }
+
   void  FlatZincModel::run(std::ostream& out, const Printer& p, const FlatZinc::Options& opt)
   {
 	  switch (_method)
@@ -683,6 +775,8 @@ void FlatZincModel::newSetVar(SetVarSpec* vs)
 
 	  if (opt.showStats())
 		  printStats(out);
+	  if (opt.showRuntime())
+		  printRuntime(out);
   }
 
   FlatZincModel::Meth

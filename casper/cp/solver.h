@@ -73,6 +73,9 @@ struct Solver : Env,Store
 	const Util::CPUTimer& getCPUTimer() const
 	{	return static_cast<const Env&>(*this).getStats().getCPUTimer(); }
 
+	Util::IHeap& getHeap() {	return Env::getHeap(); }
+	const Util::IHeap& getHeap() const {	return Env::getHeap();}
+
 private:
 	Reversible<IExplorer*>			pExplorer;
 	SolverStats						stats;

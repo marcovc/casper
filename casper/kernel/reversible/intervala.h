@@ -548,9 +548,11 @@ IntervalA<T,Container,Compare>&
 template<class T, class Container, class Compare>
 IntervalA<T,Container,Compare>::~IntervalA()
 {
-	for (typename DataT::Iterator it = data.begin();
+	clear();
+/*	for (typename DataT::Iterator it = data.begin();
 		 it != data.end();)
 		 eraseInterval(it++);
+		 */
 }
 
 /**
@@ -709,7 +711,7 @@ void IntervalA<T,Container,Compare>::
 
 /**
 	Removes the elements on the range [f,l) from the container
-	@cost O(l-f)
+	@cost O(1)
 */
 template<class T, class Container, class Compare>
 void IntervalA<T,Container,Compare>::
@@ -742,20 +744,26 @@ void IntervalA<T,Container,Compare>::
 		++q.curInt;
 
 	// erase interior intervals
-	while (p.curInt != q.curInt)
-		eraseInterval(p.curInt++);
+	if (p.curInt != q.curInt)
+		eraseIntervals(p.curInt,q.curInt);
+	//while (p.curInt != q.curInt)
+	//	eraseInterval(p.curInt++);
 }
 
 /**
 	Removes all elements from the container.
-	@cost O(N)
+	@cost O(1)
 */
 template<class T, class Container, class Compare>
 void IntervalA<T,Container,Compare>::clear()
 {
+	/*
  	for (typename DataT::Iterator it = data.begin();
-		 it != data.end(); /* nothing here */)
+		 it != data.end(); )
 		 eraseInterval(it++);
+		 */
+ 	if (data.begin() != data.end())
+ 		eraseIntervals(data.begin(),data.end());
 }
 
 /**

@@ -209,7 +209,12 @@ struct PostBndFilter2<Distinct,int,V1,int,V2>
 {
 	static bool post(Store& s, const V1& p1,const V2& p2)
 	{
-		ChkViewRel2<Distinct,int,V1,int,V2> chk(s,p1,p2);
+    	typedef typename Casper::Detail::DeRefAndSimplify<V1>::Type SV1;
+    	typedef typename Casper::Detail::DeRefAndSimplify<V2>::Type SV2;
+    	const SV1 sp1 = Casper::Detail::DeRefAndSimplify<V1>()(p1);
+    	const SV2 sp2 = Casper::Detail::DeRefAndSimplify<V2>()(p2);
+
+		ChkViewRel2<Distinct,int,SV1,int,SV2> chk(s,sp1,sp2);
 		if (chk.isTrue())
 			return true;
 		if (!chk.canBeTrue())
@@ -218,14 +223,14 @@ struct PostBndFilter2<Distinct,int,V1,int,V2>
 		IFilter* f1;
 		IFilter* f2;
 
-		if (Casper::CP::Traits::isDomExpr(p1))
-			f1 = new (s) DomDistinctD1<int,V1,int,V2>(s,p1,p2);
+		if (Casper::CP::Traits::isDomExpr(sp1))
+			f1 = new (s) DomDistinctD1<int,SV1,int,SV2>(s,sp1,sp2);
 		else
-			f1 = new (s) BndDistinctD1<int,V1,int,V2>(s,p1,p2);
-		if (Casper::CP::Traits::isDomExpr(p2))
-			f2 = new (s) DomDistinctD1<int,V2,int,V1>(s,p2,p1);
+			f1 = new (s) BndDistinctD1<int,SV1,int,SV2>(s,sp1,sp2);
+		if (Casper::CP::Traits::isDomExpr(sp2))
+			f2 = new (s) DomDistinctD1<int,SV2,int,SV1>(s,sp2,sp1);
 		else
-			f2 = new (s) BndDistinctD1<int,V2,int,V1>(s,p2,p1);
+			f2 = new (s) BndDistinctD1<int,SV2,int,SV1>(s,sp2,sp1);
 
 		return s.post(f1) and s.post(f2);
 	}
@@ -245,11 +250,16 @@ struct PostDomFilter2<Distinct,int,V1,int,V2>
 {
 	static bool post(Store& s, const V1& p1,const V2& p2)
 	{
+	   	typedef typename Casper::Detail::DeRefAndSimplify<V1>::Type SV1;
+	    typedef typename Casper::Detail::DeRefAndSimplify<V2>::Type SV2;
+	    const SV1 sp1 = Casper::Detail::DeRefAndSimplify<V1>()(p1);
+	    const SV2 sp2 = Casper::Detail::DeRefAndSimplify<V2>()(p2);
+
 		IFilter* f1;
 		IFilter* f2;
 
-		f1 = new (s) DomDistinctD1<int,V1,int,V2>(s,p1,p2);
-		f2 = new (s) DomDistinctD1<int,V2,int,V1>(s,p2,p1);
+		f1 = new (s) DomDistinctD1<int,SV1,int,SV2>(s,sp1,sp2);
+		f2 = new (s) DomDistinctD1<int,SV2,int,SV1>(s,sp2,sp1);
 
 		return s.post(f1) and s.post(f2);
 	}
@@ -400,17 +410,23 @@ struct PostBndFilter2<Member,Elem,Expr1,Seq<Elem>,Expr2 >
 {
     static bool post(Store& s,const Expr1& p1,const Expr2& p2)
     {
-    	IterationView<Expr2> it(p2);
+       	typedef typename Casper::Detail::DeRefAndSimplify<Expr1>::Type SExpr1;
+       	typedef typename Casper::Detail::DeRefAndSimplify<Expr2>::Type SExpr2;
+       	const SExpr1 sp1 = Casper::Detail::DeRefAndSimplify<Expr1>()(p1);
+       	const SExpr2 sp2 = Casper::Detail::DeRefAndSimplify<Expr2>()(p2);
+
+    	IterationView<SExpr2> it(sp2);
     	if (!it.valid())
     		return false;
     	Elem lastVal = it.value();
     	it.iterate();
     	for ( ; it.valid(); it.iterate())
     	{
-    		assert(it.value()>lastVal);
+    		if (it.value()<=lastVal)
+   				throw Casper::Exception::InvalidOperation("attempt to post a member filter over a non strictly ordered range");
     		lastVal = it.value();
     	}
-    	return s.post(new (s) BndFilterView2<Member,Elem,Expr1,Seq<Elem>,Expr2>(s,p1,p2));
+    	return s.post(new (s) BndFilterView2<Member,Elem,SExpr1,Seq<Elem>,SExpr2>(s,sp1,sp2));
     }
 };
 

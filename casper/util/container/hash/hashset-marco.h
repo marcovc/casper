@@ -171,7 +171,7 @@ struct StdHashSet
 
 	/// Creates a new StdHashSet in stdHeap with index of size \a indexsize
 	StdHashSet(uint indexsize = CASPER_HASHSET_DEFAULT_SIZE) :
-				htable(stdHeap,indexsize+1,NULL) {}
+				htable(stdHeap(),indexsize+1,NULL) {}
 
 	Iterator begin() const;
 	Iterator end() const;

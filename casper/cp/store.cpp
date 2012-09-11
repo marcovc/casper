@@ -213,8 +213,8 @@ bool Store::valid()
 	CASPER_AT_STORE_FP_ENTER(eg);
 	if (bPending)
 	{
-		bPending = false;
 		bValid = pFilterSched->execute();
+		bPending = false;
 		stats.signalFPComputation();
 	}
 	CASPER_AT_STORE_FP_LEAVE(eg);
@@ -226,6 +226,9 @@ Store::operator const State&() const { return env.getState(); }
 
 Store::operator Util::IHeap&() { return env.getState().getHeap(); }
 Store::operator const Util::IHeap&() const { return env.getState().getHeap(); }
+
+Util::IHeap& Store::getHeap() { return env.getState().getHeap(); }
+const Util::IHeap& Store::getHeap() const { return env.getState().getHeap(); }
 
 bool Store::post(const Casper::Expr<bool>& expr,
 		  Casper::CP::Consistency consistency)
@@ -244,7 +247,34 @@ bool Store::post(const Casper::Expr<bool>& expr,
 }
 
 
+struct LimitFPs : ISinglePathExplorer
+{
+	LimitFPs(CP::Store& store,uint n, ISinglePathExplorer* search) :
+		ISinglePathExplorer(store),
+		store(store),
+		n(n+store.getStats().getNbFPComputations()),search(search) {}
+	bool discard(bool atSolution)
+	{
+		if (store.getStats().getNbFPComputations() > n)
+			return true;
+		else
+			return search->discard(atSolution);
+	}
+	void reset(uint n)
+	{	this->n = store.getStats().getNbFPComputations()+n; }
+
+	CP::Store& store;
+	counter n;
+	ISinglePathExplorer* search;
+};
+
+IExplorer* limitFPs(CP::Store& store,uint n, ISinglePathExplorer* s)
+{
+	return new (store) LimitFPs(store,n,s);
+}
 
 } // CP
+
+
 } // Casper
 

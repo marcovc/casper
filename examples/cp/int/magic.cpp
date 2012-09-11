@@ -119,7 +119,7 @@ int magic(int n)
 	// perform depth first search
 	bool found = solver.solve(label(col));
 
-	Array<bool,3> pos(stdHeap,n,n,n*n,false);
+	Array<bool,3> pos(stdHeap(),n,n,n*n,false);
 
 	// if previous search found a solution, print it.
 	while (found)

@@ -577,6 +577,9 @@ DDSIteration* dds(State& state,uint k)
 IExplorer* limitFails(State& state,uint n, ISinglePathExplorer* s)
 {	return new (state) LimitFails(state,n,s);	}
 
+IExplorer* limitCPs(State& state,uint n, ISinglePathExplorer* s)
+{	return new (state) LimitCPs(state,n,s);	}
+
 // --- multiple iterations of above schedulers ---
 
 // The following works but it's ugly. forSome(n,lds(n)) is preferred.

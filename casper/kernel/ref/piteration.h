@@ -39,7 +39,7 @@ struct PIteration<Ref<T>,SetT,CondT>
 		if (!cond.value())
 			iterate();
 	}
-	bool	valid()	{	return it.valid() and cond.value();	}
+	bool	valid()	const {	return it.valid() and cond.value();	}
 	void	iterate()
 	{
 		do
@@ -70,7 +70,7 @@ struct PIteration<Util::StdPair<Ref<T>,Ref<T> >,SetT,CondT>
 		if (!cond.value())
 			iterate();
 	}
-	bool	valid()
+	bool	valid() const
 	{
 		return 	it1.valid() and it2->valid() and cond.value();
 	}
@@ -107,6 +107,8 @@ struct PIteration<Util::StdPair<Ref<T>,Ref<T> >,SetT,CondT>
 };
 
 }
+
+
 }
 
 #endif /* CASPER_KERNEL_PITERATION_H_ */

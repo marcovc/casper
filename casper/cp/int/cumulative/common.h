@@ -228,7 +228,7 @@ sweep(const int& m, const Y& limit, bool lb)
 
 	// sweep
 //	Util::StdVector<Y> contribution(stdHeap,n,lb?limits<Y>::min:limits<Y>::max);
-	Util::StdVector<Y> contribution(Util::stdHeap,n,initContrib);
+	Util::StdVector<Y> contribution(Util::stdHeap(),n,initContrib);
 	Util::StdList<int>	listPrune;
 
 	typename std::vector<Event*>::iterator it = sev.begin();

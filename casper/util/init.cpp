@@ -19,13 +19,11 @@
 // This file ensures global objects declared in 'util' are initialized in
 // the correct order.
 
-#include <casper/util/memory.h>
 #include <casper/util/debug.h>
 
 namespace Casper {
 namespace Util {
 
-StdMem	stdHeap;
 
 #ifdef CASPER_LOG
 Logger logger;

@@ -124,7 +124,7 @@ struct StdSUList
 
 	typedef	SCIterator<Value,Difference>	scit;
 
-	StdSUList(IHeap& heap = stdHeap);
+	StdSUList(IHeap& heap = stdHeap());
 	template <class InputIterator>
 	StdSUList(IHeap& heap,InputIterator first, InputIterator last);
 	template <class InputIterator>
@@ -218,7 +218,7 @@ StdSUList<T,Compare>::StdSUList(IHeap& heap, InputIterator first, InputIterator 
 /// \note Requires range [first,last) to be sorted.
 template<class T,class Compare>
 template <class InputIterator>
-StdSUList<T,Compare>::StdSUList(InputIterator first, InputIterator last) : mHeap(stdHeap)
+StdSUList<T,Compare>::StdSUList(InputIterator first, InputIterator last) : mHeap(stdHeap())
 {
 	assert(isStrictOrdered(first,last));
 	initRange(first,last);

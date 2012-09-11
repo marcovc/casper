@@ -194,6 +194,17 @@ struct Array : public Util::StdArray<Reversible<T>,dims>
 
 };
 
+namespace Traits {
+template<class T,int dims>
+struct GetElem<Array<T,dims> >
+{	typedef typename Array<T,dims>::Elem	Type;	};
+
+template<class T,int dims>
+struct GetTermElem<Array<T,dims> >
+{	typedef typename GetTermElem<T>::Type Type;	};
+
+} // Traits
+
 } // Casper
 
 #endif

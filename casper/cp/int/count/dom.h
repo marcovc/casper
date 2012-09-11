@@ -168,8 +168,15 @@ template<class NbOcc,class Vars>
 struct PostDomFilter3<CountEqual,int,NbOcc,Seq<int>,Vars,int,int>
 {
 	static bool post(Store& store, const NbOcc& nocc, const Vars& vars, int val)
-	{	return store.post(new (store)
-			DomFilterView3<CountEqual,int,NbOcc,Seq<int>,Vars,int,int>(store,nocc,vars,val));	}
+	{
+    	typedef typename Casper::Detail::DeRefAndSimplify<NbOcc>::Type 	SNbOcc;
+    	typedef typename Casper::Detail::DeRefAndSimplify<Vars>::Type 	SVars;
+    	const typename SNbOcc snocc = Casper::Detail::DeRefAndSimplify<NbOcc>()(nocc);
+    	const typename SVars svars = Casper::Detail::DeRefAndSimplify<Vars>()(vars);
+
+		return store.post(new (store)
+			DomFilterView3<CountEqual,int,SNbOcc,Seq<int>,SVars,int,int>(store,snocc,svars,val));
+	}
 };
 
 }

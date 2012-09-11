@@ -418,9 +418,9 @@ bool FD<Container,Element,T>::operator=(const Value& v)
 	Iterator it = find(v);
 	if (it == end())
 		return false;
-	if (it != begin() and !erase(begin(),it))
+	if (it != begin() and !updateMin(it))
 		return false;
-	if (++it != end() and !erase(it,end()))
+	if (++it != end() and !updateMax(it))
 		return false;
 	return true;
 }

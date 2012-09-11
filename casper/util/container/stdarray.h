@@ -292,13 +292,13 @@ struct StdArray
 
 	/// Creates a new array initialized with the range [b,e[ in stdHeap.
 	StdArray(Iterator b, Iterator e) :
-			pData(new (stdHeap) Data(stdHeap,b,e)),
+			pData(new (stdHeap()) Data(stdHeap(),b,e)),
 			mustFree(true){}
 
 #ifndef _MSC_VER
 	/// Creates a new array from an initializer list
 	StdArray(const std::initializer_list<Elem>& l) :
-		pData(new (stdHeap) Data(l)),
+		pData(new (stdHeap()) Data(l)),
 		mustFree(true) {}
 	/// Creates a new array from an initializer list
 	StdArray(IHeap& heap,const std::initializer_list<Elem>& l) :
@@ -308,14 +308,14 @@ struct StdArray
 
 	/// Creates a new (uninitialized) array with room for \p n elements in stdHeap.
 	StdArray(uint n = 0) :
-			pData(new (stdHeap) Data(stdHeap,n)),
+			pData(new (stdHeap()) Data(stdHeap(),n)),
 			mustFree(true) {}
 
 	/** Creates a new array with \p p1 elements in stdHeap and initializes
 	 *  each element with the parameter \p p2.	*/
 	template<class T2>
 	StdArray(uint p1,const T2& p2)  :
-			pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap,p1,p2)),
+			pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap(),p1,p2)),
 			mustFree(true)
 	{}
 
@@ -323,7 +323,7 @@ struct StdArray
 	 *  initializes each element with the parameter \p p3.	*/
 	template<class T3>
 	StdArray(uint p1,uint p2,const T3& p3)  :
-			pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap,p1,p2,p3)),
+			pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap(),p1,p2,p3)),
 			mustFree(true)
 	{}
 
@@ -331,7 +331,7 @@ struct StdArray
 	 *  stdHeap and initializes each element with the parameter \p p4.	*/
 	template<class T4>
 	StdArray(uint p1,uint p2,uint p3,const T4& p4) :
-		 	pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap,p1,p2,p3,p4)),
+		 	pData(Detail::ArrayDataTraits<Self,dims>::initData(stdHeap(),p1,p2,p3,p4)),
 		 	mustFree(true)
 	{}
 

@@ -137,9 +137,16 @@ struct PostDomFilter3<ElementEqual,IntSeq,ArrayView,int,IdxView,int,EvalView>
 	static bool post(Store& s,const ArrayView& a,const IdxView& idx,
 							const EvalView& eval)
 	{
-		return postBndFilter(s,elementEqual(a,idx,eval)) and
+    	typedef Casper::Detail::DeRefAndSimplify<ArrayView> SArrayView;
+    	typedef Casper::Detail::DeRefAndSimplify<IdxView> SIdxView;
+    	typedef Casper::Detail::DeRefAndSimplify<EvalView> SEvalView;
+    	const SArrayView sa = Casper::Detail::DeRefAndSimplify<ArrayView>()(a);
+    	const SIdxView sidx = Casper::Detail::DeRefAndSimplify<IdxView> ()(idx);
+    	const SEvalView seval = Casper::Detail::DeRefAndSimplify<EvalView> ()(eval);
+
+		return postBndFilter(s,elementEqual(sa,sidx,seval)) and
 			   s.post(new (s) DomFilterView3<ElementEqual,IntSeq,ArrayView,
-										int,IdxView,int,EvalView>(s,a,idx,eval));
+										int,IdxView,int,EvalView>(s,sa,sidx,seval));
 	}
 };
 

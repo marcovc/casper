@@ -955,11 +955,14 @@ struct PostDomFilter1<Distinct,Seq<int>,View>
 {
 	static bool post(Store& s,const View& v)
 	{
+    	typedef typename Casper::Detail::DeRefAndSimplify<View>::Type 	SView;
+    	const SView sv = Casper::Detail::DeRefAndSimplify<View>()(v);
+
 		// Val(distinct) is required (not redundant in this implementation)
 		// Bnd(distinct) seems to slow down sometimes.
-		return postValFilter(s,distinct(v)) and
-			   postBndFilter(s,distinct(v)) and
-			   s.post(new (s) DomFilterView1<Distinct,Seq<int>,View>(s,v));
+		return postValFilter(s,distinct(sv)) and
+			   postBndFilter(s,distinct(sv)) and
+			   s.post(new (s) DomFilterView1<Distinct,Seq<int>,SView>(s,sv));
 	}
 };
 

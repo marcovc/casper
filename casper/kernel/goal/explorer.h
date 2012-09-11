@@ -448,6 +448,26 @@ struct LimitFails : ISinglePathExplorer
 
 IExplorer* limitFails(State& state,uint n, ISinglePathExplorer* s);
 
+struct LimitCPs : ISinglePathExplorer
+{
+	LimitCPs(State& state,uint n, ISinglePathExplorer* search) :
+		ISinglePathExplorer(state),
+		n(n+getStats().getNbChoicePoints()),search(search) {}
+	bool discard(bool atSolution)
+	{
+		if (getStats().getNbChoicePoints() > n)
+			return true;
+		else
+			return search->discard(atSolution);
+	}
+	void reset(uint n)
+	{	this->n = getStats().getNbChoicePoints()+n; }
+
+	counter n;
+	ISinglePathExplorer* search;
+};
+
+IExplorer* limitCPs(State& state,uint n, ISinglePathExplorer* s);
 
 // Monotone Search Path: allows expansion and Iteration only.
 struct MonoSearchPath : ISearchPath
@@ -545,8 +565,8 @@ struct IMultiplePathExplorer : IExplorer
 {
     IMultiplePathExplorer(State& state, int maxPaths = -1) :
     	IExplorer(state),
-    	pCurPath(new MonoSearchPath(Util::stdHeap)),
-    	openPaths(Util::stdHeap),
+    	pCurPath(new MonoSearchPath(Util::stdHeap())),
+    	openPaths(Util::stdHeap()),
     	recomputeCount(0),
     	maxPaths(maxPaths)
     	{}

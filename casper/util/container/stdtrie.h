@@ -47,8 +47,8 @@ struct StdTrie
 	typedef StdArray<PNode>	Levels;
 
 	StdTrie(uint levels) :
-		levels(stdHeap,levels,static_cast<NodeI*>(NULL)),
-		pDelim(new (stdHeap) NodeI(static_cast<NodeI*>(NULL))) {}
+		levels(stdHeap(),levels,static_cast<NodeI*>(NULL)),
+		pDelim(new (stdHeap()) NodeI(static_cast<NodeI*>(NULL))) {}
 	StdTrie(IHeap& h,uint levels) :
 		levels(h,levels,static_cast<NodeI*>(NULL)),
 		pDelim(new (h) NodeI(static_cast<NodeI*>(NULL))) {}

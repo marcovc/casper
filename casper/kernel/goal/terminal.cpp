@@ -20,20 +20,9 @@
 
 namespace Casper {
 
-struct Succeed : IGoal
-{
-	Succeed() {}
-	Goal execute(IExplorer&) { return (IGoal*)NULL; }
-};
-
-struct Fail : IGoal
-{
-	Fail() {}
-	Goal execute(IExplorer& sched) {	sched.fail(); return (IGoal*)NULL; }
-};
-
+/*
 IGoal* const pGlobalSucceedGoal(new Succeed());
 IGoal* const pGlobalFailGoal(new Fail());
-
+*/
 }
 

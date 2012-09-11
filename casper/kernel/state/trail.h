@@ -25,6 +25,14 @@
 
 //using namespace std;
 
+#if 0
+extern int trailAllocs;
+extern int trailVarAllocs;
+extern int trailIncAllocs;
+extern bool inTrailVarAllocs;
+extern bool inTrailIncAllocs;
+#endif
+
 namespace Casper {
 
 
@@ -56,6 +64,13 @@ struct Trail
 	{
 		assert(!s.empty());
 		s.top().pushFront(u);
+#if 0
+		++trailAllocs;
+		if (inTrailVarAllocs)
+			++trailVarAllocs;
+		if (inTrailIncAllocs)
+			++trailIncAllocs;
+#endif
 	}
 
 	// implies saving the old one

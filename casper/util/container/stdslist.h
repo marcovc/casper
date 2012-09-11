@@ -107,7 +107,7 @@ struct StdSList
 
 	typedef Iterator 					ConstIterator;
 
-	inline StdSList(IHeap& heap = stdHeap);
+	inline StdSList(IHeap& heap = stdHeap());
 	template <class InputIterator>
 	StdSList(IHeap& heap,InputIterator first, InputIterator last);
 	StdSList(const StdSList&);

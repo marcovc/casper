@@ -406,7 +406,7 @@ GACSchema<T,View>::GACSchema(const View& vars, const Util::StdArray<T,2>& ss) :
 					Util::StdTrie<T>(solver().getHeap(),doms.size());
 		for (uint i = 0; i < ss.size(0); i++)
 		{
-			Util::StdVector<T> aux(stdHeap,doms.size(),0);
+			Util::StdVector<T> aux(stdHeap(),doms.size(),0);
 			aux[0] = ss[i][t];
 			for (uint j = 1; j <= t; j++)
 				aux[j] = ss[i][j-1];
@@ -504,7 +504,7 @@ bool GACSchema<T,View>::execute()
 	}
 
 	// find the two smallest indexes of the changed variables
-	Util::StdVector<bool>	changedVars(stdHeap,doms.size(),false);
+	Util::StdVector<bool>	changedVars(stdHeap(),doms.size(),false);
 //	uint min1,min2;
 //	min1 = min2 = doms.size();
 	while (!erased.empty())

@@ -340,16 +340,20 @@ template<class Obj>
 struct SelectVarLex : IVarSelector
 {
 	SelectVarLex(Store& s,const Obj& obj) :
-		obj(s,obj) {}
+		obj(s,obj),lastSelected(s,0) {}
 	int select()
 	{
-		for (uint r = 0 ; r < obj.size(); ++r)
+		for (uint r = lastSelected ; r < obj.size(); ++r)
 			if (!obj[r]->ground())
+			{
+				lastSelected = r;
 				return static_cast<int>(r);
+			}
 		return -1;
 	}
 	typedef typename Casper::Traits::GetEval<typename Casper::Traits::GetTermElem<Obj>::Type>::Type	ElemEval;
 	DomArrayView<ElemEval,Obj> obj;
+	Reversible<uint> lastSelected;
 };
 
 /**

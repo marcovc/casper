@@ -47,10 +47,7 @@ int golfers(uint w, uint g, uint s, bool labeling,const Util::ExampleOptions& op
 
 	// alldifferent
 	for (uint wi = 0; wi < w; wi++)
-	{
-		solver.post(distinct(vars[wi]),postBndFilter);
-		solver.post(distinct(vars[wi]),postValFilter);
-	}
+		solver.post(distinct(vars[wi]),postDomFilter);
 
 	// order positions in groups
 	for (uint wi = 0; wi < w; wi++)

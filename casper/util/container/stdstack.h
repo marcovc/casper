@@ -49,7 +49,7 @@ struct StdStack
 		IHeap&	 heap;
         PNode    mTop;
 
-        StdStack(IHeap& heap = stdHeap) : heap(heap),mTop(NULL) {}
+        StdStack(IHeap& heap = stdHeap()) : heap(heap),mTop(NULL) {}
 
         void push(const T& data)
         {	mTop = new (heap) Node(data,mTop);	}

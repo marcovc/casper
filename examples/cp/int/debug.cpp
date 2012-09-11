@@ -16,7 +16,7 @@
  *   limitations under the License.                                        *
  \*************************************************************************/
 
-#define EX 17
+#define EX 19
 
 #if EX==1
 
@@ -1609,6 +1609,346 @@ int main(int argc, char** argv)
 	cout << found << " " << marks << " " << diffs << endl;
 	cout << solver.getStats() << endl;
 
+}
+#elif EX==18
+
+
+#include <casper/kernel.h>
+#include <casper/cp/int.h>
+#include <iostream>
+#include <fstream>
+
+using namespace Casper;
+using namespace Casper::CP;
+using namespace std;
+
+int nbUpdates;
+int propCount;
+int trailAllocs;
+
+struct FilterPerc : IFilter
+{
+	FilterPerc(Store& store, const IntVarArray& x) : IFilter(store),x(x) {}
+
+	bool execute()
+	{
+		//std::cout << x << std::endl;
+		//++propCount;
+
+		// count non ground variables
+		int c = 0;
+		int* ng = new int[x.size()];
+		int s = 0;
+		for (uint i = 0; i < x.size(); ++i)
+		if (!x[i].domain().ground())
+		{
+			ng[c++] = i;
+			s += x[i].domain().size()-1;
+		}
+
+		if (s <= nbUpdates)
+		{
+			delete[] ng;
+			return false;
+		}
+
+		std::random_shuffle(&ng[0],&ng[c]);
+
+		setInQueue(cost());
+
+		for (int f = 0; f < nbUpdates; ++f)
+		{
+			int i = f % c;
+			// remove max or min
+			if (static_cast<double>(rand())/static_cast<double>(RAND_MAX) > 0.5)
+			{
+				if (!x[ng[i]].domain().updateMax(x[ng[i]].domain().max()-1))
+				{
+					std::cout << "bronca\n";
+					delete[] ng;
+					return false;
+				}
+			}
+			else
+			{
+				if (!x[ng[i]].domain().updateMin(x[ng[i]].domain().min()+1))
+				{
+					std::cout << "bronca\n";
+					delete[] ng;
+					return false;
+				}
+			}
+
+			if (x[ng[i]].domain().ground())
+				ng[i] = ng[--c];
+		}
+		setInQueue(noQueue);
+		delete[] ng;
+		return true;
+	}
+
+	void attach(INotifiable* s)
+	{
+		pS = s;
+		for (uint i = 0; i < x.size(); ++i)
+			x[i].domain().attachOnGround(s);
+	}
+	void detach()
+	{
+		for (uint i = 0; i < x.size(); ++i)
+			x[i].domain().detachOnGround(pS);
+	}
+	IntVarArray x;
+	INotifiable* pS;
+};
+
+void solveNodes(int n, int r, double u, int nodes)
+{
+	const int rangeSize = 30;
+	Solver solver;
+	solver.setExplorer(limitFPs(solver,nodes,static_cast<Casper::ISinglePathExplorer*>(solver.getExplorer())));
+
+	IntVarArray	vars(solver,n,1,r*rangeSize*2);
+	for (int i = 0; i < n; ++i)
+	{
+		int c = 0;
+		for (auto it = vars[i].domain().begin(); it != vars[i].domain().end(); )
+			if ((c++/rangeSize)%2 == 1)
+				vars[i].domain().erase(it++);
+			else
+				++it;
+	}
+
+	solver.filterSched().post(new (solver) FilterPerc(solver,vars),false);
+
+	//std::cout << vars << std::endl;
+	Casper::Util::CPUTimer timer("");
+	bool found = solver.solve(label(solver,vars,selectVarLex(solver,vars,false),selectValsMin(solver,vars)));
+
+	while (found)
+	{
+		found = solver.next();
+	}
+	timer.pause();
+	std::cout << n << " " << r <<  " " << u << " " << solver.getStats().getStoreStats().getNbFPComputations() << " " << timer.getSecs() << " ";
+	std::cout << trailAllocs/static_cast<double>(solver.getStats().getStoreStats().getNbFPComputations())/n << std::endl;
+}
+
+#if 1
+int main(int argc, char** argv)
+{
+	 if (argc!=4)
+	  {
+		  std::cerr << "usage: nbRanges maxNodes randomSeed\n";
+		  return 1;
+	  }
+	  int ranges = atoi(argv[1]);
+	  int nodes = atoi(argv[2]);
+	  int seed = atoi(argv[3]);
+
+	  srand(seed);
+
+	  for (double n = 10; n < 1000; n*=1.4)
+	  {
+		  for (double u = 0; u < 4; u+= 0.1)
+		  {
+			  nbUpdates = n*u;
+			  propCount = 0;
+			  trailAllocs = 0;
+			  solveNodes((int)n, ranges,u, nodes);
+			 // std::cout << propCount << endl;
+		  }
+	  }
+	  return 0;
+}
+#else
+int main(int argc, char* argv[])
+{
+  if (argc!=6)
+  {
+	  std::cerr << "usage: nbVars updatePerc nbRanges nbNodes randSeed\n";
+	  return 1;
+  }
+
+  int n = atoi(argv[1]);
+  double u = atof(argv[2]);
+  int ranges = atoi(argv[3]);
+  int nodes = atoi(argv[4]);
+  int seed = atoi(argv[5]);
+
+  srand(seed);
+
+  propCount = 0;
+  nbUpdates = n*u;
+  trailAllocs = 0;
+
+  solveNodes((int)n, ranges,u, nodes);
+
+  return 0;
+}
+
+#endif
+
+#elif EX==19
+
+int nbUpdates;
+int propCount;
+int trailAllocs;
+int trailVarAllocs;
+int trailIncAllocs;
+bool inTrailVarAllocs;
+bool inTrailIncAllocs;
+
+#include <casper/kernel.h>
+#include <casper/cp/int.h>
+#include <casper/kernel/spexpr/expr.h>
+#include <iostream>
+#include <fstream>
+
+using namespace Casper;
+using namespace Casper::CP;
+using namespace std;
+
+void solveSchedule()
+{
+	const int nbWeekDays = 5;
+	const int nbDailyShifts = 4;
+	const int nbWorkers = 4;
+
+	enum WeekDays { mon, tue, wed, thu, fri };
+	enum DailyShifts { s08_14, s14_20, s20_02, s02_08 };
+	enum Workers { boss, w1, w2, w3 };
+
+	Solver solver;
+	IntVarArray2 worker(solver,nbWeekDays,nbDailyShifts,1,nbWorkers);
+
+	for (uint w = 2; w <= nbWorkers; ++w)
+	{
+		IntBndExpr e(solver,0);
+		for (uint d = 0; d < nbWeekDays; ++d)
+			for (uint s = 0; s < nbDailyShifts; ++s)
+				e = e + cast<int>(worker[d][s]==w);
+		solver.post(e==6);
+	}
+
+	for (uint w = 2; w <= nbWorkers; ++w)
+		for (uint s = 0; s < nbDailyShifts; ++s)
+		{
+			IntBndExpr e(solver,0);
+			for (uint d = 0; d < nbWeekDays; ++d)
+				e = e + cast<int>(worker[d][s]==w);
+			solver.post(e<=2);
+		}
+
+	for (uint d = 0; d < nbWeekDays; ++d)
+	{
+		for (uint s = 0; s < nbDailyShifts-1; ++s)
+			solver.post(worker[d][s]!=worker[d][s+1]);
+		if (d<nbWeekDays-1)
+			solver.post(worker[d][nbDailyShifts-1]!=worker[d+1][0]);
+	}
+
+	solver.post(worker[(int)mon][(int)s14_20]==(int)boss);
+	solver.post(worker[(int)tue][(int)s14_20]==(int)boss);
+
+	for (uint d = 0; d < nbWeekDays; ++d)
+		for (uint s = 0; s < nbDailyShifts; ++s)
+			if (!((d==mon and s==s14_20) or (d==tue and s==s14_20)))
+				solver.post(worker[d][s]!=1);
+
+	bool found = solver.solve(label(solver,worker));
+	if (found)
+		cout << worker << endl;
+}
+
+void solveFactory()
+{
+	Solver solver;
+	//IntVarArray start(solver,3,11,0,15);
+
+//	for (int i = 0; i < 15; ++i)
+//		if (start[0][0]==i)
+
+}
+
+void solvePacking()
+{
+	const int maxNbBoxes = 7;
+	enum Components { v1,v2,
+					  p1,p2,p3,p4,
+					  a1,a2,a3,
+					  f1,f2,f3,f4,f5,f6,
+					  c1,c2,c3,c4 };
+	Solver solver;
+	IntVarArray2 itemCount(solver,5,maxNbBoxes,0,6);
+
+	// procura
+	solver.post(sumEqual(itemCount[0],2));
+	solver.post(sumEqual(itemCount[1],4));
+	solver.post(sumEqual(itemCount[2],3));
+	solver.post(sumEqual(itemCount[3],6));
+	solver.post(sumEqual(itemCount[4],4));
+
+	// tipo de caixa
+	for (int i = 0; i < maxNbBoxes; i++)
+	{
+		Expr<int> e(0);
+		for (int t = 0; t < 5; ++t)
+			e = rel<Add>(e,itemCount[t][i]);
+		solver.post(rel<Equal>(e,0) or rel<Equal>(e,3) or rel<Equal>(e,4) or rel<Equal>(e,6));
+	}
+
+	for (int i = 0; i < maxNbBoxes; i++)
+	{
+		// vidro n‹o pode ser armazenado com o ferro
+		solver.post(itemCount[0][i]==0 or itemCount[3][i]==0);
+		// vidro n‹o pode ser armazenado com o ao
+		solver.post(itemCount[0][i]==0 or itemCount[2][i]==0);
+		// cer‰mica n‹o pode ser armazenado com o ferro
+		solver.post(itemCount[4][i]==0 or itemCount[3][i]==0);
+		// cer‰mica n‹o pode ser armazenado com o ao
+		solver.post(itemCount[4][i]==0 or itemCount[2][i]==0);
+	}
+
+	// symmetry breaking
+	for (int i = 0; i < maxNbBoxes-1; i++)
+	{
+		Expr<int> e1(0);
+		for (int t = 0; t < 5; ++t)
+			e1 = rel<Add>(e1,itemCount[t][i]);
+		Expr<int> e2(0);
+		for (int t = 0; t < 5; ++t)
+			e2 = rel<Add>(e2,itemCount[t][i+1]);
+		solver.post(rel<LessEqual>(e2,e1));
+	}
+
+	IntVar firstEmptyBox(solver,0,maxNbBoxes-1);
+	solver.post(itemCount[0][firstEmptyBox]+
+				itemCount[1][firstEmptyBox]+
+				itemCount[2][firstEmptyBox]+
+				itemCount[3][firstEmptyBox]+
+				itemCount[4][firstEmptyBox] == 0);
+/*	IntBndExpr nbBoxes(solver,0);
+	for (int i = 0; i < 19; i++)
+	{
+		BoolBndExpr usedBox(solver,false);
+		for (int t = 0; t < 5; ++t)
+			usedBox = usedBox or (itemCount[t][i]>0);
+		nbBoxes = nbBoxes + cast<int>(usedBox);
+	}
+*/
+	solver.setExplorer(bbMinimize(solver,firstEmptyBox));
+	bool found = solver.solve(label(solver,itemCount,selectVarMinDom(solver,itemCount)));
+	while (found)
+	{
+		cout << itemCount << endl;
+		found = solver.next();
+	}
+}
+
+int main()
+{
+	solvePacking();
 }
 
 #endif

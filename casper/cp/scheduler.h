@@ -546,10 +546,20 @@ struct FIFOFilterSched : IQueueFilterSched
 	bool post(Filter f,bool schedule=true)
 	{
 		++nbPosts;
-		if (nbPosts == toExecuteMaxSize)
+		if (nbPosts == toExecuteMaxSize+1)
 		{
+			const uint oldToExecuteMaxSize = toExecuteMaxSize;
+			//std::cout << "enlarging queue to " << (toExecuteMaxSize*2) << std::endl;
 			toExecuteMaxSize *= 2;
 			toExecute.resize(toExecuteMaxSize);
+			// if queued filters currently wrap around then we must move the filters from
+			// the begin to the new allocated space
+			if (toExecuteBegin > toExecuteEnd)
+			{
+				for (uint i = 0; i < toExecuteEnd; ++i)
+					toExecute[oldToExecuteMaxSize+i] = toExecute[i];
+				toExecuteEnd += oldToExecuteMaxSize;
+			}
 		}
 		if (store.getFilterWeighting())
 		{
@@ -571,6 +581,7 @@ struct FIFOFilterSched : IQueueFilterSched
 		if (f.getImpl().inQueue() != noQueue/*<= qid*/)
 			return false;
 		f.getImpl().setInQueue(qid);
+	//	std::cout << "enqueing at " << toExecuteEnd << std::endl;
 		toExecute[toExecuteEnd] = f.getPImpl();
 		++toExecuteEnd;
 		if (toExecuteEnd == toExecuteMaxSize)
@@ -581,6 +592,7 @@ struct FIFOFilterSched : IQueueFilterSched
 	bool enqueueForce(Filter f)
 	{
 		f.getImpl().setInQueue(qid);
+		//std::cout << "force enqueing at " << toExecuteEnd << std::endl;
 		toExecute[toExecuteEnd] = f.getPImpl();
 		++toExecuteEnd;
 		if (toExecuteEnd == toExecuteMaxSize)
@@ -600,6 +612,7 @@ struct FIFOFilterSched : IQueueFilterSched
 			#ifndef CASPER_EXTRA_STATS
 			store.getStats().signalPropagation();
 			#endif
+		//	std::cout << "executing from " << toExecuteBegin << std::endl;
 			pActiveFilter = toExecute[toExecuteBegin];
 			pActiveFilter->setInQueue(noQueue);
 			#ifdef CASPER_EXTRA_STATS
@@ -633,10 +646,12 @@ struct FIFOFilterSched : IQueueFilterSched
 #ifndef CASPER_OPTIM_DONT_CLEAR_ON_FAIL
 		if (toExecuteEnd < toExecuteBegin)
 		{
+		//	std::cout << "clearing from " << toExecuteBegin << " to " << toExecuteMaxSize << std::endl;
 			for ( ; toExecuteBegin < toExecuteMaxSize; ++toExecuteBegin)
 				toExecute[toExecuteBegin]->setInQueue(noQueue);
 			toExecuteBegin = 0;
 		}
+	//	std::cout << "clearing from " << toExecuteBegin << " to " << toExecuteEnd << std::endl;
 		for ( ; toExecuteBegin != toExecuteEnd; ++toExecuteBegin)
 			toExecute[toExecuteBegin]->setInQueue(noQueue);
 #else

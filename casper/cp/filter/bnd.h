@@ -91,8 +91,13 @@ struct PostBndFilter1
 {
 	static bool post(Store& s,const Expr1& v1)
 	{
-		return ChkViewRel1<Func,Eval1,Expr1>(s,v1).canBeTrue() and
-				s.post(new (s) BndFilterView1<Func,Eval1,Expr1>(s,v1));
+    	typedef Casper::Detail::DeRefAndSimplify<Expr1> SDExpr1;
+    	const typename SDExpr1::Type sdv1 = SDExpr1()(v1);
+
+    	//std::cout << "posting " << Casper::Traits::getTypeStr<Rel1<Func,typename SDExpr1::Type> >() << std::endl;
+
+		return ChkViewRel1<Func,Eval1,typename SDExpr1::Type>(s,sdv1).canBeTrue() and
+				s.post(new (s) BndFilterView1<Func,Eval1,typename SDExpr1::Type>(s,sdv1));
 	}
 };
 
@@ -101,9 +106,16 @@ struct PostBndFilter2
 {
 	static bool post(Store& s,const Expr1& v1,const Expr2& v2)
 	{
-		return ChkViewRel2<Func,Eval1,Expr1,Eval2,Expr2>(s,v1,v2).canBeTrue() and
+    	typedef Casper::Detail::DeRefAndSimplify<Expr1> SDExpr1;
+    	typedef Casper::Detail::DeRefAndSimplify<Expr2> SDExpr2;
+    	const typename SDExpr1::Type sdv1 = SDExpr1()(v1);
+    	const typename SDExpr2::Type sdv2 = SDExpr2()(v2);
+
+    	return ChkViewRel2<Func,Eval1,typename SDExpr1::Type,
+    							Eval2,typename SDExpr2::Type>(s,sdv1,sdv2).canBeTrue() and
 				//(not ChkViewRel2<Func,Eval1,Expr1,Eval2,Expr2>(s,v1,v2).isTrue())  and  // FIXME
-				s.post(new (s) BndFilterView2<Func,Eval1,Expr1,Eval2,Expr2>(s,v1,v2));
+				s.post(new (s) BndFilterView2<Func,Eval1,typename SDExpr1::Type,
+												   Eval2,typename SDExpr2::Type>(s,sdv1,sdv2));
 	}
 };
 
@@ -113,8 +125,19 @@ struct PostBndFilter3
 {
 	static bool post(Store& s,const Expr1& v1,const Expr2& v2,const Expr3& v3)
 	{
-		return ChkViewRel3<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3>(s,v1,v2,v3).canBeTrue() and
-				s.post(new (s) BndFilterView3<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3>(s,v1,v2,v3));
+    	typedef Casper::Detail::DeRefAndSimplify<Expr1> SDExpr1;
+    	typedef Casper::Detail::DeRefAndSimplify<Expr2> SDExpr2;
+    	typedef Casper::Detail::DeRefAndSimplify<Expr3> SDExpr3;
+    	const typename SDExpr1::Type sdv1 = SDExpr1()(v1);
+    	const typename SDExpr2::Type sdv2 = SDExpr2()(v2);
+    	const typename SDExpr3::Type sdv3 = SDExpr3()(v3);
+
+    	return ChkViewRel3<Func,Eval1,typename SDExpr1::Type,
+    							Eval2,typename SDExpr2::Type,
+    							Eval3,typename SDExpr3::Type>(s,sdv1,sdv2,sdv3).canBeTrue() and
+				s.post(new (s) BndFilterView3<Func,Eval1,typename SDExpr1::Type,
+												   Eval2,typename SDExpr2::Type,
+												   Eval3,typename SDExpr3::Type>(s,sdv1,sdv2,sdv3));
 	}
 };
 
@@ -124,8 +147,23 @@ struct PostBndFilter4
 {
 	static bool post(Store& s,const Expr1& v1,const Expr2& v2,const Expr3& v3,const Expr4& v4)
 	{
-		return ChkViewRel4<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4>(s,v1,v2,v3,v4).canBeTrue() and
-				s.post(new (s) BndFilterView4<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4>(s,v1,v2,v3,v4));
+    	typedef Casper::Detail::DeRefAndSimplify<Expr1> SDExpr1;
+    	typedef Casper::Detail::DeRefAndSimplify<Expr2> SDExpr2;
+    	typedef Casper::Detail::DeRefAndSimplify<Expr3> SDExpr3;
+    	typedef Casper::Detail::DeRefAndSimplify<Expr4> SDExpr4;
+    	const typename SDExpr1::Type sdv1 = SDExpr1()(v1);
+    	const typename SDExpr2::Type sdv2 = SDExpr2()(v2);
+    	const typename SDExpr3::Type sdv3 = SDExpr3()(v3);
+    	const typename SDExpr4::Type sdv4 = SDExpr4()(v4);
+
+    	return ChkViewRel4<Func,Eval1,typename SDExpr1::Type,
+    							Eval2,typename SDExpr2::Type,
+    							Eval3,typename SDExpr3::Type,
+    							Eval4,typename SDExpr4::Type>(s,sdv1,sdv2,sdv3,sdv4).canBeTrue() and
+				s.post(new (s) BndFilterView4<Func,Eval1,typename SDExpr1::Type,
+												   Eval2,typename SDExpr2::Type,
+												   Eval3,typename SDExpr3::Type,
+												   Eval4,typename SDExpr4::Type>(s,sdv1,sdv2,sdv3,sdv4));
 	}
 };
 
@@ -136,9 +174,27 @@ struct PostBndFilter5
 	static bool post(Store& s,const Expr1& v1,const Expr2& v2,
 						 const Expr3& v3,const Expr4& v4,const Expr5& v5)
 	{
-		return ChkViewRel5<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4,Eval5,Expr5>(s,v1,v2,v3,v4,v5).canBeTrue() and
+    	typedef Casper::Detail::DeRefAndSimplify<Expr1> SDExpr1;
+    	typedef Casper::Detail::DeRefAndSimplify<Expr2> SDExpr2;
+    	typedef Casper::Detail::DeRefAndSimplify<Expr3> SDExpr3;
+    	typedef Casper::Detail::DeRefAndSimplify<Expr4> SDExpr4;
+    	typedef Casper::Detail::DeRefAndSimplify<Expr5> SDExpr5;
+    	const typename SDExpr1::Type sdv1 = SDExpr1()(v1);
+    	const typename SDExpr2::Type sdv2 = SDExpr2()(v2);
+    	const typename SDExpr3::Type sdv3 = SDExpr3()(v3);
+    	const typename SDExpr4::Type sdv4 = SDExpr4()(v4);
+    	const typename SDExpr5::Type sdv5 = SDExpr4()(v5);
+    	return ChkViewRel5<Func,Eval1,typename SDExpr1::Type,
+    							Eval2,typename SDExpr2::Type,
+    							Eval3,typename SDExpr3::Type,
+    							Eval4,typename SDExpr4::Type,
+    							Eval5,typename SDExpr5::Type>(s,sdv1,sdv2,sdv3,sdv4,sdv5).canBeTrue() and
 				s.post(new (s)
-			BndFilterView5<Func,Eval1,Expr1,Eval2,Expr2,Eval3,Expr3,Eval4,Expr4,Eval5,Expr5>(s,v1,v2,v3,v4,v5));
+			BndFilterView5<Func,Eval1,typename SDExpr1::Type,
+								Eval2,typename SDExpr2::Type,
+								Eval3,typename SDExpr3::Type,
+								Eval4,typename SDExpr4::Type,
+								Eval5,typename SDExpr5::Type>(s,sdv1,sdv2,sdv3,sdv4,sdv5));
 	}
 };
 
@@ -445,15 +501,21 @@ struct PostBndFilter2<Or,bool,Expr1,bool,Expr2>
 {
     static bool post(Store& s,const Expr1& p1,const Expr2& p2)
     {
-    	ChkView<Expr1> v1(s,p1);
-    	ChkView<Expr2> v2(s,p2);
+    	typedef Casper::Detail::DeRefAndSimplify<Expr1> SDExpr1;
+    	typedef Casper::Detail::DeRefAndSimplify<Expr2> SDExpr2;
+    	const typename SDExpr1::Type sdv1 = SDExpr1()(p1);
+    	const typename SDExpr2::Type sdv2 = SDExpr2()(p2);
+
+    	ChkView<typename SDExpr1::Type> v1(s,sdv1);
+    	ChkView<typename SDExpr2::Type> v2(s,sdv2);
     	if (v1.isTrue() or v2.isTrue())
     		return true;
     	if (!v1.canBeTrue())
-    		return v2.canBeTrue() and postBndFilter(s,p2);
+    		return v2.canBeTrue() and postBndFilter(s,sdv2);
     	if (!v2.canBeTrue())
-    		return v1.canBeTrue() and postBndFilter(s,p1);
-    	return s.post(new (s) BndFilterView2<Or,bool,Expr1,bool,Expr2>(s,p1,p2));
+    		return v1.canBeTrue() and postBndFilter(s,sdv1);
+    	return s.post(new (s) BndFilterView2<Or,bool,typename SDExpr1::Type,
+    											bool,typename SDExpr2::Type>(s,sdv1,sdv2));
     }
 };
 
@@ -605,6 +667,7 @@ struct BndFilterView2<Less,Eval,Expr1,Eval,Expr2> :
 		BndFilterView2<Greater,Eval,Expr2,Eval,Expr1>(store,p2,p1) {}
 };
 
+#if 0
 
 #define GECODE_SUM
 /**
@@ -648,7 +711,7 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 					s += x[i].min();
 			bool ret = postBndFilter(store,newx[0]+newx[1]+newx[2]==v.value()-s);
 			setInQueue(noQueue);
-			detach(pOwner);
+			detach();
 			return ret;
 		}
 		else
@@ -664,7 +727,7 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 					s += x[i].min();
 			bool ret = postBndFilter(store,newx[0]+newx[1]==v.value()-s);
 			setInQueue(noQueue);
-			detach(pOwner);
+			detach();
 			return ret;
 		}
 		else
@@ -680,7 +743,7 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 					s += x[i].min();
 			//solver().post(newx[0]==v.value()-s);
 			setInQueue(noQueue);
-			detach(pOwner);
+			detach();
 			return newx[0].domain().updateRange(v.value()-s,v.value()-s);
 		}
 */
@@ -742,7 +805,7 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 		if (sl == su)
 		{
 			setInQueue(IFilter::noQueue);
-			detach(pOwner);
+			detach();
 			return true;
 		}
 		setInQueue(IFilter::noQueue);
@@ -879,6 +942,7 @@ struct BndFilterView2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2> : IFilter
 };
 #endif
 
+#endif
 
 // BndFilterView over a Filter (still needed?)
 #if 0

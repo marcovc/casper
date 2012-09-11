@@ -26,10 +26,9 @@ using namespace Casper;
 using namespace Casper::CP;
 using namespace std;
 
-
 void golomb(uint n,uint m,uint g, bool minimize, const Util::ExampleOptions& opt)
 {
-	// define the CPSolver object
+	// define the Solver object
 	Solver solver;
 
 	// create an array for storing n marks, each one with the domain [0,m]
@@ -82,7 +81,6 @@ void golomb(uint n,uint m,uint g, bool minimize, const Util::ExampleOptions& opt
 	if (opt.showRuntime())
 		cout << solver.getCPUTimer() << endl;
 }
-
 
 int main(int argc, char** argv)
 {

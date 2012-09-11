@@ -141,7 +141,9 @@ struct StoreStats
 				countRangeDomainUpdates(0)
 				#ifdef CASPER_EXTRA_STATS
 				,countEffectivePropagations(0)
+				#ifdef CASPER_LOG
 				,individualPropCounts(*this)
+				#endif
 				#endif
 	{
 		#if defined(CASPER_EXTRA_STATS) and defined(CASPER_LOG)
@@ -392,6 +394,9 @@ struct Store : INotifiable
 	Util::IHeap& getStdHeap() {	return *globalSHeap; }
 	const Util::IHeap& getStdHeap() const {	return *globalSHeap; }
 
+	Util::IHeap& getHeap();
+	const Util::IHeap& getHeap() const;
+
 	bool notify()
 	{
 		//env.log(this,"CP::Store",Util::Logger::solverNotify);
@@ -417,8 +422,15 @@ protected:
 	#endif
 };
 
-
 } // CP
+
+struct IExplorer;
+struct ISinglePathExplorer;
+
+namespace CP {
+IExplorer* limitFPs(CP::Store& store,uint n, ISinglePathExplorer* s);
+} // CP
+
 } // Casper
 
 std::ostream& operator<<(std::ostream& os, const Casper::CP::StoreStats& s);

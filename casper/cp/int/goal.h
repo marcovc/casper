@@ -71,10 +71,17 @@ struct SelectValsMin<Seq<Eval>,View> : IValSelector
 	{
 		if (doms[idx]->ground())
 			return succeed();
+#ifdef LABEL_OPTIM
+		return Goal(store,
+				postVarEqualCons(store,*doms[idx],doms[idx]->min()) or
+				(postVarGreaterCons(store,*doms[idx],doms[idx]->min())  and callValSelector(store,this,idx))
+			);
+#else
 		return Goal(store,
 				post(store,rel<Equal>(doms[idx].getObj(),doms[idx]->min())) or
 				(post(store,rel<Greater>(doms[idx].getObj(),doms[idx]->min())) and callValSelector(store,this,idx))
 				);
+#endif
 	}
 	Store&	store;
 	DomArrayView<Eval,View> doms;

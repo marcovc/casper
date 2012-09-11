@@ -69,7 +69,7 @@ struct StdHashSet : std::set<T>
 		return true;
 	}
 
-	IHeap& getHeap() const {	return stdHeap;	}
+	IHeap& getHeap() const {	return stdHeap();	}
 
 };
 
@@ -87,7 +87,7 @@ struct QuickHashSet : StdHashSet<T,EqualT,Hasher>
 		Super(maxInserts)
 	{}
 
-	IHeap& getHeap() const {	return stdHeap;	}
+	IHeap& getHeap() const {	return stdHeap();	}
 };
 
 } // Casper

@@ -25,14 +25,40 @@
 
 namespace Casper {
 
+struct Succeed : IGoal
+{
+	Succeed() {}
+	Goal execute(IExplorer&) { return (IGoal*)NULL; }
+};
 
+struct Fail : IGoal
+{
+	Fail() {}
+	Goal execute(IExplorer& sched) {	sched.fail(); return (IGoal*)NULL; }
+};
+
+#if 0
 extern IGoal* const pGlobalSucceedGoal;
 extern IGoal* const pGlobalFailGoal;
 
 
 inline Goal	succeed() 				{	return pGlobalSucceedGoal; }
 inline Goal	fail() 					{	return pGlobalFailGoal; }
+#else
 
+inline Goal	succeed()
+{
+	static Succeed g;
+	return &g;
+}
+
+inline Goal	fail()
+{
+	static Fail g;
+	return &g;
+}
+
+#endif
 } // Casper
 
 #endif /* CASPER_KERNEL_GOAL_TERMINAL_H_ */

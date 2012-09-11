@@ -386,6 +386,8 @@ NEW_FN_3(sum,Sum)
 NEW_FN_4(sum,Sum)
 
 NEW_REL_2(sumEqual,SumEqual)
+NEW_REL_2(sumLessEqual,SumLessEqual)
+NEW_REL_2(sumGreaterEqual,SumGreaterEqual)
 
 NEW_REL_2(ifThen,IfThen)
 NEW_REL_3(ifThenElse,IfThenElse)
@@ -479,6 +481,8 @@ struct FuncToStr<Cast<float> >
 struct UnknownRel;
 
 namespace Traits {
+
+//template<class> struct DeRef;
 
 template<class Func,class T>
 struct GetEval<Rel1<Func,T> >
@@ -603,6 +607,14 @@ template<class T1,class T2>
 struct GetEval<Rel2<SumEqual,T1,T2> >
 {	typedef bool	Type;	};
 
+template<class T1,class T2>
+struct GetEval<Rel2<SumLessEqual,T1,T2> >
+{	typedef bool	Type;	};
+
+template<class T1,class T2>
+struct GetEval<Rel2<SumGreaterEqual,T1,T2> >
+{	typedef bool	Type;	};
+
 template<class T1>
 struct GetEval<Rel1<Sum,T1> >
 {	typedef	typename Traits::GetEval<typename Traits::GetTermElem<T1>::Type>::Type	Type;	};
@@ -631,17 +643,29 @@ template<class T1,class T2,class T3,class T4,class T5>
 struct GetEval<Rel5<Cumulative,T1,T2,T3,T4,T5> >
 {	typedef	bool Type;	};
 
+#if 1
 template<class Expr1,class Expr2,class Expr3,class Expr4>
 struct GetElem<Rel4<All,Expr1,Expr2,Expr3,Expr4> >
 {	typedef Expr4	Type;	};
+#else
+template<class Expr1,class Expr2,class Expr3,class Expr4>
+struct GetElem<Rel4<All,Expr1,Expr2,Expr3,Expr4> >
+{	typedef typename DeRef<Expr4>::Type	Type;	};
+#endif
 
 template<class Expr1,class Expr2>
 struct GetElem<Rel2<Element,Expr1,Expr2> >
 {	typedef typename Traits::GetElem<typename Traits::GetElem<Expr1>::Type>::Type	Type;	};
 
+#if 1
 template<class Expr1,class Expr2,class Expr3,class Expr4>
 struct GetTermElem<Rel4<All,Expr1,Expr2,Expr3,Expr4> >
-{	typedef Expr4	Type;	};
+{	typedef Expr4 Type;	};
+#else
+template<class Expr1,class Expr2,class Expr3,class Expr4>
+struct GetTermElem<Rel4<All,Expr1,Expr2,Expr3,Expr4> >
+{	typedef typename DeRef<Expr4>::Type	Type;	};
+#endif
 
 template<class Expr1,class Expr2>
 struct GetTermElem<Rel2<Element,Expr1,Expr2> >
@@ -829,6 +853,180 @@ static std::string getFuncName()
 }
 
 }; // Detail
+
+
+namespace Detail {
+
+/*
+ * Simplifies an expression (evaluates subexpressions when possible)
+ *
+ */
+template<class T>
+struct Simplify
+{
+	typedef T Type;
+	Type operator()(const T& t) const
+	{	return t; }
+};
+
+template<class Func,class T1>
+struct SimplifyRel1
+{
+	typedef Rel1<Func,T1> Type;
+	Type operator()(const T1& t) const
+	{	return rel<Func>(t); }
+};
+
+template<class Func,class T1,class T2>
+struct SimplifyRel2
+{
+	typedef Rel2<Func,T1,T2> Type;
+	Type operator()(const T1& t1,const T2& t2) const
+	{	return rel<Func>(t1,t2); }
+};
+
+template<class Func,class T1,class T2,class T3>
+struct SimplifyRel3
+{
+	typedef Rel3<Func,T1,T2,T3> Type;
+	Type operator()(const T1& t1,const T2& t2,const T3& t3) const
+	{	return rel<Func>(t1,t2,t3); }
+};
+
+template<class Func,class T1,class T2,class T3,class T4>
+struct SimplifyRel4
+{
+	typedef Rel4<Func,T1,T2,T3,T4> Type;
+	Type operator()(const T1& t1,const T2& t2,const T3& t3,const T4& t4) const
+	{	return rel<Func>(t1,t2,t3,t4); }
+};
+
+template<class Func,class T1>
+struct Simplify<Rel1<Func,T1> >
+{
+	typedef Simplify<T1>	SimplArg;
+	typedef SimplifyRel1<Func,typename SimplArg::Type> Delegate;
+	typedef typename Delegate::Type Type;
+	Type operator()(const Rel1<Func,T1>& r) const
+	{	return Delegate()(SimplArg()(r.p1)); }
+};
+
+template<class Func,class T1,class T2>
+struct Simplify<Rel2<Func,T1,T2> >
+{
+	typedef Simplify<T1>	SimplArg1;
+	typedef Simplify<T2>	SimplArg2;
+	typedef SimplifyRel2<Func,typename SimplArg1::Type,
+							  typename SimplArg2::Type> Delegate;
+	typedef typename Delegate::Type Type;
+	Type operator()(const Rel2<Func,T1,T2>& r) const
+	{	return Delegate()(SimplArg1()(r.p1),SimplArg2()(r.p2)); }
+};
+
+template<class Func,class T1,class T2,class T3>
+struct Simplify<Rel3<Func,T1,T2,T3> >
+{
+	typedef Simplify<T1>	SimplArg1;
+	typedef Simplify<T2>	SimplArg2;
+	typedef Simplify<T3>	SimplArg3;
+	typedef SimplifyRel3<Func,typename SimplArg1::Type,
+							  typename SimplArg2::Type,
+							  typename SimplArg3::Type> Delegate;
+	typedef typename Delegate::Type Type;
+	Type operator()(const Rel3<Func,T1,T2,T3>& r) const
+	{	return Delegate()(SimplArg1()(r.p1),SimplArg2()(r.p2),SimplArg3()(r.p3)); }
+};
+
+template<class Func,class T1,class T2,class T3,class T4>
+struct Simplify<Rel4<Func,T1,T2,T3,T4> >
+{
+	typedef Simplify<T1>	SimplArg1;
+	typedef Simplify<T2>	SimplArg2;
+	typedef Simplify<T3>	SimplArg3;
+	typedef Simplify<T4>	SimplArg4;
+	typedef SimplifyRel4<Func,typename SimplArg1::Type,
+							  typename SimplArg2::Type,
+							  typename SimplArg3::Type,
+							  typename SimplArg4::Type> Delegate;
+	typedef typename Delegate::Type Type;
+	Type operator()(const Rel4<Func,T1,T2,T3,T4>& r) const
+	{	return Delegate()(SimplArg1()(r.p1),SimplArg2()(r.p2),SimplArg3()(r.p3),SimplArg4()(r.p4)); }
+};
+
+template<class T>
+struct Simplify<Util::StdList<T> >
+{
+	typedef Util::StdList<typename Simplify<T>::Type> Type;
+	Type operator()(const Util::StdList<T>& t) const
+	{
+		Util::StdList<typename Simplify<T>::Type> r;
+		for (typename Util::StdList<T>::ConstIterator it = t.begin(); it != t.end(); ++it)
+			r.pushBack(Simplify<T>()(*it));
+		return r;
+	}
+};
+
+template<class SeqT>
+struct SimplifyRel2<Element,SeqT,int>
+{
+	typedef typename Casper::Traits::GetElem<SeqT>::Type	Elem;
+	typedef typename Simplify<Elem>::Type Type;
+	Type operator()(const SeqT& a, int idx) const
+	{
+		const Elem& e = ElementView<SeqT,Elem>(a).get(idx);
+		return Simplify<Elem>()(e);
+	}
+};
+
+template<>
+struct SimplifyRel1<Abs,int>
+{
+	typedef int Type;
+	Type operator()(int p1) const
+	{	return std::abs(p1);	}
+};
+
+template<>
+struct SimplifyRel2<Add,int,int>
+{
+	typedef int Type;
+	Type operator()(int p1, int p2) const
+	{	return p1+p2;	}
+};
+
+template<>
+struct SimplifyRel2<Sub,int,int>
+{
+	typedef int Type;
+	Type operator()(int p1, int p2) const
+	{	return p1-p2;	}
+};
+
+template<>
+struct SimplifyRel2<Min,int,int>
+{
+	typedef int Type;
+	Type operator()(int p1, int p2) const
+	{	return std::min(p1,p2);	}
+};
+
+// TODO: specialize for all other rels
+
+template<class> struct DeRef;
+
+template<class T>
+struct DeRefAndSimplify
+{
+	typedef typename Casper::Detail::DeRef<T>::Type	DType;
+	typedef typename Simplify<DType>::Type	Type;
+	Type operator()(const T& t) const
+	{
+		return Simplify<DType>()(DeRef<T>()(t));
+	}
+};
+
+} // Detail
+
 }; // Casper
 
 template<class F>

@@ -329,6 +329,7 @@ struct ChkViewRel1<Not,bool,Expr1>
 
 	void attach(INotifiable* f) { 	v.attach(f);}
 	void detach() {	v.detach();}
+	bool attached() const {	return v.attached(); }
 
 	Rel1<Not,Expr1> getObj()  const
 	{ 	return rel<Not>(v.getObj());	}
@@ -353,12 +354,14 @@ struct ChkViewRel2<And,bool,Expr1,bool,Expr2>
 	{	return p1.setToTrue() and p2.setToTrue();	}
 	bool setToFalse()
 	{
-		detach();
+		if (attached())
+			detach();
 		return store.post(rel<Or>(rel<Not>(p1.getObj()),rel<Not>(p2.getObj())));
 	}
 
-	void attach(INotifiable* f) { 	pOwner=f; p1.attach(f); p2.attach(f);}
-	void detach() {	p1.detach(); p2.detach();}
+	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);}
+	void detach() {	assert(attached()); p1.detach(); p2.detach();}
+	bool attached() const {	return p1.attached(); }
 
 	Rel2<And,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<And,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
@@ -366,7 +369,6 @@ struct ChkViewRel2<And,bool,Expr1,bool,Expr2>
 	Store&			store;
 	ChkView<Expr1>	p1;
 	ChkView<Expr2>	p2;
-	INotifiable*	pOwner;
 };
 
 /**
@@ -384,19 +386,22 @@ struct ChkViewRel2<Or,bool,Expr1,bool,Expr2>
 	{	return p1.canBeTrue() or p2.canBeTrue();	}
 	bool setToTrue()
 	{
-		detach();
+		if (attached())
+			detach();
 		return store.post(rel<Or>(p1.getObj(),p2.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach();
+		if (attached())
+			detach();
 		//return store().post(!p1.getObj() and !p2.getObj());
 		return p1.setToFalse() and p2.setToFalse();
 	}
 //	Store& store() const {	return p1.store();	}
 
-	void attach(INotifiable* f) { 	pOwner=f; p1.attach(f); p2.attach(f);}
-	void detach() {	p1.detach(); p2.detach();}
+	void attach(INotifiable* f) { 	p1.attach(f); p2.attach(f);}
+	void detach() {	assert(attached()); p1.detach(); p2.detach(); }
+	bool attached() const {	return p1.attached(); }
 
 	Rel2<Or,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Or,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
@@ -404,7 +409,6 @@ struct ChkViewRel2<Or,bool,Expr1,bool,Expr2>
 	Store&			store;
 	ChkView<Expr1>	p1;
 	ChkView<Expr2>	p2;
-	INotifiable*	pOwner;
 };
 
 /**
@@ -432,25 +436,28 @@ template<class Eval,class Expr1,class Expr2>
 struct ChkViewRel2<Equal,Eval,Expr1,Eval,Expr2>
 {
 	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
-			store(store),p1(store,p1),p2(store,p2) {}
+			store(store),p1(store,p1),p2(store,p2),bAttached(store,false) {}
 	bool isTrue() const	// is it true?
 	{	return p1.max()==p2.min() and p1.min()==p2.max();	}
 	bool canBeTrue() const 	// can it still be true?
 	{	return p1.max()>=p2.min() and p1.min()<=p2.max();	}
 	bool setToTrue()
 	{
-		detach();
+		if (attached())
+			detach();
 		return store.post(rel<Equal>(p1.getObj(),p2.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach();
+		if (attached())
+			detach();
 		return store.post(rel<Distinct>(p1.getObj(),p2.getObj()));
 	}
 //	Store& store() const {	return p1.store();	}
 
-	void attach(INotifiable* f) { 	pOwner=f; p1.attach(f); p2.attach(f);}
-	void detach() {	p1.detach(); p2.detach();}
+	void attach(INotifiable* f) { 	bAttached=true; p1.attach(f); p2.attach(f);}
+	void detach() {	assert(attached()); bAttached=false; p1.detach(); p2.detach(); }
+	bool attached() const {	return bAttached; }
 
 	Rel2<Equal,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<Equal,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
@@ -458,7 +465,7 @@ struct ChkViewRel2<Equal,Eval,Expr1,Eval,Expr2>
 	Store&				store;
 	BndView<Eval,Expr1>	p1;
 	BndView<Eval,Expr2>	p2;
-	INotifiable*	pOwner;
+	Reversible<bool>	bAttached;
 };
 
 /**
@@ -485,25 +492,28 @@ template<class Eval,class Expr1,class Expr2>
 struct ChkViewRel2<GreaterEqual,Eval,Expr1,Eval,Expr2>
 {
 	ChkViewRel2(Store& store, const Expr1& p1,const Expr2& p2) :
-			store(store),p1(store,p1),p2(store,p2) {}
+			store(store),p1(store,p1),p2(store,p2),bAttached(store,false) {}
 	bool isTrue() const	// is it true?
 	{	return p1.min()>=p2.max();	}
 	bool canBeTrue() const 	// can it still be true?
 	{	return p1.max()>=p2.min();	}
 	bool setToTrue()
 	{
-		detach();
+		if (attached())
+			detach();
 		return store.post(rel<GreaterEqual>(p1.getObj(),p2.getObj()));
 	}
 	bool setToFalse()
 	{
-		detach();
+		if (attached())
+			detach();
 		return store.post(rel<Less>(p1.getObj(),p2.getObj()));
 	}
 //	Store& store() const {	return getState(p1,p2);	}
 
-	void attach(INotifiable* f) { 	pOwner=f; p1.attach(f); p2.attach(f);}
-	void detach() {	p1.detach(); p2.detach();}
+	void attach(INotifiable* f) { 	bAttached=true; p1.attach(f); p2.attach(f);}
+	void detach() {	assert(attached()); bAttached=false; p1.detach(); p2.detach(); }
+	bool attached() const {	return bAttached; }
 
 	Rel2<GreaterEqual,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<GreaterEqual,Expr1,Expr2>(p1.getObj(),p2.getObj());	}
@@ -511,7 +521,7 @@ struct ChkViewRel2<GreaterEqual,Eval,Expr1,Eval,Expr2>
 	Store&				store;
 	BndView<Eval,Expr1>	p1;
 	BndView<Eval,Expr2>	p2;
-	INotifiable*	pOwner;
+	Reversible<bool>	bAttached;
 };
 
 /**
@@ -653,6 +663,7 @@ struct ChkViewRel2<InTable,Seq<Eval>,Expr1,Seq<Eval>,Expr2>
 /**
  * 	ChkView over the SumEqual constraint.
  * 	\ingroup ChkViews
+ * 	TODO: everything
  */
 template<class Eval,class Expr1,class Expr2>
 struct ChkViewRel2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2>
@@ -677,6 +688,74 @@ struct ChkViewRel2<SumEqual,Seq<Eval>,Expr1,Eval,Expr2>
 
 	Rel2<SumEqual,Expr1,Expr2> getObj()  const
 	{ 	return Rel2<SumEqual,Expr1,Expr2>(p1);	}
+
+	Store&	store;
+	Expr1 p1;
+	Expr2 p2;
+};
+
+/**
+ * 	ChkView over the SumLessEqual constraint.
+ * 	\ingroup ChkViews
+ * 	TODO: everything
+ */
+template<class Eval,class Expr1,class Expr2>
+struct ChkViewRel2<SumLessEqual,Seq<Eval>,Expr1,Eval,Expr2>
+{
+	ChkViewRel2(Store& store, const Expr1& p1, const Expr2& p2) : store(store),p1(p1),p2(p2) {}
+	bool isTrue() const	// is it true?
+	{	return false; }
+	bool canBeTrue() const 	// can it still be true?
+	{	return true; }
+	bool setToTrue()
+	{
+		return store.post(rel<SumLessEqual>(p1,p2));
+	}
+	bool setToFalse()
+	{
+		assert(0); return false;
+	}
+//	Store& store() const {	return getState(p1);	}
+
+	void attach(INotifiable* f) { 	}
+	void detach() {	}
+
+	Rel2<SumLessEqual,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<SumLessEqual,Expr1,Expr2>(p1);	}
+
+	Store&	store;
+	Expr1 p1;
+	Expr2 p2;
+};
+
+/**
+ * 	ChkView over the SumGreaterEqual constraint.
+ * 	\ingroup ChkViews
+ * 	TODO: everything
+ */
+template<class Eval,class Expr1,class Expr2>
+struct ChkViewRel2<SumGreaterEqual,Seq<Eval>,Expr1,Eval,Expr2>
+{
+	ChkViewRel2(Store& store, const Expr1& p1, const Expr2& p2) : store(store),p1(p1),p2(p2) {}
+	bool isTrue() const	// is it true?
+	{	return false; }
+	bool canBeTrue() const 	// can it still be true?
+	{	return true; }
+	bool setToTrue()
+	{
+		return store.post(rel<SumGreaterEqual>(p1,p2));
+	}
+	bool setToFalse()
+	{
+		assert(0); return false;
+	}
+//	Store& store() const {	return getState(p1);	}
+
+	void attach(INotifiable* f) { 	}
+	void detach() {	}
+
+	Rel2<SumGreaterEqual,Expr1,Expr2> getObj()  const
+	{ 	return Rel2<SumGreaterEqual,Expr1,Expr2>(p1);	}
 
 	Store&	store;
 	Expr1 p1;

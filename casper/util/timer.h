@@ -215,7 +215,8 @@ struct CPUTimer : ITimer
 	//void print(std::ostream& os) const;
 
 protected:
-	struct timespec tic,tac;	// could be local to 'pause()' ...
+	struct timespec tic;
+	struct timespec tac;	// could be local to 'pause()' ...
 	bool isRunning;
 };
 

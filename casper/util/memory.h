@@ -391,7 +391,11 @@ struct Heap : Util::PImplIdiom<IHeap>
 };
 */
 
-extern StdMem stdHeap;
+inline StdMem& stdHeap()
+{
+	static StdMem m;
+	return m;
+}
 
 } // Util
 } // Casper

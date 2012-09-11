@@ -186,21 +186,18 @@ class CLinearIneq:
 			else:
 				print "constraint "+"+".join(l)+ctr+";"
 
-#	def getNbSolsUb(self,nbValues):
-#		ep = (self.arity-1)*len(self.constraints)
-#		en = 0
-#		for c1 in range(len(self.constraints)):
-#			for c2 in range(c1+1,len(self.constraints)):
-#				en += len(set(self.constraints[c1]).intersection(set(self.constraints[c2])))
-#		return nbValues**(ep-en)
-			
+		
 class StressCSP:
-	def __init__(self,nbVars,nbVals):
+	def __init__(self,nbVars,nbVals, posOnly=True):
 		self.constraints = []
 		self.nbVars = nbVars
 		self.nbVals = nbVals
-		self.minVal = 1
-		self.maxVal = nbVals
+		if posOnly:
+			self.minVal = 1
+			self.maxVal = nbVals
+		else:
+			self.minVal = -nbVals/2+1
+			self.maxVal = nbVals/2			
 		self.sol = []
 		for i in range(0,nbVars):
 			self.sol.append(random.choice(range(self.minVal,self.maxVal+1)))
@@ -242,10 +239,16 @@ if __name__ == "__main__":
 	
 	args = parser.parse_args()
 	
+	nbvars = 160
+	nbvals = 50
+	arity = 100
+	nbcons = 4
+	
 	random.seed(int(args.seed[0]))
-	csp = StressCSP(100,50)
+	csp = StressCSP(nbvars,nbvals,False)
 	#csp.addConstraint(CIntDistinct, 100, 43)
-	csp.addConstraint(CLinearIneq, 100, 10, 10, 3)
+	#csp.addConstraint(CLinearIneq, 100, 10, 10, 3)
+	csp.addConstraint(CLinearEq, arity, 10, nbcons)
 	csp.printMzn()
 	#csp.computeK()
 	

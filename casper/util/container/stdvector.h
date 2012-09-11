@@ -93,9 +93,9 @@ struct StdVector
 	typedef ReverseIterator 					ConstReverseIterator;
 
 	StdVector(uint size) :
-			mHeap(stdHeap),
+			mHeap(stdHeap()),
 			_size(size),
-			data((Elem*)stdHeap.allocate(_size*sizeof(Elem)))
+			data((Elem*)stdHeap().allocate(_size*sizeof(Elem)))
 		{}
 
 	StdVector(IHeap& heap,uint size) :
@@ -136,7 +136,7 @@ struct StdVector
 	}
 #ifndef _MSC_VER
 	StdVector(const std::initializer_list<Elem>& l) :
-		mHeap(stdHeap),
+		mHeap(stdHeap()),
 		_size(std::distance(l.begin(),l.end())),
 		data((Elem*)mHeap.allocate(_size*sizeof(Elem)))
 	{

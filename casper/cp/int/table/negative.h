@@ -232,7 +232,7 @@ GACSchemaNeg<T,View>::GACSchemaNeg(const View& vars, const Util::StdArray<T,2>& 
 					Util::StdTrie<T>(solver().getHeap(),doms.size());
 		for (uint i = 0; i < ss.size(0); i++)
 		{
-			Util::StdVector<T> aux(stdHeap,doms.size(),0);
+			Util::StdVector<T> aux(stdHeap(),doms.size(),0);
 			aux[0] = ss[i][t];
 			for (uint j = 1; j <= t; j++)
 				aux[j] = ss[i][j-1];

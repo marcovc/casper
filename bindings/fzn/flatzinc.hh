@@ -7,7 +7,8 @@
  *  	Marco Correia, 2012
  */
 
-#define CASPER_LOG_NRANGES_DEPTH
+//#define CASPER_LOG_NRANGES_DEPTH
+#define CASPER_LOG_MODRANGES_DEPTH
 
 #ifndef CASPER_FLATZINC_HH__
 #define CASPER_FLATZINC_HH__
@@ -84,6 +85,9 @@ typedef Casper::CP::IntSetVarArray SetVarArray;
     /// Show statistics
     void printStats(std::ostream& out);
 
+    /// Show runtime
+    void printRuntime(std::ostream& out);
+
   public:
     /// The Solver object
     Solver solver;
@@ -91,6 +95,9 @@ typedef Casper::CP::IntSetVarArray SetVarArray;
     bool valid;
     /// The search tree
     Casper::Goal search;
+    /// The timer
+    Casper::Util::CPUTimer timer;
+
 
     /// The integer variables
     IntVarArray* piv;

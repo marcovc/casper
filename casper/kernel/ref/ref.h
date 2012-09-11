@@ -28,6 +28,10 @@
 
 namespace Casper {
 
+namespace Detail {
+template<class,class,class> struct PIteration;
+} // Detail
+
 template<class> struct Ref;
 
 /** \defgroup DataStructures Data Structures
@@ -158,7 +162,77 @@ struct GetTypeStr<Ref<T> >
 	}
 };
 
+
 } // Traits
+
+namespace Detail {
+
+
+/**
+ * 	Dereferences an object (replaces all occurrences of Ref by its value)
+ */
+template<class T>
+struct DeRef
+{
+	typedef T Type;
+	Type operator()(const T& t) const
+	{	return t; }
+};
+
+template<class T>
+struct DeRef<Ref<T> >
+{
+	typedef T	Type;
+	Type operator()(const Ref<T>& t) const
+	{	return t.value(); }
+};
+
+template<class F,class T>
+struct DeRef<Rel1<F,T> >
+{
+	typedef Rel1<F,typename DeRef<T>::Type>	Type;
+	Type operator()(const Rel1<F,T>& t) const
+	{	return Type(DeRef<T>()(t.p1)); }
+};
+
+template<class F,class T1,class T2>
+struct DeRef<Rel2<F,T1,T2> >
+{
+	typedef Rel2<F,typename DeRef<T1>::Type,typename DeRef<T2>::Type>	Type;
+	Type operator()(const Rel2<F,T1,T2>& t) const
+	{	return Type(DeRef<T1>()(t.p1),DeRef<T2>()(t.p2)); }
+};
+
+template<class F,class T1,class T2,class T3>
+struct DeRef<Rel3<F,T1,T2,T3> >
+{
+	typedef Rel3<F,typename DeRef<T1>::Type,typename DeRef<T2>::Type,typename DeRef<T3>::Type>	Type;
+	Type operator()(const Rel3<F,T1,T2,T3>& t) const
+	{	return Type(DeRef<T1>()(t.p1),DeRef<T2>()(t.p2),DeRef<T3>()(t.p3)); }
+};
+
+template<class F,class T1,class T2,class T3,class T4>
+struct DeRef<Rel4<F,T1,T2,T3,T4> >
+{
+	typedef Rel4<F,typename DeRef<T1>::Type,typename DeRef<T2>::Type,typename DeRef<T3>::Type,typename DeRef<T4>::Type>	Type;
+	Type operator()(const Rel4<F,T1,T2,T3,T4>& t) const
+	{	return Type(DeRef<T1>()(t.p1),DeRef<T2>()(t.p2),DeRef<T3>()(t.p3),DeRef<T4>()(t.p4)); }
+};
+
+template<class VarT,class SetT,class CondT,class ExprT>
+struct DeRef<Rel4<All,VarT,SetT,CondT,ExprT> >
+{
+	typedef Util::StdList<typename DeRef<ExprT>::Type>	Type;
+	Type operator()(const Rel4<All,VarT,SetT,CondT,ExprT>& t) const
+	{
+		Type r;
+		for (Casper::Detail::PIteration<VarT,SetT,CondT> pit(t.p1,t.p2,t.p3); pit.valid(); pit.iterate())
+			r.pushBack(DeRef<ExprT>()(t.p4));
+		return r;
+	}
+};
+
+}	// Detail
 
 template<class Eval>
 struct GetPState<Ref<Eval> >

@@ -88,7 +88,6 @@ template<class Expr1,class Expr2>
 void BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>::attach(INotifiable* pParent)
 {
 	//assert(this->pParent==NULL);
-	std::cout << this << " attach\n";
 	typedef BndFilterView2<LessEqual,IntSeq,Expr1,IntSeq,Expr2> Self;
 	this->pParent = pParent;
 	dx.attach(pParent);
@@ -271,8 +270,13 @@ struct PostBndFilter2<LessEqual,IntSeq,Expr1,IntSeq,Expr2>
 {
 	static bool post(Store& store,const Expr1& x,const Expr2& y)
 	{
-		BndArrayView<int,Expr1>	v1(store,x);
-		BndArrayView<int,Expr2>	v2(store,y);
+    	typedef typename Casper::Detail::DeRefAndSimplify<Expr1>::Type SExpr1;
+    	typedef typename Casper::Detail::DeRefAndSimplify<Expr2>::Type SExpr2;
+    	const SExpr1 sx = Casper::Detail::DeRefAndSimplify<Expr1>()(x);
+    	const SExpr2 sy = Casper::Detail::DeRefAndSimplify<Expr2>()(y);
+
+		BndArrayView<int,SExpr1>	v1(store,sx);
+		BndArrayView<int,SExpr2>	v2(store,sy);
 		assert(v1.size()==v2.size());
 
 		if (v1.size()==1)

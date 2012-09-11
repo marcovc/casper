@@ -219,12 +219,14 @@ bool ValFilterView1<Distinct,Seq<Eval>,View>::execute()
 }
 #endif
 
-template<class Eval,class View>
-struct PostValFilter1<Distinct,Seq<Eval>,View>
+template<class Eval,class Expr1>
+struct PostValFilter1<Distinct,Seq<Eval>,Expr1>
 {
-	static bool post(Store& s,const View& v)
+	static bool post(Store& s,const Expr1& v1)
 	{
-		return s.post(new (s) ValFilterView1<Distinct,Seq<Eval>,View>(s,v));
+    	typedef typename Casper::Detail::DeRefAndSimplify<Expr1>::Type SExpr1;
+    	const SExpr1 sv1 =  Casper::Detail::DeRefAndSimplify<Expr1>()(v1);
+		return s.post(new (s) ValFilterView1<Distinct,Seq<Eval>,SExpr1>(s,sv1));
 	}
 };
 

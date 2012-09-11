@@ -723,59 +723,6 @@ struct DomArrayView<Eval,Rel4<All,VarT,SetT,CondT,ExprT> > :
 
 };
 
-#define BNDVIEW_SUM_INCREMENTAL
-#ifndef BNDVIEW_SUM_INCREMENTAL
-/**
- *	BndView over a Sum of values.
- *	\ingroup Views
- **/
-template<class Expr1,class Eval>
-struct BndViewRel1<Sum,Expr1,Eval>
-{
-	BndViewRel1(CPSolver& solver, const Expr1& p1) : v(solver,p1) {}
-	Eval min() const
-	{
-		Eval r = 0;
-		for (uint i = 0; i < v.size(); ++i)
-			r += v[i].min();
-		return r;
-	}
-	Eval max() const
-	{
-		Eval r = 0;
-		for (uint i = 0; i < v.size(); ++i)
-			r += v[i].max();
-		return r;
-	}
-	bool updateMin(const Eval& mi)
-	{
-		Eval m = max();
-		for (uint i = 0; i < v.size(); ++i)
-			if (!v[i].updateMin(mi-m+v[i].max()))
-				return false;
-		return true;
-	}
-	bool updateMax(const Eval& ma)
-	{
-		Eval m = min();
-		for (uint i = 0; i < v.size(); ++i)
-			if (!v[i].updateMax(ma-m+v[i].min()))
-				return false;
-		return true;
-	}
-	void range(Eval& l,Eval& u) const {	l = min(); u = max(); }
-	bool updateRange(const Eval& l, const Eval& u)
-	{	return updateMin(l) and updateMax(u);	}
-
-	void attach(INotifiable* f) { 	v.attach(f); }
-	void detach(INotifiable* f) {	v.detach(f); }
-
-	Rel1<Sum,Expr1> getObj()  const
-	{ 	return Rel1<Sum,Expr1>(v.getObj());	}
-
-	BndArrayView<Eval,Expr1>	v;
-};
-#else
 /**
  *	BndView over a Sum of values.
  *	\ingroup Views
@@ -879,8 +826,6 @@ struct BndViewRel1<Sum,Expr1,Eval>
 	Vector<Eval>				cachedViewMax;
 	INotifiable*				pOwner;
 };
-#endif
-
 
 template<class Expr1,class Expr2,class Eval>
 struct BndViewRel2<SumProduct,Expr1,Expr2,Eval> :

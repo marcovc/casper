@@ -28,6 +28,8 @@
 #include <vector>
 #include <algorithm>
 
+#include <unistd.h>
+
 namespace Casper {
 namespace Util {
 

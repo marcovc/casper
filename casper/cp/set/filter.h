@@ -289,8 +289,13 @@ struct PostBndFilter2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2>
 {
 	static bool post(Store& s, const Expr1& v1, const Expr2& v2)
 	{
-		return postBndFilter(s,member(v2,v1)) and
-			   s.post(new (s) BndFilterView2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2>(s,v1,v2));
+	   	typedef typename Casper::Detail::DeRefAndSimplify<Expr1>::Type SExpr1;
+    	typedef typename Casper::Detail::DeRefAndSimplify<Expr2>::Type SExpr2;
+    	const SExpr1 sv1 = Casper::Detail::DeRefAndSimplify<Expr1>()(v1);
+    	const SExpr2 sv2 = Casper::Detail::DeRefAndSimplify<Expr2>()(v2);
+
+		return postBndFilter(s,member(sv2,sv1)) and
+			   s.post(new (s) BndFilterView2<MaxEqual,Set<Eval>,Expr1,Eval,Expr2>(s,sv1,sv2));
 	}
 };
 
@@ -376,8 +381,13 @@ struct PostBndFilter2<MinEqual,Set<Eval>,Expr1,Eval,Expr2>
 {
 	static bool post(Store& s, const Expr1& v1, const Expr2& v2)
 	{
-		return postBndFilter(s,member(v2,v1)) and
-			   s.post(new (s) BndFilterView2<MinEqual,Set<Eval>,Expr1,Eval,Expr2>(s,v1,v2));
+	   	typedef typename Casper::Detail::DeRefAndSimplify<Expr1>::Type SExpr1;
+    	typedef typename Casper::Detail::DeRefAndSimplify<Expr2>::Type SExpr2;
+    	const SExpr1 sv1 = Casper::Detail::DeRefAndSimplify<Expr1>()(v1);
+    	const SExpr2 sv2 = Casper::Detail::DeRefAndSimplify<Expr2>()(v2);
+
+		return postBndFilter(s,member(sv2,sv1)) and
+			   s.post(new (s) BndFilterView2<MinEqual,Set<Eval>,Expr1,Eval,Expr2>(s,sv1,sv2));
 	}
 };
 

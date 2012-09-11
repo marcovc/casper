@@ -43,9 +43,14 @@ struct PostBndFilter2<SumEqual,Set<Elem>,Expr1,Elem,Expr2>
 	};
 	static bool post(Store& s, const Expr1& v1, const Expr2& v2)
 	{
-		return s.post(new (s) BndFilterView3<SumEqual,Set<int>,Expr1,
+	   	typedef typename Casper::Detail::DeRefAndSimplify<Expr1>::Type SExpr1;
+    	typedef typename Casper::Detail::DeRefAndSimplify<Expr2>::Type SExpr2;
+    	const SExpr1 sv1 = Casper::Detail::DeRefAndSimplify<Expr1>()(v1);
+    	const SExpr2 sv2 = Casper::Detail::DeRefAndSimplify<Expr2>()(v2);
+
+		return s.post(new (s) BndFilterView3<SumEqual,Set<int>,SExpr1,
 													  Eval<Elem>,Eval<Elem>,
-													  int,Expr2>(s,v1,Eval<Elem>(),v2));
+													  int,SExpr2>(s,sv1,Eval<Elem>(),sv2));
 
 	//	return s.post(sumEqual(v1,Eval<Elem>(),v2));
 	}

@@ -267,7 +267,7 @@ uint BndFilterView5<Cumulative,Seq<X>,Start,Seq<X>,Duration,
 			   Seq<X>,End,Seq<Y>,Height,Y,Capacity>::findSc(Util::StdSList<Y>& sc,
 												   Util::StdVector<uint>& h2i)
 {
-	Util::StdVector<bool>	c(Util::stdHeap,capacity+1,false);
+	Util::StdVector<bool>	c(Util::stdHeap(),capacity+1,false);
 	uint k = 0;
 	for (uint i = 0; i < n; i++)
 	{

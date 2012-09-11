@@ -118,7 +118,7 @@ struct StdList
 	typedef std::reverse_iterator<Iterator> 	ReverseIterator;
 	typedef ReverseIterator 			ConstReverseIterator;
 
-	StdList(IHeap& heap = stdHeap);
+	StdList(IHeap& heap = stdHeap());
 	template <class InputIterator>
 	StdList(IHeap& heap,InputIterator first, InputIterator last);
 	template <class InputIterator>
@@ -203,7 +203,7 @@ StdList<T>::StdList(IHeap& mHeap, InputIterator first, InputIterator last) :
 template<class T>
 template <class InputIterator>
 StdList<T>::StdList(InputIterator first, InputIterator last) :
-								mHeap(stdHeap)
+								mHeap(stdHeap())
 {	initRange(first,last);	}
 
 template<class T>

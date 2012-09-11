@@ -119,7 +119,7 @@ struct StdHashSet : std::unordered_set<T,Hasher,EqualT>
 	/// Inserts a elem in the hashset. Returns \p false if the element already exists. O(1)
 	bool insert(ConstReference elem) {	return Super::insert(elem).second;	}
 
-	Util::IHeap& getHeap() const {	return stdHeap;	}
+	Util::IHeap& getHeap() const {	return stdHeap();	}
 
 };
 
@@ -137,7 +137,7 @@ struct QuickHashSet : StdHashSet<T,EqualT,Hasher>
 		Super(maxInserts)
 	{}
 
-	IHeap& getHeap() const {	return stdHeap;	}
+	IHeap& getHeap() const {	return stdHeap();	}
 };
 
 } // Util

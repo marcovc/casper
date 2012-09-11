@@ -263,7 +263,9 @@ SetFD<T>::SetFD(Store& store, InputIterator possBegin,
 					lubSL(store),
 					domainSL(store) 
 {
-	assert(Casper::Util::Detail::isStrictOrdered(possBegin,possEnd));
+	if (!Casper::Util::Detail::isStrictOrdered(possBegin,possEnd))
+		throw Casper::Exception::InvalidOperation("attempt to create a set variable from a non strictly ordered range");
+
 	// post internal constraints
 	store.filterSched().post(Filter(new (store) SetFDCard1<T>(*this)),false);
 	store.filterSched().post(Filter(new (store) SetFDCard2<T>(*this)),false);
@@ -289,8 +291,11 @@ SetFD<T>::SetFD(Store& store, InputIterator1 inBegin,
 					lubSL(store),
 					domainSL(store) 
 {
-	assert(Casper::Util::Detail::isStrictOrdered(inBegin,inEnd));
-	assert(Casper::Util::Detail::isStrictOrdered(possBegin,possEnd));
+	if (!Casper::Util::Detail::isStrictOrdered(inBegin,inEnd))
+		throw Casper::Exception::InvalidOperation("attempt to create a set variable from a non strictly ordered range");
+	if (!Casper::Util::Detail::isStrictOrdered(possBegin,possEnd))
+		throw Casper::Exception::InvalidOperation("attempt to create a set variable from a non strictly ordered range");
+
 	// post internal constraints
 	store.filterSched().post(Filter(new (store) SetFDCard1<T>(*this)),false);
 	store.filterSched().post(Filter(new (store) SetFDCard2<T>(*this)),false);

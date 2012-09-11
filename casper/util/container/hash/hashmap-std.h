@@ -80,7 +80,7 @@ struct QuickHashMap : StdHashMap<KeyT,DataT,EqualKey,Hasher>
 	QuickHashMap(uint maxInserts, float cratio = 0.8) :
 		Super(maxInserts){}
 
-	IHeap& getHeap() const {	return stdHeap;	}
+	IHeap& getHeap() const {	return stdHeap();	}
 };
 
 } // Util
